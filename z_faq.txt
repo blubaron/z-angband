@@ -1,0 +1,393 @@
+
+                    Z+Angband Official FAQ
+
+				by Mangojuice
+			mangojuice75@gmail.com
+
+                    December 10, 2008
+
+==========================================================================
+Table of contents
+==========================================================================
+
+1. General questions
+  1.1 What is Z+Angband?
+  1.2 On what computers can I play it?
+  1.3 Where can I download it?
+
+2. Game-play questions
+  2.1 How to quests work in Z+Angband?
+  2.2 Where do I get a quest?
+  2.3 Do I have to do quests?
+  2.4 What else are guilds good for?
+  2.5 How come the potion of Cure Critical Wounds I just drank didn't 
+      cure my confusion?
+  2.6 Help!  I can't find this artifact I'm supposed to be questing for!
+  2.7 Where do I get my reward for clearing this Orc camp?
+  2.8 How do quivers work?
+  2.9 What does this item do?
+  2.10 What does this spell do?
+  2.11 What does this artifact do?
+  2.12 What does this monster do?
+  2.13 What magic realm(s) should I choose?
+  2.14 I just tried to learn a spell and I was warned that I am running 
+       out of "tier 1 slots."  What does that mean?
+  2.15 I accidentally tried to study a spell I already know, and the
+       game asked me if I want to "improve" it.  What does this mean?
+  2.16 How does the new magic system work for priests?
+
+
+
+==========================================================================
+1. General questions
+==========================================================================
+
+--------------------------------------------------------------------------
+1.1 What is Z+Angband?
+--------------------------------------------------------------------------
+
+Z+Angband is an unofficial further step in the development of ZAngband.
+ZAngband is a popular variant of the roguelike game Angband.
+
+--------------------------------------------------------------------------
+1.2 On what computers can I play it?
+--------------------------------------------------------------------------
+
+Z+Angband is available for Windows as a zipped package with an executable.
+Source code packages are available with ports to many other operating
+systems, including Unix and MAC.  
+
+--------------------------------------------------------------------------
+1.3 Where can I download it?
+--------------------------------------------------------------------------
+
+The newest version of Z+Angband is always available from the Z+Angband
+homepage:
+
+http://mangojuice75.googlepages.com/
+
+
+==========================================================================
+2. Game-play questions
+==========================================================================
+
+--------------------------------------------------------------------------
+2.1 How do quests work in Z+Angband?
+--------------------------------------------------------------------------
+
+One of the key components of Z+Angband is the addition of a wide variety
+of quests.  Quests are assigned to you when you visit a quest building;
+when you complete the quest, you return there to claim your reward.  Quests
+of many different types are used in Z+Angband; you may be asked to clear
+out a dangerous place, kill a certain number of specific enemies, find a
+specific artifact, deliver a message through the wilderness, or defend a 
+farm from monsters.
+
+--------------------------------------------------------------------------
+2.2 Where do I get a quest? 
+--------------------------------------------------------------------------
+
+You need to visit a quest building.  These come in four different types.
+
+- Castles (also Keeps / Town Halls): There is one of these in each town.  
+  They send you on quests of all types, and reward you with stat bonuses,
+  gold, and experience.
+- Guilds: There are one or more guilds in many towns but not all.  Each 
+  different type of guild sends you on a certain subset of the types of 
+  quests (for instance, Cathedrals are likely to send you after undead 
+  enemies), and each guild gives different types of rewards.  All except
+  for Thieves' guilds give you treasure as part of your reward... not 
+  that it is always especially good, and all give you stat bonuses.
+- Couriers: These exist in some cities; they will send you on quests to
+  deliver a message to a building somewhere else in the wilderness.  
+  Couriers reward you exclusively with gold.
+- Farms: These are found outside of cities in some areas of the map, but
+  are not marked on your Wilderness map.  They will give you small rewards
+  for defending them against a group of monsters.
+
+In addition, Banks exist in the game that can give you loans; when you
+take out a loan, you get a quest to repay the loan.  
+
+--------------------------------------------------------------------------
+2.3 Do I have to do quests? 
+--------------------------------------------------------------------------
+
+No, but you do have to if you want to win the game.  The final quests
+to kill Oberon and the Serpent of Chaos don't show up until you finish 
+all the quests in one of the Castle buildings.  You don't have to be
+successful in all the quests to move past them, however.
+
+If you want a game without these quests, there is no current way to 
+turn them off in a normal game.  However, if you play in "vanilla_town"
+mode (or "ironman_downwards" mode), quests will be disabled.
+
+--------------------------------------------------------------------------
+2.4 What else are guilds good for? 
+--------------------------------------------------------------------------
+
+Guilds provide services to all.  However, members of each guild get 
+access to some extra services, and generally at lower prices than other
+classes.  Guild membership is based on your class, so you can't change it
+after the start of the game, with one exception: if you aren't a Thief, 
+you can join a Thieves' guild by completing a first quest for no other
+reward.  Some classes are members of more than one guild.  All classes 
+except for Mindcrafters are members of at least one.  
+
+Mages' Guilds sell spellbooks to members, give them a free place to rest
+overnight, and offer a wand/staff/rod recharging service.  For members,
+this service is precisely controlled; for others, it involves some risk
+of backfiring.
+
+Cathedrals are the home guilds of priests and paladins.  They offer 
+long-lasting blessings for small donations, and can restore drained stats
+for a price.  Cathedrals in towns with dungeons also provide a free 
+Word of Recall service to members.
+
+Warriors' Guilds help adventurers understand the damage potential of their
+weapons.  They also provide a free place to rest for members, and also 
+can repair members' damaged (but not cursed) armor for free.
+
+Thieves' Guilds offer no services to non-members, and offer object
+identification and full identification services to members.  In addition,
+actual Rogues can sleep there for free.
+
+Rangers' Guilds sell spellbooks to members, give them a free place to rest
+overnight, and have maps of the surrounding wilderness that members may
+use for free, and that others may pay to consult.
+
+--------------------------------------------------------------------------
+2.5 How come the potion of Cure Critical Wounds I just drank didn't
+    cure my confusion?
+--------------------------------------------------------------------------
+
+They no longer do that.  To cure confusion, look for potions of Curing,
+or Mushrooms of Cure Critical Wounds.  
+
+--------------------------------------------------------------------------
+2.6 Help!  I can't find this artifact I'm supposed to be questing for!
+--------------------------------------------------------------------------
+
+These quests are a little tricky but very doable, don't panic.  Make sure
+you are in the right dungeon.  Make sure you go down to a sufficient 
+depth (equal to the danger level of the quest).  The artifact should be on
+the floor somewhere.
+
+--------------------------------------------------------------------------
+2.7 Where do I get my reward for clearing this Orc camp?
+--------------------------------------------------------------------------
+
+Those quests are not granted in buildings, and you get no reward for
+completing them.  However, they typically have a bunch of treasure in
+them; that's your reward.
+
+--------------------------------------------------------------------------
+2.8 How do quivers work?
+--------------------------------------------------------------------------
+
+Z+Angband introduced quivers (alpha testing) in version 0.2.3.  Quivers 
+are "containers", a new class of objects that can contain other objects.
+You do not equip quivers.  Generally speaking, you should automatically
+stash missile weapons in a quiver when you have one, if there's room.  
+
+You can use the ammunition out of a quiver at no penalty.  However, be
+aware the quivers can themselves be destroyed by damage from fire or 
+acid; if this happens you may end up the ammo you can no longer carry
+without the container.  
+
+Most object-interaction commands will automatically let you choose a 
+container that contains objects you could select.  If you want to
+manually reorganize your stuff in containers, the best way is by using
+the "Organize" command ('O' in the original keyset, ^O in roguelike.)
+
+Currently, containers are only for shots, arrows, and bolts, and 
+empty chests do not become containers.
+
+--------------------------------------------------------------------------
+2.9 What does this item do? 
+--------------------------------------------------------------------------
+
+Use the 'I' command to inspect it.  Most basic items are thoroughly
+explained.  Some items, that "may have hidden powers," require full
+identification before you can be sure you have learned everything about
+them.  Look for a scroll of *Identify*, or a Thieves' Guild.  
+
+--------------------------------------------------------------------------
+2.10 What does this spell do? 
+--------------------------------------------------------------------------
+
+Use the 'b' (browse) command (or 'I') to look through your spellbook.
+You can select spells you are high enough level to learn and read a
+description of them.
+
+--------------------------------------------------------------------------
+2.11 What does this artifact do? 
+--------------------------------------------------------------------------
+
+It depends on the artifact.  Some artifacts in the game are randomly
+generated, and there's no way to say in advance what they will be
+capable of.  Others are fixed artifacts with specific abilities;
+spoiler lists exist for them, but if you want to consult them you'll
+have to locate them yourself.
+
+In the game, you can find what an artifact does by using s scroll of
+*Identify* or fully identifying it in a Thieves' guild.  Some magic
+realms can also cast the spell to reveal an object's powers.  You can 
+then use the 'I' command any time to remind yourself of an object's
+powers.
+
+--------------------------------------------------------------------------
+2.12 What does this monster do? 
+--------------------------------------------------------------------------
+
+As in other roguelikes, you learn about the abilities of monsters as
+you face them.  You can also go to a Library, if you can find one, and
+research a monster to learn detailed information about its abilities 
+for a price.
+
+As of version 0.3.2pre1, some monsters you encounter may be randomly
+generated unique monsters with somewhat unpredictable abilities.  These
+can also be researched at a library.  Also, if you know a lot about a
+monster (say, a Cave troll) then that knowledge carries over somewhat 
+to knowledge about related uniques (say, Argauth, the Cave Troll).  
+
+--------------------------------------------------------------------------
+2.13 What magic realm(s) should I choose? 
+--------------------------------------------------------------------------
+
+It's up to you, each has its strengths and weaknesses.  Here's a brief
+summary; more can be learned through the help menu.
+
+Life Magic: Good at healing and buffing spells.  Decent damage potential,
+especially against evil.  Has detect traps, but otherwise little in the 
+way of information spells.  Virtually no escape spells.
+
+Sorcery Magic: Has excellent utility, escape, and information spells,
+and some protective magic.  However, Sorcery has no healing and no 
+damage spells whatsoever.
+
+Nature Magic: Fairly well-balanced overall.  It lacks a common identify
+spell, and has no low-level attack spells, and not much in the way of
+escape magic at all.  Has some healing and some protective magic.
+
+Arcane Magic: Great utility spells but many of the Arcane spells become
+obsolete later in the game, and it doesn't have any especially powerful
+spells.  On the plus side, all of its books are commonly found in 
+stores.
+
+Chaos Magic: A great variety of damage-dealing magic, and some utility
+spells that have a destructive flavor.  No informative or defensive magic
+at all.
+
+Conjuration Magic: Specializes in summoning spells and escapes, and also
+has a decent complement of low-level damage spells.  No information
+magic at all.
+
+Death Magic: Has a wide range of attack spells, with only a few utility
+spells. 
+
+Illusion Magic: Specializes in trickery and defensive spells. Has a
+medium level of information and offensive spells.
+
+--------------------------------------------------------------------------
+2.14 I just tried to learn a spell and I was warned that I am running
+     out of "tier 1 slots."  What does this mean? 
+--------------------------------------------------------------------------
+
+In Z+Angband 0.3.0 and later, the spell system has changed.  In
+previous versions, every character would eventually be able to learn
+every spell in their chosen realms (except for specific spells
+unavailable to specific classes).  Now, you have a limited number of
+spells you can learn, and must choose which spells to learn and which
+to pass up.  
+
+The "slots" you have for spells you can learn come in one of five
+"tiers," which correspond to various power levels of spells.  Tier 1
+spells are the ones you learn earliest in the game, Tier 2 spells
+after that, and so on.  Your Tier 1 slots are only good for Tier 1
+spells, but Tier 2 slots can be used for Tier 1 or Tier 2 spells, et
+cetera.  So your Tier 5 slots can be used for any spell in the game.  
+
+You can only use Tier n slots when your character's level has advanced
+beyond the top level of spells a Tier n-1 slot could be used for.
+
+The game warns you when you are running low on a particular tier
+slots, and also warns you before allowing you to "downgrade" a slot by
+using it for a lower Tier of spell.  In many cases, especially when
+Arcane is one of your realms, downgrades may be fairly routine.  But
+for top-heavy schools like Death or Chaos, you may want to preserve
+your high-tier slots for high-level spells later on.  
+
+You can use the "spell knowledge" screen (use '~' to access knowledges)
+to see how many spell slots you have left in each tier, and what 
+spells you have learned so far.
+
+--------------------------------------------------------------------------
+2.15 I accidentally tried to study a spell I already know, and the 
+     game asked me if I want to "improve" it.  What does this mean?
+--------------------------------------------------------------------------
+
+An interesting feature of the Z+Angband magic system (after version
+0.3.0) is the ability to "focus" spells by learning them multiple
+times in exchange for bonuses.  When you learn a spell for the second
+time, it becomes "improved", for the third time, "specialized", and
+for the fourth time, "mastered."  The more you specialize a spell, the
+better your chances of successfully casting the spell, and the less
+mana it costs you.  Also, if the spell does something quantitative
+(like damage, duration, or healing), the quantity of its effect will
+be improved. 
+
+You should be aware that spell focus uses higher-tier slots than the
+spell itself.  Each class has a "focus offset" that determines the
+difference.  For mages and high mages, the offset is 7; for Warrior
+Mages, it is 8, and for Rangers, Chaos Warriors, and Rogues, the
+offset is 10.  Each time you focus a spell, you add another multiple
+of the offset to the spell's base level.  For instance, a Warrior Mage
+can first learn Mana Burst at level 11 which makes it a tier 2 spell.
+The spell can be improved at level 19, also a tier 2 spell.  It can be
+specialized at level 27, a tier 3 spell, and finally mastered at level
+35, a tier 4 spell. 
+
+Note that since the maximum player level is 50, there will be levels
+of focus for certain spells that are simply unattainable, especially
+for spells that start out as high level ones.
+
+--------------------------------------------------------------------------
+2.16 How does the new magic system work for priests?
+--------------------------------------------------------------------------
+
+In Angband and most variants, Priests, Paladins, and Monks learn
+spells ("prayers") randomly.  For such characters, the new magic
+system has one major drawback but there is some good news to balance
+it.  The big drawback is that since these characters can no longer
+eventually learn all the prayers in their realms, and they cannot
+control the prayers they learn, they may never get the chance to learn
+specific spells they may want.  However, some other changes have been
+made that keep this negative to a minimum.  
+
+First, these types of spellcasters cannot focus prayers.  This is a
+disadvantage in some ways, but it helps ensure that slots are not
+wasted.  Second, instead of learning one randomly chosen prayer when
+they study, these characters have two prayers selected for them.  If
+the two prayers are different, the player will have the chance to
+decline the first prayer if they don't want to learn it, and will then
+learn the second random prayer.  Third, the game knows about spells
+that are present in both of the player's realms: if you learn such a
+spell or prayer (both as a magic user or as a priestly spellcaster),
+you learn it in both realms simultaneously.  Fourth, these characters
+have had their experience scale adjusted.  
+
+--------------------------------------------------------------------------
+2.17 What does it mean when a potion is {worthless}?  Or when a ring is
+     {cursed?}
+--------------------------------------------------------------------------
+
+You can discover a potion is worthless, without learning exactly what it
+does, if you turn it into gold and get fool's gold.  If this happens, that
+potion is markes as {worthless} to remind you of what you had previously 
+observed.
+
+Similarly, if you discover that an unidentified ring or amulet is cursed, 
+and later find the same kind of item, it will be marked as {cursed?} to 
+remind you that you came across one once that was cursed.  The game will
+normally prompt you before you equip an item marked as {cursed?}, but 
+there is an option to disable this if you prefer.

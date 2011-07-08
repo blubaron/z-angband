@@ -1,0 +1,289 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.57)
+AC_INIT(Zangband, 0.3.3, bugs@zangband.org)
+AC_CONFIG_SRCDIR([src/angband.h])
+AC_CONFIG_HEADER([src/autoconf.h])
+
+AC_LANG([C])
+
+dnl default option
+GAMEGROUP="games"
+
+AC_ARG_WITH(setgid,
+[  --with-setgid=NAME      setgid usage: install angband as group NAME],
+[case "$withval" in
+  no)  GAMEGROUP= ;;
+  yes) GAMEGROUP="games" ;;
+  *)   GAMEGROUP="$withval" ;;
+esac])
+AC_SUBST(GAMEGROUP)
+
+AC_ARG_WITH(x11,
+[  --with-x11=no           Don't include support for X11])
+
+AC_ARG_WITH(tcltk,
+[  --with-tcltk=DIR        Use DIR/include and DIR/lib for tcl and tk])
+
+if test -n "$tcltk" -a "$tcltk" != "no" ; then
+	CPPFLAGS="-I$tcltk/include $CPPFLAGS"
+	LDFLAGS"$LDFLAGS -L$tcltk/lib"
+fi
+
+AC_ARG_WITH(tkdir,
+[  --with-tkdir=TKDIR      Use TKDIR/include and TKDIR/lib for tk if
+                          is in a different place from tcl directory
+						  and is not auto-detected properly])
+
+if test -n "$tkdir" -a "$tkdir" != "no" ; then
+	CPPFLAGS="-I$tkdir/include $CPPFLAGS"
+	LDFLAGS"$LDFLAGS -L$tkdir/lib"
+fi
+
+AC_ARG_WITH(gtk,
+[  --with-gtk=yes          Use gtk support (you'll need to turn of sgid flag)])
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+
+
+dnl Detect cygwin
+case `(uname -s) 2>/dev/null` in
+  *cygwin* ) CYGWIN=yes;;
+  *CYGWIN* ) CYGWIN=yes;;
+         * ) CYGWIN=no;;
+esac
+
+if test "$CYGWIN" = "yes"; then
+  AC_DEFINE(WINDOWS, 1, [WIN32 port])
+  LIBS="$LIBS -lwinmm"
+  LDFLAGS="$LDFLAGS -s -mwindows -e _mainCRTStartup"
+  cygwin="y"
+  AC_SUBST(cygwin)
+fi
+
+if test "x$with_x11" != "xno" ; then
+	if test "x$with_gtk" != "xno" ; then
+		# Add gtk include paths if needed
+		AC_CHECK_PROGS(GTK_CONFIG, [gtk-config], [no])
+		if test $GTK_CONFIG != "no" ; then
+			CFLAGS="$CFLAGS `$GTK_CONFIG --cflags`" 
+			LDFLAGS="$LDFLAGS `$GTK_CONFIG --libs`"
+		fi
+	fi
+
+	# Find X11 path
+	AC_PATH_X
+	if test -n "$x_includes" ; then
+		CPPFLAGS="-I$x_includes $CPPFLAGS"
+	fi
+	if test -n "$x_libraries" ; then
+		LDFLAGS="$LDFLAGS -L$x_libraries"
+	fi
+
+	# Checks for libraries.
+
+	AC_SEARCH_LIBS([XCreateImage], [X11],
+		AC_DEFINE(USE_X11, 1, [Use basic X11 port])
+		AC_DEFINE(USE_XPJ, 1, [Use X11 projected port]))
+
+	# Some or all of these libraries must be included before -lXaw
+
+	# FIXME: Replace `main' with a function in `-lXext':
+	AC_CHECK_LIB([Xext], [main])
+	# FIXME: Replace `main' with a function in `-lXm':
+	AC_CHECK_LIB([Xm], [main])
+	# FIXME: Replace `main' with a function in `-lXmu':
+	AC_CHECK_LIB([Xmu], [main])
+	# FIXME: Replace `main' with a function in `-lXt':
+	AC_CHECK_LIB([Xt], [main])
+	# FIXME: Replace `main' with a function in `-lSM':
+	AC_CHECK_LIB([SM], [main])
+	# FIXME: Replace `main' with a function in '-lXpm':
+	AC_CHECK_LIB([Xpm], [main])
+	# FIXME: Replace `main' with a function in `-lGn':
+	AC_CHECK_LIB([Gn], [main])
+	# FIXME: Replace `main' with a function in `-lICE':
+	AC_CHECK_LIB([ICE], [main])
+
+	AC_SEARCH_LIBS([XawInitializeWidgetSet], [Xaw],
+		AC_DEFINE(USE_XAW, 1, [Use xaw port]))
+fi
+
+AC_SEARCH_LIBS([initscr], [ncurses curses], 
+	AC_DEFINE(USE_GCU, 1, [Use gcu port]),
+	# Only check termcap if we don't have GCU
+	AC_SEARCH_LIBS([tgetent], [termcap],
+		AC_DEFINE(USE_CAP, 1, [Use termcap port])))
+
+if test "x$with_gtk" != "xno" ; then
+	AC_SEARCH_LIBS([gtk_init_check], [gtk],
+		AC_DEFINE(USE_GTK, 1, [Use gtk port]))
+fi
+
+dnl A function to search for header files
+AC_DEFUN(AC_SEARCH_HEADERS,
+[
+	for search_header in $1
+	do
+        [AC_CHECK_HEADER($search_header,
+		    [$2=`AS_DIRNAME($search_header)`]
+			
+			[if test "$$2" != "/usr/include"; then
+			   CPPFLAGS="-I$$2 $CPPFLAGS"
+			fi
+			break]
+			,
+			[])]
+	done
+])
+
+if test "x$with_tcltk" != "xno" ; then
+	AC_SEARCH_LIBS([Tcl_Init], [tcl84 tcl8.4 tcl83 tcl8.3],
+	AC_SEARCH_LIBS([Tk_Init], [tk84 tk8.4 tk83 tk8.3],
+	    [AC_SEARCH_HEADERS(/usr/local/include/tcl.h /usr/local/include/tcl/tcl.h /usr/include/tcl.h /usr/include/tcl8.4/tcl.h /usr/local/include/tcl8.4/tcl.h /usr/include/tcl8.3/tcl.h /usr/local/include/tcl8.3/tcl.h
+		    ,BASE_TCL_DIR)
+		
+		AC_SEARCH_HEADERS("$BASE_TCL_DIR/tk.h" /usr/local/include/tk.h /usr/local/include/tcl/tk.h /usr/include/tk.h /usr/include/tk8.4/tk.h /usr/local/include/tk8.4/tk.h /usr/include/tk8.3/tk.h /usr/local/include/tk8.3/tk.h
+		    ,BASE_TK_DIR)
+		
+        dnl Checks for libraries.
+		if test "x$BASE_TCL_DIR" != x && test "x$BASE_TK_DIR" != x; then
+            TK_PORT="y"; AC_SUBST(TK_PORT)
+			AC_DEFINE(USE_TNB, 1, [Use tcl/tk port])
+			AC_DEFINE(PLATFORM_X11, 1, [Use tcl/tk port X11 version])
+	    fi
+		]))
+fi
+
+# Check for a 64-bit `long long' type
+AC_TRY_COMPILE(,[long long int i;], 
+	AC_DEFINE(USE_64B, 1, [Have 64-bit long long type]),)
+
+dnl Detect Dos
+case `(uname -s) 2>/dev/null` in
+  *DOS* ) DOS=yes;;
+      * ) DOS=no;;
+esac
+
+if test "$DOS" = "yes"; then
+
+	# FIXME: Replace `main' with a function in `-lpc':
+	AC_CHECK_LIB([pc], [main],
+		LIBS="-lpc $LIBS"
+		AC_DEFINE(USE_IBM, 1, [Use DOS port]))
+
+	# FIXME: Replace `main' with a function in `-lalleg':
+	AC_CHECK_LIB([alleg], [main],
+		LIBS="-lalleg $LIBS"
+		AC_DEFINE(USE_DOS, 1, [Use graphical DOS port])
+		AC_DEFINE(USE_BACKGROUND, 1, [Background support for DOS port]))
+fi
+
+# FIXME: Replace `main' with a function in `-lbsd':
+AC_CHECK_LIB([bsd], [main])
+# FIXME: Replace `main' with a function in `-lcposix':
+AC_CHECK_LIB([cposix], [main])
+# FIXME: Replace `main' with a function in `-linet':
+AC_CHECK_LIB([inet], [main])
+# FIXME: Replace `main' with a function in `-lnsl_s':
+AC_CHECK_LIB([nsl_s], [main])
+# FIXME: Replace `main' with a function in `-lrpcsvc':
+AC_CHECK_LIB([rpcsvc], [main])
+# FIXME: Replace `main' with a function in `-lsun':
+AC_CHECK_LIB([sun], [main])
+# FIXME: Replace `main' with a function in `-lvga':
+#AC_CHECK_LIB([vga], [main])
+# FIXME: Replace `main' with a function in `-lvgagl':
+#AC_CHECK_LIB([vgagl], [main])
+# FIXME: Replace `main' with a function in `-lvideo':
+AC_CHECK_LIB([video], [main])
+# FIXME: Replace `main' with a function in `-lwinmm':
+AC_CHECK_LIB([winmm], [main])
+# FIXME: Replace `main' with a function in `-lz':
+AC_CHECK_LIB([z], [main])
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([fcntl.h limits.h locale.h memory.h netdb.h stddef.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h sys/timeb.h termio.h unistd.h sys/ipc.h sys/shm.h])
+
+AC_CHECK_HEADERS([termios.h], 
+	AC_DEFINE(USE_VCS, 1, [Use termios port]))
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+AC_CHECK_SIZEOF(long int)
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MALLOC
+AC_FUNC_MEMCMP
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+AC_TYPE_SIGNAL
+AC_FUNC_STAT
+AC_FUNC_STRCOLL
+AC_FUNC_STRFTIME
+AC_FUNC_VPRINTF
+AC_FUNC_MMAP
+AC_CHECK_FUNCS([floor ftruncate gethostname memchr memmove memset mkdir modf select setlocale strchr strcspn strdup strerror strpbrk strrchr strstr strtol strtoul])
+
+AC_CHECK_FUNCS([Tk_SetClassProcs TkpSync])
+AC_CHECK_FUNCS([mkstemp usleep getpwuid getpwnam shmget])
+
+dnl A nice function to test compiler options (like warnings)
+AC_DEFUN(AC_CHECK_CC_OPT,
+[FLAG=`echo zangband_cv_cflag_$1 | sed s/-/_/g`
+AC_CACHE_CHECK([whether ${CC-cc} accepts $1],
+[$FLAG],
+[echo 'void f(void); void f(){}' > conftest.c
+if test -z "`${CC-cc} -c ${CFLAGS} $1 conftest.c 2>&1`"; then
+  eval $FLAG=yes
+else
+  eval $FLAG=no
+fi])
+if test ${!FLAG} = yes ; then
+  CFLAGS="$1 $CFLAGS"
+fi
+])
+
+dnl Check for lots of extra warning options
+AC_CHECK_CC_OPT(-pedantic)
+AC_CHECK_CC_OPT(-W)
+AC_CHECK_CC_OPT(-Wall)
+AC_CHECK_CC_OPT(-Wmissing-prototypes)
+AC_CHECK_CC_OPT(-Wmissing-declarations)
+AC_CHECK_CC_OPT(-Wno-long-long)
+AC_CHECK_CC_OPT(-Wwrite-strings)
+AC_CHECK_CC_OPT(-Wpointer-arith)
+AC_CHECK_CC_OPT(-Wbad-function-cast)
+AC_CHECK_CC_OPT(-Waggregate-return)
+AC_CHECK_CC_OPT(-Wstrict-prototypes)
+AC_CHECK_CC_OPT(-Wredundant-decls)
+dnl AC_CHECK_CC_OPT(-Wunreachable-code)
+AC_CHECK_CC_OPT(-Wchar-subscripts)
+AC_CHECK_CC_OPT(-Wimplicit)
+AC_CHECK_CC_OPT(-Wparentheses)
+AC_CHECK_CC_OPT(-Wsequence-point)
+AC_CHECK_CC_OPT(-Wreturn-type)
+AC_CHECK_CC_OPT(-Wswitch)
+AC_CHECK_CC_OPT(-Wunused)
+AC_CHECK_CC_OPT(-Wuninitialized)
+AC_CHECK_CC_OPT(-Wundef)
+AC_CHECK_CC_OPT(-Wnested-externs)
+AC_CHECK_CC_OPT(-Wdeclaration-after-statement)
+AC_CHECK_CC_OPT(-Wsign-compare)
+
+dnl This is turned off since the Tk and GTK headers are
+dnl not const-correct with literal strings.
+dnl AC_CHECK_CC_OPT(-Wcast-qual)
+
+AC_CONFIG_FILES([makefile])
+AC_OUTPUT
