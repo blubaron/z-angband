@@ -1091,8 +1091,13 @@ static void wr_extra(void)
 	wr_byte(0);					/* oops */
 	wr_byte(0);					/* oops */
 
-	/* Future use */
-	for (i = 0; i < 12; i++) wr_u32b(0L);
+  /* Dump the main home info - Brett*/
+  /* uses 4 of the 48 future use bytes */
+	wr_s16b(p_ptr->home_place_num);
+	wr_s16b(p_ptr->home_store_num);
+
+  /* Future use */
+	for (i = 0; i < 11; i++) wr_u32b(0L);
 
 	/* Ignore some flags */
 	wr_u32b(0L);				/* oops */

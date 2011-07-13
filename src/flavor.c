@@ -1286,6 +1286,13 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 	/* No more details wanted */
 	if (mode < 1) return;
 
+  /* Hack so that bonuses are not displayed - Brett */
+  /* but this prevents the possibility of containers from being dropped trapped? does anyone care? */
+	if (o_ptr->tval == TV_CONTAINER)
+	{
+    return;
+  }
+
 	/* Hack -- Chests must be described in detail */
 	if (o_ptr->tval == TV_CHEST)
 	{

@@ -60,7 +60,7 @@
 #endif /* !DEBUG */
 
 /* Savefile version */
-#define SAVEFILE_VERSION 61
+#define SAVEFILE_VERSION 62
 
 
 /*
@@ -122,6 +122,8 @@
 #define DF_DENSE		0x00004000  /* 2x monster generation */
 #define DF_POOLS		0x00008000  /* multiple very small lakes */  /* Not implemented */
 #define DF_PURE_CASTLE	0x00010000  /* Castle occupies the whole level */
+//#define DF_CAVERN 	0x00020000  /* Cavern occupies the whole level*/
+//#define DF_LABRINTH	0x00040000  /* Labrinth occupies the whole level */
 
 
 
@@ -615,7 +617,7 @@
 /*
  * The racial powers
  */
-#define MAX_RACE_POWERS		28
+#define MAX_RACE_POWERS		29
 
 
 /* Monk martial arts... */
@@ -2531,7 +2533,7 @@
 /*
  * Special cave grid flags
  */
-#define CAVE_DUM1       0x01
+#define CAVE_BLOCK      0x01
 #define CAVE_GLOW       0x02	/* self-illuminating */
 #define CAVE_ICKY       0x04	/* part of a vault */
 #define CAVE_ROOM       0x08	/* part of a room */
@@ -2568,14 +2570,47 @@
 /*
  * Feature flags
  */
-#define FF_BLOCK		0x01	/* Blocks movement + los */
-#define FF_BLOCK_LOS	0x02	/* Half-blocks los */
-#define FF_USE_TRANS	0x04	/* Use transparency light effects */
-#define FF_ICKY			0x08	/* Terrain can not have objects */
-#define FF_PERM			0x10	/* Permanent terrain */
-#define FF_OBJECT		0x20	/* Terrain is described like an object */
-#define FF_PATTERN		0x40	/* The pattern */
-#define FF_MARK			0x80	/* Remember tile if seen */
+/*#define FF_BLOCK		0x01	/* Blocks movement + los */
+/*#define FF_BLOCK_LOS	0x02	/* Half-blocks los */
+/*#define FF_USE_TRANS	0x04	/* Use transparency light effects */
+/*#define FF_ICKY			0x08	/* Terrain can not have objects */
+/*#define FF_PERM			0x10	/* Permanent terrain */
+/*#define FF_OBJECT		0x20	/* Terrain is described like an object */
+/*#define FF_PATTERN		0x40	/* The pattern */
+/*#define FF_MARK			0x80	/* Remember tile if seen */
+/* from angband 3.2.0*/
+enum
+{
+	FF_PWALK        = 0x00000001, /* Player can walk through */
+	FF_PPASS        = 0x00000002, /* Player can pass in wraith/ghost form */
+	FF_MWALK        = 0x00000004, /* monster can walk through */
+	FF_MPASS        = 0x00000008, /* wraith/ghost can pass through */
+	FF_NO_LOS       = 0x00000010, /* LOS blocked */
+	FF_HIDDEN       = 0x00000020, /* if search successful, switch to base feature */
+	FF_DOOR         = 0x00000040, /* this is a door of some type, open or close switch to base */
+	FF_EXIT_UP      = 0x00000080, /* can go to the previous level here */
+	FF_EXIT_DOWN    = 0x00000100, /* can go to the next level here */
+	FF_PERM         = 0x00000200, /* permanent terrain */
+	FF_TRAP         = 0x00000400, /* there is a field action here */
+	FF_QUEST        = 0x00000800, /* player can enter a quest level here */
+	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature */
+	FF_MARK         = 0x00002000, /* memorized on map when seen*/
+	//FF_BORING       = 0x00002000, /* not marked if not currently seen? (!MARK)*/
+	FF_OVERLAY      = 0x00004000, /* draw on top of base feature */
+	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path */
+	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold */
+	FF_DIG_OBJ      = 0x00020000, /* If dug through w/DIG or searched w/HIDDEN place object */
+	FF_DIG_CUSTOM   = 0x00040000, /* If dug through w/DIG or searched w/HIDDEN place object from lookup table of feature index */
+	FF_DIG_FOOD     = 0x00080000, /* If dug through w/DIG or searched w/HIDDEN place food object */
+	FF_ICKY         = 0x00100000, /* Terrain can not have objects */
+	FF_HALF_LOS     = 0x00200000, /* Half-blocks los */
+	FF_OBJECT       = 0x00400000, /* Terrain is described like an object */
+	FF_CLOSED       = 0x00800000, /* Terrain (usually door) is closed */
+	FF_BROKEN       = 0x01000000, /* Terrain (usually door) is broken */
+	FF_WILD         = 0x02000000, /* Terrain takes additional time to cross */
+	FF_LIQUID       = 0x04000000, /* Terrain is water, lava, or acid */
+	FF_DAMAGING     = 0x08000000  /* Terrain damages player like deep lava or acid, uses dig for damage amount */
+};
 
 /*
  * Bit flags for the "project()" function
@@ -2987,8 +3022,9 @@
 #define GF_PETRIFY		99
 #define GF_SILENCE		100
 #define GF_TERRAFORM	101
+#define GF_PURG_CURSE	102
 
-#define MAX_GF			101
+#define MAX_GF			102
 
 #define GF_ILLUSION		128   /* Illusion _offset_.  Illusionary fire, e.g. is GF_FIRE + GF_ILLUSION. */
 #define GF_STRONG_ILLUSION	256  /* Double-strength illusion. */
@@ -4846,19 +4882,26 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 /*
  * Determine if a "legal" grid is a "floor" grid
  */
+//#define cave_floor_grid(C) \
+//    (!(f_info[(C)->feat].flags & FF_BLOCK))
 #define cave_floor_grid(C) \
-    (!(f_info[(C)->feat].flags & FF_BLOCK))
+    (!(f_info[(C)->feat].flags & FF_NO_LOS) && (f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
 /*
  * Determine if a "legal" grid is a "wall" grid
  */
+//#define cave_wall_grid(C) \
+//    (f_info[(C)->feat].flags & FF_BLOCK)
 #define cave_wall_grid(C) \
-    (f_info[(C)->feat].flags & FF_BLOCK)
+    (!(f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
+    //((f_info[(C)->feat].flags & FF_NO_LOS) && !(f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
 
 /*
  * A sight-blocking grid that doesn't block movement
  */
+//#define cave_semi_grid(C) \
+//	(f_info[(C)->feat].flags & FF_BLOCK_LOS)
 #define cave_semi_grid(C) \
-	(f_info[(C)->feat].flags & FF_BLOCK_LOS)
+    ((f_info[(C)->feat].flags & FF_NO_LOS) && (f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
 
 
 /*

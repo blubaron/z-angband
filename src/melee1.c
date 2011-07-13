@@ -1251,8 +1251,8 @@ bool make_attack_normal(int m_idx)
 						/* Take "poison" effect */
 						obvious = pois_dam(10, "disease", randint1(rlev) + 5);
 
-						/* Damage CON (10% chance) */
-						if (randint0(100) < 10)
+						/* Damage CON (10% chance) */ /* but not if con is sustained - Brett */
+						if ((randint0(100) < 10) && !FLAG(p_ptr, TR_SUST_CON))
 						{
 							/* 1% chance for perm. damage */
 							bool perm = (one_in_(10));

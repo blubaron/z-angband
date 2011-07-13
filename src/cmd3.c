@@ -2164,7 +2164,13 @@ static bool item_tester_hook_organizable(const object_type *o_ptr)
 	bool test = FALSE;
 	object_type * j_ptr;
 
-	/* Temporarily set number to be 0. */
+  /* if this is a container, show in organize list - Brett */
+  if (o_ptr->tval == TV_CONTAINER)
+  {
+    return (TRUE);
+  }
+
+  /* Temporarily set number to be 0. */
 	*num = 0;
 
 	OBJ_ITT_START(p_ptr->inventory, j_ptr)
@@ -2258,7 +2264,7 @@ static void do_cmd_organize_aux(void)
 		item_tester_tval = 0;
 
 		/* Show the prompt */
-		prtf(0, 0, "Which container?%s", inven_carry_okay_no_containers(o_ptr) ? " (* for Inven)" : "");
+		prtf(0, 0, "Move to which container?%s", inven_carry_okay_no_containers(o_ptr) ? " (* for Inven)" : "");
 
 		/* Get a response */
 		while (TRUE)

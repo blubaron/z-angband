@@ -507,6 +507,7 @@ void search(void)
 
 	cave_type *c_ptr;
 	object_type *o_ptr;
+  feature_type *feat;
 
 	/* Start with base search ability */
 	chance = p_ptr->skills[SKILL_SNS];
@@ -554,14 +555,24 @@ void search(void)
 					}
 				}
 
+        feat  = &(f_info[c_ptr->feat]);
 				/* Secret door */
-				if (c_ptr->feat == FEAT_SECRET)
+				//if (c_ptr->feat == FEAT_SECRET)
+				if (feat->flags & FF_HIDDEN)
 				{
-					/* Message */
-					msgf("You have found a secret door.");
 
 					/* Pick a door */
-					create_closed_door(x, y);
+          if (feat->base_feat) {
+					  /* Message */
+					  msgf("You have found a secret %s.", f_name + f_info[feat->base_feat].name);
+					  create_closed_door(x, y, feat->base_feat);
+          } else {
+					  /* Message */
+            if (feat->flags & FF_DOOR) {
+					    msgf("You have found a secret door.");
+					    create_closed_door(x, y, the_feat(FEAT_CLOSED));
+            }
+          }
 
 					/* Disturb */
 					disturb(FALSE);
@@ -882,6 +893,23 @@ void carry(int pickup)
 							delete_dungeon_object(o_ptr);
 						}
 					}
+					//if ((i == 'A') || (i == 'a'))
+					//{
+						/* try to use alchemy on it */
+						/*if (has charged rod of alchemy )
+						{
+							alchemy_aux(o_ptr); // need to split this fn from alchemy()
+						}
+						else if (has scroll of alchemy )
+						{
+							alchemy_aux(o_ptr); // need to split this fn from alchemy()
+						}
+						else if (has spell of alchemy and mana)
+						{
+							alchemy_aux(o_ptr); // need to split this fn from alchemy()
+						}
+            */
+					//}
 				}
 
 				/* Attempt to pick up an object. */
@@ -1506,6 +1534,7 @@ void py_attack(int x, int y)
 	int blows;
 
 	cave_type *c_ptr = area(x, y);
+  feature_type *feat_ptr = &(f_info[c_ptr->feat]);
 
 	monster_type *m_ptr = &m_list[c_ptr->m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
@@ -1646,12 +1675,14 @@ void py_attack(int x, int y)
 	}
 
 	/* Monsters in rubble can take advantage of cover. -LM- */
-	if (c_ptr->feat == FEAT_RUBBLE)
+	//if (c_ptr->feat == FEAT_RUBBLE)
+  if (feat_ptr->flags & FF_HALF_LOS)
 	{
 		terrain_bonus = r_ptr->ac / 7 + 5;
 	}
 	/* Monsters in water are vulnerable. -LM- */
-	else if (c_ptr->feat == FEAT_DEEP_WATER)
+	//else if (c_ptr->feat == FEAT_DEEP_WATER)
+	else if ((feat_ptr->flags & FF_LIQUID) && !(FLAG(r_ptr, RF_CAN_SWIM) || FLAG(r_ptr, RF_CAN_FLY)))
 	{
 		terrain_bonus -= r_ptr->ac / 5;
 	}
@@ -2355,6 +2386,7 @@ void move_player(int dir, int do_pickup)
 	pcave_type *pc_ptr;
 	monster_type *m_ptr;
 	object_type *o_ptr;
+  feature_type *feat;
 
 	char m_name[80];
 
@@ -2383,6 +2415,7 @@ void move_player(int dir, int do_pickup)
 	/* Examine the destination */
 	c_ptr = area(x, y);
 	pc_ptr = parea(x, y);
+  feat  = &(f_info[c_ptr->feat]);
 
 	/* Get the monster */
 	m_ptr = &m_list[c_ptr->m_idx];
@@ -2479,18 +2512,18 @@ void move_player(int dir, int do_pickup)
 	 * has effective -10 speed
 	 * Rangers can move without penality
 	 */
-	else if ((c_ptr->feat == FEAT_TREES) ||
+	/*else if ((c_ptr->feat == FEAT_TREES) ||
 			 (c_ptr->feat == FEAT_PINE_TREE) ||
 			 (c_ptr->feat == FEAT_SNOW_TREE) ||
 	                 (c_ptr->feat == FEAT_MOUNTAIN) ||
 			 (c_ptr->feat == FEAT_SNOW_MOUNTAIN) ||
 			 (c_ptr->feat == FEAT_OBELISK) ||
-			 (c_ptr->feat == FEAT_BOULDER))
+			 (c_ptr->feat == FEAT_BOULDER)) 
 	{
 		oktomove = TRUE;
 		if (!FLAG(p_ptr, TR_WILD_WALK))
 			p_ptr->state.energy_use += 10;
-	}
+	}*/
 
 	/* Disarm a visible trap */
 	else if ((do_pickup != easy_disarm) && is_visible_trap(c_ptr))
@@ -2499,16 +2532,35 @@ void move_player(int dir, int do_pickup)
 		return;
 	}
 
-	else if (cave_floor_grid(c_ptr))
+	//else if (cave_floor_grid(c_ptr))
+	else if (feat->flags & FF_PWALK)
 	{
 		oktomove = TRUE;
+	  /*
+	   * Player can move through trees and
+	   * has effective -10 speed
+	   * Rangers can move without penality
+	   */
+	  if ((feat->flags & FF_WILD) || (feat->flags & FF_HALF_LOS))
+	  {
+		  if (!FLAG(p_ptr, TR_WILD_WALK))
+			  p_ptr->state.energy_use += 10;
+    }
+    else if (feat->flags & FF_NO_LOS)
+	  {
+		  if (!FLAG(p_ptr, TR_WILD_WALK))
+			  p_ptr->state.energy_use += 20;
+    }
 	}
 
 	/* Closed door */
-	else if (c_ptr->feat == FEAT_CLOSED)
-	{
+	//else if (c_ptr->feat == FEAT_CLOSED)
+	else if ((feat->flags & FF_DOOR) && (feat->flags & FF_CLOSED))
+  { 
+    /* TODO eventually just test for the closed flag, and let do_open_cmd_aux
+            open it in the right way  */
 		/* Pass through the door? */
-		if (p_can_pass_walls)
+		if (p_can_pass_walls && (feat->flags & FF_PPASS))
 		{
 			/* Automatically open the door? */
 			if (easy_open && !do_cmd_open_aux(x, y))
@@ -2529,7 +2581,7 @@ void move_player(int dir, int do_pickup)
 			/* Notice things in the dark */
 			if ((pc_ptr->feat != c_ptr->feat) && !player_can_see_grid(pc_ptr))
 			{
-				msgf("You feel a closed door blocking your way.");
+				msgf("You feel a closed %s blocking your way.", f_name + feat->name);
 				remember_grid(c_ptr, pc_ptr);
 				lite_spot(x, y);
 			}
@@ -2544,7 +2596,7 @@ void move_player(int dir, int do_pickup)
 					return;
 				}
 
-				msgf("There is a closed door blocking your way.");
+				msgf("There is a closed %s blocking your way.", f_name + feat->name);
 
 				if (!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_STUN) || query_timed(TIMED_IMAGE)))
 					p_ptr->state.energy_use = 0;
@@ -2556,7 +2608,8 @@ void move_player(int dir, int do_pickup)
 	}
 
 	/* Player can not walk through "walls" unless in wraith form... */
-	else if (!p_can_pass_walls)
+	//else if (!p_can_pass_walls)
+	else if (!(p_can_pass_walls && (feat->flags & FF_PPASS)))
 	{
 		oktomove = FALSE;
 
@@ -2573,8 +2626,38 @@ void move_player(int dir, int do_pickup)
 		/* Notice things */
 		else
 		{
+      /* trees, jungle, etc */
+			if (feat->flags & FF_WILD)
+			{
+				msgf(MSGT_HITWALL, "The %s is impassable.", f_name + feat->name);
+
+				if (!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_STUN) || query_timed(TIMED_IMAGE)))
+					p_ptr->state.energy_use = 0;
+
+				/*
+				 * Well, it makes sense that you lose time bumping into
+				 * a wall _if_ you are confused, stunned or blind; but
+				 * typing mistakes should not cost you a turn...
+				 */
+			}
+			else if (feat->flags & FF_OBJECT)
+			{
+				msgf(MSGT_HITWALL, "There is a %s blocking your way.", f_name + feat->name);
+
+				if (!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_STUN) || query_timed(TIMED_IMAGE)))
+					p_ptr->state.energy_use = 0;
+			}
+			/* Wall (or secret door) */
+			else
+			{
+				msgf(MSGT_HITWALL, "The %s is blocking your way.", f_name + feat->name);
+
+				if (!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_STUN) || query_timed(TIMED_IMAGE)))
+					p_ptr->state.energy_use = 0;
+			}
+
 			/* Rubble */
-			if (c_ptr->feat == FEAT_RUBBLE)
+			/*if (c_ptr->feat == FEAT_RUBBLE)
 			{
 				msgf(MSGT_HITWALL, "There is rubble blocking your way.");
 
@@ -2586,10 +2669,10 @@ void move_player(int dir, int do_pickup)
 				 * a wall _if_ you are confused, stunned or blind; but
 				 * typing mistakes should not cost you a turn...
 				 */
-			}
+			/*}
 
 			/* Jungle */
-			else if (c_ptr->feat == FEAT_JUNGLE)
+			/*else if (c_ptr->feat == FEAT_JUNGLE)
 			{
 				msgf(MSGT_HITWALL, "The jungle is impassable.");
 
@@ -2598,7 +2681,7 @@ void move_player(int dir, int do_pickup)
 			}
 
 			/* Pillar */
-			else if (c_ptr->feat == FEAT_PILLAR)
+			/*else if (c_ptr->feat == FEAT_PILLAR)
 			{
 				msgf(MSGT_HITWALL, "There is a pillar blocking your way.");
 
@@ -2607,13 +2690,13 @@ void move_player(int dir, int do_pickup)
 			}
 
 			/* Wall (or secret door) */
-			else
+			/*else
 			{
 				msgf(MSGT_HITWALL, "There is a wall blocking your way.");
 
 				if (!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_STUN) || query_timed(TIMED_IMAGE)))
 					p_ptr->state.energy_use = 0;
-			}
+			}*/
 		}
 
 		/* Sound */

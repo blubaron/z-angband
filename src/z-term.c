@@ -1551,6 +1551,58 @@ void Term_putch(int x, int y, byte a, char c)
 	Term_addch(a, c);
 }
 
+/*
+ * Move to a location and, using an attr, add a big tile
+ */
+void Term_big_putch(int x, int y, byte a, char c)
+{
+  int hor, vert;
+
+	/* Avoid warning */
+	(void)c;
+
+	/* No tall skinny tiles */
+	if (tile_width_mult > 1)
+	{
+	  /* Horizontal first */
+	  for (hor = 0; hor <= tile_width_mult; hor++)
+		{
+		  /* Queue dummy character */
+		  if (hor != 0)
+			{	
+			  if (a & 0x80)
+				  Term_putch(x + hor, y, 255, -1);
+				else
+				  Term_putch(x + hor, y, 1, ' ');
+				  //Term_putch(x + hor, y, TERM_WHITE, ' ');
+			}
+
+			/* Now vertical */
+			for (vert = 1; vert <= tile_height_mult; vert++)
+			{
+			  /* Queue dummy character */
+			  if (a & 0x80)
+				  Term_putch(x + hor, y + vert, 255, -1);
+				else
+				  Term_putch(x + hor, y + vert, 1, ' ');
+				  //Term_putch(x + hor, y + vert, TERM_WHITE, ' ');
+			}
+		}
+	}
+	else
+	{
+	  /* Only vertical */
+	  for (vert = 1; vert <= tile_height_mult; vert++)
+		{
+		  /* Queue dummy character */
+		  if (a & 0x80)
+			  Term_putch(x, y + vert, 255, -1);
+			else
+			  Term_putch(x, y + vert, 1, ' ');
+				//Term_putch(x, y + vert, TERM_WHITE, ' ');
+		}
+	}
+}
 
 /*
  * Place cursor at (x,y), and clear the next "n" chars

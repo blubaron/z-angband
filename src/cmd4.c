@@ -4427,9 +4427,18 @@ static bool do_cmd_knowledge_dungeon(int dummy)
 	return (FALSE);
 }
 
+/*
+ * Recall info about a symbol
+ */
+static bool do_cmd_knowledge_symbol(int dummy)
+{
+  do_cmd_query_symbol();	
+	return (FALSE);
+}
 
+bool count_wilderness(int);
 /* Some gaps for options that should not show up always */
-static menu_type knowledge_menu[17] =
+static menu_type knowledge_menu[19] =
 {
 	{"Display known uniques", NULL, do_cmd_knowledge_uniques, MN_ACTIVE | MN_CLEAR},
 	{"Display known objects", NULL, do_cmd_knowledge_objects, MN_ACTIVE | MN_CLEAR},
@@ -4437,6 +4446,8 @@ static menu_type knowledge_menu[17] =
 	{"Display mutations", NULL, do_cmd_knowledge_mutations, MN_ACTIVE | MN_CLEAR},
 	{"Display current pets", NULL, do_cmd_knowledge_pets, MN_ACTIVE | MN_CLEAR},
 	{"Display current quests", NULL, do_cmd_knowledge_quests, MN_ACTIVE | MN_CLEAR},
+	{"Recall creature symbol", NULL, do_cmd_knowledge_symbol, MN_ACTIVE | MN_CLEAR},
+	{"Recall building counts", NULL, count_wilderness, MN_ACTIVE | MN_CLEAR},
 	MENU_END,
 	MENU_END,
 	MENU_END,
@@ -4456,7 +4467,7 @@ static menu_type knowledge_menu[17] =
  */
 void do_cmd_knowledge(void)
 {
-	int nr, last_option = 6;
+	int nr, last_option = 8;
 
 	/* File type is "TEXT" */
 	FILE_TYPE(FILE_TYPE_TEXT);
@@ -4470,17 +4481,17 @@ void do_cmd_knowledge(void)
 	 */
 
 	/* Copy in the display notes */
-	if (take_notes) knowledge_menu[nr++] = knowledge_menu[12];
+	if (take_notes) knowledge_menu[nr++] = knowledge_menu[14];
 
 	/* Copy in the wilderness displays */
 	if (!vanilla_town)
 	{
-		knowledge_menu[nr++] = knowledge_menu[13];
-		knowledge_menu[nr++] = knowledge_menu[14];
+		knowledge_menu[nr++] = knowledge_menu[15];
+		knowledge_menu[nr++] = knowledge_menu[16];
 	}
 
 	if (p_ptr->spell.realm[0])
-		knowledge_menu[nr++] = knowledge_menu[15];
+		knowledge_menu[nr++] = knowledge_menu[17];
 
 	/* Display the menu */
 	display_menu(knowledge_menu, -1, FALSE, NULL, "Display current knowledge");
@@ -4489,7 +4500,7 @@ void do_cmd_knowledge(void)
 	for (; nr >= last_option; nr--)
 	{
 		/* menu item 14 contains a MENU_END */
-		knowledge_menu[nr] = knowledge_menu[16];
+		knowledge_menu[nr] = knowledge_menu[18];
 	}
 }
 

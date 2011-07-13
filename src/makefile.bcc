@@ -112,7 +112,6 @@ OBJ = \
 	fields.obj \
 	effects.obj \
 	dungeon.obj \
-	cmd7.obj \
 	cmd6.obj \
 	cmd5.obj \
 	cmd4.obj \

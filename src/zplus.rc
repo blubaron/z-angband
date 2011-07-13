@@ -89,6 +89,19 @@ ANGBAND MENU
 			MENUITEM "Term-6 window", 276
 			MENUITEM "Term-7 window", 277
 		}
+
+		MENUITEM SEPARATOR
+
+		POPUP "Term 0 Tile Size"
+		{
+			MENUITEM "Font",   190
+			MENUITEM "8 x 8",   191
+			MENUITEM "8 x 16", 194
+			MENUITEM "16 x 16", 192
+			MENUITEM "32 x 32", 193
+			MENUITEM "16 x 32", 196
+			MENUITEM "12 x 13", 199
+		}
 	}
 
 	POPUP "&Options"
@@ -99,6 +112,10 @@ ANGBAND MENU
 			MENUITEM "&Old tiles", 401
 			MENUITEM "&Adam Bolt's tiles", 402
 			MENUITEM "&David Gervais's tiles", 403
+			MENUITEM "&16x16 Combined tiles", 405
+			MENUITEM "&Resized tiles", 404
+			MENUITEM "&Test Tiles", 406
+  	  MENUITEM SEPARATOR
 			MENUITEM "&Bigtile Mode", 409
 		}
 

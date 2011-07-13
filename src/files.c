@@ -180,6 +180,8 @@ static const named_num gf_desc[] =
 	{NULL, 0}
 };
 
+const byte lighting_colours[16];
+const byte darking_colours[16];
 
 /*
  * Parse a sub-file of the "extra info" (format shown below)
@@ -281,7 +283,8 @@ errr process_pref_file_command(char *buf)
 	/* Process "R:<num>:<a>/<c>" -- attr/char for monster races */
 	if (buf[0] == 'R')
 	{
-		if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
+    byte count = tokenize(buf + 2, 4, zz, TOKENIZE_CHECKQUOTE);
+		if (count >= 3)
 		{
 			monster_race *r_ptr;
 			i = (huge) strtol(zz[0], NULL, 0);
@@ -291,6 +294,12 @@ errr process_pref_file_command(char *buf)
 			r_ptr = &r_info[i];
 			if (n1) r_ptr->x_attr = n1;
 			if (n2) r_ptr->x_char = n2;
+      //if (count == 4) {
+        // we have some flag modifications
+        //if (strchr(zz[3],'O')) {
+          // mark that this tile gets drawn with overdraw
+        //}
+      //}
 			return (0);
 		}
 	}
@@ -312,10 +321,11 @@ errr process_pref_file_command(char *buf)
 		}
 	}
 
-	/* Process "T:<num>:<a>/<c>" -- attr/char for fields */
+	/* Process "T:<num>:<a>/<c>{:fF}" -- attr/char for fields */
 	else if (buf[0] == 'T')
 	{
-		if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
+    byte count = tokenize(buf + 2, 4, zz, TOKENIZE_CHECKQUOTE);
+		if (count >= 3)
 		{
 			field_thaum *t_ptr;
 			i = (huge) strtol(zz[0], NULL, 0);
@@ -325,14 +335,29 @@ errr process_pref_file_command(char *buf)
 			t_ptr = &t_info[i];
 			if (n1) t_ptr->f_attr = n1;
 			if (n2) t_ptr->f_char = n2;
+      if (count == 4) {
+        // we have some flag modifications
+        if (strchr(zz[3],'l'))
+        {
+          // force no dynamic lighting changes
+          t_ptr->info &= ~FIELD_INFO_TRANS;
+        }
+        else if (strchr(zz[3],'L')) {
+          // force dynamic lighting changes
+          t_ptr->info |= FIELD_INFO_TRANS;
+        //else if (strchr(zz[3],'O')) {
+          // mark that this tile gets drawn with overdraw
+        }
+      }
 			return (0);
 		}
 	}
 
-	/* Process "F:<num>:<a>/<c>" -- attr/char for terrain features */
+	/* Process "F:<num>:<a>/<c>{:fF}" -- attr/char for terrain features */
 	else if (buf[0] == 'F')
 	{
-		if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
+    byte count = tokenize(buf + 2, 7, zz, TOKENIZE_CHECKQUOTE);
+		if (count >= 3)
 		{
 			feature_type *f_ptr;
 			i = (huge) strtol(zz[0], NULL, 0);
@@ -342,6 +367,38 @@ errr process_pref_file_command(char *buf)
 			f_ptr = &f_info[i];
 			if (n1) f_ptr->x_attr = n1;
 			if (n2) f_ptr->x_char = n2;
+		  f_ptr->xd_attr = f_ptr->x_attr;
+		  f_ptr->xd_char = f_ptr->x_char;
+		  f_ptr->xl_attr = f_ptr->x_attr;
+		  f_ptr->xl_char = f_ptr->x_char;
+      if (count == 7) {
+			  n1 = strtol(zz[3], NULL, 0);
+			  n2 = strtol(zz[4], NULL, 0);
+			  if (n1) f_ptr->xd_attr = n1;
+			  if (n2) f_ptr->xd_char = n2;
+
+			  n1 = strtol(zz[5], NULL, 0);
+			  n2 = strtol(zz[6], NULL, 0);
+			  if (n1) f_ptr->xl_attr = n1;
+			  if (n2) f_ptr->xl_char = n2;
+      } else
+      if (count == 5) {
+			  n1 = strtol(zz[3], NULL, 0);
+			  n2 = strtol(zz[4], NULL, 0);
+			  if (n1) f_ptr->xd_attr = n1;
+			  if (n2) f_ptr->xd_char = n2;
+      } else
+      {
+        if (f_ptr->x_attr < 16) {
+			    /* If is ascii graphics */
+		      f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
+		      f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
+        }/* else
+        if (f_ptr->flags & FF_USE_TRANS) {
+          f_ptr->xd_char += 1;
+          f_ptr->xl_char -= 1;
+        }*/
+      }
 			return (0);
 		}
 	}
@@ -349,7 +406,8 @@ errr process_pref_file_command(char *buf)
 	/* Process "W:<num>:<a>/<c>" -- xtra attr/char for terrain features */
 	else if (buf[0] == 'W')
 	{
-		if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
+    return (1);
+		/*if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
 		{
 			feature_type *f_ptr;
 			i = (huge) strtol(zz[0], NULL, 0);
@@ -360,7 +418,7 @@ errr process_pref_file_command(char *buf)
 			if (n1) f_ptr->w_attr = n1;
 			if (n2) f_ptr->w_char = n2;
 			return (0);
-		}
+		}*/
 	}
 
 	/* Process "S:<num>:<a>/<c>" -- attr/char for special things */
@@ -579,6 +637,32 @@ errr process_pref_file_command(char *buf)
 		}
 	}
 
+	/* Process "I:<elementwidth>:<elementheight>:<filename>:<maskname>"
+     -- image info used with graphic files */
+	else if (buf[0] == 'I')
+	{
+    byte count = tokenize(buf + 2, 4, zz, TOKENIZE_CHECKQUOTE);
+		if (count > 2)
+		{
+      graf_width = (byte)strtol(zz[0], NULL, 0);
+      graf_height = (byte)strtol(zz[1], NULL, 0);
+      if (strlen(zz[2]) >= 32) {
+      	/* Failure */
+        return (1);
+      }
+   	  text_to_ascii(graf_name, zz[2]);
+	  	if (count > 3) {
+        if (strlen(zz[3]) >= 32) {
+      	  /* Failure */
+          return (1);
+        }
+	  	  text_to_ascii(graf_mask, zz[3]);
+      }
+			/* Success */
+			return (0);
+		}
+	}
+
 
 	/* Failure */
 	return (1);
@@ -771,6 +855,11 @@ static cptr process_pref_file_expr(char **sp, char *fp)
 						break;
 				}
 			}
+			else if (streq(b + 1, "GRAFC"))
+			{
+				strnfmt(temp_string,32,"%d",use_graphics);
+        v = temp_string; /* temp_string will not be used again before the comparison - Brett */
+			}
 
 			/* Monochrome mode */
 			else if (streq(b + 1, "MONOCHROME"))
@@ -797,6 +886,14 @@ static cptr process_pref_file_expr(char **sp, char *fp)
 			else if (streq(b + 1, "PLAYER"))
 			{
 				v = player_base;
+			}
+			else if (streq(b + 1, "PLAYERNAME"))
+			{
+				v = player_name;
+			}
+			else if (streq(b + 1, "GENDER"))
+			{
+ 				v = sp_ptr->title;
 			}
 
 			/* Town */
@@ -3525,7 +3622,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			{
 				/* Wait for it */
 				prtf(0, hgt - 1,
-				"[Press a Number, Return, Space, -, =, /, \\, or ESC to exit.]");
+				"[Press a Number, Return, Space, -, =, /, \\, b, \', or ESC to exit.]");
 			}
 		}
 		else
@@ -3541,7 +3638,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			else
 			{
 				/* Wait for it */
-				prtf(0, hgt - 1, "[Press Return, Space, -, =, /, \\, or ESC to exit.]");
+				prtf(0, hgt - 1, "[Press Return, Space, -, =, /, \\, b, \', or ESC to exit.]");
 			}
 		}
 
@@ -3667,6 +3764,19 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		if (k == ' ')
 		{
 			line = line + hgt - 4;
+		}
+
+		/* Go back a single line */
+		if (k == '\'')
+		{
+			line = line - 1;
+			if (line < 0) line = 0;
+		}
+		/* Go back one page */
+		if (k == 'b')
+		{
+			line = line - (hgt - 4);
+			if (line < 0) line = 0;
 		}
 
 		/* Recurse on numbers */
@@ -4077,7 +4187,15 @@ void do_cmd_save_game(int is_autosave)
 		char buf[1024];
 
 		strnfmt(oldsf, 1024, "%s", savefile);
-		strnfmt(newsf, 1024, "%s.auto", savefile);
+		/*strnfmt(newsf, 1024, "%s.auto", savefile);
+     * add a second autosave slot, for additional protection */
+    if (autosave_freq & 1) {
+  		strnfmt(newsf, 1024, "%s.auto1", savefile);
+      autosave_freq -= 1;
+    } else {
+  		strnfmt(newsf, 1024, "%s.auto", savefile);
+      autosave_freq += 1;
+    }
 
 		/* Grab permissions */
 		safe_setuid_grab();

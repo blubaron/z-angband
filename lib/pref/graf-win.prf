@@ -11,11 +11,37 @@
 # Standard file
 ?:[EQU $GRAF old]
 %:graf-xxx.prf
+I:8:8:8x8.bmp
 
-# New tiles
+# New tiles by Adam Bolt
 ?:[EQU $GRAF new]
 %:graf-new.prf
+I:16:16:16x16.bmp:mask.bmp
 
 # David Gervais tiles
 ?:[EQU $GRAF david]
 %:graf-dvg.prf
+I:32:32:32x32dvg.png:32x32msk.png
+# I:32:32:32x32.bmp:mask32.png
+
+# Reduced David Gervais tiles
+?:[EQU $GRAFC 6]
+%:graf-dvg_old.prf
+I:12:13:12x13.bmp:12x13msk.bmp
+
+# Reduced David Gervais tiles
+?:[EQU $GRAFC 7]
+%:graf-dvg_mod.prf
+I:16:16:16x16mod.png
+#I:16:16:16x16dvg.bmp:16x16msk.bmp
+
+# Test of PNG transparency (png from angband 3.2.0)
+?:[EQU $GRAFC 8]
+%:graf-dvg_mod10.prf
+I:16:16:16x16mod10.png
+#%:graf-dvg_old.prf
+#I:32:32:32x32ang.png
+#I:32:32:32x32.bmp:mask32.bmp
+
+?:1
+

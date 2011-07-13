@@ -529,7 +529,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 			c_ptr = cave_p(x+1,y);
 
 			if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-				!(c_ptr->info & FF_BLOCK))
+				!(c_ptr->info & CAVE_BLOCK))
 			{
 				if (yfirst == -1)  yfirst = y;
 				ylast = y;
@@ -539,7 +539,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 			c_ptr = cave_p(x-1,y);
 
 			if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-				!(c_ptr->info & FF_BLOCK))
+				!(c_ptr->info & CAVE_BLOCK))
 			{
 				if (yfirst == -1)  yfirst = y;
 				ylast = y;
@@ -559,7 +559,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x+i, y);
 
 				if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-					!(c_ptr->info & FF_BLOCK))
+					!(c_ptr->info & CAVE_BLOCK))
 				{
 					ok = TRUE;
 				}
@@ -573,7 +573,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x-i, y);
 
 				if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-					!(c_ptr->info & FF_BLOCK))
+					!(c_ptr->info & CAVE_BLOCK))
 				{
 					ok = TRUE;
 				}
@@ -591,7 +591,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x,y);
 
 				if (c_ptr->feat != FEAT_CLOSED && c_ptr->feat != FEAT_SECRET &&
-					(c_ptr->info & FF_BLOCK))
+					(c_ptr->info & CAVE_BLOCK))
 				{
 					set_feat_bold(x,y, dun->feat_floor);
 				}
@@ -612,7 +612,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 			c_ptr = cave_p(x,y+1);
 
 			if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-				!(c_ptr->info & FF_BLOCK))
+				!(c_ptr->info & CAVE_BLOCK))
 			{
 				if (xfirst == -1)  xfirst = x;
 				xlast = x;
@@ -622,7 +622,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 			c_ptr = cave_p(x,y-1);
 
 			if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-				!(c_ptr->info & FF_BLOCK))
+				!(c_ptr->info & CAVE_BLOCK))
 			{
 				if (xfirst == -1)  xfirst = x;
 				xlast = x;
@@ -642,7 +642,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x, y+i);
 
 				if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-					!(c_ptr->info & FF_BLOCK))
+					!(c_ptr->info & CAVE_BLOCK))
 				{
 					ok = TRUE;
 				}
@@ -656,7 +656,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x, y-i);
 
 				if (c_ptr->feat == FEAT_CLOSED || c_ptr->feat == FEAT_SECRET ||
-					!(c_ptr->info & FF_BLOCK))
+					!(c_ptr->info & CAVE_BLOCK))
 				{
 					ok = TRUE;
 				}
@@ -674,7 +674,7 @@ static void apply_symmetry_connect(dun_type * d_ptr, bool horiz)
 				c_ptr = cave_p(x,y);
 
 				if (c_ptr->feat != FEAT_CLOSED && c_ptr->feat != FEAT_SECRET &&
-					(c_ptr->info & FF_BLOCK))
+					(c_ptr->info & CAVE_BLOCK))
 				{
 					set_feat_bold(x,y, dun->feat_floor);
 				}

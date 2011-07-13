@@ -170,6 +170,9 @@ void delete_dungeon_object(object_type *o_ptr)
 	/* Visual update */
 	lite_spot(x, y);
 
+  /* Notice the change  - Brett */
+  p_ptr->window |= PW_VISIBLE;
+
 	/* Wipe the object */
 	object_wipe(o_ptr);
 
@@ -196,6 +199,9 @@ void delete_object(int x, int y)
 
 	/* Visual update */
 	lite_spot(x, y);
+
+  /* Notice the change  - Brett */
+  p_ptr->window |= PW_VISIBLE;
 }
 
 
@@ -442,7 +448,15 @@ void wipe_o_list(void)
 	{
 		o_ptr = &o_list[i];
 
-		o_ptr->allocated = FALSE;
+		if (o_ptr->allocated == 2)
+    {
+      o_ptr->allocated = TRUE;
+    }
+    else
+    {
+  		o_ptr->allocated = FALSE;
+    }
+		//o_ptr->allocated = FALSE;
 	}
 
 	/* Only if inventory exists */
@@ -1851,6 +1865,7 @@ bool object_can_contain(const object_type *j_ptr, const object_type *o_ptr, int 
 	int slots = 0;
 	int objs = 0;
 
+  /* Paranoia */
 	if (j_ptr->tval != TV_CONTAINER) return (FALSE);
 
 	/* Handle priority.  Priority 0 should be superior to stacking with similar objects,
@@ -1860,10 +1875,24 @@ bool object_can_contain(const object_type *j_ptr, const object_type *o_ptr, int 
 	if (priority == 0 && j_ptr->sval != 3) return (FALSE);
 
 	/* For now, all containers are for ammunition only. */
-	if (o_ptr->tval != TV_SHOT && o_ptr->tval != TV_ARROW && o_ptr->tval != TV_BOLT)
-		return (FALSE);
+	//if (o_ptr->tval != TV_SHOT && o_ptr->tval != TV_ARROW && o_ptr->tval != TV_BOLT)
+	//	return (FALSE);
 
-	/* Go through the list */
+  /* Make sure the tval is in the range held by the object - Brett */
+  if (j_ptr->to_a) {
+    if (((o_ptr->tval < j_ptr->to_d) || (o_ptr->tval > j_ptr->to_a))
+      && (o_ptr->tval != j_ptr->to_h))
+    {
+  		return (FALSE);
+    }
+  } else if (j_ptr->to_d) {
+    /* we are accepting any object except those in the exclusion range */
+    if (!((o_ptr->tval < j_ptr->to_h) || (o_ptr->tval > j_ptr->to_d)))
+    {
+  		return (FALSE);
+    }
+  }
+  /* Go through the list */
 	OBJ_ITT_START (j_ptr->contents_o_idx, j2_ptr)
 	{
 		/* Count slots */
@@ -1877,8 +1906,11 @@ bool object_can_contain(const object_type *j_ptr, const object_type *o_ptr, int 
 	}
 	OBJ_ITT_END;
 
-	/* Check for maximum number of objects */
-	if (objs + o_ptr->number > j_ptr->pval) return (FALSE);
+	/* Check for maximum wieght - Brett */
+	if (j_ptr->weight + o_ptr->weight > j_ptr->pval) return (FALSE);
+
+  /* Check for maximum number of objects */
+	//if (objs + o_ptr->number > j_ptr->pval) return (FALSE);
 
 	/* Check for maximum number of stacks */
 	if (slots + (can_absorb ? 0 : 1) > j_ptr->ac) return (FALSE);
@@ -4187,6 +4219,7 @@ static bool put_object(object_type *o_ptr, int x, int y)
 		/* Notice + Redraw */
 		note_spot(x, y);
 
+  	p_ptr->window |= PW_VISIBLE;
 		return (TRUE);
 	}
 

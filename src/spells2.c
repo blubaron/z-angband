@@ -1143,7 +1143,7 @@ bool detect_traps(bool ident)
  * Place a random type of normal door at the given location.
  * Use this in-game
  */
-void create_closed_door(int x, int y)
+void create_closed_door(int x, int y, u16b feat)
 {
 	int tmp;
 
@@ -1163,21 +1163,21 @@ void create_closed_door(int x, int y)
 	if (tmp < 300)
 	{
 		/* Create closed door */
-		cave_set_feat(x, y, FEAT_CLOSED);
+		cave_set_feat(x, y, feat);
 	}
 
 	/* Locked doors (99/400) */
 	else if (tmp < 399)
 	{
 		/* Create locked door */
-		make_lockjam_door(x, y, randint1(10) + p_ptr->depth / 10, FALSE);
+		make_lockjam_door(x, y, feat, randint1(10) + p_ptr->depth / 10, FALSE);
 	}
 
 	/* Stuck doors (1/400) */
 	else
 	{
 		/* Create jammed door */
-		make_lockjam_door(x, y, randint1(5) + p_ptr->depth / 10, TRUE);
+		make_lockjam_door(x, y, feat, randint1(5) + p_ptr->depth / 10, TRUE);
 	}
 }
 
@@ -1186,18 +1186,30 @@ static bool door_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
+  feature_type *feat_ptr  = &(f_info[c_ptr->feat]);
 
 	/* Detect secret doors */
-	if (c_ptr->feat == FEAT_SECRET)
+	/*if (c_ptr->feat == FEAT_SECRET)
 	{
-		/* Pick a door */
+		/* Pick a door *//*
 		create_closed_door(x, y);
-	}
+	}*/
 
 	/* Detect doors */
-	if ((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_OPEN) ||
-		(c_ptr->feat == FEAT_BROKEN))
+	//if ((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_OPEN) ||
+	//	(c_ptr->feat == FEAT_BROKEN))
+	if (feat_ptr->flags &  FF_DOOR)
 	{
+	  if (feat_ptr->flags &  FF_HIDDEN)
+	  {
+			/* Pick a door */
+      if (feat_ptr->base_feat) {
+				create_closed_door(x, y, feat_ptr->base_feat);
+      } else {
+				create_closed_door(x, y, the_feat(FEAT_CLOSED));
+      }
+  		//create_closed_door(x, y, feat->base_feat);
+    }
 		/* Hack -- Memorize */
 		remember_grid(c_ptr, pc_ptr);
 
@@ -1225,9 +1237,11 @@ static bool stair_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
+  feature_type *feat  = &(f_info[c_ptr->feat]);
 
 	/* Detect stairs */
-	if ((c_ptr->feat == FEAT_LESS) || (c_ptr->feat == FEAT_MORE))
+	//if ((c_ptr->feat == FEAT_LESS) || (c_ptr->feat == FEAT_MORE))
+	if ((feat->flags &  FF_EXIT_UP) || (feat->flags &  FF_EXIT_DOWN)) 
 	{
 		/* Hack -- Memorize */
 		remember_grid(c_ptr, pc_ptr);
@@ -1255,9 +1269,11 @@ static bool treasure_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
+  feature_type *feat  = &(f_info[c_ptr->feat]);
 
 	/* Magma/Quartz + Known Gold */
-	if ((c_ptr->feat == FEAT_MAGMA_K) || (c_ptr->feat == FEAT_QUARTZ_K))
+	//if ((c_ptr->feat == FEAT_MAGMA_K) || (c_ptr->feat == FEAT_QUARTZ_K))
+	if (feat->flags &  FF_DIG_GOLD) 
 	{
 		/* Hack -- Memorize */
 		remember_grid(c_ptr, pc_ptr);
@@ -4377,7 +4393,10 @@ bool purge_area(void)
 {
 	bool rv = remove_curse();
 
-	if (project_hack2(GF_KILL_CURSE, p_ptr->lev, PROJECT_ITEM))
+	if (project_hack2(GF_PURG_CURSE, p_ptr->lev, PROJECT_ITEM))
+		rv = TRUE;
+
+  if (project_hack2(GF_KILL_CURSE, p_ptr->lev, PROJECT_ITEM))
 		rv = TRUE;
 
 	return (rv);

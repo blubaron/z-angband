@@ -123,6 +123,26 @@
 #define IDM_FILE_SCORE			120
 #define IDM_FILE_EXIT			130
 
+#define IDM_GRAF_FONT 		180
+#define IDM_GRAF_FILE 		181
+#define IDM_GRAF_08X08		182
+#define IDM_GRAF_16X16		183
+#define IDM_GRAF_32X32		184
+#define IDM_GRAF_12X13		185
+
+#define IDM_TILE_FONT 		190
+#define IDM_TILE_08X08		191
+#define IDM_TILE_16X16		192
+#define IDM_TILE_32X32		193
+#define IDM_TILE_08X16		194
+#define IDM_TILE_10X20		195
+#define IDM_TILE_16X32		196
+#define IDM_TILE_08X13		197
+#define IDM_TILE_10X17		198
+#define IDM_TILE_12X13		199
+#define IDM_TILE_12X20		188
+#define IDM_TILE_16X25		189
+
 #define IDM_WINDOW_VIS_0		200
 #define IDM_WINDOW_VIS_1		201
 #define IDM_WINDOW_VIS_2		202
@@ -181,6 +201,9 @@
 #define IDM_OPTIONS_GRAPHICS_OLD    401
 #define IDM_OPTIONS_GRAPHICS_ADAM   402
 #define IDM_OPTIONS_GRAPHICS_DAVID  403
+#define IDM_OPTIONS_GRAPHICS_DAVID_6  404
+#define IDM_OPTIONS_GRAPHICS_DAVID_7  405
+#define IDM_OPTIONS_GRAPHICS_DAVID_8  406
 #define IDM_OPTIONS_BIGTILE         409
 #define IDM_OPTIONS_SOUND           410
 #define IDM_OPTIONS_LOW_PRIORITY    420
@@ -1020,6 +1043,14 @@ static void save_prefs(void)
 	strnfmt(buf, 128, "%d", arg_graphics);
 	WritePrivateProfileString("Angband", "Graphics", buf, ini_file);
 	
+  /* Save the tile width */
+	strnfmt(buf, 128, "%d", tile_width_mult);
+  WritePrivateProfileString("Angband", "TileWidth", buf, ini_file);
+
+  /* Save the tile height */
+	strnfmt(buf, 128, "%d", tile_height_mult);
+  WritePrivateProfileString("Angband", "TileHeight", buf, ini_file);
+
 	/* Save the "use_bigtile" flag */
 	strnfmt(buf, 128, "%d", use_bigtile ? 1 : 0);
 	WritePrivateProfileString("Angband", "Bigtile", buf, ini_file);
@@ -1085,7 +1116,17 @@ static void load_prefs(void)
 	char buf[1024];
 
 	/* Extract the "arg_graphics" flag */
-	arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+	GetPrivateProfileString("Angband", "Graphics", "0", buf, 1024, ini_file);
+  if (strlen(buf) == 1) {
+	  arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+  }
+  arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+	
+  /* Extract the tile width */
+	tile_width_mult = GetPrivateProfileInt("Angband", "TileWidth", 1, ini_file);
+
+	/* Extract the tile height */
+	tile_height_mult = GetPrivateProfileInt("Angband", "TileHeight", 1, ini_file);
 
 	/* Extract the "use_bigtile" flag */
 	use_bigtile = GetPrivateProfileInt("Angband", "Bigtile", FALSE, ini_file);
@@ -1363,6 +1404,8 @@ static int new_palette(void)
 
 
 #ifdef USE_GRAPHICS
+extern BOOL ReadDIB_DX9(HWND hWnd, LPSTR lpFileName, DIBINIT *pInfo);
+extern BOOL ReadDIB2_DX9(HWND hWnd, LPSTR lpFileName, DIBINIT *pInfo, DIBINIT *pMask);
 /*
  * Initialize graphics
  */
@@ -1374,13 +1417,28 @@ static bool init_graphics(void)
 		char buf[1024];
 		int wid, hgt;
 		cptr name;
+		cptr mask = NULL;
 
-		if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
+		if (graf_width && graf_height)
+		{
+			wid = graf_width;
+			hgt = graf_height;
+
+			name = graf_name;
+      if (strlen(graf_mask) > 1) {
+        mask = graf_mask;
+  			//use_transparency = FALSE;
+      }// else {
+  			use_transparency = TRUE;
+      //}
+    }
+		else if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
 		{
 			wid = 32;
 			hgt = 32;
 
 			name = "32x32.bmp";
+			mask = "mask32.bmp";
 
 			use_transparency = TRUE;
 		}
@@ -1390,6 +1448,7 @@ static bool init_graphics(void)
 			hgt = 16;
 
 			name = "16X16.BMP";
+			mask = "mask.bmp";
 
 			use_transparency = TRUE;
 		}
@@ -1405,40 +1464,38 @@ static bool init_graphics(void)
 		path_make(buf, ANGBAND_DIR_XTRA_GRAF, name);
 
 		/* Load the bitmap or quit */
-		if (!ReadDIB(data[0].w, buf, &infGraph))
-		{
-			plog_fmt("Cannot read bitmap file '%s'", name);
-			return (FALSE);
-		}
+		//if (!ReadDIB(data[0].w, buf, &infGraph))
+		//if (!ReadDIB_DX9(data[0].w, buf, &infGraph))
+    if (mask) 
+    {
+		  if (!ReadDIB_DX9(data[0].w, buf, &infGraph))
+		  {
+			  plog_fmt("Cannot read bitmap file '%s'", name);
+			  return (FALSE);
+		  }
+			
+      /* Access the mask file */
+			path_build(buf, sizeof(buf), ANGBAND_DIR_XTRA_GRAF, mask);
+
+			/* Load the bitmap or quit */
+			if (!ReadDIB_DX9(data[0].w, buf, &infMask))
+			{
+				plog_fmt("Cannot read bitmap file '%s'", buf);
+				return (FALSE);
+			}
+    }
+    else
+    {
+		  if (!ReadDIB2_DX9(data[0].w, buf, &infGraph, &infMask))
+		  {
+			  plog_fmt("Cannot read bitmap file '%s'", name);
+			  return (FALSE);
+		  }
+    }
 
 		/* Save the new sizes */
 		infGraph.CellWidth = wid;
 		infGraph.CellHeight = hgt;
-
-		if (arg_graphics == GRAPHICS_ADAM_BOLT)
-		{
-			/* Access the mask file */
-			path_make(buf, ANGBAND_DIR_XTRA_GRAF, "mask.bmp");
-
-			/* Load the bitmap or quit */
-			if (!ReadDIB(data[0].w, buf, &infMask))
-			{
-				plog_fmt("Cannot read bitmap file '%s'", buf);
-				return (FALSE);
-			}
-		}
-		else if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-		{
-			/* Access the mask file */
-			path_make(buf, ANGBAND_DIR_XTRA_GRAF, "mask32.bmp");
-
-			/* Load the bitmap or quit */
-			if (!ReadDIB(data[0].w, buf, &infMask))
-			{
-				plog_fmt("Cannot read bitmap file '%s'", buf);
-				return (FALSE);
-			}
-		}
 
 		/* Activate a palette */
 		if (!new_palette())
@@ -1846,25 +1903,33 @@ static errr Term_xtra_win_react(void)
 		FreeDIB(&infGraph);
 		FreeDIB(&infMask);
 
-		/* Initialize (if needed) */
-		if (arg_graphics && !init_graphics())
+		/* Change setting */
+		use_graphics = arg_graphics;
+
+		/* Reset visuals */
+    #ifdef ANGBAND_2_8_1
+		  reset_visuals();
+    #else /* ANGBAND_2_8_1 */
+		  reset_visuals(TRUE);
+    #endif /* ANGBAND_2_8_1 */
+
+    /* Initialize (if needed) */
+    /* moved this down here because prefs are set in reset_visuals and I want
+     * info loaded there in init_graphics - Brett */
+		if (use_graphics && !init_graphics())
 		{
 			/* Warning */
 			plog("Cannot initialize graphics!");
 
 			/* Cannot enable */
-			arg_graphics = GRAPHICS_NONE;
+			use_graphics = GRAPHICS_NONE;
+		  /* Reset visuals */
+      #ifdef ANGBAND_2_8_1
+		    reset_visuals();
+      #else /* ANGBAND_2_8_1 */
+		    reset_visuals(TRUE);
+      #endif /* ANGBAND_2_8_1 */
 		}
-
-		/* Change setting */
-		use_graphics = arg_graphics;
-
-		/* Reset visuals */
-#ifdef ANGBAND_2_8_1
-		reset_visuals();
-#else /* ANGBAND_2_8_1 */
-		reset_visuals(TRUE);
-#endif /* ANGBAND_2_8_1 */
 	}
 
 #endif /* USE_GRAPHICS */
@@ -2029,6 +2094,8 @@ static errr Term_xtra_win_sound(int v)
 	/* Play the sound, catch errors */
         /* HACK: disabling sounds
         return (PlaySound(buf, 0, SND_FILENAME | SND_ASYNC)); */
+	/* Oops */
+	return (1);
 
 #else /* WIN32 */
 
@@ -2250,6 +2317,46 @@ static errr Term_curs_win(int x, int y)
 	return 0;
 }
 
+/*
+ * Low level graphics (Assumes valid input).
+ *
+ * Draw a "cursor" at (x,y), using a "yellow box".
+ */
+static errr Term_bigcurs_win(int x, int y)
+{
+	term_data *td = (term_data*)(Term->data);
+
+	RECT rc;
+	HDC hdc;
+
+	int tile_wid, tile_hgt;
+
+	if (td->map_active)
+	{
+		/* Normal cursor in map window */
+		Term_curs_win(x, y);
+		return 0;
+	}
+	else
+	{
+		tile_wid = td->tile_wid;
+		tile_hgt = td->tile_hgt;
+	}
+
+	/* Frame the grid */
+	rc.left = x * tile_wid + td->size_ow1;
+        rc.right = rc.left + tile_width_mult * tile_wid;
+	rc.top = y * tile_hgt + td->size_oh1;
+        rc.bottom = rc.top + tile_height_mult * tile_hgt;
+
+	/* Cursor is done as a yellow "box" */
+	hdc = GetDC(td->w);
+	FrameRect(hdc, &rc, hbrYellow);
+	ReleaseDC(td->w, hdc);
+
+	/* Success */
+	return 0;
+}
 
 /*
  *
@@ -2444,8 +2551,9 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	hdcSrc = CreateCompatibleDC(hdc);
 	hbmSrcOld = SelectObject(hdcSrc, infGraph.hBitmap);
 
-	if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-			(arg_graphics == GRAPHICS_DAVID_GERVAIS))
+	//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
+	//		(arg_graphics == GRAPHICS_DAVID_GERVAIS))
+  if (infMask.hBitmap)
 	{
 		hdcMask = CreateCompatibleDC(hdc);
 		SelectObject(hdcMask, infMask.hBitmap);
@@ -2469,9 +2577,10 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		x1 = col * w1;
 		y1 = row * h1;
 
-		if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-			(arg_graphics == GRAPHICS_DAVID_GERVAIS))
-		{
+		//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
+		//	(arg_graphics == GRAPHICS_DAVID_GERVAIS))
+		if (hdcMask)
+    {
 			x3 = (tcp[i] & 0x7F) * w1;
 			y3 = (tap[i] & 0x7F) * h1;
 
@@ -2533,8 +2642,9 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	SelectObject(hdcSrc, hbmSrcOld);
 	DeleteDC(hdcSrc);
 
-	if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-		(arg_graphics == GRAPHICS_DAVID_GERVAIS))
+	//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
+	//	(arg_graphics == GRAPHICS_DAVID_GERVAIS))
+  if (hdcMask)
 	{
 		/* Release */
 		SelectObject(hdcMask, hbmSrcOld);
@@ -3067,6 +3177,12 @@ static void setup_menus(void)
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_BIGTILE,
 				   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_SOUND,
@@ -3093,6 +3209,12 @@ static void setup_menus(void)
 	              (arg_graphics == GRAPHICS_ADAM_BOLT ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID,
 	              (arg_graphics == GRAPHICS_DAVID_GERVAIS ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6,
+	              (arg_graphics == 6 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
+	              (arg_graphics == 7 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
+	              (arg_graphics == 8 ? MF_CHECKED : MF_UNCHECKED));
 
 	CheckMenuItem(hm, IDM_OPTIONS_BIGTILE,
 	              (use_bigtile ? MF_CHECKED : MF_UNCHECKED));
@@ -3113,6 +3235,9 @@ static void setup_menus(void)
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_BIGTILE, MF_ENABLED);
 	}
 #endif /* USE_GRAPHICS */
@@ -3656,7 +3781,131 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 
-		case IDM_OPTIONS_GRAPHICS_NONE:
+		case IDM_TILE_08X08:
+		{
+			td = &data[0];
+			td->tile_wid = 8;
+			td->tile_hgt = 8;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+
+		case IDM_TILE_08X16:
+		{
+			td = &data[0];
+			td->tile_wid = 8;
+			td->tile_hgt = 16;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+		case IDM_TILE_16X16:
+		{
+			td = &data[0];
+			td->tile_wid = 16;
+			td->tile_hgt = 16;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+
+		case IDM_TILE_32X32:
+		{
+			td = &data[0];
+			td->tile_wid = 32;
+			td->tile_hgt = 32;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+
+		case IDM_TILE_12X13:
+		{
+			td = &data[0];
+			td->tile_wid = 12;
+			td->tile_hgt = 13;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+		case IDM_TILE_FONT:
+		{
+			td = &data[0];
+			td->tile_wid = td->font_wid;
+			td->tile_hgt = td->font_hgt;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+		case IDM_TILE_16X32:
+		{
+			td = &data[0];
+			td->tile_wid = 16;
+			td->tile_hgt = 32;
+
+			term_getsize(td);
+
+			term_window_resize(td);
+
+			break;
+		}
+
+    /*case IDM_OPTIONS_GRAPHICS_NONE:
+    case IDM_OPTIONS_GRAPHICS_OLD:
+    case IDM_OPTIONS_GRAPHICS_ADAM:
+    case IDM_OPTIONS_GRAPHICS_DAVID:
+    case IDM_OPTIONS_GRAPHICS_DAVID_6:
+    case IDM_OPTIONS_GRAPHICS_DAVID_7:
+    case IDM_OPTIONS_GRAPHICS_DAVID_8:
+		{
+			/* Paranoia *//*
+			if (!p_ptr->cmd.inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_graphics" *//*
+	    switch (wCmd)
+	    {
+        case IDM_OPTIONS_GRAPHICS_NONE: arg_graphics = GRAPHICS_NONE; break;
+        case IDM_OPTIONS_GRAPHICS_OLD: arg_graphics = GRAPHICS_ORIGINAL; break
+        case IDM_OPTIONS_GRAPHICS_ADAM: arg_graphics = GRAPHICS_ADAM_BOLT; break;
+        case IDM_OPTIONS_GRAPHICS_DAVID: arg_graphics = GRAPHICS_DAVID_GERVAIS; break;
+        case IDM_OPTIONS_GRAPHICS_DAVID_6: arg_graphics = 6; break;
+        case IDM_OPTIONS_GRAPHICS_DAVID_7: arg_graphics = 7; break;
+        case IDM_OPTIONS_GRAPHICS_DAVID_8: arg_graphics = 8; break;
+      }
+			if (arg_graphics != use_graphics)
+			{
+				/* React to changes *//*
+				Term_xtra_win_react();
+
+				/* Hack -- Force redraw *//*
+				Term_key_push(KTRL('R'));
+			}
+      break;
+    }*/
+    case IDM_OPTIONS_GRAPHICS_NONE:
 		{
 			/* Paranoia */
 			if (!p_ptr->cmd.inkey_flag || !initialized)
@@ -3741,6 +3990,75 @@ static void process_menus(WORD wCmd)
 			if (arg_graphics != GRAPHICS_DAVID_GERVAIS)
 			{
 				arg_graphics = GRAPHICS_DAVID_GERVAIS;
+
+				/* React to changes */
+				Term_xtra_win_react();
+
+				/* Hack -- Force redraw */
+				Term_key_push(KTRL('R'));
+			}
+
+			break;
+		}
+		case IDM_OPTIONS_GRAPHICS_DAVID_6:
+		{
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_graphics" */
+			if (arg_graphics != 6)
+			{
+				arg_graphics = 6;
+
+				/* React to changes */
+				Term_xtra_win_react();
+
+				/* Hack -- Force redraw */
+				Term_key_push(KTRL('R'));
+			}
+
+			break;
+		}
+		case IDM_OPTIONS_GRAPHICS_DAVID_7:
+		{
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_graphics" */
+			if (arg_graphics != 7)
+			{
+				arg_graphics = 7;
+
+				/* React to changes */
+				Term_xtra_win_react();
+
+				/* Hack -- Force redraw */
+				Term_key_push(KTRL('R'));
+			}
+
+			break;
+		}
+		case IDM_OPTIONS_GRAPHICS_DAVID_8:
+		{
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized)
+			{
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_graphics" */
+			if (arg_graphics != 8)
+			{
+				arg_graphics = 8;
 
 				/* React to changes */
 				Term_xtra_win_react();

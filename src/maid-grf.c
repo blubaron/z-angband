@@ -235,6 +235,27 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 	use_graphics = GRAPHICS_NONE;
 	use_transparency = FALSE;
 
+	if (graf_width && graf_height)
+	{
+    /* WARNING - this assumes that graphics is correct, may not be if
+    GRAPHICS_ANY is used? */
+
+    strnfmt(filename+1024-128,128,"graf/%s",graf_name);
+		path_build(filename, 1024, ANGBAND_DIR_XTRA, filename+1024-128);
+    // may or may not work, has not been tested
+		//path_make(filename, ANGBAND_DIR_XTRA_GRAF, graf_name);
+		if (0 == fd_close(fd_open(filename, O_RDONLY)))
+		{
+			use_transparency = TRUE;
+
+			*xsize = graf_width;
+			*ysize = graf_height;
+		}
+	  use_graphics = graphics;
+
+    /* Did we change the graphics? */
+		return (old_graphics != use_graphics);
+	}
 	if ((graphics == GRAPHICS_ANY) || (graphics == GRAPHICS_DAVID_GERVAIS))
 	{
 		/* Try the "32x32.bmp" file */
@@ -546,30 +567,36 @@ void del_overhead_map(void)
 	FREE(map_cache_x);
 	FREE(map_cache_y);
 
-	/* Delete each block */
-	for (i = 0; i < MAP_CACHE; i++)
-	{
-		/* Deallocate rows of a block */
-		for (j = 0; j < WILD_BLOCK_SIZE; j++)
-		{
-			FREE(map_cache[i][j]);
-		}
+  if (map_cache)
+  {
+	  /* Delete each block */
+	  for (i = 0; i < MAP_CACHE; i++)
+	  {
+		  /* Deallocate rows of a block */
+		  for (j = 0; j < WILD_BLOCK_SIZE; j++)
+		  {
+        // crashes here if program quits before this is allocated
+        // eg if there is an error reading k_info.txt - Brett
+			  FREE(map_cache[i][j]);
+		  }
 
-		/* Free block */
-		FREE(map_cache[i]);
-	}
+		  /* Free block */
+		  FREE(map_cache[i]);
+	  }
 
-	/* Free the list of pointers to blocks */
-	FREE(map_cache);
+	  /* Free the list of pointers to blocks */
+	  FREE(map_cache);
+  }
+  if (map_grid) {
+	  for (i = 0; i < WILD_SIZE; i++)
+	  {
+		  /* Free one row of the wilderness */
+		  FREE(map_grid[i]);
+	  }
 
-	for (i = 0; i < WILD_SIZE; i++)
-	{
-		/* Free one row of the wilderness */
-		FREE(map_grid[i]);
-	}
-
-	/* Free the overhead map itself */
-	FREE(map_grid);
+	  /* Free the overhead map itself */
+	  FREE(map_grid);
+  }
 }
 
 
@@ -853,6 +880,7 @@ static void display_banner(wild_done_type *w_ptr)
 			{
 				/* Town with castle and no home */
 				banner = "Move around, press * for town, q for quests or any key to exit.";
+//						"Hit *, |, ~ for info, Move around, or hit any other key to continue.");
 			}
 			/* Inn */
 			else
@@ -867,8 +895,10 @@ static void display_banner(wild_done_type *w_ptr)
 		else
 		{
 			/* Display standard bottom line */
-			put_fstr(wid / 2 - 23, hgt - 1,
-					"Move around or hit any other key to continue.");
+			//put_fstr(wid / 2 - 23, hgt - 1,
+					//"Move around or hit any other key to continue.");
+			put_fstr(wid / 2 - 30, hgt - 1,
+					"Move around, ~ for info, or hit any other key to continue.");
 
 			/* It is a wilderness dungeon */
 			if (pl_ptr->type == PL_DUNGEON)
@@ -877,19 +907,22 @@ static void display_banner(wild_done_type *w_ptr)
 				if (pl_ptr->dungeon->recall_depth == 0)
 				{
 					/* It is still guarded by monsters */
-					banner = format("Guarded %s", dungeon_type_name(pl_ptr->dungeon->habitat));
+					//banner = format("Guarded %s", dungeon_type_name(pl_ptr->dungeon->habitat));
+					banner = format("%s, Guarded", pl_ptr->name);
 				}
 				else
 				{
 					/* No monsters to guard it */
-					banner = format("Unguarded %s", dungeon_type_name(pl_ptr->dungeon->habitat));
+					//banner = format("Unguarded %s", dungeon_type_name(pl_ptr->dungeon->habitat));
+					banner = pl_ptr->name;
 				}
 			}
 			/* It is a wilderness quest */
 			else if (pl_ptr->type == PL_QUEST_PIT)
 			{
 				/* Fetch wilderness quest name */
-				banner = quest[pl_ptr->quest_num].name;
+				//banner = quest[pl_ptr->quest_num].name;
+				banner = pl_ptr->name;
 			}
 			else if (pl_ptr->type == PL_QUEST_STAIR)
 			{
@@ -897,7 +930,9 @@ static void display_banner(wild_done_type *w_ptr)
 				quest_type *q_ptr = &quest[pl_ptr->quest_num];
 				if ((q_ptr->flags & QUEST_FLAG_KNOWN) && (q_ptr->status == QUEST_STATUS_TAKEN ||
 					q_ptr->status == QUEST_STATUS_COMPLETED || q_ptr->status == QUEST_STATUS_FAILED))
-					banner = "Quest";
+					//banner = "Quest";
+  				//banner = quest[pl_ptr->quest_num].name;
+					banner = format("Level %d Quest", q_ptr->level);
 				else
 					banner = "";
 			}
@@ -911,8 +946,10 @@ static void display_banner(wild_done_type *w_ptr)
 	else
 	{
 		/* Display standard bottom line */
-		put_fstr(wid / 2 - 23, hgt - 1,
-				"Move around or hit any other key to continue.");
+		//put_fstr(wid / 2 - 23, hgt - 1,
+				//"Move around or hit any other key to continue.");
+		put_fstr(wid / 2 - 30, hgt - 1,
+					"Move around, ~ for info, or hit any other key to continue.");
 	}
 }
 
@@ -1258,11 +1295,27 @@ void do_cmd_view_map(void)
 				continue;
 			}
 
-			/* On a town?  -- MT */
-			if (w_ptr->place)
+			if ((c == '~') || (c == '|')) // Added by Brett
 			{
-				/* Check if this is an info command */
-				if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
+    		/* Check artifacts, uniques, objects, quests etc. */
+		    do_cmd_knowledge();
+        continue;
+			}
+      else
+			/* Accept '*' or a direction -- MT */
+			if ((c == '*') || (c == 'h') || (c == 'q'))
+      { 
+        // key is checked here, to trap the key press, so it does not
+        // leave the map when not on a town
+			  /* On a town?  -- MT */
+			  if (w_ptr->place)
+			  {
+          /* Check if this is an info command */
+				  if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
+				  /* Display info for this town -- MT */
+				  //single_town_info(w_ptr->place);
+			  }
+				continue;
 			}
 
 			/* Done if not a direction */
@@ -1312,7 +1365,7 @@ void do_cmd_view_map(void)
  * This is used to do dynamic lighting effects in ascii :-)
  */
 
-static const byte lighting_colours[16] =
+const byte lighting_colours[16] =
 {
 	/* TERM_DARK */
 	TERM_L_DARK,
@@ -1363,7 +1416,7 @@ static const byte lighting_colours[16] =
 	TERM_L_UMBER,
 };
 
-static const byte darking_colours[16] =
+const byte darking_colours[16] =
 {
 	/* TERM_DARK */
 	TERM_DARK,
@@ -2124,60 +2177,41 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 		 * We then need to have a grid that is allowed to be lit.
 		 */
 		if (view_bright_lite && !query_timed(TIMED_BLIND)
-			&& (!(f_ptr->flags & FF_BLOCK)
+			//&& (!(f_ptr->flags & FF_BLOCK)
+			&& ((f_ptr->flags & (FF_PWALK|FF_MWALK))
 				|| (view_granite_lite && !view_torch_grids)))
 		{
 			/* It's not in view or no lighting effects? */
 			if (((!(player & (GRID_VIEW))) && view_special_lite)
 				|| !visible)
 			{
-				/* If is ascii graphics */
-				if (a < 16)
-				{
-					/* Use darkened colour */
-					a = darking_colours[a];
-				}
-				else if ((use_graphics == GRAPHICS_ADAM_BOLT)
-						 && (f_ptr->flags & FF_USE_TRANS))
-				{
-					/* Use a dark tile */
-					c++;
-				}
+		    a = f_ptr->xd_attr;
+		    c = f_ptr->xd_char;
 			}
 			else if (lite && view_yellow_lite)
 			{
-				/* Use the torch effect */
-				if (a < 16)
-				{
-					/* Use bright colour */
-					a = lighting_colours[a];
-				}
-				else if ((use_graphics == GRAPHICS_ADAM_BOLT)
-						 && (f_ptr->flags & FF_USE_TRANS))
-				{
-					/* Use a light tile */
-					c += 2;
-				}
+		    a = f_ptr->xl_attr;
+		    c = f_ptr->xl_char;
 			}
 		}
 
 		/* Save the terrain info for the transparency effects */
 
 		/* Does the feature have "extended terrain" information? */
-		if (f_ptr->w_attr)
+		/*if (f_ptr->w_attr)
 		{
 			/*
 			 * Store extended terrain information.
 			 * Note hack to get lighting right.
 			 */
-			(*tap) = f_ptr->w_attr + a - f_ptr->x_attr;
+	/*		(*tap) = f_ptr->w_attr + a - f_ptr->x_attr;
 			(*tcp) = f_ptr->w_char + c - f_ptr->x_char;
 		}
 		else
-		{
+		{*/
 			(*tap) = a;
 			(*tcp) = c;
-		}
+		/*}*/
 	}
 
 
@@ -2985,16 +3019,16 @@ void display_map(int *cx, int *cy)
 					ma[j + 1][i + 1] = f_info[feat].x_attr;
 					mc[j + 1][i + 1] = f_info[feat].x_char;
 
-					if (f_info[feat].w_attr)
+					/*if (f_info[feat].w_attr)
 					{
 						mta[j + 1][i + 1] = f_info[feat].w_attr;
 						mtc[j + 1][i + 1] = f_info[feat].w_char;
 					}
 					else
-					{
+					{*/
 						mta[j + 1][i + 1] = ma[j + 1][i + 1];
 						mtc[j + 1][i + 1] = mc[j + 1][i + 1];
-					}
+					/*}*/
 				}
 			}
 		}

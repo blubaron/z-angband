@@ -2208,6 +2208,7 @@ static void take_move(int m_idx, int *mm)
 	int oy, ox;
 
 	cave_type *c_ptr;
+  feature_type *feat_ptr;
 
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
@@ -2253,6 +2254,7 @@ static void take_move(int m_idx, int *mm)
 
 		/* Access that cave grid */
 		c_ptr = area(nx, ny);
+    feat_ptr = &(f_info[c_ptr->feat]);
 
 		if (in_boundsp(nx, ny) && player_can_see_grid(parea(nx, ny)))
 		{
@@ -2263,7 +2265,8 @@ static void take_move(int m_idx, int *mm)
 		y_ptr = &m_list[c_ptr->m_idx];
 
 		/* Floor is open? */
-		if (cave_floor_grid(c_ptr))
+		//if (cave_floor_grid(c_ptr))
+		if (feat_ptr->flags & FF_MWALK)
 		{
 			/* Go ahead and move */
 			do_move = TRUE;
@@ -2282,19 +2285,21 @@ static void take_move(int m_idx, int *mm)
 		}
 
 		/* Permanent wall */
-		else if (cave_perma_grid(c_ptr) && cave_wall_grid(c_ptr))
+		/*else if (cave_perma_grid(c_ptr) && cave_wall_grid(c_ptr))
 		{
 			do_move = FALSE;
 		}
 
 		/* Hack -- closed or secret doors are no obstacle */
-		else if ((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
+		//else if ((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
+		else if (feat_ptr->flags & FF_DOOR)
 		{
 			do_move = TRUE;
 		}
 
 		/* Monster moves through walls (and doors) */
-		else if (FLAG(r_ptr, RF_PASS_WALL))
+		//else if (FLAG(r_ptr, RF_PASS_WALL))
+		else if (FLAG(r_ptr, RF_PASS_WALL) && (feat_ptr->flags & FF_MPASS))
 		{
 			/* Pass through walls/doors/rubble */
 			do_move = TRUE;
@@ -2304,7 +2309,8 @@ static void take_move(int m_idx, int *mm)
 		}
 
 		/* Monster destroys walls (and doors) */
-		else if (FLAG(r_ptr, RF_KILL_WALL))
+		//else if (FLAG(r_ptr, RF_KILL_WALL))
+		else if (FLAG(r_ptr, RF_KILL_WALL) && (feat_ptr->flags & FF_MPASS) && !(feat_ptr->flags & FF_PERM))
 		{
 			/* Eat through walls/doors/rubble */
 			do_move = TRUE;
@@ -2321,7 +2327,8 @@ static void take_move(int m_idx, int *mm)
 			cave_set_feat(nx, ny, the_floor());
 		}
 
-		else if (cave_wall_grid(c_ptr))
+		//else if (cave_wall_grid(c_ptr))
+		else //if (!(feat_ptr->flags & FF_MWALK))
 		{
 			/* This monster cannot walk through walls */
 			do_move = FALSE;
@@ -2344,19 +2351,30 @@ static void take_move(int m_idx, int *mm)
 		/* Open / bash doors */
 		if (did_open_door)
 		{
-			cave_set_feat(nx, ny, FEAT_OPEN);
+			//cave_set_feat(nx, ny, FEAT_OPEN);
+      if (feat_ptr->base_feat) {
+		    cave_set_feat(nx, ny, feat_ptr->base_feat);
+      } else {
+        cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+      }
 		}
 		else if (did_bash_door)
 		{
 			if (one_in_(2))
 			{
-				cave_set_feat(nx, ny, FEAT_BROKEN);
+				//cave_set_feat(nx, ny, FEAT_BROKEN);
+				cave_set_feat(nx, ny, the_feat(FEAT_BROKEN));
 			}
 
 			/* Open the door */
 			else
 			{
-				cave_set_feat(nx, ny, FEAT_OPEN);
+				//cave_set_feat(nx, ny, FEAT_OPEN);
+        if (feat_ptr->base_feat) {
+		      cave_set_feat(nx, ny, feat_ptr->base_feat);
+        } else {
+          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+        }
 			}
 		}
 
@@ -2372,13 +2390,43 @@ static void take_move(int m_idx, int *mm)
 		}
 
 		/* Handle closed doors and secret doors */
-		if (do_move &&
-			((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET)) &&
-			(FLAG(r_ptr, RF_OPEN_DOOR)) &&
+		//if (do_move &&
+		//	((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET)) &&
+		//	(FLAG(r_ptr, RF_OPEN_DOOR)) &&
+		//	(!is_pet(m_ptr) || p_ptr->pet_open_doors))
+		if (do_move && (feat_ptr->flags & FF_DOOR)
+      && (feat_ptr->flags & (FF_CLOSED|FF_HIDDEN)))
+    {
+			if ((FLAG(r_ptr, RF_OPEN_DOOR)) &&
 			(!is_pet(m_ptr) || p_ptr->pet_open_doors))
 		{
 			/* Open the door */
-			cave_set_feat(nx, ny, FEAT_OPEN);
+			//cave_set_feat(nx, ny, FEAT_OPEN);
+      if (feat_ptr->flags & FF_HIDDEN) {
+        u16b closed_feat, open_feat;
+        if (feat_ptr->base_feat) {
+          closed_feat = feat_ptr->base_feat;
+        } else {
+          closed_feat = the_feat(FEAT_CLOSED);
+        }
+        if (closed_feat) {
+          open_feat = f_info[closed_feat].base_feat;
+        } else {
+          open_feat = 0;
+        }
+        
+        if (open_feat) {
+		      cave_set_feat(nx, ny, open_feat);
+        } else {
+          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+        }
+      } else {
+        if (feat_ptr->base_feat) {
+		      cave_set_feat(nx, ny, feat_ptr->base_feat);
+        } else {
+          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+        }
+      }
 
 			/* Take a turn */
 			do_turn = TRUE;
@@ -2389,13 +2437,14 @@ static void take_move(int m_idx, int *mm)
 			/* The door was opened */
 			did_open_door = TRUE;
 		}
-		else if (((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
-				 && !did_pass_wall)
+		//else if (((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
+		//		 && !did_pass_wall)
+		else if (!did_pass_wall)
 		{
 			/* Monsters cannot walk through closed doors */
 			do_move = FALSE;
 		}
-
+    }
 		/* The player is in the way.  Attack him. */
 		if (do_move && (ny == p_ptr->py) && (nx == p_ptr->px))
 		{

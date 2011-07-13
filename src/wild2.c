@@ -224,6 +224,19 @@ static void place_player_start(s32b *x, s32b *y, u16b this_town)
 
 	/* Set current town */
 	p_ptr->place_num = this_town;
+
+  /* Set starting home */
+  p_ptr->home_place_num = this_town;
+  p_ptr->home_store_num = 0;
+  /* using tempx instead of i for the index because it is already here */
+	for (tempx = 0; tempx < place[this_town].numstores; tempx++)
+	{
+    if (place[this_town].store[tempx].type == BUILD_STORE_HOME)
+    {
+      p_ptr->home_store_num = tempx;
+      break;
+    }
+	}
 }
 
 
@@ -242,12 +255,29 @@ void select_town_name(char *name, int pop)
 
 	if (pop < T_SIZE_SMALL)
 	{
-		/* Simply copy it */
-		strnfmt(name, T_NAME_LEN + 1, "%s", buf);
+		/* Hamlet */
+		if ((len < T_NAME_LEN - 5) && one_in_(3))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%sville", buf);
+		}
+		else if ((len < T_NAME_LEN - 4) && one_in_(2))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "Ald %s", buf);
+		}
+		else
+		{
+			/* Simply copy it */
+			strnfmt(name, T_NAME_LEN + 1, "%s", buf);
+		}
 	}
 	else if (pop < T_SIZE_TOWN)
 	{
 		/* Tiny town */
+		if ((len < T_NAME_LEN - 4) && one_in_(3))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%s Dun", buf);
+		}
+        else
 		if ((len < T_NAME_LEN - 6) && one_in_(2))
 		{
 			strnfmt(name, T_NAME_LEN + 1, "%s Watch", buf);
@@ -266,6 +296,15 @@ void select_town_name(char *name, int pop)
 			strnfmt(name, T_NAME_LEN + 1, "%s Town", buf);
 		}
 				else
+		if ((len < T_NAME_LEN - 3) && one_in_(2))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%ston", buf);
+		}
+		else if ((len < T_NAME_LEN - 4) && one_in_(3))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "Tel %s", buf);
+		}
+		else
 		{
 			/* Simply copy it */
 			strnfmt(name, T_NAME_LEN + 1, "%s", buf);
@@ -274,17 +313,25 @@ void select_town_name(char *name, int pop)
 	else if (pop < T_SIZE_CASTLE)
 	{
 		/* City */
-		if ((len < T_NAME_LEN - 5) && one_in_(3))
+		if ((len < T_NAME_LEN - 4) && one_in_(8))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%sford", buf);
+		}
+		else if ((len < T_NAME_LEN - 5) && one_in_(7))
 		{
 			strnfmt(name, T_NAME_LEN + 1, "%s City", buf);
 		}
-		else if ((len < T_NAME_LEN - 5) && one_in_(2))
+		else if ((len < T_NAME_LEN - 5) && one_in_(6))
 		{
 			strnfmt(name, T_NAME_LEN + 1, "%s View", buf);
 		}
-		else if ((len < T_NAME_LEN - 5) && one_in_(2))
+		else if ((len < T_NAME_LEN - 5) && one_in_(5))
 		{
-			strnfmt(name, T_NAME_LEN + 1, "%s Keep", buf);
+			strnfmt(name, T_NAME_LEN + 1, "%s Fort", buf);
+		}
+		else if ((len < T_NAME_LEN - 5) && one_in_(4))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "Fort %s", buf);
 		}
 		else
 		{
@@ -297,6 +344,15 @@ void select_town_name(char *name, int pop)
 		get_table_name(buf2, FALSE);
 
 		/* Castle */
+		if ((len < T_NAME_LEN - 7) && one_in_(2))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%s Castle", buf);
+		}
+		else if ((len < T_NAME_LEN - 5) && one_in_(2))
+		{
+			strnfmt(name, T_NAME_LEN + 1, "%s Keep", buf);
+		}
+		else
 		if ((len + strlen(buf2) < T_NAME_LEN - 1) && one_in_(2))
 		{
 			strnfmt(name, T_NAME_LEN + 1, "%s-%s", buf, buf2);
@@ -905,7 +961,111 @@ static bool create_city(int x, int y, int town_num)
 		}
 	}
 
-	/*
+  /* I have seen a few towns with many temples, but no large
+     or medium in the game, this corrects that somewhat - Brett */
+  j = build[BUILD_TEMPLE1] + build[BUILD_TEMPLE2] + build[BUILD_TEMPLE3];
+  if ((build[BUILD_STORE_TEMPLE] > 4) && !j)
+  {
+    /* make one temple each a hidden, a high temple, and a large temple
+       all but 2 others random between them */
+		for (i = 0; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE3;
+        build[BUILD_TEMPLE3]++;
+        break;
+      }
+    }
+		for (; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE2;
+        build[BUILD_TEMPLE2]++;
+        break;
+      }
+    }
+		for (; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE1;
+        build[BUILD_TEMPLE1]++;
+        break;
+      }
+    }
+    build[BUILD_STORE_TEMPLE] -= 3;
+    j = build[BUILD_STORE_TEMPLE] - 2;
+    for (; j > 0; j--) 
+    {
+	    for (i = 0; i < build_num; i++)
+		  {
+  			if (build_list[i] == BUILD_STORE_TEMPLE)
+        {
+          if (one_in_(3))
+          {
+            build_list[i] = BUILD_TEMPLE3;
+            build[BUILD_TEMPLE3]++;
+          }
+          else
+          if (one_in_(2))
+          {
+            build_list[i] = BUILD_TEMPLE2;
+            build[BUILD_TEMPLE2]++;
+          }
+          else
+          {
+            build_list[i] = BUILD_TEMPLE1;
+            build[BUILD_TEMPLE1]++;
+          }
+          build[BUILD_STORE_TEMPLE]--;
+          break;
+        }
+      }
+    }
+  }
+  else
+  if ((build[BUILD_STORE_TEMPLE] == 4) && !j)
+  {
+    /* make one temple a large temple, and one a medium */
+		for (i = 0; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE2;
+        build[BUILD_TEMPLE2]++;
+        break;
+      }
+    }
+		for (; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE1;
+        build[BUILD_TEMPLE1]++;
+        break;
+      }
+    }
+    build[BUILD_STORE_TEMPLE] -= 2;
+  }
+  else
+  if ((build[BUILD_STORE_TEMPLE] == 3) && !j)
+  {
+    /* make one temple a medium temple */
+		for (i = 0; i < build_num; i++)
+		{
+  		if (build_list[i] == BUILD_STORE_TEMPLE)
+      {
+        build_list[i] = BUILD_TEMPLE1;
+        build[BUILD_TEMPLE1]++;
+        build[BUILD_STORE_TEMPLE]--;
+        break;
+      }
+    }
+  }
+
+  /*
 	 * Generate store and building data structures
 	 *
 	 * We need to do this second, because we need to
@@ -977,8 +1137,8 @@ static void draw_gates(byte i, byte j, place_type *pl_ptr)
 					generate_fill(x + 3, y + 3, x + 4, y + 4, FEAT_FLOOR);
 
 					/* Right gate */
-					make_lockjam_door(x + 4, y + 3, 0, FALSE);
-					make_lockjam_door(x + 4, y + 4, 0, FALSE);
+					make_lockjam_door(x + 4, y + 3, 0, 0, FALSE);
+					make_lockjam_door(x + 4, y + 4, 0, 0, FALSE);
 
 					return;
 				}
@@ -995,8 +1155,8 @@ static void draw_gates(byte i, byte j, place_type *pl_ptr)
 					generate_fill(x + 3, y + 3, x + 4, y + 4, FEAT_FLOOR);
 
 					/* Left gate */
-					make_lockjam_door(x + 3, y + 3, 0, FALSE);
-					make_lockjam_door(x + 3, y + 4, 0, FALSE);
+					make_lockjam_door(x + 3, y + 3, 0, 0, FALSE);
+					make_lockjam_door(x + 3, y + 4, 0, 0, FALSE);
 
 					return;
 				}
@@ -1013,8 +1173,8 @@ static void draw_gates(byte i, byte j, place_type *pl_ptr)
 					generate_fill(x + 3, y + 3, x + 4, y + 4, FEAT_FLOOR);
 
 					/* Bottom gate */
-					make_lockjam_door(x + 3, y + 4, 0, FALSE);
-					make_lockjam_door(x + 4, y + 4, 0, FALSE);
+					make_lockjam_door(x + 3, y + 4, 0, 0, FALSE);
+					make_lockjam_door(x + 4, y + 4, 0, 0, FALSE);
 
 					return;
 				}
@@ -1031,8 +1191,8 @@ static void draw_gates(byte i, byte j, place_type *pl_ptr)
 					generate_fill(x + 3, y + 3, x + 4, y + 4, FEAT_FLOOR);
 
 					/* Top gate */
-					make_lockjam_door(x + 3, y + 3, 0, FALSE);
-					make_lockjam_door(x + 4, y + 3, 0, FALSE);
+					make_lockjam_door(x + 3, y + 3, 0, 0, FALSE);
+					make_lockjam_door(x + 4, y + 3, 0, 0, FALSE);
 
 					return;
 				}
@@ -1158,7 +1318,7 @@ static void draw_general(int x0, int y0, store_type *st_ptr, int x, int y)
 
 		case BUILD_BLANK:
 		{
-			/* Do Nothing */
+			/* Do Nothing *//* Save location for future use - Brett */st_ptr->x = x0;st_ptr->y = y0;
 
 			break;
 		}
@@ -2775,19 +2935,87 @@ byte the_floor(void)
 	/* In the dungeon */
 	return (place[p_ptr->place_num].dungeon->floor);
 }
+/* Hack - return the current type of "wall" */
+byte the_wall(void)
+{
+	/* In the wilderness */
+	if (!p_ptr->depth) return (FEAT_WALL_EXTRA);
 
+	/* In the dungeon */
+	return (place[p_ptr->place_num].dungeon->wall);
+}
+byte the_wall_perm(void)
+{
+	/* In the wilderness */
+	if (!p_ptr->depth) return (FEAT_PERM_EXTRA);
+
+	/* In the dungeon */
+	return (place[p_ptr->place_num].dungeon->perm_wall);
+}
+
+/* Hack - return the current type of "closed door" */
+byte the_door_closed(void)
+{
+  return FEAT_CLOSED;
+	/* In the wilderness */
+	//if (!p_ptr->depth) return (FEAT_DIRT);
+
+	/* In the dungeon */
+	//return (place[p_ptr->place_num].dungeon->floor);
+}
+
+/* Hack - return the current type of "broken door" */
+byte the_door_broken(void)
+{
+  return FEAT_BROKEN;
+	/* In the wilderness */
+	//if (!p_ptr->depth) return (FEAT_DIRT);
+
+	/* In the dungeon */
+	//return (place[p_ptr->place_num].dungeon->floor);
+}
+/* Hack - return the current type of "pillar" */
+byte the_pillar(void)
+{
+  return FEAT_PILLAR;
+	/* In the wilderness */
+	//if (!p_ptr->depth) return (FEAT_DIRT);
+
+	/* In the dungeon */
+	//return (place[p_ptr->place_num].dungeon->floor);
+}
+
+u16b the_feat(u16b feat)
+{
+	if (!p_ptr->depth) 
+  {if (feat == FEAT_FLOOR) return (FEAT_DIRT); 
+    return feat;
+  }
+  switch (feat) {
+  case FEAT_FLOOR:
+    return (place[p_ptr->place_num].dungeon->floor);
+  case FEAT_WALL_EXTRA:
+    return (place[p_ptr->place_num].dungeon->wall);
+  case FEAT_PERM_EXTRA:
+    return (place[p_ptr->place_num].dungeon->perm_wall);
+  }
+  return feat;
+}
 
 static bool create_towns(int *xx, int *yy)
 {
 	int x, y, i, j, used, cur_score;
 	bool first_try = TRUE;
-
+  int have_library = 0;
 	wild_gen2_type *w_ptr;
 
 	place_type *pl_ptr;
 
 	/* Variables to pick "easiest" town. */
 	u16b best_town = 0, town_value = 0;
+
+	/* Variables to pick "largest" town. */
+  int high_count = 0, high_count_place = 0;
 
 	/*
 	 * Try to add z_info->wp_max towns.
@@ -2881,9 +3109,19 @@ static bool create_towns(int *xx, int *yy)
 					best_town = place_count;
 				}
 			}
+			if (pl_ptr->store[i].type == BUILD_LIBRARY)
+			{
+        /* need a library somewhere to research bounty quests */
+        have_library++;
+      }
 		}
+    if (pl_ptr->numstores > high_count) {
+      /* keep track of the largest city since we are already touching all places */
+      high_count = pl_ptr->numstores;
+      high_count_place = place_count;
+    }
 
-		/* Increment number of places */
+    /* Increment number of places */
 		place_count++;
 	}
 
@@ -2948,6 +3186,56 @@ static bool create_towns(int *xx, int *yy)
 	}
 
 	pl_ptr = &place[best_town];
+
+  if (!have_library) {
+    /* need a library somewhere to research bounty quests */
+    int j = high_count_place;
+    /* check if the largest city has a blank spot */
+    y = 0;
+    for (i = place[j].numstores-1; i > 0; i--)
+    {
+      if (place[j].store[i].type == BUILD_NONE) {
+        /* change a random blank spot to a library, and init it */
+			  if (build_is_store(BUILD_LIBRARY))
+			  {
+				  store_init(j, i, BUILD_LIBRARY);
+			  }
+			  else
+			  {
+				  build_init(j, i, BUILD_LIBRARY);
+			  }
+        y++;
+        break;
+      }
+    }
+    x = place_count*10;
+    while ((!y) && (x >= 0)) {
+      /* we did not find a blank spot it the largest place, so try random places */
+      j = randint0(place_count);
+      if (place[j].type != PL_TOWN_FRACT) {
+        continue;
+      }
+      x--;
+      for (i = place[j].numstores-1; i > 0; i--)
+      {
+        if (place[j].store[i].type == BUILD_NONE) {
+          /* use this spot */
+			    if (build_is_store(BUILD_LIBRARY))
+			    {
+				    store_init(j, i, BUILD_LIBRARY);
+			    }
+			    else
+			    {
+				    build_init(j, i, BUILD_LIBRARY);
+			    }
+          y++;
+          break;
+        }
+      }
+    }
+    /* if x is 0 then no blank buildings were found, the player
+     * will just have to do without a library */
+  }
 
 	/* Build starting city / town */
 	draw_city(pl_ptr);
@@ -3282,6 +3570,9 @@ static void create_quest_stairs(int start_num)
 	}
 }
 
+/* forward declaration for naming dungeons - Brett */
+void name_dungeons();
+
 /*
  * Initialise the place structures
  *
@@ -3314,13 +3605,16 @@ bool init_places(int xx, int yy)
 
 	cur = place_count;
 	
-	/* Initialize building quests */
+  /* give names to the dungeons and camps */
+	name_dungeons();
+
+  /* Initialize building quests */
 	init_build_quests();
 
 	/* Create quest stairs */
 	create_quest_stairs(cur);
 
-	/* Hack - set global region back to wilderness value */
+  /* Hack - set global region back to wilderness value */
 	set_region(0);
 
 	/* Done */
@@ -3883,8 +4177,8 @@ void draw_inn(place_type *pl_ptr)
 	}
 
 	/* Make the doors */
-	make_lockjam_door(x1, y1, 0, FALSE);
-	make_lockjam_door(x2, y2, 0, FALSE);
+	make_lockjam_door(x1, y1, 0, 0, FALSE);
+	make_lockjam_door(x2, y2, 0, 0, FALSE);
 
 	Rand_quick = FALSE;
 

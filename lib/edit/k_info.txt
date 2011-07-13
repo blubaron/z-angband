@@ -2160,10 +2160,10 @@ D:This scroll dispels nearby undead (60).
 N:212:*Enchant Weapon*
 G:?:d
 I:70:21:0
-W:50:0:5:500
-A:20/3:50/1
+W:50:0:5:10000
+A:50/3:70/1
 F:EASY_KNOW
-L:USE:  if not enchant_spell(randint1(5), randint1(5), 0, 5) then result = FALSE end
+L:USE:  if not enchant_spell(randint1(5), randint1(5), 0, 105) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll magically enchants one weapon.
 D:  It might not work on a weapon that's already enchanted.
@@ -2180,10 +2180,10 @@ D:This scroll curses your current weapon, making it worse than useless.
 N:214:*Enchant Armor*
 G:?:d
 I:70:20:0
-W:50:0:5:500
-A:20/3:50/1
+W:50:0:5:10000
+A:50/3:70/1
 F:EASY_KNOW
-L:USE:  if not enchant_spell(0, 0, rand_range(2, 7), 5) then result = FALSE end
+L:USE:  if not enchant_spell(0, 0, rand_range(2, 7), 105) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll magically enchants one piece of armor.
 D:  It might not work on armor that's already enchanted.
@@ -2245,9 +2245,10 @@ A:1/3:7/1
 F:EASY_KNOW
 L:USE:  word_of_recall()
 L:USE:  ident = TRUE
-D:This scroll has two uses.  If read within a dungeon, it returns you
+D:This scroll has three uses.  If read within a dungeon, it returns you
 D: to the surface.  If read near the entrance of a dungeon, it takes you to
-D: the last level of that dungeon you recalled out from.
+D: the last level of that dungeon you recalled out from. If read in the
+D: wilderness, it takes you to your home.
 
 N:221:*Destruction*
 G:?:d
@@ -6725,41 +6726,41 @@ D:This ring bites deep into your finger and drains your blood.
 # many will not let you use a container if it's not empty.  To reoganize, use
 # the 'O' (organize) command (^O in the roguelike keyset).  
 
-N:672:& Small quiver~
+N:672:& Small Quiver~
 G:&:u
-I:6:92:60
+I:6:1:250
 W:10:0:10:100
 A:10/2
-P:4:1d1:0:0:0
+P:4:1d1:5:15:18
 F:EASY_KNOW
-D:It is a container for ammunition.  It can hold up to 60 arrows, bolts, or shots.
+D:It is a container for ammunition.  It can hold up to 25 stones of arrows, bolts, shots, or spikes.
 
 N:673:& Quiver~
 G:&:u
-I:6:91:100
-W:20:0:20:100
+I:6:2:400
+W:20:0:20:250
 A:20/2
-P:6:1d1:0:0:0
+P:6:1d1:5:15:18
 F:EASY_KNOW
-D:It is a container for ammunition.  It can hold up to 100 arrows, bolts, or shots.
+D:It is a container for ammunition.  It can hold up to 40 stones of arrows, bolts, shots, or spikes.
 
-N:674:& Large quiver~
+N:674:& Large Quiver~
 G:&:U
-I:6:90:150
+I:6:3:600
 W:40:0:30:750
 A:40/2
-P:8:1d1:0:0:0
+P:8:1d1:5:15:18
 F:EASY_KNOW
-D:It is a container for ammunition.  It can hold up to 150 arrows, bolts, or shots.
+D:It is a container for ammunition.  It can hold up to 60 stones of arrows, bolts, shots, or spikes.
 
-N:675:& Flameproof quiver~
+N:675:& Flameproof Quiver~
 G:&:U
-I:6:75:100
+I:6:4:400
 W:60:0:20:750
 A:60/2
-P:6:1d1:0:0:0
-F:IGNORE_FIRE | EASY_KNOW
-D:It is a container for ammunition.  It can hold up to 100 arrows, bolts, or shots.
+P:6:1d1:5:15:18
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:It is a container for ammunition.  It can hold up to 40 stones of arrows, bolts, shots, or spikes.
 
 N:676:[Sleight of Hand]
 G:?:v
@@ -6873,6 +6874,187 @@ D:This potion makes you resistant to stat draining for 20-40 turns.
 #P:0:1d12:0:0:0
 #F:SHOW_MODS | THROW
 #D:A light-weight flat disc of metal with cutting points.
+
+#######
+# additions by Brett
+
+# Scroll of Corrosion Resistance - copied from Enchant Armor
+N:684:Corrosion Resistance
+G:?:d
+I:70:16:0
+W:26:0:5:250
+A:26/2
+F:EASY_KNOW
+D:Protect a peice of equipment from acid.
+L:USE:	if not rustproof() then result = FALSE end
+
+# Polishing Cream (Potion of Corrosion Resistance) - modified from Restore Constitution
+N:685:Polishing
+G:!:d
+I:75:46:0
+W:20:0:20:300
+A:20/2
+P:0:1d1:0:0:0
+F:EASY_KNOW
+D:Protect a peice of equipment from acid.
+L:USE:	if not rustproof() then result = FALSE end
+
+# Scroll of Infuse Magic - modified from Acquirement
+N:686:Infuse Magic
+G:?:d
+I:70:46:0
+W:50:0:5:20000
+A:35/8
+F:EASY_KNOW
+L:USE:	if not enchant_pval(randint1(3), 0) then result = FALSE end
+
+# Scroll of *Infuse Magic* - modified from Acquirement
+N:687:*Infuse Magic*
+G:?:d
+I:70:46:0
+W:60:0:5:100000
+A:60/8: 90/4
+F:EASY_KNOW
+L:USE:	if not enchant_pval(1, 1) then result = FALSE end
+
+# Scroll of Shadow Jump - reset the wilderness - modified from Acquirement
+N:688:Shadow Jump
+G:?:d
+I:70:46:0
+W:35:0:5:1000
+A:35/8:60/4:80/1
+F:EASY_KNOW
+L:USE:	if not shadow_jump() then result = FALSE end
+
+# Quivers and other containers below are in ALPHA testing.
+# Most commands will let you navigate into containers to select objects;
+# many will not let you use a container if it's not empty.  To reoganize, use
+# the 'O' (organize) command (^O in the roguelike keyset).  
+
+N:689:& Small Food Sack~
+G:&:u
+I:6:1:60
+W:10:0:10:200
+A:10/2
+P:12:1d1:0:75:80
+F:EASY_KNOW
+D:It is a container for food.  It can hold up to 6.0 stones of food or potions.
+
+N:690:& Food Sack~
+G:&:u
+I:6:2:100
+W:20:0:20:500
+A:20/2
+P:20:1d1:0:75:80
+F:EASY_KNOW
+D:It is a container for food.  It can hold up to 10.0 stones of food or potions.
+
+N:691:& Large Food Sack~
+G:&:U
+I:6:3:150
+W:40:0:30:1500
+A:40/2
+P:23:1d1:0:75:80
+F:EASY_KNOW
+D:It is a container for food.  It can hold up to 15.0 stones of food or potions.
+
+N:692:& Indestructable Food Sack~
+G:&:U
+I:6:4:100
+W:60:0:20:3000
+A:60/2
+P:23:1d1:0:75:80
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:It is a container for food.  It can hold up to 10.0 stones of food or potions.
+
+N:693:& Small Weapon Belt~
+G:&:u
+I:6:1:800
+W:10:0:10:200
+A:10/2
+P:12:1d1:0:19:23
+F:EASY_KNOW
+D:A bandolier that goes over your shoulder.  It can hold up to 80.0 stones
+D: of weapons or bows.
+
+N:694:& Weapon Belt~
+G:&:u
+I:6:2:1600
+W:20:0:20:500
+A:20/2
+P:20:1d1:0:19:23
+F:EASY_KNOW
+D:A bandolier that goes over your shoulder.  It can hold up to 160.0 stones
+D: of weapons or bows.
+
+N:695:& Large Weapon Belt~
+G:&:U
+I:6:3:2400
+W:40:0:30:1500
+A:40/2
+P:23:1d1:0:19:23
+F:EASY_KNOW
+D:A bandolier that goes over your shoulder.  It can hold up to 240.0 stones
+D: of weapons or bows.
+
+N:696:& Indestructable Weapon Belt~
+G:&:U
+I:6:4:1600
+W:60:0:20:3000
+A:60/2
+P:23:1d1:0:19:23
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:A bandolier that goes over your shoulder.  It can hold up to 160.0 stones
+D: of weapons or bows.
+
+N:697:& Small Pouch~
+G:&:u
+I:6:1:100
+W:10:0:10:200
+A:10/2
+P:12:1d1:45:39:40
+F:EASY_KNOW
+D:It is a container for jewelery.  It can hold up to 10.0 stones of
+D: rings, amulets, or lights.
+
+N:698:& Pouch~
+G:&:u
+I:6:2:200
+W:20:0:20:500
+A:20/2
+P:20:1d1:45:39:40
+F:EASY_KNOW
+D:It is a container for jewelery.  It can hold up to 20.0 stones of
+D: rings, amulets, or lights.
+
+N:699:& Large Pouch~
+G:&:U
+I:6:3:300
+W:40:0:30:1500
+A:40/2
+P:23:1d1:45:39:40
+F:EASY_KNOW
+D:It is a container for jewelery.  It can hold up to 30.0 stones of
+D: rings, amulets, or lights.
+
+N:700:& Indestructable Pouch~
+G:&:U
+I:6:4:200
+W:60:0:20:3000
+A:60/2
+P:23:1d1:45:39:40
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:It is a container for jewelery.  It can hold up to 20.0 stones of
+D: rings, amulets, or lights.
+
+N:701:& Indestructable Pack~
+G:&:U
+I:6:4:1600
+W:60:0:20:3000
+A:60/2
+P:23:1d1:6:7:0
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:It can hold up to 160.0 stones of items
 
 
 

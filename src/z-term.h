@@ -269,6 +269,16 @@ struct term
 
 extern term *Term;
 
+extern byte tile_width_mult; /* an attempt to use the graphics multiple of tilesize - Brett */
+extern byte tile_height_mult;
+
+extern char graf_name[32];/* - Brett */
+extern char graf_mask[32];/* - Brett */
+extern byte graf_width;/* - Brett */
+extern byte graf_height;/* - Brett */
+
+extern char temp_string[32];/* - Brett */
+
 
 /**** Available Functions ****/
 

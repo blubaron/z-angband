@@ -16,7 +16,8 @@
 /* Hack: For use in get_item & subroutines.  */
 s16b curr_container = 0;
 
-
+const byte lighting_colours[16];
+const byte darking_colours[16];
 /*
  * Reset the "visual" lists
  *
@@ -43,10 +44,23 @@ void reset_visuals(void)
 		/* Assume we will use the underlying values */
 		f_ptr->x_attr = f_ptr->d_attr;
 		f_ptr->x_char = f_ptr->d_char;
+    if (f_ptr->x_attr < 16) {
+			/* If is ascii graphics */
+		  f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
+		  f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
+		  f_ptr->xd_char = f_ptr->x_char;
+		  f_ptr->xl_char = f_ptr->x_char;
+    } else
+    {
+		  f_ptr->xd_attr = f_ptr->x_attr;
+		  f_ptr->xl_attr = f_ptr->x_attr;
+		  f_ptr->xd_char = f_ptr->x_char;
+		  f_ptr->xl_char = f_ptr->x_char;
+    }
 
 		/* No extra information */
-		f_ptr->w_attr = 0;
-		f_ptr->w_char = 0;
+		/*f_ptr->w_attr = 0;
+		f_ptr->w_char = 0;*/
 	}
 
 	/* Extract default attr/char code for objects */
@@ -79,8 +93,12 @@ void reset_visuals(void)
 		t_ptr->f_char = t_ptr->d_char;
 	}
 
+  graf_width = 0;
+  graf_height = 0;
+  graf_name[0] = 0;
+  graf_mask[0] = 0;
 
-	if (use_graphics)
+  if (use_graphics)
 	{
 		/* Process "graf.prf" */
 		(void)process_pref_file("graf.prf");
@@ -864,7 +882,33 @@ static void roff_obj_aux(const object_type *o_ptr)
 		}
 	}
 
-	/* If it is a weapon */
+	/* if fully known - show the value - Brett */
+  if (object_known_full(o_ptr))
+  {
+    store_type *st_ptr = NULL;
+    if (p_ptr->place_num && (place[p_ptr->place_num].numstores > 1)) {
+	    place_type *pl_ptr = &place[p_ptr->place_num];
+
+	    int i, which = -1;
+
+	    /* Get the building the player is on */
+	    for (i = 0; i < pl_ptr->numstores; i++)
+	    {
+		    if ((p_ptr->py - pl_ptr->y * 16 == pl_ptr->store[i].y) &&
+			    (p_ptr->px - pl_ptr->x * 16 == pl_ptr->store[i].x))
+		    {
+          st_ptr = &pl_ptr->store[i];
+          break;
+		    }
+	    }
+    }
+    if (!st_ptr	|| (st_ptr->type == BUILD_STORE_HOME))
+	  {
+      int price = object_value_real(o_ptr);
+		  roff("You think %s worth %d gold.  ", o_ptr->number > 1 ? "they are each" : "it is", price);
+	  }
+  }
+  /* If it is a weapon */
 	if (o_ptr->tval >= TV_BOW && o_ptr->tval <= TV_SWORD)
 	{
 		/* Obtain the "hold" value */
@@ -1667,7 +1711,11 @@ bool item_tester_hook_armour_no_acid(const object_type *o_ptr)
 	if (item_tester_hook_armour(o_ptr) &&
 		!FLAG(o_ptr, TR_IGNORE_ACID)) return (TRUE);
 
-	return (FALSE);
+  /* I'm just tired of loosing early containers to low level monsters - Brett */
+  if (o_ptr->tval == TV_CONTAINER && !FLAG(o_ptr, TR_IGNORE_ACID))
+    return (TRUE);
+
+  return (FALSE);
 }
 
 /*

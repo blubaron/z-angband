@@ -98,9 +98,8 @@ static void wiz_create_named_art(int a_idx)
  */
 static void do_cmd_wiz_hack_mango(int arg)
 {
-	int i, j;
+	int i, j, k;
 	cheat_know = TRUE;
-	int k;
 
 	i = randint1(75);
 	j = get_mon_num(i);

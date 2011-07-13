@@ -113,17 +113,25 @@ struct feature_type
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
 
-	byte d_attr;	/* Default feature attribute */
-	char d_char;	/* Default feature character */
+  u32b flags;	/* Properties of the feature */
+  u16b base_feat;	/* index of the underlying feature */
 
+  byte d_attr;	/* Default feature attribute */
+	char d_char;	/* Default feature character */
 
 	byte x_attr;	/* Desired feature attribute */
 	char x_char;	/* Desired feature character */
 
-	byte w_attr;	/* Desired extra feature attribute */
-	char w_char;	/* Desired extra feature character */
+	byte priority;	/* Display priority on mini map*/
+	byte dig;	/* How hard is it to dig through? or How locked or jammed is it? */
 
-	byte flags;	/* Properties of the feature */
+  byte xd_attr;	/* Desired feature attribute when dimmed */
+	char xd_char;	/* Desired feature character when dimmed */
+	byte xl_attr;	/* Desired feature attribute when bright */
+	char xl_char;	/* Desired feature character when bright */
+
+  /*byte name_len;	/* length of name string */
+	/*byte text_len;	/* length of feature description string */
 };
 
 
@@ -1566,6 +1574,8 @@ struct player_type
 	s32b au;	/* Current Gold */
 
 	s16b place_num;	/* Current place number in the wilderness */
+	s16b home_place_num;	/* Place of primary home - default is starting town */
+	s16b home_store_num;	/* Which building of place is primary home - default is home in starting town */
 
 	s32b wilderness_x;	/* Coordinates in the wilderness */
 	s32b wilderness_y;
@@ -1909,6 +1919,24 @@ struct dun_gen_type
 	byte floor;		/* Floor terrain type */
 	byte wall;      /* Wall terrain type */
 	byte perm_wall; /* Permanent wall terrain type */
+	
+  /*byte door_open;		  /* Override terrain type */
+	/*byte door_closed;		/* Override terrain type */
+	/*byte door_broken;		/* Override terrain type */
+	/*byte door_secret;		/* Override terrain type */
+
+  /*byte stair_up;	  	/* Override terrain type */
+  /*byte stair_down;		/* Override terrain type */
+	/*byte pillar;    		/* Override terrain type */
+	/*byte stair_closed;	/* Override terrain type */
+	
+	/*byte rubble;    		/* Override terrain type */
+	/*byte wallsupport;  	/* Override terrain type */
+	/*byte freq_small;		/* frequency of small levels */
+
+  /*u16b statue;	    	/* Override terrain type */
+	/*u16b fountain;	  	/* Override terrain type */
+	/*u16b window;	    	/* Override terrain type */
 
 	stream_gen_type vein[2];  /* For magma veins, etc. */
 	stream_gen_type river[2];

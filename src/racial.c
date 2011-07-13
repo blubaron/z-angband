@@ -280,6 +280,12 @@ static void cmd_racial_power_aux(const mutation_type *mut_ptr)
 					(void)restore_level();
 				}
 
+				else if (mut_ptr->level == 35)
+				{
+					if (autosave_l) do_cmd_save_game(TRUE);
+					(void)shadow_jump();
+				}
+
 				else if (mut_ptr->level == 30)
 				{
 					msgf("You start walking around. Your surroundings change.");

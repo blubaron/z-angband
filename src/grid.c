@@ -252,14 +252,14 @@ void place_closed_door(int x, int y)
 	else if (tmp < 399)
 	{
 		/* Create locked door */
-		make_lockjam_door(x, y, randint1(10) + p_ptr->depth / 10, FALSE);
+		make_lockjam_door(x, y, 0, randint1(10) + p_ptr->depth / 10, FALSE);
 	}
 
 	/* Stuck doors (1/400) */
 	else
 	{
 		/* Create jammed door */
-		make_lockjam_door(x, y, randint1(5) + p_ptr->depth / 10, TRUE);
+		make_lockjam_door(x, y, 0, randint1(5) + p_ptr->depth / 10, TRUE);
 	}
 }
 

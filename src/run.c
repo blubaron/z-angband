@@ -30,7 +30,8 @@ static int see_wall(int x, int y)
 	f_ptr = &f_info[pc_ptr->feat];
 
 	/* Return block-los status */
-	return (f_ptr->flags & FF_BLOCK);
+	//return (f_ptr->flags & FF_BLOCK);
+	return (!(f_ptr->flags & (FF_PWALK|FF_MWALK)));
 }
 
 
@@ -263,7 +264,8 @@ static int see_interesting(int x, int y)
  *   What moves to remove from consideration if both the
  *   checks listed pass.
  */
-typedef long long _u64b;
+//typedef long long _u64b;
+typedef unsigned _int64 _u64b;
 
 static const struct
 {

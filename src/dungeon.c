@@ -443,6 +443,15 @@ static void sense_inventory(void)
 	OBJ_ITT_DFS_START (p_ptr->inventory, o_ptr)
 	{
 		sense_item(o_ptr, heavy, FALSE, TRUE);
+    /* HACK only sense one layer of pack contents - Brett */
+    if (o_ptr->tval == TV_CONTAINER) {
+      object_type *o2_ptr;
+	    OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
+	    {
+    		sense_item(o2_ptr, heavy, FALSE,TRUE);
+	    }
+	    OBJ_ITT_END;
+    }
 	}
 	OBJ_ITT_END;
 }
@@ -1874,7 +1883,7 @@ static void process_world(void)
 	/* Delayed Word-of-Recall */
 	if (query_timed(TIMED_WORD_RECALL))
 	{
-		place_type *pl_ptr;
+		//place_type *pl_ptr;
 
 		/* Count down towards recall */
 		*(get_timed_ptr(TIMED_WORD_RECALL)) = query_timed(TIMED_WORD_RECALL) - 1;
@@ -1882,22 +1891,22 @@ static void process_world(void)
 		p_ptr->redraw |= (PR_STATUS);
 
 		/* Hack - no recalling in the middle of the wilderness */
-		if ((!p_ptr->depth) && (!p_ptr->place_num))
+		/*if ((!p_ptr->depth) && (!p_ptr->place_num))
 		{
 			if (!query_timed(TIMED_WORD_RECALL))
 				msgf("You feel a momentary yank downwards, but it passes.");
 			return;
 		}
 
-		pl_ptr = &place[p_ptr->place_num];
+		pl_ptr = &place[p_ptr->place_num];*/
 
 		/* No recalling if there's no dungeon, etc. */
-		if (!pl_ptr->dungeon || !(pl_ptr->dungeon->recall_depth))
+		/*if (!pl_ptr->dungeon || !(pl_ptr->dungeon->recall_depth))
 		{
 			if (!query_timed(TIMED_WORD_RECALL))
 				msgf("You feel a momentary yank downwards, but it passes.");
 			return;
-		}
+		}*/
 
 		/* Activate the recall */
 		if (!query_timed(TIMED_WORD_RECALL))
@@ -1915,9 +1924,16 @@ static void process_world(void)
 
 				p_ptr->depth = 0;
 			}
-			else
+			else if (p_ptr->place_num)
 			{
 				dun_type *d_ptr = dungeon();
+		    /* No recalling if there's no dungeon, etc. */
+		    if (!d_ptr || !(d_ptr->recall_depth))
+		    {
+			    if (!query_timed(TIMED_WORD_RECALL))
+				    msgf("You feel a momentary yank downwards, but it passes.");
+			    return;
+		    }
 
 				msgf("You feel yourself yanked downwards!");
 
@@ -1951,6 +1967,50 @@ static void process_world(void)
 						p_ptr->depth = d_ptr->max_level;
 					}
 				}
+      } else if (p_ptr->home_place_num && p_ptr->home_store_num)
+      {
+        /* Move the player from its current wilderness location to its primary home
+         * Copied from building_magetower() - Brett */
+
+        place_type *pl_ptr2 = &place[p_ptr->home_place_num];
+				store_type *st_ptr2 = &pl_ptr2->store[p_ptr->home_store_num];
+
+				msgf("You feel yourself pulled home!");
+
+        /* Move the player */
+				p_ptr->px = pl_ptr2->x * 16 + st_ptr2->x;
+				p_ptr->py = pl_ptr2->y * 16 + st_ptr2->y;
+
+				p_ptr->wilderness_x = p_ptr->px;
+				p_ptr->wilderness_y = p_ptr->py;
+
+				/* Notice player location */
+				Term_move_player();
+
+				/* Remove all monster lights */
+				lite_n = 0;
+
+        /* Mark the entire view as forgotten */
+        view_n = 0;
+
+				/* Notice the move */
+				move_wild();
+
+				/* Check for new panel (redraw map) */
+				verify_panel();
+
+				/* Update stuff */
+				p_ptr->update |= (PU_VIEW | PU_FLOW | PU_MON_LITE);
+
+				/* Update the monsters */
+				p_ptr->update |= (PU_DISTANCE);
+
+				/* Window stuff */
+				p_ptr->window |= (PW_OVERHEAD | PW_DUNGEON);
+      } else
+      {
+		    msgf("You lose concentration wondering where to go and the tension leaves the air around you...");
+		    p_ptr->redraw |= (PR_STATUS);
 			}
 
 			/* Sound */
@@ -3375,6 +3435,9 @@ void play_game(bool new_game)
 
 		/* Wipe everything */
 		wipe_all_list();
+    /* Use the line I removed from wipe_all_list */
+    /* (to clear player inventory) - Brett */
+    if (p_ptr->inventory) delete_object_list(&p_ptr->inventory);
 
 		/* Hack -- seed for flavors */
 		seed_flavor = randint0(0x10000000);

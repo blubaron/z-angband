@@ -1,0 +1,367 @@
+All of my changes are released using the dual license system that angband uses:
+  This work is free software; you can redistribute it and/or modify it
+  under the terms of either:
+ 
+  a) the GNU General Public License as published by the Free Software
+     Foundation, version 2, or
+ 
+  b) the "Angband license":
+     This software may be copied and distributed for educational, research,
+     and not for profit purposes provided that this copyright and statement
+     are included in all such copies.  Other copyrights may also apply.
+
+These are changes to the released source made over time from zAngband 2.7.4 to z+Angband 0.3.3beta.
+
+My second commit added all of these to my copy of 0.3.3 at once. When
+MangoJuice releases a 0.3.4, I am intending to overwrite all this and
+add my changes back in peice by piece.  Using commits for each item, 
+MangoJuice or a contributor would be able to remove any of my
+controversial changes, especially balance changes like the infuse
+magic scrolls and general backpacks.
+  
+    Added corrosion resistance scroll and potion as mid-level items to
+      k_info.txt, and updated misc.txt with the new item count. (zpa has 
+      scroll of rustproofing, but the above is still in anyways)
+
+    On a bounty quest, it now lists the monster symbol, to facilitate looking the monster up in a library.(on new quests)
+
+    You set a home to go to when you cast word of recall in the wilderness (and go to it)
+      The save file version number has been incremented, for backwards compatibility.
+      uses the first 4 bytes of the 48 byte future use area
+
+    Gave dungeons a bit more flavored place names on wilderness map
+      zpa is overwriting this, move name_dungeons somewhere else? - fixed in maid-grf
+
+    Gave monster camps names on wilderness map
+
+    Adjusted player birth so that if you know your desired starting
+      values, before the race and class bonuses, you can set them directly,
+      instead of auto roll. This is done using the autoroll weights. The
+      values should add up to 86.
+
+    Changed create_city() to replace basic temples with higher level ones, if
+      there are several basic temples, because I had not seen the higher
+      level ones in my games. (not needed because zpa has better building
+      distribution, but still in anyways, just in case.)
+
+    Map makers will reveal the whole wilderness map, if you pay them 30 times
+      their normal amount, or 150,000 gold, whichever is greater. Cheap stores
+      may only charge 100,000 gold. (for zpa, changed in t_info.txt) all the
+      map makers are charging 100,000 gold?
+
+    You can now access knowledge menu from wilderness map using '~' or '|'.
+    Switched some lines, so pressing '*' when not on a town does not leave map.
+      zpa town commands are also trapped, for the same reason
+
+    Added ability to recall creature symbols from the knowledge menu
+
+    Added commands to go back a full page and go back a single line in some
+      menus. (changes were made to show_file())
+
+    You can now rest in homes, to either dawn or dusk, depending on the time.
+      The rest command is on line 25, so if you have a 24 line display, it
+      will not show up. Press 'R' to rest.
+
+    You can eat from inventory in homes, using do_cmd_eat_food.
+      does not allow food in the home to be selected. Press 'E' to eat.
+
+    Changed some grammar in roff_mon_aux() when there are more than 2 items.
+      change was to add commas where they should be.
+
+    Added a scroll (Infuse Magic) to increase the pval of an item, used the code
+      from enchant armor, but the scroll level and stats should be the same as
+      Acquirement - enchant_pval function partly done. Manually added lua binding.
+
+    Added habitat text to monster description in roff_mon_aux() to make it
+      worthwhile to research in library for bounty quests
+
+    Added code to create_towns, to force a library to be created, if one was
+      not created already. It first looks at the largest city and put it into
+      a blank spot. If a blank spot is not found, the code tries a bunch of
+      random places. This code will fail only if there are no places with 
+      blank spots, or that the random part does not try the place. Both 
+      fails are extremely rare. If no town has a library, all I can say is to
+      try to find a shadow jump scroll or do without the library, but again
+      this case is *extremely* rare.
+
+    Added a scroll (level 35/8:60/4:80/1) and Amberite power(level 35, cost 100) 
+      called Shadow Walk(or Shadow Jump), which resets the wilderness and the
+      monster camps. The player's inventory and the inventory of the main home
+      are preserved. To save the player's inventory, I needed to remove a line
+      from wipe_all_lists() and add it at the other place the function is used.
+      To save the inventory of the player's main house, I needed to change how
+      wipe_o_list works a bit. there are probably still memory leaks
+      associated with this. (so save and reload game after jumping?)
+      Manually added lua binding.
+      TODO Still need to clear quest and monstor questors, clear unique
+      monster kills, clear any artifacts not in the players inventory.
+
+    Changed draw_general() to store a position for empty buildings and blank
+      spots, because the memory is being used anyways, and the info could be
+      used in the future. Perhaps to buy homes or other buildings.
+
+    Added a simple object list. It is displayed just below the monster list. 
+      Does not check for mimics yet. changed put_object, delete_dungeon_object,
+      delete_object, and display_visable. added display_visable_obejcts and
+      display_visable_item. When the list updates objects are listed from
+      closest to farthest, up to range 19. When the list updates, the monster
+      list updates as well (and vice versa). objects already on ground do not
+      show up until an object is dropped or picked up (To keep update count
+      down?). also, gold is not shown. (because of the item_tester_okay in
+      test floor) need visable update when objects go into and out of los?
+
+    item_tester_okay only checks if first item in a container is okay, reversed
+      check and result, so it returns true if all items are okay. (but this
+      section is not used anyways)
+
+    increased power of *enchant* scrolls so that they always have an effect
+      increased cost to 10000, rarity to 50/3:70/1
+
+    changed containers so that in k_info.txt (and object_can_contain)
+      pval is the maximum weight that can be in the container in tenths
+      zpa has pval as the max number of ammo that can be held, but weight is more
+        general for containers
+      ac is the maximum number of lines in the container
+      to_d is the minimum tval of potential contents
+      to_a is the maximum tval of potential contents
+      to_h is an extra tval for something not in the range between to_d and to_a
+      if to_a is 0 then anything can be put into the container, except if it is
+       in the range between to_h and to_d
+      with these changes, need to change how the container line is displayed
+       to not show the to_h,to_d, and to_a - done
+      if another tval is needed, then the number of lines (stacks) can be hard
+       coded (to 23?) and ac used for another tval.
+      *need container support in shadow jump?
+      *weight limits are not working?
+
+    Added containers to item_tester_hook_organizable, so that containers will
+      show up in the initial organize list, to remove items from (moving to *)
+
+    Implemented 4 sizes of jewelry pouches, food sacks, and weapon belts. Also
+      a high level general backpack.
+
+    Allow specifing which graphic files load with a pref line: 
+      I:<elementwidth>:<elementheight>:<filename>{:<filemaskname>}
+      rather than the hard coded sizes and file names in maid-win.c and maid-grf.c
+      .prf files are read in reset_visuals,so need to make sure the images are loaded
+      after reset_visuals is called. I have not changed the code for platforms
+      other than Windows. * this will be reverted and the code will be changed to load
+      a graphics list from a text file, like I wrote for angband.
+
+    Also, added a number based test the graf test. So instead of none,old,new,david
+      you would have 0,1,2,3. so $GRAF new would be $GRAFC 2
+      in the ini file, there is a line Graphics = <number> use this number
+      with the [EQU $GRAFC <number>] test in graf-win.prf. Works so don't need
+      to recompile except to add a number to the graphics list, which we don't
+      need to do if we do not change the graphics. I left $GRAF in for backwards
+      compatibility. * this will be reverted and the code will be changed to load
+      a graphics list from a text file, like I wrote for angband.
+ 
+   Added a second backup to rotate with for autosave_b. tests if autosave_freq
+      is odd or even when deciding which suffix to use, and adds or subtracts 1
+      so that the other suffix would be used next time. odd is even+1
+
+    Added the ability to load a PNG tileset. support is through both DirectX and
+      libPNG. The directx version will load any file format that DirectX9 supports.
+      the libPNG version will fall back to read bmp if it fails.
+
+    In graf.prf files, added a flag to T: and F: lines, flag can be l or L
+      l forces the tile to be used without dynamic support, whatever t_info.txt or 
+      f_info.txt says. L forces dynamic lighting on. (in the future, for R:
+      lines, the flag O will tell the program to show the tile with overdraw.
+      This means that the program will show the tile above it in the tileset
+      in the tile above on screen. Same for T:, F:, and K: lines. not
+      implemented yet. need a flag to set in monster_kind? or some flag that
+      persists and can get to term_pict_win. Perhaps a structure like Angband's
+      grid_data struct, and pass this structure to all of the term_pict_xxx functions.)
+     Undid above for F: lines. F: lines are now like in FAangband
+       (F:<normal>{:<dark>{:<bright>}}) where normal, dark, and bright are the
+       tile coordinates or color/character pair for that lighting type. T: lines
+       do not use lighting anyways? so not changed. * fields have a 
+       FIELD_INFO_TRANS flag, what does it do? it can use dynamic lighting
+       through a feat (~line 2233 in maid-grf.c) * change to match
+
+    In pref files added a gender test, for future female player character tiles.
+      [EQU $GENDER Male] or [EQU $GENDER Female]
+
+    In pref files added a player name test, for those who want more specific
+      user pref files. [EQU $PLAYERNAME Corwin] or [EQU $PLAYERNAME Torg] not tested yet.
+      what happens with spaces in the name?
+      I think $PLAYER is the name of the save file? (player_base)
+      redirections/changes would have to be made manually?
+
+    Added random approximate level bounty quests back to castles and if a member,
+      guilds. levels range from plevel-5 to (plevel-5)*2. ranger guilds have a 10%
+      chance of offering find place quests (if not everything has been found),
+      mage and thief guilds have a 10% chance of offering find artifact quests,
+      as does the large castle. Bounties are offered only if the building does
+      not have any other quest available.
+
+    Wrote a tile picker. can load the working tiles and pref file, also tiles and 
+        pref file for 2 placeholder sources.
+      matches hard coded strings in the tile filename "32x32", "16x16", 8x8" to 
+        get the tile size. can also parse filename of format XxY.bmp. only looks
+        for mask in XxYmsk.bmp.
+      can pick a cell to assign an item from the working tiles. the top left cell is
+        considdered to be not assigned.
+      can mark an item as using placeholder artwork, so it is listed in a seperate
+        list. "^" is the placeholder character and can appear anywhere in the
+        comments for that item. either on the same line as the item, after the item
+        or the whole line before the item. item must be assigned a cell to be
+        considered to have placeholder artwork.
+      can view the tiles and copy a tile and its mask from a source to the working
+        set. from p1, pick, place, and mark that its a placeholder. From p2, just place.
+      can swap tiles, including masks, with the one left of it, and save it in
+        the working tiles. (Ctrl-P)
+      can middle click on a tile to select what uses it in the main window.
+        (left click to center the display on the click spot, right click to
+        select a tile to be assigned or overwritten by a placeholder.)
+      can save a 32bit png with transparency by clearing the mask name before
+        the save as command, or by selecting "no, then "cancel" when it asks
+        to confirm/pick the mask name during a "save as" command.
+      *edit note is not working. notes are in parentheses after the comments
+        on the same line or the previous one in the pref file. "# name (note)"
+        notes are everything between the first open and the last close paren,
+        *so need to rename items that have parentheses in their names,
+        otherwise the part of the name in parens is taken to be the note, and
+        keeps being added on repeated load-save-quit  cycles. or change to brackets.
+      *need to be able to type in the coordinates.
+      can load/save DaJAngband info/pref files? "DaJAngband" must appear
+        somewhere in the path of what is selected in the initial open dialog
+        box. Possibly a dummy file in the edit directory.
+      can load/save Angband info/pref files? "Angband" or "angband" must appear
+        somewhere in the path of what is selected in the initial open dialog
+        box. Possibly a dummy file in the edit directory.
+      for the above two lines, looks for ./lib/edit/terrain.txt, and if found
+        looks for the game name in the path, and does not present the initial
+        open dialog box.
+      loads flags from an ini file that tell how to load pref files, and which
+        file names to use. flags = 0 for zpa, 847 for angband. the ini file is
+        written using flags determined when the tile picker is run and the ini
+        file does not exist.
+
+    Changed F: lines in graf-new to add specific dark/bright tiles, same for
+      graf-dvg_mod.pref. graf-old.prf is fine since the original tiles do not
+      have shades for the dynamic lighting, and my changes are an extension,
+      not a replacement.
+      changed all references to a graphics mode (use_graphics == XXX to use_graphics > 1)
+        except those in the main-xxx.c files and maid-grf.c, the the GRAF test in files.c
+      *need to implement for fields and change some T: lines similarly.
+        especially for graf-new, which has shades for traps.
+
+    Expanded feature_type structure. added base_feat, priority, and dig. also
+      changed flags to 32 bits (from 8 bits). added flags to tell what can be
+      done to the feat. changed many tests for a specific feature to a test for
+      a flag expected in the feature. esp in do_cmd_tunnel, do_cmd_open, and
+      do_cmd_close. changed f_info to add/change/remove flags as appropiate.
+      with the base_feat variable the feat gets switched to the base feat if has flags:
+        HIDDEN - switched when searched
+        DOOR,CLOSED not hidden or broken - switched when opened
+        DOOR not hidden or broken - switched when closed
+        DIG - switched when tunneled, if any of above, switch with floor
+        OVERLAY - same as above but draw both, if any of above, switch with floor on destruction
+        TRAP - done as a field, so nothing to do. remove the flag possibility?
+      if a feature has DIG_GOLD, DIG_OBJ, DIG_CUSTOM, or DIG_FOOD, the object
+        is placed when the feature is searched or dug through, depending on if
+        the feat has the DIG flag or the HIDDEN flag. * add for CLOSED too?
+        but closed assumes closed, open pair of feats that will always switch
+        between each other? * move code to place_feat_object(featue_type *f_ptr)
+        and put fn in appropiate places (tunnel, search, open?).
+      outside of generation, redirection, and pattern tiles, there should not
+        be tests for specific feats? or tests should use the_feat(feat) for 
+        possible redirection? (also use the_floor(),the_wall(),the_perm_wall())
+
+      all flags are:
+enum
+{
+	FF_PWALK        = 0x00000001, /* Player can walk through 
+	FF_PPASS        = 0x00000002, /* Player can pass in wraith/ghost form 
+	FF_MWALK        = 0x00000004, /* monster can walk through 
+	FF_MPASS        = 0x00000008, /* wraith/ghost can pass through 
+	FF_NO_LOS       = 0x00000010, /* LOS blocked 
+	FF_HIDDEN       = 0x00000020, /* if search successful, switch to base feature 
+	FF_DOOR         = 0x00000040, /* this is a door of some type, open or close switch to base 
+	FF_EXIT_UP      = 0x00000080, /* can go to the previous level here 
+	FF_EXIT_DOWN    = 0x00000100, /* can go to the next level here 
+	FF_PERM         = 0x00000200, /* permanent terrain, never switches regardless of other flags 
+	FF_TRAP         = 0x00000400, /* there is a field action here 
+	FF_QUEST        = 0x00000800, /* player can enter a quest level here or it is a quest target itself
+	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature 
+	FF_MARK         = 0x00002000, /* memorized on map when seen
+	//FF_BORING       = 0x00002000, /* not marked if not currently seen? (!MARK)
+	FF_OVERLAY      = 0x00004000, /* draw on top of base feature
+	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path 
+	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold 
+	FF_DIG_OBJ      = 0x00020000, /* If dug through w/DIG or searched w/HIDDEN place object 
+	FF_DIG_CUSTOM   = 0x00040000, /* If dug through w/DIG or searched w/HIDDEN place object from lookup table of feature index
+	FF_DIG_FOOD     = 0x00080000, /* If dug through w/DIG or searched w/HIDDEN place food object 
+	FF_ICKY         = 0x00100000, /* Terrain can not have objects 
+	FF_HALF_LOS     = 0x00200000, /* Half-blocks los 
+	FF_OBJECT       = 0x00400000, /* Terrain is described like an object 
+	FF_CLOSED       = 0x00800000, /* Terrain (usually door) is closed 
+	FF_BROKEN       = 0x01000000, /* Terrain (usually door) is broken 
+	FF_WILD         = 0x02000000, /* does this terrain take additional time to cross 
+	FF_LIQUID       = 0x04000000, /* Terrain is water, lava, or acid 
+	FF_DAMAGING     = 0x08000000  /* Terrain damages player like swamp, lava or acid 
+}; ugg. only 4 flags spots left.  trap can be removed? make all features mark?
+      player/monster flying allowed in the terrain?
+      swimming would be liquid+pwalk/mwalk
+
+    *Added GF_PURG_CURSE spell effect, when it hits an object on the ground, if
+      cursed, the curse is removed. added effect to purge_area, before the
+      kill curse effect. 
+     *finish working on project_f
+
+
+  Stuff I did for zAngband, but are not needed for z+Angband
+    *Changed do_cmd_knowledge_objects() and print_monster_string() to use the
+      default text character, instead of the icon character, because the 
+      icon character crashes the program for me. It appears froff does not
+      know how to deal with the icon information.
+    xWhen you list your quests, it now lists the city you got the quest from.(on new quests)
+      for message, defender, bounty, find place, find item. What else are requested?
+      zpa - all quests are generated at the beginning? does this put an extra
+      starting town name in the quest name? yes, also zpa has its own place/building line
+      message so this should be removed - changes undone
+    xOn a message quest, it now lists if you have delivered the message, but not gotten your reward.(on new quests)
+    xChanged add_monsters to have a 20% chance to force bountied creatures
+      to spawn in an underground dungeon level of the right level and habitat.
+      The bountied monsters also have a 20% chance to spawn on the bottom
+      level, for the smaller dungeons types. A message will be given if 
+      it is generated. ("Your pulse quickens.") zpa - similar already done except message
+    xOn Relic quests, changed it so that the artifact may be generated on any
+      level below (higher number) the artifact's level. Each level has a 10%
+      chance of it being generated on that level. It will always be generated
+      at least on the bottom level. A message will be given if it is generated.
+    xChanged library function (research_mon) so that it adds a sighting to the 
+      viewed monster if there is not one. (so the info can be recalled in the
+      normal recall commands.)
+
+  Stuff I was thinking for zAngband, but are not needed for z+Angband
+    XIf all of the monster camps have been completed, once per day, there
+      should be a 1% chance of one of the camps respawning and the quest resetting.
+      In zpa, camps are never cleared.
+    xPerhaps move changes from add_monsters in generate.c to activate_quest in
+      quest.c? - already done by zpa
+    Xadd a quest list (ctrl-Q) to the possible lists in recall symbol, for both
+      knowledge menu and libraries
+    XPut a trashcan chest on every level, to move destroyed non-worthless objects into?
+    xCommand to center the current block in the view? if automatic, it would
+      slow the program a bit, because of the additional graphics updates.
+
+
+  Stuff that I changed but later reverted
+    Tile Picker:
+      Ctrl-P double swap tiles, used to rearrange from adam bolt lighting to
+        david geravis lighting, also adjusts assigned cell for all three tiles.
+        - removed since dynamic lighting works differently now and there is no
+        need to adjust the Adam Bolt tiles
+      when loading tiles you should always use bmp file for both color and mask
+        unless you are very sure you will not save the tiles, because it has
+        trouble saving as png. it always saves both color and mask as 24 bits.
+        - uses libPNG to save, and is more reliable
+    Reduced chance of bounty being forced to spawn on an appropiate level to 20%
+      also made message show all the time when a bounty  monster is generated.
+      reverted back to 50% since only one is generated at a time. Since then 
+      allow up to a third of what remains to be generated
+

@@ -998,13 +998,39 @@ I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
 D:5:0:0:0:0:0:0:0
 L:SBINIT:place_sb(rand_range(90, 125), 0)
 L:PENTER:do_cmd_bldg(field)
-L:BUILD1:building_options("E) Examine Map (".. factor * 5 .."gp)")
+L:BUILD1:local cost
+L:BUILD1:	if (factor < 1000) then
+L:BUILD1:	  cost = 100000
+L:BUILD1:	else
+L:BUILD1:	if (factor < 5000) then
+L:BUILD1:	  cost = 150000
+L:BUILD1:	else
+L:BUILD1:	  cost = factor * 30
+L:BUILD1:	end
+L:BUILD1:	end
+L:BUILD1:building_options("E) Examine Map (".. factor * 5 .."gp)",
+L:BUILD1:			  "W) Examine Whole Map (".. cost .."gp)")
 L:BUILD2:local cost
 L:BUILD2:if (command == 'E') then
 L:BUILD2:	cost = factor * 5
 L:BUILD2:	if (test_gold(cost) == TRUE) then
 L:BUILD2:		msgf("You learn of the lay of the lands.")
 L:BUILD2:		map_wilderness(20, player.wilderness_x / 16, player.wilderness_y / 16)
+L:BUILD2:		player.au = player.au - cost
+L:BUILD2:	end
+L:BUILD2:	done = TRUE
+L:BUILD2:	message_flush()
+L:BUILD2:elseif (command == 'W') then
+L:BUILD2:	if (factor < 1000) then
+L:BUILD2:	  cost = 100000
+L:BUILD2:	elseif (factor < 5000) then
+L:BUILD2:	  cost = 150000
+L:BUILD2:	else
+L:BUILD2:	  cost = factor * 30
+L:BUILD2:	end
+L:BUILD2:	if (test_gold(cost) == TRUE) then
+L:BUILD2:		msgf("You pore over all of their maps.")
+L:BUILD2:		map_wilderness(96, 64, 64)
 L:BUILD2:		player.au = player.au - cost
 L:BUILD2:	end
 L:BUILD2:	done = TRUE
@@ -2079,7 +2105,7 @@ L:BUILD1:if (build_has_quest() == TRUE) then
 L:BUILD1:    building_options("Q) Request Reward")
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:    building_options("Q) Request Quest (".. build_get_qlevel() ..")")
-L:BUILD1:end
+L:BUILD1:else building_options("Q) Request Bounty") end
 L:BUILD2:if (command == 'Q') then
 L:BUILD2:	build_cmd_quest(0, field)
 L:BUILD2:	done = TRUE
@@ -2100,7 +2126,7 @@ L:BUILD1:	building_options("Q) Request Reward")
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:	building_options(
 L:BUILD1:         "Q) Request Quest (".. build_get_qlevel() ..")")
-L:BUILD1:end
+L:BUILD1:else building_options("Q) Request Bounty") end
 L:BUILD2:if (command == 'Q') then
 L:BUILD2:	build_cmd_quest(10, field)
 L:BUILD2:	done = TRUE
@@ -2125,6 +2151,8 @@ L:BUILD1:local rstring if (build_has_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Reward" 
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Quest ("..build_get_qlevel()..")" 
+L:BUILD1:elseif (is_member() == TRUE) then
+L:BUILD1:  rstring = "Q) Request Bounty" 
 L:BUILD1:else rstring = "" end
 L:BUILD1:if (is_member() == TRUE) then
 L:BUILD1:	building_options(rstring, 
@@ -2173,6 +2201,8 @@ L:BUILD1:local rstring if (build_has_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Reward" 
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Quest ("..build_get_qlevel()..")" 
+L:BUILD1:elseif (is_member() == TRUE) then
+L:BUILD1:  rstring = "Q) Request Bounty" 
 L:BUILD1:else rstring = "" end
 L:BUILD1:if (is_member() == TRUE) then
 L:BUILD1:	building_options(rstring, 
@@ -2226,6 +2256,8 @@ L:BUILD1:local rstring if (build_has_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Reward" 
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Quest ("..build_get_qlevel()..")" 
+L:BUILD1:elseif (is_member() == TRUE) then
+L:BUILD1:  rstring = "Q) Request Bounty" 
 L:BUILD1:else rstring = "" end
 L:BUILD1:if (is_member() == TRUE) then
 L:BUILD1:	building_options(rstring, 
@@ -2289,6 +2321,8 @@ L:BUILD1:elseif (is_member() == TRUE and build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Quest (".. build_get_qlevel()..")" 
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Membership"
+L:BUILD1:elseif (is_member() == TRUE) then
+L:BUILD1:  rstring = "Q) Request Bounty" 
 L:BUILD1:else  rstring = "" end
 L:BUILD1:if (is_full_member() == TRUE) then
 L:BUILD1:	building_options(rstring, 
@@ -2345,6 +2379,8 @@ L:BUILD1:local rstring if (build_has_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Reward" 
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:  rstring = "Q) Request Quest ("..build_get_qlevel()..")" 
+L:BUILD1:elseif (is_member() == TRUE) then
+L:BUILD1:  rstring = "Q) Request Bounty" 
 L:BUILD1:else rstring = "" end
 L:BUILD1:if (is_member() == TRUE) then
 L:BUILD1:	building_options(rstring, 
@@ -2468,7 +2504,7 @@ L:BUILD1:	building_options("Q) Request Reward")
 L:BUILD1:elseif (build_next_quest() == TRUE) then
 L:BUILD1:	building_options(
 L:BUILD1:         "Q) Request Quest (".. build_get_qlevel() ..")")
-L:BUILD1:end
+L:BUILD1:else building_options("Q) Request Bounty") end
 L:BUILD2:if (command == 'Q') then
 L:BUILD2:	build_cmd_quest(0, field)
 L:BUILD2:	done = TRUE

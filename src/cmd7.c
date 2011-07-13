@@ -97,6 +97,12 @@ static void dump_wild_tile_summary(FILE *fff, int x, int y, int setting)
 
 static void dump_tile_summary(FILE *fff, int x, int y, int setting)
 {
+  /* declatations moved here because in ansi c, declarations have to
+     be at the beginning of the scope - Brett */
+  cave_type *c_ptr;
+  pcave_type *pc_ptr;
+  monster_type *m_ptr;
+
 	bool show_monster = FALSE;
 	bool show_object = FALSE;
 	bool show_field = FALSE;
@@ -146,11 +152,11 @@ static void dump_tile_summary(FILE *fff, int x, int y, int setting)
 			show_object = show_monster = show_field = show_terrain = TRUE;
 			break;
 	}
-	cave_type *c_ptr = area(x,y);
-	pcave_type *pc_ptr = parea(x,y);
+	c_ptr = area(x,y);
+	pc_ptr = parea(x,y);
 	
 	/* Monsters first */
-	monster_type *m_ptr = &m_list[c_ptr->m_idx];
+	m_ptr = &m_list[c_ptr->m_idx];
 
 	if (show_monster && c_ptr->m_idx && m_ptr->r_idx && m_ptr->ml && 
 			!(m_ptr->smart & SM_MIMIC))
@@ -162,6 +168,9 @@ static void dump_tile_summary(FILE *fff, int x, int y, int setting)
 	/* Then objects */
 	if (show_object)
 	{
+    /* declatations moved here because in ansi c, declarations have to
+       be at the beginning of the scope - Brett */
+		object_type *o_ptr;
 		/* First, check for undetected mimics */
 		if (c_ptr->m_idx) 
 		{
@@ -176,7 +185,6 @@ static void dump_tile_summary(FILE *fff, int x, int y, int setting)
 			}
 		}
 		
-		object_type *o_ptr;
 		OBJ_ITT_START (c_ptr->o_idx, o_ptr)
 		{
 			if ((o_ptr->info & OB_SEEN) && (!SQUELCH(o_ptr->k_idx) || FLAG(o_ptr, TR_SQUELCH)))
@@ -341,9 +349,11 @@ static bool wild_grid_matches_list_setting(int x, int y, int setting)
 
 	if (setting == LIST_UNEXPLORED)
 	{
+    /* declatations moved here because in ansi c, declarations have to
+       be at the beginning of the scope - Brett */
+		int i;
 		/* Don't accept known tiles */
 		if (w_ptr->info & WILD_INFO_SEEN) return FALSE;
-		int i;
 		for (i = 0; i < 10; i++)
 		{
 			int px = x + ddx[i];
@@ -448,8 +458,10 @@ static bool grid_matches_list_setting(int x, int y, int setting)
 		}
 		case LIST_UNEXPLORED:
 		{
-			if (pc_ptr->player & GRID_KNOWN) return FALSE;
+      /* declatations moved here because in ansi c, declarations have to
+         be at the beginning of the scope - Brett */
 			int i;
+			if (pc_ptr->player & GRID_KNOWN) return FALSE;
 			for (i = 0; i < 10; i++)
 			{
 				int px = x + ddx[i];
@@ -520,11 +532,14 @@ static bool grid_matches_list_setting(int x, int y, int setting)
 
 static bool point_matches_dir_aux (int x, int y, int px, int py, int dir)
 {
+  /* declatations moved here because in ansi c, declarations have to
+     be at the beginning of the scope - Brett */
+  int dx, dy;
 	/* dir = 5 means don't filter */
 	if (dir == 5) return TRUE;
 	
-	int dx = x - px; 
-	int dy = y - py;
+	dx = x - px; 
+	dy = y - py;
 	
 	/* Make sure the vector has the right sign of its x and y components */
 	if (SGN(dx) && SGN(ddx[dir]) && (SGN(dx) != SGN(ddx[dir])))
@@ -550,6 +565,11 @@ static void do_cmd_list_aux (int setting)
 {
 	int k, x, y, dir;
 	char com;
+  /* declatations moved here because in ansi c, declarations have to
+     be at the beginning of the scope - Brett */
+	FILE *fff;
+	char file_name[1024];
+	//int place_order[place_count];
 
 	/* Can't do this while hallucinating. */
 	if (query_timed(TIMED_IMAGE))
@@ -558,15 +578,12 @@ static void do_cmd_list_aux (int setting)
 		return;
 	}
 	
-	FILE *fff;
 
 	if (!get_com("Direction? ", &com))
 		dir = 5;
 	else dir = get_keymap_dir(com);
 	if (dir < 1 || dir > 9) dir = 5;
 	
-	char file_name[1024];
-	int place_order[place_count];
 	
 	/* Open a temporary file */
 	fff = my_fopen_temp(file_name, 1024);
@@ -897,7 +914,7 @@ static bool do_cmd_list_places(int dummy)
 	FILE *fff;
 
 	char file_name[1024];
-	int place_order[place_count];
+	//int place_order[place_count];
 	
 	/* Hack - ignore parameter */
 	(void) dummy;

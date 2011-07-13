@@ -89,6 +89,16 @@ bool use_sound;	/* The "sound" mode is enabled */
 byte use_graphics;	/* The "graphics" mode enabled (0 is none) */
 bool use_bigtile = FALSE;	/* Use square map tiles */
 
+byte tile_width_mult = 1;            /* Tile width in units of font width */
+byte tile_height_mult = 1;           /* Tile height in units of font height */
+
+char temp_string[32] = ""; /* temporary string space - be careful no loop overwrites - Brett  */
+char graf_name[32] = ""; /* name of graphics image file - Brett  */
+char graf_mask[32] = ""; /* name of graphics mask file - Brett  */
+byte graf_width = 0; /* width and height of a graphics element in */
+byte graf_height = 0; /* the graphics image file - Brett */
+
+
 bool use_transparency = FALSE;	/* Use transparent tiles */
 
 s16b signal_count;	/* Hack -- Count interupts */
@@ -119,7 +129,6 @@ s32b friend_align = 0;
 
 s16b store_cache_num = 0;	/* Number of stores with stock */
 store_type **store_cache;	/* The cache of store stocks */
-
 
 
 /* Special options */

@@ -1346,6 +1346,7 @@ static bool player_birth_aux_3(void)
 
 	bool flag;
 	bool previous = FALSE;
+  bool useweights = TRUE;
 
 	char ch;
 
@@ -1374,10 +1375,16 @@ static bool player_birth_aux_3(void)
 		clear_from(10);
 
 		/* Extra info */
-		put_fstr(5, 10,
+		//put_fstr(5, 10,
+		//			"The auto-roller will generate 500 characters and try to pick\n"
+		//			"the one with the best stats, according to the weightings you\n"
+		//			"choose below. Enter a value from 1-100 for each stat.");
+		put_fstr(5, 9,
 					"The auto-roller will generate 500 characters and try to pick\n"
 					"the one with the best stats, according to the weightings you\n"
-					"choose below. Enter a value from 1-100 for each stat.");
+					"choose below. Enter a value from 1-100 for each stat. If the\n"
+ 					"sum of the weights is 86, and each weight is between 5 - 20,\n"
+					"then the weight will be used directly for the stats.\n");
 
 		/* Prompt for the stat weights */
 		put_fstr(2, 15, "Enter weight for: ");
@@ -1427,6 +1434,17 @@ static bool player_birth_aux_3(void)
 	/* Clean up */
 	clear_from(10);
 
+  // decide if we are going to use the weights as stats
+  v = 0;
+	for (i = 0; i < A_MAX; i++)
+	{
+    if ((stat_weight[i] > 20) || (stat_weight[i] < 5))
+    {
+      useweights = FALSE;
+      break;
+    }
+    v += stat_weight[i];
+  }
 
 	/*** Generate ***/
 
@@ -1435,6 +1453,18 @@ static bool player_birth_aux_3(void)
 	{
 		int col = 42;
 
+    if (useweights && (v == 86))
+    {
+      /* use the weights as stats directly */
+		  for (i = 0; i < A_MAX; i++)
+		  {
+        /* copy the stats to stat_use so the money generated is correct */
+			  stat_use[i] =  10 * (stat_weight[i] + rp_ptr->r_adj[i] + cp_ptr->c_adj[i]);
+        /* Set the stat */
+        p_ptr->stat[i].cur = p_ptr->stat[i].max = stat_use[i];
+		  }
+    }
+    else
 		/* Feedback */
 		if (autoroller)
 		{

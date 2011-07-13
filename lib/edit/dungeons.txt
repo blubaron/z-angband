@@ -1,0 +1,212 @@
+# File: dungeons.txt
+
+# This file is used to initialize the "lib/raw/dungeons.raw" file, which is
+# used to initialize the "dungeon type" information for the z+Angband game.
+
+# Do not modify this file unless you know exactly what you are doing,
+# unless you wish to risk possible system crashes and broken savefiles.
+
+# After modifying this file, delete the "lib/raw/dungeons.raw" file.
+
+# Note that dungeon zero is used for the "vanilla" dungeon.
+
+# === Understanding dungeons.txt ===
+
+# N: serial number : default dungeon name
+# L: min level : max level : chance : population : height : room limits
+# H: Habitat Flag | Habitat Flag | etc
+# R: Roomtype Flag | Roomtype Flag | etc
+# O: treasure : combat items: magic items : tools
+# W: floor_feat : wall_feat : perm_wall_feat : rubble_feat
+# d: closed : open : broken : secret_closed
+# w: stair_up : stair_down : quest_stair : pillar_feat
+# C: monsters : objects : doors : traps : rubble : stairs : tunnels
+# c: small_levels : arena_levels : cavern_levels : labrinth_levels : vault_levels : city_levels
+# S: streamer1feat : s1_t_feat : s1_size : s1_number : s1_t_chance
+# s: streamer2feat : s2_t_feat : s2_size : s2_number : s2_t_chance
+# V: river1feat_shallow : r1_deep : r1_rarity : r1_size
+# v: river2feat_shallow : r2_deep : r2_rarity : r2_size
+# l: lake_feat_shallow : lake_deep : lake_rarity : lake_size
+# n: chance : name generator string
+# F: flag | flag | etc
+# D: Description
+
+# 'N' indicates the beginning of an entry. The serial number must
+# increase for each new item. Entry 0 is used for the vanilla dungeon.
+
+# 'L' is for levels and limits - min level, max level, dungeon chance,
+# wilderness population and height, and room limits
+
+# 'H' is for habitat flags. These are fairly self-explanatory. As many H:
+# lines may be used as are needed to specify all the flags and flags
+# are separated by the '|' symbol.
+
+# 'R' is for room type flags. These are the types of rooms that are
+# allowed to appear in the dungeon. As many R:
+# lines may be used as are needed to specify all the flags and flags
+# are separated by the '|' symbol.
+
+# 'W' is for floor and wall feature overrides - floor, digable wall,
+# permanent wall, and rubble
+
+# 'w' is for stair feature overrides - up, down, quest, and pillar
+
+# 'd' is for door feature overrides - closed, open, broken, and
+# closed secret. Secret doors are always closed when found.  The 
+# feature used with open secret doors is the base feature of the
+# closed secret door.
+
+# 'O' is for object theme.  The three numbers represent the percent
+# chance to drop treasure, combat and magic items.  The chance to
+# drop tools is defined as 100 - the sum of these three numbers.
+# Note that monsters do not drop junk.  Junk can only be generated
+# in the dungeon when you enter it.
+
+# 'C' is for the chances that various things will appear - monsters,
+# objects, doors, traps, rubble, stairs, and tunnels
+
+# 'c' is for the chances that a level will be a special type - small
+# levels, arena levels, cavern levels, labrinth levels, vault levels,
+# and city levels.
+
+# 'S' is for the first type of streamer that changes the wall type -
+# feature, treasure_feature, streamer width, number of streamers, 
+# and chance of treasure feature.
+
+# 's' is for the second type of streamer that changes the wall type -
+# feature, treasure_feature, streamer width, number of streamers, 
+# and chance of treasure feature.
+
+# 'V' is for the first type of river that may be generated - shallow
+# water feature, deep water feature, rarity, and width.
+
+# 'v' is for the second type of river that may be generated - shallow
+# water feature, deep water feature, rarity, and width.
+
+# 'l' is for a lake that may be generated - shallow
+# feature, deep feature, rarity, and radius.
+
+# 'n' is for a possible name given to the dungeon using the random
+# name generator - chance, generator id, name format string. The name
+# string allows a name from a name generator to be inserted into the
+# string. For instance, "Mines of %s" might become "Mines of Bahzkhel",
+# or "%s Tower" might become "Lauregaer Tower", or "%ssford" might
+# become "Ronddalsford". The generator id is usually 0 to use the 
+# elvish name generator. The other name generators are 1 - dwarvish.
+# If not present all dungeons of the type will use the default name.
+
+# 'F' is for flags. These are fairly self-explanatory. As many F:
+# lines may be used as are needed to specify all the flags and flags
+# are separated by the '|' symbol.
+
+# 'D' is for description. As many D: lines may be used as are needed
+# to describe the monster. Note that lines may need spaces at their
+# ends to prevent words from running together in the monster memory.
+
+
+# Version stamp (required)
+
+V:0.3.3
+
+##### The Player #####
+
+N:0:Player
+G:@:w
+
+N:1:Sewers
+L:1:30:1:100:0:0
+H:DUN_DARKWATER
+R:SIMPLE | NATURAL | ANIMAL | STRANGE
+W:11:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:7:16:7:40
+C:100:90:100:50:150:60:100
+c:0:0:150:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:137:136:20:2
+l:137:136:10:50
+F:DF_TRACK | DF_ROAD
+D:A foul smell comes up from the sewers
+
+N:2:Lair
+L:10:50:1:100:100:0
+H:DUN_LAIR
+R:SIMPLE | NATURAL | COMPLEX | RUIN
+W:88:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:50:10:10:0
+C:110:100:100:100:100:100:100
+c:0:0:150:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:94:93:20:2
+l:137:136:10:50
+D:You hear various noises coming from the lair.
+
+N:3:Evil Temple
+L:20:60:1:250:250:0
+H:DUN_TEMPLE
+R:SIMPLE | COMPLEX | DENSE | FANCY | BUILDING | CRYPT
+W:12:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:30:30:30
+C:110:110:100:100:50:100:100
+c:0:0:0:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:86:85:30:2
+l:86:85:15:15
+n:33:0:"%s Monestary"
+n:34:0:"Temple of %s"
+n:33:0:"%s Temple"
+F:DF_ROAD
+D:A malignant aura comes from this building.
+
+N:3:Evil Tower
+L:20:60:1:250:200:0
+H:DUN_TOWER
+R:SIMPLE | COMPLEX | BUILDING | VAULT
+W:13:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:20:0:80:0
+C:100:100:100:200:0:150:100
+c:0:0:0:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:94:93:20:1
+v:86:85:30:1
+l:86:85:15:15
+n:50:0:"Tower of %s"
+n:50:0:"%s Tower"
+F:DF_TRACK
+D:A malignant aura comes from this building.
+
+N:3:Ruins
+L:20:80:1:0:150:0
+H:DUN_RUIN
+R:RUIN
+W:14:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:20:0:80:0
+C:100:100:100:200:0:150:100
+c:0:0:0:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:86:85:30:2
+l:137:136:10:50
+n:50:0:"Ruins of %s"
+n:50:0:"Ruins"
+F:DF_TRACK | DF_ROAD
+D:You see some ancient ruins.
+
+

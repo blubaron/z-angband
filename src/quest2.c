@@ -22,13 +22,17 @@
 #define MAX_TRIES 30
 extern const store_type *curr_build;
 
+extern bool request_find_item(int dummy); 
+extern bool request_bounty(int dummy);
+extern bool request_find_place(int dummy);
+
 int in_quest(void)
 {
 	if (current_quest == NULL) return (0);
 	else return (1);
 }
 
-static int curr_scale;
+extern int curr_scale;
 
 /* See if this quest is a wild quest and activate it if necessary */
 void discover_wild_quest(int q_num)
@@ -609,7 +613,10 @@ static void display_monster_quest(quest_type *q_ptr)
 		if (q_ptr->type == QUEST_TYPE_BOUNTY)
 		{
 			/* One at a time */
-			number = 1;
+      if (q_ptr->data.dun.max_num - q_ptr->data.dun.cur_num > 3) 
+        number = randint1((q_ptr->data.dun.max_num - q_ptr->data.dun.cur_num)/3);
+      else
+  			number = 1;
 
 			/* Which monster? */
 			r_idx = q_ptr->data.bnt.r_idx;
@@ -671,6 +678,9 @@ static void display_monster_quest(quest_type *q_ptr)
 				if (place_monster_aux
 					(x, y, r_idx, FALSE, group, FALSE, FALSE, TRUE))
 				{
+          /* give a message, so player knows a bounty is nearby? - Brett */
+          /*if (!preserve_mode)*/
+            msgf("Your pulse quickens. You sense a target on this level.");
 					/* Success */
 					break;
 				}
@@ -752,7 +762,7 @@ void trigger_quest_create(byte c_type, vptr data)
 					r_ptr = &r_info[q_ptr->data.bnt.r_idx];
 
 					/* Is the player inside the right sort of dungeon? */
-					if (level && (r_ptr->flags[7] & d_ptr->habitat || !monster_theme))
+					if (level && ((r_ptr->flags[7] & d_ptr->habitat) || !monster_theme))
 					{
 						/* Frequent when the monster would not be that much out of depth. */
 						if ((level >= r_ptr->level-5) && (one_in_(2)))
@@ -1447,7 +1457,8 @@ static void give_reward(store_type * st_ptr, quest_type * q_ptr)
 		gain_exp(xp);
 
 		/* Tell the player */
-		msgf ("You receive experience!");
+		//msgf ("You receive experience!");
+		msgf ("You receive %d experience!", xp);
 	}
 
 	if (stat != -1 && q_ptr->level >= 5)
@@ -2048,7 +2059,76 @@ void request_quest(const store_type *b_ptr, int scale)
 	if (q_num == -1)
 	{
 		/* No quests available */
-		msgf ("Sorry, we don't have any errands for you.");
+		/*msgf ("Sorry, we don't have any errands for you.");*/
+    if (is_member() || (b_ptr->type == BUILD_CASTLE0)
+       || (b_ptr->type == BUILD_CASTLE1)  || (b_ptr->type == BUILD_CASTLE2)) {
+      q_ptr = NULL;
+	    switch(b_ptr->type)
+	    {
+		    case BUILD_CASTLE0:
+		    case BUILD_CASTLE2:
+  		  case BUILD_WARRIOR_GUILD:
+		    case BUILD_CATHEDRAL:
+		      /* Hack: quest difficulty should be random */
+          if (p_ptr->max_lev > 5) {
+			      curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+          } else {
+			      curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+          }
+          if (request_bounty(0)) {
+            q_ptr = lookup_quest_building(b_ptr);
+          }
+			    return;
+		    case BUILD_CASTLE1:
+		    case BUILD_MAGE_GUILD:
+		    case BUILD_THIEVES_GUILD:
+			    /* Hack: 10% chance of artifact quest o.w. bounty */
+          if (one_in_(10)) {
+            curr_scale = damroll(10,10)-9;
+            if (request_find_item(0)) {
+              q_ptr = lookup_quest_building(b_ptr);
+            }
+          }
+          if (!q_ptr) {
+            if (p_ptr->max_lev > 5) {
+			        curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+            } else {
+			        curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+            }
+            if (request_bounty(0)) {
+              q_ptr = lookup_quest_building(b_ptr);
+            }
+          }
+			    return;
+			  case BUILD_RANGER_GUILD:
+			    /* Hack: 10% chance of find place o.w. bounty */
+          if (one_in_(10)) {
+            curr_scale = damroll(10,10)-9;
+            //request_find_item(0);
+            if (request_find_item(0)) {
+              q_ptr = lookup_quest_building(b_ptr);
+            }
+          }
+          if (!q_ptr) {
+            if (p_ptr->max_lev > 5) {
+			        curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+            } else {
+			        curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+            }
+            if (request_bounty(0)) {
+              q_ptr = lookup_quest_building(b_ptr);
+            }
+          }
+			    return;
+	    }
+	    if (!q_ptr)
+	    {
+    		/* No quests available */
+        msgf ("Sorry, we don't have any errands for you.");
+      }
+    } else {
+      msgf ("Sorry, we don't have any errands for you.");
+    }
 		return;
 	}
 	/* Available quest, but player level not sufficient */

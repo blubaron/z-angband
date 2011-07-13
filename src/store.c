@@ -1145,6 +1145,9 @@ static void display_store(void)
 	{
 		prtf(31, 22, " g) Get an item.");
 		prtf(31, 23, " d) Drop an item.");
+	  prtf(56, 23, " H) Set your main Home.");
+	  prtf(31, 24, " E) Eat something.");
+	  prtf(56, 24, " R) Rest for a time.");
 	}
 
 	/* Shop commands XXX XXX XXX */
@@ -2018,6 +2021,35 @@ static void store_examine(void)
 	return;
 }
 
+/*
+ * Set the player's recall home		   Brett
+ */
+static void store_home(void)
+{
+  int i;
+	place_type *pl_ptr;
+
+  if (st_ptr->type == BUILD_STORE_HOME) {
+    p_ptr->home_place_num = p_ptr->place_num;
+    p_ptr->home_store_num = 0;
+    // find which building we are in to store the info
+    pl_ptr = &place[p_ptr->place_num];
+	  for (i = 0; i < pl_ptr->numstores; i++)
+	  {
+      if (&(pl_ptr->store[i]) == st_ptr)
+      {
+        p_ptr->home_store_num = i;
+        msgf("You decide to live here.");
+        break;
+      }
+	  }
+  }
+  if (0 == p_ptr->home_store_num)
+  {
+    msgf("You decide to be homeless for a while.");
+  }
+  return;
+}
 
 /*
  * Hack -- set this to leave the store
@@ -2350,6 +2382,33 @@ static void store_process_command(void)
 			break;
 		}
 
+
+		case 'H':
+		{
+			/* Set Recall Home */
+			store_home();
+			break;
+		}
+		case 'R':
+		{
+			/* Rest Home */
+      if (st_ptr->type == BUILD_STORE_HOME)
+      {
+			  home_rest();
+      }
+			break;
+		}
+		case 'E':
+		{
+			/* Eat something */
+      if (st_ptr->type == BUILD_STORE_HOME)
+      {
+        do_cmd_eat_food();
+  			//(void)set_food(PY_FOOD_MAX - 1);
+			  //home_eat_food();
+      }
+			break;
+		}
 		default:
 		{
 			/* Is it a standard command? */
@@ -2702,6 +2761,9 @@ void do_cmd_store(const field_type *f1_ptr)
 		{
 			prtf(31, 22, " g) Get an item.");
 			prtf(31, 23, " d) Drop an item.");
+	  	prtf(56, 23, " H) Set your main Home.");
+	  	prtf(31, 24, " E) Eat something.");
+	  	prtf(56, 24, " R) Rest for a time.");
 		}
 
 		/* Shop commands XXX XXX XXX */
@@ -2857,7 +2919,18 @@ bool send_home (void)
 		}
 	}
 
-	/* Look for other towns, if they exist */
+  /* check if the main home has space */
+  if (which < 0 && p_ptr->home_place_num)
+  {
+	  if (get_list_length(place[p_ptr->home_place_num].store[p_ptr->home_store_num].stock)
+      < place[p_ptr->home_place_num].store[p_ptr->home_store_num].max_stock)
+	  {
+		  which = p_ptr->home_store_num;
+		  pl_ptr = &place[p_ptr->home_place_num];
+	  }
+  }
+
+  /* Look for other towns, if they exist */
 	if (which < 0 && !vanilla_town)
 	{
 		/* Search towns in order of distance from the player / the player's place. */

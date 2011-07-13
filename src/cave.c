@@ -3062,6 +3062,7 @@ void map_area(void)
 
 	cave_type *c_ptr, *c2_ptr;
 	pcave_type *pc_ptr, *pc2_ptr;
+  feature_type *feat_ptr, *feat2_ptr;
 
 	/* Pick an area to map */
 	y1 = py - MAX_DETECT - randint1(10);
@@ -3082,7 +3083,7 @@ void map_area(void)
 		{
 			c_ptr = area(x, y);
 			pc_ptr = parea(x, y);
-
+      feat_ptr = &(f_info[c_ptr->feat]);
 
 			if (p_ptr->depth) {
 
@@ -3099,20 +3100,27 @@ void map_area(void)
 
 						c2_ptr = area(xx, yy);
 						pc2_ptr = parea(xx, yy);
+            feat2_ptr = &(f_info[c2_ptr->feat]);
 
 						/* Memorize some grids */
 								/* Transitions to solid grids */
-						if ((cave_floor_grid(c_ptr) && !cave_floor_grid(c2_ptr)) ||
+						//if ((cave_floor_grid(c_ptr) && !cave_floor_grid(c2_ptr)) ||
+            if (( (feat_ptr->flags & (FF_PWALK||FF_MWALK)) 
+              && !(feat2_ptr->flags & (FF_PWALK||FF_MWALK)) ) ||
 								/* Transitions to liquids */
-							(!liquid_grid(c_ptr) && liquid_grid(c2_ptr)) ||
+							//(!liquid_grid(c_ptr) && liquid_grid(c2_ptr)) ||
+              (!(feat_ptr->flags & FF_LIQUID) && (feat2_ptr->flags & FF_LIQUID)) ||
 								/* Rubble transitions */
-							(c_ptr->feat != FEAT_RUBBLE && c2_ptr->feat == FEAT_RUBBLE)  ||
+							//(c_ptr->feat != FEAT_RUBBLE && c2_ptr->feat == FEAT_RUBBLE)  ||
+              (!(feat_ptr->flags & FF_DIG_OBJ) && (feat2_ptr->flags & FF_DIG_OBJ)) ||
 								/* Visible doors */
-							c2_ptr->feat == FEAT_BROKEN || c2_ptr->feat == FEAT_OPEN ||
-							c2_ptr->feat == FEAT_CLOSED ||
+							//c2_ptr->feat == FEAT_BROKEN || c2_ptr->feat == FEAT_OPEN ||
+							//c2_ptr->feat == FEAT_CLOSED ||
+              (!(feat2_ptr->flags & FF_HIDDEN) && (feat2_ptr->flags & FF_DOOR)) ||
 								/* Stairs */
-							c2_ptr->feat == FEAT_LESS || c2_ptr->feat == FEAT_MORE ||
-							c2_ptr->feat == FEAT_QUEST_LESS || c2_ptr->feat == FEAT_QUEST_MORE)
+							//c2_ptr->feat == FEAT_LESS || c2_ptr->feat == FEAT_MORE ||
+							//c2_ptr->feat == FEAT_QUEST_LESS || c2_ptr->feat == FEAT_QUEST_MORE)
+              ((feat_ptr->flags & FF_EXIT_UP) && (feat2_ptr->flags & FF_EXIT_DOWN)))
 						{
 							/* Memorize the grid */
 							remember_grid(c2_ptr, pc2_ptr);
@@ -3321,7 +3329,9 @@ void cave_set_feat(int x, int y, int feat)
 	if (cave_floor_grid(c_ptr))
 	{
 		/* Is new eat a wall grid? */
-		if (f_info[feat].flags & FF_BLOCK)
+		//if (f_info[feat].flags & FF_BLOCK)
+		if (!(f_info[feat].flags & (FF_PWALK|FF_MWALK)) 
+      || (f_info[feat].flags & FF_NO_LOS))
 		{
 			/* Update some things */
 			p_ptr->update |= (PU_VIEW | PU_FLOW | PU_MONSTERS | PU_MON_LITE);
@@ -3330,7 +3340,9 @@ void cave_set_feat(int x, int y, int feat)
 	else
 	{
 		/* Is new feat a floor grid? */
-		if (!(f_info[feat].flags & FF_BLOCK))
+		//if (!(f_info[feat].flags & FF_BLOCK))
+		if (f_info[feat].flags & (FF_PWALK|FF_MWALK)
+      || !(f_info[feat].flags & FF_NO_LOS))
 		{
 			/* Update some things */
 			p_ptr->update |= (PU_VIEW | PU_FLOW | PU_MONSTERS | PU_MON_LITE);

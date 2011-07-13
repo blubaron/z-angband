@@ -1488,6 +1488,10 @@ static void add_monsters_block(int x, int y)
  */
 void wild_discover(int wx, int wy)
 {
+  /* declatations moved here because in ansi c, declarations have to
+     be at the beginning of the scope - Brett */
+  place_type *pl_ptr;
+
 	/* Mark as seen */
 	wild[wy][wx].done.info |= WILD_INFO_SEEN;
 	
@@ -1495,7 +1499,7 @@ void wild_discover(int wx, int wy)
 	if (!wild[wy][wx].done.place) return;
 	
 	/* Get place */
-	place_type *pl_ptr = &place[wild[wy][wx].done.place];
+	pl_ptr = &place[wild[wy][wx].done.place];
 	
 	pl_ptr->seen = TRUE;
 	
@@ -2427,7 +2431,7 @@ void wipe_all_list(void)
 	int i;
 
 	/* Hack - cull the players inventory */
-	if (p_ptr->inventory) delete_object_list(&p_ptr->inventory);
+	//if (p_ptr->inventory) delete_object_list(&p_ptr->inventory);
 
 	/* Clear the store cache */
 	for (i = 0; i < store_cache_num; i++)

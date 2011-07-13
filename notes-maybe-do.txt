@@ -1,0 +1,121 @@
+
+
+  Maybe Todo:
+    add random approximate level bounty quests back to castle. this would be
+      generated on the fly with quest levels .9*plvl - 1.5*plvl. rewards only
+      gold and xp, no items. maybe add to alchemists as well? (rare potion ingredients)
+
+    Finish enchant_pval? what is left to do?
+
+    Be able to abandon a quest and get another from the same quest giver after
+      a period of time.
+
+    Change spell gain for priests,paladins, and monks to be like spell gain
+      for spellcasters? (for now I changed spell slots for priests, paladins,
+      and monks back to 38, so they can get all of the spells in the life/death realms.)
+
+    Be able to forget a spell and free up the spell slot (respec)
+
+    Allow pets to travel through stairs with the player
+
+    Default weights for classes during autoroll?
+
+    allow term windows to have a scroll bar
+
+    have to buy homes not in the starting town (100,000 gold?)
+
+    be able to change empty buildings to stores and upgrade them
+      perhaps change blank spots and homes not is starting town to a blank store field
+      then in the store purchase a building type. but in do_cmd_building() need
+      to have a check if its owned by the player and show more options if it is
+      (Upgrade, no longer own). Building price except home is 300,000 + 100,000*rarity?
+
+    Change containers so that the player may not use the contents directly? so
+      that the player is required to use a turn to remove an object to main
+      inventory to use, identify, etc. Pickup direct to, fire from, inspect in
+      container should still work without using energy.
+
+    change chests so that they are containers, and their objects are generated at drop
+
+    want set of tiles per dungeon that use floor, wall, door (open, closed,
+      broken), stair up, stair down
+
+    Want new featue types: road a,b town ground a,b, 
+
+    x?For find ruin quests, check if the place block is known first? I don't
+      think quests should be given for known locations. Especially since
+      mapmakers can now reveal the whole map.
+
+    Show time of day text under main screen? where? (from turn (of 10000)):
+      Sunrise (0)
+      Morning (833)
+      Late Morning (1667)
+      Noon (2500)
+      Afternoon (3333)
+      Late Afternoon (4167)
+      Sunset (5000)
+      Evening(5833)
+      Late Evening (6667)
+      Midnight(7500)
+      Late Night(8333)
+      Predawn(9167)
+    Only in Wilderness?(replace wilderness name) Night creatures still get
+      bonus in dungeons so no. After tile multipliers, put to right of
+      wilderness name and don't care if it is shown or not.
+
+    Move dungeon type info from tables.c (line 5191) to a file (dungeons.txt and dungeons.raw)
+      use dun_gen_type structure
+      since we have seperate attr/char pairs for each lighting level in
+        features, remove the USE_TRANS flag and add EXIT_DOWN and EXIT_UP flags
+        also add QUEST_DOWN flag.
+      add door, stair, and pillar redirection (8 more bytes per type)
+      add generation (incl. vault spec.) and redirection of rubble, 
+        fountain, window, wall support, and statue.
+
+
+    vault symbol changes:
+#    v - treasure or trap
+#    0 - quest boss or item, or monster up to 9 levels OOD and treasure up to 7 levels OOD
+#    1 - monster up to 5 levels out of depth (OOD)
+#    2 - monster up to 12 levels OOD
+#    3 - monster up to 19 levels OOD
+#    4 - monster up to 26 levels OOD
+#    5 - monster up to 33 levels OOD
+#    6 - monster up to 40 levels OOD
+#    7 - monster up to 3 levels OOD and/or treasure up to 7 levels OOD
+#    8 - monster up to 9 levels OOD and treasure up to 7 levels OOD
+#    9 - monster up to 20 levels OOD and treasure up to 10 levels OOD
+#    E - monster up to 30 levels OOD and treasure up to 15 levels OOD
+#    F - monster up to 40 levels OOD and treasure up to 20 levels OOD
+
+#    p - pattern start point
+#    a-d - pattern path
+#    P - pattern end - only heals once?
+#    A - pattern ??
+#    B - pattern teleport point??
+
+    vault symbol additions:
+#    = - visible door, locked
+#    - - visible door, unlocked but closed - or open?
+#    | - pillar
+#    @ - rubble
+#    < - preferred connection point for corridors, or entry stairs if vault is the level
+#    > - exit stairs if vault is the level, or preferred connection point for corridors
+#    * - vein (quartz or magma)
+
+#    / - ramp up part
+#    \ - ramp down part
+#    o - nothing
+#    ; - fence? (border between floor and nothing)
+
+    vault symbols unchanged
+#    % - outside of the vault, where corridors may be connected
+#    # - granite
+#    X - impenetrable rock
+#    + - secret door
+#    ^ - trap
+# other symbols vault specific defined by:
+# V:<sym>:<type>:<id> where type is R, K, F, or T (or g for monster group)
+FA/DaJangband have extra vault types/chars incorporate, modify above?
+
+

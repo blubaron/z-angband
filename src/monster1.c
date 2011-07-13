@@ -755,8 +755,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" may breathe ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" or ");
+		  else if (vn > 2) roff(", or ");
+			else roff(" or ");
 
 			/* Dump */
 			roff(CLR_L_RED "%s", vp[n]);
@@ -861,8 +861,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" which ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" or ");
+		  else if (vn > 2) roff(", or ");
+			else roff(" or ");
 
 			/* Dump */
 			roff(CLR_L_RED "%s", vp[n]);
@@ -945,8 +945,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" can ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" and ");
+		  else if (vn > 2) roff(", and ");
+			else roff(" and ");
 
 			/* Dump */
 			roff(CLR_L_UMBER "%s", vp[n]);
@@ -1003,8 +1003,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" is hurt by ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" and ");
+		  else if (vn > 2) roff(", and ");
+			else roff(" and ");
 
 			/* Dump */
 			roff(CLR_YELLOW "%s", vp[n]);
@@ -1035,8 +1035,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" resists ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" and ");
+		  else if (vn > 2) roff(", and ");
+			else roff(" and ");
 
 			/* Dump */
 			roff(CLR_ORANGE "%s", vp[n]);
@@ -1069,8 +1069,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" resists ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" and ");
+		  else if (vn > 2) roff(", and ");
+			else roff(" and ");
 
 			/* Dump */
 			roff(CLR_ORANGE "%s", vp[n]);
@@ -1102,8 +1102,8 @@ static void roff_mon_aux(int r_idx, int remem)
 			/* Intro */
 			if (n == 0) roff(" cannot be ");
 			else if (n < vn - 1) roff(", ");
-			else
-				roff(" or ");
+		  else if (vn > 2) roff(", or ");
+			else roff(" or ");
 
 			/* Dump */
 			roff(CLR_YELLOW "%s", vp[n]);
@@ -1516,6 +1516,59 @@ static void roff_mon_aux(int r_idx, int remem)
 		roff("Nothing is known about %s attack.  ", wd_his[msex]);
 	}
 
+	/* Collect habitats */
+	vn = 0;
+	if (FLAG(mf_ptr, RF_DUN_DARKWATER)) vp[vn++] = "sewers";
+	if (FLAG(mf_ptr, RF_DUN_LAIR)) vp[vn++] = "lairs";
+	if (FLAG(mf_ptr, RF_DUN_TEMPLE)) vp[vn++] = "evil temples";
+	if (FLAG(mf_ptr, RF_DUN_TOWER)) vp[vn++] = "evil towers";
+	if (FLAG(mf_ptr, RF_DUN_RUIN)) vp[vn++] = "ruins";
+	if (FLAG(mf_ptr, RF_DUN_GRAVE)) vp[vn++] = "graveyards";
+	if (FLAG(mf_ptr, RF_DUN_CAVERN)) vp[vn++] = "caverns";
+	if (FLAG(mf_ptr, RF_DUN_PLANAR)) vp[vn++] = "planar gates";
+	if (FLAG(mf_ptr, RF_DUN_HELL)) vp[vn++] = "gates to hell";
+	if (FLAG(mf_ptr, RF_DUN_HORROR)) vp[vn++] = "dungeons of horror";
+	if (FLAG(mf_ptr, RF_DUN_MINE)) vp[vn++] = "mines";
+	if (FLAG(mf_ptr, RF_DUN_CITY)) vp[vn++] = "outlaw towns";
+	if (FLAG(mf_ptr, RF_WILD_FOREST1)) vp[vn++] = "forests";
+	if (FLAG(mf_ptr, RF_WILD_FOREST2)) vp[vn++] = "thick forests";
+	if (FLAG(mf_ptr, RF_WILD_MOUNT1)) vp[vn++] = "mountains";
+	if (FLAG(mf_ptr, RF_WILD_MOUNT2)) vp[vn++] = "mountains";
+	if (FLAG(mf_ptr, RF_WILD_WASTE1)) vp[vn++] = "deserts";
+	if (FLAG(mf_ptr, RF_WILD_WASTE2)) vp[vn++] = "wastelands";
+	if (FLAG(mf_ptr, RF_WILD_SWAMP1)) vp[vn++] = "marshes";
+	if (FLAG(mf_ptr, RF_WILD_SWAMP2)) vp[vn++] = "swamps";
+	if (FLAG(mf_ptr, RF_WILD_SHORE)) vp[vn++] = "shorelines";
+	if (FLAG(mf_ptr, RF_WILD_OCEAN)) vp[vn++] = "oceans";
+	if (FLAG(mf_ptr, RF_WILD_GRASS)) vp[vn++] = "grasslands";
+	if (FLAG(mf_ptr, RF_WILD_TOWN)) vp[vn++] = "towns";
+	if ((FLAG(mf_ptr, RF_DUN_XTRA1)) || (FLAG(mf_ptr, RF_DUN_XTRA2))
+   || (FLAG(mf_ptr, RF_DUN_XTRA3)) || (FLAG(mf_ptr, RF_DUN_XTRA4))
+   || (FLAG(mf_ptr, RF_DUN_XTRA5)) || (FLAG(mf_ptr, RF_DUN_XTRA6))
+   || (FLAG(mf_ptr, RF_DUN_XTRA7)) || (FLAG(mf_ptr, RF_DUN_XTRA8)))
+    vp[vn++] = "other places";
+	/* Describe non-effects */
+	if (vn)
+	{
+		/* Intro */
+		roff("%^s", wd_he[msex]);
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) roff(" likes to live in ");
+			else if (n < vn - 1) roff(", ");
+		  else if (vn > 2) roff(", and ");
+			else roff(" and ");
+
+			/* Dump */
+			roff(CLR_UMBER "%s", vp[n]);
+		}
+
+		/* End */
+		roff(".  ");
+  }
 
 	/*
 	 * Notice "Quest" monsters, but only if you
@@ -1642,6 +1695,133 @@ void display_roff_mon(int r_idx)
 
 
 /*
+ * Hack -- show a list of objects after the monsters in the current "term" window
+ */
+void display_visable_item(int x, int y, object_type *o_ptr)
+{
+  byte a;
+  char c;
+	cptr attr;
+  if (o_ptr) {
+		/* Display graphics for object, if desired */
+		a = object_attr(o_ptr);
+		c = object_char(o_ptr);
+		/* Hack - if no object, don't display the 'nothing' symbol */
+		if (!o_ptr->number) c = ' ';
+
+		/* Fake monochrome */
+		if (!use_color)
+		{
+			/* Hack - no equippy char */
+			a = TERM_WHITE;
+			c = ' ';
+		}
+
+    /* Go to left of screen */
+	  Term_gotoxy(x, y);
+    /* draw the objhect character */
+		Term_draw(x+1, y, a, c);
+
+		/* Get the color */
+		attr = color_seq[tval_to_attr[o_ptr->tval % 128]];
+		/* Display the entry itself */
+		put_fstr(x+3, y++, "%s" CLR_SET_DEFAULT "%v", attr, OBJECT_FMT(o_ptr, FALSE, 3));
+  }
+}
+void display_visable_objects(void)
+{
+  //int max, mx,my;
+  unsigned int num;
+  //int line = 1, x = 0;
+  //int cur_x;
+  int i,j,radius;
+  object_type *o_ptr;
+  cave_type *c_ptr;
+  //unsigned int disp_count = 0;
+
+  int y = Term->scr->cy +1;
+  if (y >= Term->hgt) {
+    /* we are already at the bottom of the term window, 
+     * so cannot display anything
+     */
+    return;
+  }
+  // we do not need to test for hallucinations here
+  // since it was done in display_visable
+	/* Are we hallucinating? */
+	if (query_timed(TIMED_IMAGE))
+	{
+		//put_fstr(0, 10, CLR_VIOLET "Hallucinations");
+
+		return;
+	}
+  c_ptr = area(p_ptr->px,p_ptr->py);
+  o_ptr = test_floor(&num,c_ptr,3);
+  if (o_ptr) {
+    display_visable_item(0,y++,o_ptr);
+  }
+  for (radius = 1; radius < 19; ++radius) {
+    j = p_ptr->py - radius;
+    for (i=p_ptr->px-radius; i < p_ptr->px+radius; ++i) {
+      if (y > Term->hgt) {
+        break;
+      }
+      if (!in_bounds2(i,j)) continue;
+      c_ptr = area(i,j);
+      o_ptr = test_floor(&num,c_ptr,3);
+      if (o_ptr) {
+        display_visable_item(0,y++,o_ptr);
+      }
+    }
+    j = p_ptr->py + radius;
+    for (i=p_ptr->px-radius; i < p_ptr->px+radius; ++i) {
+      if (y > Term->hgt) {
+        break;
+      }
+      if (!in_bounds2(i,j)) continue;
+      c_ptr = area(i,j);
+      o_ptr = test_floor(&num,c_ptr,3);
+      if (o_ptr) {
+        display_visable_item(0,y++,o_ptr);
+      }
+    }
+
+    i = p_ptr->px - radius;
+    for (j=p_ptr->py-radius; j < p_ptr->py+radius; ++j) {
+      if (y > Term->hgt) {
+        break;
+      }
+      if (!in_bounds2(i,j)) continue;
+      c_ptr = area(i,j);
+      o_ptr = test_floor(&num,c_ptr,3);
+      if (o_ptr) {
+        display_visable_item(0,y++,o_ptr);
+      }
+    }
+    i = p_ptr->px + radius;
+    for (j=p_ptr->py-radius; j < p_ptr->py+radius; ++j) {
+      if (y > Term->hgt) {
+        break;
+      }
+      if (!in_bounds2(i,j)) continue;
+      c_ptr = area(i,j);
+      o_ptr = test_floor(&num,c_ptr,3);
+      if (o_ptr) {
+        display_visable_item(0,y++,o_ptr);
+      }
+    }
+    if (y > Term->hgt) {
+      break;
+    }
+  }
+  if (y < Term->hgt) {
+    /* Erase the rest of the window */
+    clear_from(y);
+  }
+
+}
+
+/*
  * Hack -- show a list of the visible monsters in the current "term" window
  */
 void display_visible(void)
@@ -1668,7 +1848,7 @@ void display_visible(void)
 	for (y = 0; y < Term->hgt; y++)
 	{
 		/* No more to display */
-		if (!i) return;
+		if (!i) break;//return;
 
 		/* Go to left of screen */
 		Term_gotoxy(0, y);
@@ -1694,6 +1874,8 @@ void display_visible(void)
 		}
 
 		/* Dump the name */
+		/* Prepend count */
+		roff("[%d]:", r_ptr->r_see);
 		if (FLAG(r_ptr, RF_QUESTOR))
 		{
 			roff(CLR_L_RED "%s", mon_race_name(r_ptr));
@@ -1715,7 +1897,8 @@ void display_visible(void)
 		/* Append the "optional" attr/char info */
 		roff("/('");
 		Term_addch(a2, c2);
-		roff("'):");
+		/*roff("'):");*/
+		roff("')");
 
 		/* Wizards get extra info */
 		if (p_ptr->state.wizard)
@@ -1724,7 +1907,7 @@ void display_visible(void)
 		}
 
 		/* Append count */
-		roff("[%d]", r_ptr->r_see);
+		/* roff("[%d]", r_ptr->r_see);*/
 
 		/* Look for the next one */
 		while (i > 0)
@@ -1737,6 +1920,8 @@ void display_visible(void)
 			}
 		}
 	}
+  Term_gotoxy(0, y);
+  display_visable_objects();
 }
 
 

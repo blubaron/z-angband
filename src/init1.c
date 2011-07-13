@@ -52,7 +52,7 @@
 /*
  * Feature flag types
  */
-static cptr f_info_flags[] =
+/*static cptr f_info_flags[] =
 {
 	"BLOCK",
 	"HALF_LOS",
@@ -62,6 +62,37 @@ static cptr f_info_flags[] =
 	"OBJECT",
 	"PATTERN",
 	"MARK"
+};*/
+static cptr f_info_flags[] =
+{
+	"PWALK",
+	"PPASS",
+	"MWALK",
+	"MPASS",
+	"NO_LOS",
+	"HIDDEN",
+	"DOOR",
+	"EXIT_UP",
+	"EXIT_DOWN",
+	"PERM",
+	"TRAP",
+	"QUEST",
+	"DIG",
+	"MARK",
+	"OVERLAY",
+	"PATTERN",
+	"DIG_GOLD",
+	"DIG_OBJ",
+	"DIG_CUSTOM",
+	"DIG_FOOD",
+	"ICKY",
+	"HALF_LOS",
+  "OBJECT",
+  "CLOSED",
+  "BROKEN",
+  "WILD",
+  "LIQUID",
+  "DAMAGES"
 };
 
 
@@ -1340,12 +1371,12 @@ errr parse_v_info(char *buf, header *head)
 /*
  * Grab one flag from a textual string
  */
-static errr grab_one_feat_flag(byte *flags, cptr names[], cptr what)
+static errr grab_one_feat_flag(u32b *flags, cptr names[], cptr what)
 {
 	int i;
 
 	/* Check flags */
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 28; i++)
 	{
 		if (streq(what, names[i]))
 		{
@@ -1456,6 +1487,83 @@ errr parse_f_info(char *buf, header *head)
 			/* Start the next entry */
 			s = t;
 		}
+	}
+	/* Process 'P' for "Parameters" (one line only) */
+	else if (buf[0] == 'P')
+	{
+		/* There better be a current f_ptr */
+		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Paranoia */
+		if (!buf[2]) return (PARSE_ERROR_GENERIC);
+
+    t = NULL;
+		/* Find the colon before the name */
+		s = strchr(buf + 2, ':');
+    if (s)
+    {
+      /* there is more than one parameter */
+		  /* Nuke the colon, advance to the next param */
+		  *s++ = '\0';
+    }
+    /* Get the number of the parameter */
+		i = atoi(buf + 2);
+		
+    /* Paranoia */
+		if (i < 0) return (PARSE_ERROR_GENERIC);
+    
+    f_ptr->priority = i;
+    
+    if (s) {
+      t = strchr(s, ':');
+      if (t)
+      {
+		    /* Nuke the colon, advance to the next param */
+		    *t++ = '\0';
+      }
+      /* Get the number of the parameter */
+		  i = atoi(s);
+		  
+      /* Paranoia */
+		  if (i < 0) return (PARSE_ERROR_GENERIC);
+      
+      f_ptr->dig = i;
+      /*if (t) use this section if there is a third parameter
+      {
+      }
+      else
+      {
+      }*/
+    }
+    else
+    {
+      f_ptr->dig = 0;
+    }
+	}
+	/* Process 'M' for "Mimic Feature" (one line only) */
+	else if (buf[0] == 'M')
+	{
+		/* There better be a current f_ptr */
+		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Paranoia */
+		if (!buf[2]) return (PARSE_ERROR_GENERIC);
+
+		/* Find the colon before the name */
+		s = strchr(buf + 2, ':');
+    if (s)
+    {
+      /* there is more than one parameter */
+		  /* Nuke the colon, advance to the next param */
+		  *s++ = '\0';
+    }
+    /* Get the number of the param */
+		i = atoi(buf + 2);
+		
+    /* Paranoia */
+		if (i < 0) return (PARSE_ERROR_GENERIC);
+
+    f_ptr->base_feat = i;
 	}
 	else
 	{

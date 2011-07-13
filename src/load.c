@@ -1392,8 +1392,40 @@ static void rd_extra(void)
 	rd_byte(&tmp8u);
 	rd_byte(&tmp8u);
 
+	/* 48 byte future use area - Brett */
+	/* Read some location information - Brett*/
+  if (sf_version > 61) 
+  {
+    /* The main home info - Brett*/
+	  rd_s16b(&p_ptr->home_place_num);
+	  rd_s16b(&p_ptr->home_store_num);
+  } else {
+    place_type *pl_ptr;
+    for (i = 0; i < 4; i++) rd_byte(&tmp8u);
+    /* set the home to the first one found */
+	  for (i = 0; i < place_count; i++)
+	  {
+		  pl_ptr = &place[i];
+      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+      {
+	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
+	      {
+          if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
+          {
+            p_ptr->home_place_num = i;
+            p_ptr->home_store_num = tmp16s;
+            break;
+          }
+        }
+        if (i < pl_ptr->numstores)
+        {
+          break;
+        }
+      }
+    }
+  }
 	/* Future use */
-	for (i = 0; i < 48; i++) rd_byte(&tmp8u);
+	for (i = 0; i < 44; i++) rd_byte(&tmp8u);
 
 	/* Skip the flags */
 	strip_bytes(12);

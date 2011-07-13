@@ -1198,7 +1198,7 @@ void get_map_size(int *x, int *y)
 	/* Get size */
 	Term_get_size(&wid, &hgt);
 
-    /* Offset */
+  /* Offset (for status area) */
 	hgt -= ROW_MAP + 1;
 	wid -= COL_MAP + 1;
 
@@ -1865,6 +1865,7 @@ static bool target_set_accept(int x, int y)
 
 	cave_type *c_ptr;
 	pcave_type *pc_ptr;
+	feature_type *feat_ptr;
 
 	object_type *o_ptr;
 	field_type *f_ptr;
@@ -1913,23 +1914,44 @@ static bool target_set_accept(int x, int y)
 
 	/* Interesting memorized features */
 	feat = pc_ptr->feat;
+  feat_ptr = &(f_info[pc_ptr->feat]);
 
-	/* Notice the Pattern */
-	if (cave_pattern_grid(pc_ptr)) return (TRUE);
+  /* Ignore hidden terrain */
+	if (feat_ptr->flags & FF_HIDDEN) return (FALSE);
+
+  /* Notice the Pattern */
+	if (feat_ptr->flags & FF_PATTERN) return (TRUE);
 
 	/* Notice doors */
-	if (feat == FEAT_OPEN) return (TRUE);
+	if (feat_ptr->flags & FF_DOOR) return (TRUE);
+
+	/* Notice stairs */
+	if (feat_ptr->flags & FF_EXIT_UP) return (TRUE);
+	if (feat_ptr->flags & FF_EXIT_DOWN) return (TRUE);
+
+	/* Notice quest terrain */
+	if (feat_ptr->flags & FF_QUEST) return (TRUE);
+
+	/* Notice veins with treasure */
+	if (feat_ptr->flags & FF_DIG_GOLD) return (TRUE);
+	if (feat_ptr->flags & FF_DIG_CUSTOM) return (TRUE);
+
+  /* Notice the Pattern */
+	/*if (cave_pattern_grid(pc_ptr)) return (TRUE);
+
+	/* Notice doors */
+	/*if (feat == FEAT_OPEN) return (TRUE);
 	if (feat == FEAT_BROKEN) return (TRUE);
 
 	/* Notice stairs */
-	if (feat == FEAT_LESS) return (TRUE);
+	/*if (feat == FEAT_LESS) return (TRUE);
 	if (feat == FEAT_MORE) return (TRUE);
 
 	/* Notice doors */
-	if (feat == FEAT_CLOSED) return (TRUE);
+	/*if (feat == FEAT_CLOSED) return (TRUE);
 
 	/* Notice veins with treasure */
-	if (feat == FEAT_MAGMA_K) return (TRUE);
+	/*if (feat == FEAT_MAGMA_K) return (TRUE);
 	if (feat == FEAT_QUARTZ_K) return (TRUE);
 
 	/* Nope */
@@ -2503,6 +2525,7 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 			}
 
 			if (f_info[feat].flags & FF_OBJECT)
+			//if (f_info[feat].flags & FF_OVERLAY)
 			{
 				/* Pick proper indefinite article */
 				s3 = (is_a_vowel(name[0])) ? "an " : "a ";

@@ -2219,7 +2219,8 @@ player_magic magic_info[MAX_CLASS] =
 
 		/* No spell focus with random learners */
 		99,
-		{15, 13, 12, 11, 13}  /* 64, extra on top for Death priests */
+		//{15, 13, 12, 11, 13}  /* 64, extra on top for Death priests */
+		{16, 16, 16, 16, 12}  /* 76, able to learn all spells in both realms - Brett */
 	},
 
 	{
@@ -2267,7 +2268,8 @@ player_magic magic_info[MAX_CLASS] =
 
 		/* No spell focus with random learners */
 		99,
-		{7, 7, 5, 4, 9}  /* Extra on top b/c of spell compression */
+		//{7, 7, 5, 4, 9}  /* Extra on top b/c of spell compression */
+		{8, 8, 8, 8, 6}  /* 38 Able to learn all spells in a realm - Brett*/
 	},
 
 	{
@@ -2315,7 +2317,8 @@ player_magic magic_info[MAX_CLASS] =
 
 		/* No spell focus with random learners */
 		99,
-		{8, 7, 6, 6, 7}  /* Slight spell compression */
+		//{8, 7, 6, 6, 7}  /* Slight spell compression */
+		{8, 8, 8, 8, 6}  /* Slight spell compression */
 	},
 
 	{
@@ -4958,6 +4961,16 @@ const mutation_type race_powers[MAX_RACE_POWERS] =
 
 	{
 	    RACE_AMBERITE,
+	    "You can cross into farther shadows.",
+	    "(nothing)",
+	    "(nothing)",
+	    "Shadow walking",
+	    35, 100, A_INT, 50,
+	    0
+	},
+
+	{
+	    RACE_AMBERITE,
 	    "You can mentally walk the pattern.",
 	    "(nothing)",
 	    "(nothing)",
@@ -5375,7 +5388,7 @@ dun_gen_type dungeons[] =
 	{{23, 23, 23, 23}, RF7_DUN, 1, 127, 1,
 		100, 100,
 		RT_SIMPLE | RT_RVAULT | RT_DENSE,
-		FEAT_DIRT,
+		FEAT_FLOOR,
 		FEAT_WALL_SOLID,
 		FEAT_PERM_SOLID,
 		{{0, FEAT_MAGMA, 1, 2, 3},

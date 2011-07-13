@@ -25,7 +25,7 @@
 #define MAX_TRIES 20
 
 const store_type *curr_build;
-static int curr_scale;
+int curr_scale;
 static int curr_place_num;
 
 static int thresh = 30;
@@ -297,17 +297,17 @@ static u16b insert_dungeon_monster_quest(u16b r_idx, u16b num, u16b level)
 		plural_aux(buf);
 
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill the %d %s that are guarding dungeon level %d.", (int)num, buf, level);
+		(void)strnfmt(q_ptr->name, 128, "Kill the %d %s (%c) that are guarding dungeon level %d.", (int)num, buf, r_ptr->d_char, level);
 	}
 	else if (FLAG(r_ptr, RF_UNIQUE))
 	{
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill %s, who is guarding dungeon level %d.", mon_race_name(r_ptr), level);
+		(void)strnfmt(q_ptr->name, 128, "Kill %s (%c), who is guarding dungeon level %d.", mon_race_name(r_ptr), r_ptr->d_char, level);
 	}
 	else
 	{
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill one %s, who is guarding dungeon level %d.", mon_race_name(r_ptr), level);
+		(void)strnfmt(q_ptr->name, 128, "Kill one %s (%c), who is guarding dungeon level %d.", mon_race_name(r_ptr), r_ptr->d_char, level);
 	}
 
 	/* Save the quest data */
@@ -439,11 +439,11 @@ static u16b insert_boss_quest(u16b r_idx, int x, int y, int p_num)
 
 	/* Create quest name */
 	if (FLAG(r_ptr, RF_UNIQUE) || FLAG(r_ptr, RF_UNIQUE_7))
-		(void)strnfmt(q_ptr->name, 256, "%s and %s %s have been %s the area %s %s.  Find %s %s and %s %s.",
-				  buf, pron, buf4, buf2, town_dir, town_name, pron, buf3, buf5, pron2);
+		(void)strnfmt(q_ptr->name, 256, "%s (%c) and %s %s have been %s the area %s %s.  Find %s %s and %s %s.",
+				  buf, r_ptr->d_char, pron, buf4, buf2, town_dir, town_name, pron, buf3, buf5, pron2);
 	else
-		(void)strnfmt(q_ptr->name, 256, "%s and %s %s have been %s the area %s %s.  Find their %s and %s them.",
-				  buf, pron, buf4, buf2, town_dir, town_name, buf3, buf5);
+		(void)strnfmt(q_ptr->name, 256, "%s (%c) and %s %s have been %s the area %s %s.  Find their %s and %s them.",
+				  buf, r_ptr->d_char, pron, buf4, buf2, town_dir, town_name, buf3, buf5);
 
 	d_type = DUN_TYPE_PURE_CASTLE;
 	if (strchr("fqrBCK", r_ptr->d_char))
@@ -735,8 +735,8 @@ static u16b insert_kill_quest(u16b r_idx, int x, int y, int p_num)
 	get_rnd_line("quest4.txt", 0, buf5);
 
 	/* Create quest name */
-	(void)strnfmt(q_ptr->name, 256, "%s has been %s the area %s %s.  Track %s to %s %s and %s %s.",
-				  buf, buf2, town_dir, town_name, pron2, pron, buf3, buf5, pron2);
+	(void)strnfmt(q_ptr->name, 256, "%s (%c) has been %s the area %s %s.  Track %s to %s %s and %s %s.",
+				  buf, r_ptr->d_char, buf2, town_dir, town_name, pron2, pron, buf3, buf5, pron2);
 
 	d_type = DUN_TYPE_PURE_CASTLE;
 	if (strchr("fqrBCK", r_ptr->d_char))
@@ -825,6 +825,7 @@ static bool ambiguous (int place_num)
 		}
 	}
 
+  return ambig[place_num];
 }
 
 /*
@@ -1076,7 +1077,7 @@ static u16b find_random_artifact(void)
 	return (0);
 }
 
-static bool request_find_item(int dummy)
+bool request_find_item(int dummy)
 {
 	quest_type *q_ptr;
 	int q_idx;
@@ -1341,17 +1342,17 @@ static int insert_bounty_quest(u16b r_idx, u16b num)
 		plural_aux(buf);
 
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill %d %s.", num, buf);
+		(void)strnfmt(q_ptr->name, 128, "Kill %d %s (%c).", num, buf, r_ptr->d_char);
 	}
 	else if (FLAG(r_ptr, RF_UNIQUE))
 	{
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill %s.", mon_race_name(r_ptr));
+ 		(void)strnfmt(q_ptr->name, 128, "Kill %s (%c).", mon_race_name(r_ptr), r_ptr->d_char);
 	}
 	else
 	{
 		/* XXX XXX Create quest name */
-		(void)strnfmt(q_ptr->name, 128, "Kill %d %s.", num, mon_race_name(r_ptr));
+ 		(void)strnfmt(q_ptr->name, 128, "Kill %d %s (%c).", num, mon_race_name(r_ptr), r_ptr->d_char);
 	}
 
 	/* We need to place the monster(s) when the dungeon is made */
@@ -1383,7 +1384,7 @@ static int insert_bounty_quest(u16b r_idx, u16b num)
 	return (q_num);
 }
 
-static bool request_bounty(int dummy)
+bool request_bounty(int dummy)
 {
 	int i;
 
@@ -1449,7 +1450,8 @@ static bool request_bounty(int dummy)
 	}
 	else
 	{
-		num = (10 + randint0(15)) / r_ptr->rarity;
+		//num = (10 + randint0(15)) / r_ptr->rarity;
+		num = 5 + randint0(p_ptr->max_lev / 2) / r_ptr->rarity;
 	}
 
 	/* Generate the quest */
@@ -1540,7 +1542,7 @@ static quest_type *insert_find_place_quest(void)
 	return (q_ptr);
 }
 
-static bool request_find_place(int dummy)
+bool request_find_place(int dummy)
 {
 	quest_type *q_ptr;
 

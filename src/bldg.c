@@ -918,6 +918,105 @@ bool inn_rest(void)
 	return (TRUE);
 }
 
+bool home_rest(void)
+{
+	s32b day_len = TOWN_DAY;//10L * TOWN_DAWN;
+	s32b tick = turn % day_len;
+
+  /* Hurt? */
+	if (p_ptr->tim.poisoned)
+	{
+		msgf("You feel too sick to get any rest.");
+		message_flush();
+
+		return (FALSE);
+	}
+	if (p_ptr->tim.cut)
+	{
+		msgf("The wound hurts to much to get any rest.");
+		message_flush();
+
+		return (FALSE);
+	}
+  if (tick < (day_len>>1)) /*day_len/2*/
+  {
+	  /* Rest until sunset */
+    turn += (day_len>>1)-tick;
+  }
+  else
+  {
+    /* Rest all night */
+	  turn += day_len-tick;
+  }
+	p_ptr->chp = p_ptr->mhp;
+
+	/*
+	 * Nightmare mode has a TY_CURSE at midnight...
+	 * and the player may want to avoid that.
+	 */
+	if (ironman_nightmare)
+	{
+		msgf("Horrible visions flit through your mind as you sleep.");
+
+		/* Have some nightmares */
+		while (TRUE)
+		{
+			have_nightmare();
+
+			if (!one_in_(3)) break;
+		}
+
+		msgf("You awake screaming.");
+		message_flush();
+
+		return (TRUE);
+	}
+
+	/* Normally heal the player */
+	(void)clear_blind();
+	(void)clear_confused();
+	p_ptr->tim.stun = 0;
+	p_ptr->csp = p_ptr->msp;
+
+  if (tick < (day_len>>1)) /*len/2*/
+  {
+	  msgf("You awake ready to take on the night.");
+  }
+  else
+  {
+	  msgf("You awake refreshed for the new day.");
+  }
+	message_flush();
+
+	return (TRUE);
+}
+/*
+ * Eat some food (from the pack or floor)
+ */
+/*void do_cmd_eat_food_aux(object_type *o_ptr); // this is a static fn in its file, so cannot use here
+bool home_eat_food(void)
+{
+	object_type *o_ptr;
+	cptr q, s;
+
+
+	/* Restrict choices to food */
+	/*item_tester_tval = TV_FOOD;
+
+	/* Get an item */
+	/*q = "Eat which item? ";
+	s = "You have nothing to eat.";
+
+	o_ptr = get_item(q, s, (USE_INVEN | USE_STORE));
+
+	/* Not a valid item */
+	/*if (!o_ptr) return (FALSE);
+
+	/* Eat the object */
+	/*do_cmd_eat_food_aux(o_ptr);
+  return (TRUE);
+}*/
+
 /*
  * Calculate the probability of successful hit for a weapon and certain AC
  *

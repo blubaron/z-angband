@@ -719,8 +719,16 @@ bool check_down_wild(void)
 	/* Hack - no recalling in the middle of the wilderness */
 	if (!p_ptr->place_num)
 	{
-		msgf("Nothing happens.");
-		return (FALSE);
+    /* Removed to allow recalling to main home in wildernes - Brett */
+		/*msgf("Nothing happens.");
+		return (FALSE);*/
+    if (p_ptr->home_place_num && p_ptr->home_store_num) 
+    {
+		  return (TRUE);
+    } else 
+    {
+		  return (FALSE);
+    }
 	}
 
 	/* Cannot recall in towns with no dungeon */
@@ -784,17 +792,19 @@ void recall_player(int turns)
 
 	if (!check_down_wild()) return;
 
-	if (p_ptr->depth && (d_ptr->recall_depth > p_ptr->depth))
-	{
-		if (get_check("Reset recall depth? "))
-			d_ptr->recall_depth = (char) p_ptr->depth;
+  if (d_ptr) /*added to prevent a crash when recalling in the wilderness - Brett */
+  {
+	  if (p_ptr->depth && (d_ptr->recall_depth > p_ptr->depth))
+	  {
+		  if (get_check("Reset recall depth? "))
+			  d_ptr->recall_depth = (char) p_ptr->depth;
 
-	}
-	else if (p_ptr->depth > d_ptr->recall_depth)
-	{
-		d_ptr->recall_depth = (char) p_ptr->depth;
-	}
-
+	  }
+	  else if (p_ptr->depth > d_ptr->recall_depth)
+	  {
+		  d_ptr->recall_depth = (char) p_ptr->depth;
+	  }
+  }
 	set_timed(TIMED_WORD_RECALL, (query_timed(TIMED_WORD_RECALL) ? 0 : turns), "The air about you becomes charged...",
 		"A tension leaves the air around you...");
 }
@@ -1075,7 +1085,10 @@ static bool brand_arrows(object_type *o_ptr, int brand_type)
 {
 	byte ego = 0; 
 	cptr act, actp;
-	
+  /* declatations moved here because in ansi c, declarations have to
+     be at the beginning of the scope - Brett */
+	s32b cost;
+
 	if (brand_type != 0 || o_ptr->xtra_name) 
 	{
 		if (flush_failure) flush();
@@ -1105,7 +1118,7 @@ static bool brand_arrows(object_type *o_ptr, int brand_type)
 	(void)enchant(o_ptr, rand_range(4, 6), ENCH_TOHIT | ENCH_TODAM, 0);
 	
 	/* Hack - save the price */
-	s32b cost = o_ptr->cost;
+	cost = o_ptr->cost;
 
 	add_ego_flags(o_ptr, ego);
 
@@ -1235,12 +1248,12 @@ bool brand_weapon(int brand_type)
 {
 	object_type *o_ptr;
 	
-	/* Looking for a weapon */
-	item_tester_hook = item_tester_hook_brandable;
-
 	/* Get an item */
 	cptr q = "Brand which item? ";
 	cptr s = "You have nothing to brand.";
+
+	/* Looking for a weapon */ /* moved below above to get all declarations at beginning of scope - Brett */
+	item_tester_hook = item_tester_hook_brandable;
 
 	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
 
@@ -1521,6 +1534,15 @@ void identify_pack(void)
 	{
 		/* Identify it */
 		identify_item(o_ptr);
+    /* HACK only identify one layer of pack contents - Brett */
+    if (o_ptr->tval == TV_CONTAINER) {
+      object_type *o2_ptr;
+	    OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
+	    {
+    		identify_item(o2_ptr);
+	    }
+	    OBJ_ITT_END;
+    }
 	}
 	OBJ_ITT_END;
 
@@ -1544,7 +1566,7 @@ void identify_pack(void)
  * an unidentified scroll is remove curse when it has no apparent
  * effect, in rare circumstances.
  */
-static bool uncurse_item(object_type *o_ptr, bool all)
+bool uncurse_item(object_type *o_ptr, bool all)
 {
 	bool heavy;
 
@@ -1621,6 +1643,15 @@ static int remove_curse_aux(bool all)
 	{
 		/* Count the uncursings */
 		if (uncurse_item(o_ptr, all)) cnt++;
+    /* HACK only sense one layer of pack contents - Brett */
+    if (o_ptr->tval == TV_CONTAINER) {
+      object_type *o2_ptr;
+	    OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
+	    {
+    		if (uncurse_item(o2_ptr, all)) cnt++;
+	    }
+	    OBJ_ITT_END;
+    }
 	}
 	OBJ_ITT_END;
 
@@ -1703,11 +1734,19 @@ bool alchemy(void)
 	/* Check for artifacts */
 	if (!can_player_destroy_object(o_ptr))
 	{
-		/* Message */
-		msgf("You fail to turn %s to gold!", o_name);
+    /* allow destroying artifacts if we have already completely identified it - Brett */
+    if (object_known_full(o_ptr))
+    {
+  	  if (!get_check("Really turn this artifact (%s) to gold? ", o_name)) return FALSE;
+    }
+    else
+    {
+		  /* Message */
+		  msgf("You fail to turn %s to gold!", o_name);
 
-		/* Done */
-		return FALSE;
+		  /* Done */
+		  return FALSE;
+    }
 	}
 
 	price = object_value_real(o_ptr);
@@ -1727,11 +1766,11 @@ bool alchemy(void)
 
 		if (amt > 1) price *= amt;
 
-		if (price > 20000) price = 20000+(price-20000)/2;
-		if (price > 10000) price = 10000+(price-10000)/2;
+		//if (price > 20000) price = 20000+(price-20000)/2;
+		//if (price > 10000) price = 10000+(price-10000)/2;
 		if (price > 5000) price = 5000+(price-5000)/2;
 
-		if (price > 30000) price = 30000;
+		//if (price > 30000) price = 30000;
 		if (price) msgf("You turn %s to %ld coins worth of gold.", o_name, price);
 		else msgf ("You turn %s into fine gold dust.", o_name);
 		p_ptr->au += price;
@@ -2158,6 +2197,21 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac, char power)
 			   ((o_ptr->number > 1) ? "" : "s"));
 
 	/* Enchant */
+  while (power > 100) {    
+    power -= 100;
+    if (num_hit) {
+      if (enchant(o_ptr, 1, ENCH_TOHIT | ENCH_FORCE, power)) okay = TRUE;
+      num_hit--;
+    }
+    if (num_dam) {
+      if (enchant(o_ptr, 1, ENCH_TODAM | ENCH_FORCE, power)) okay = TRUE;
+      num_dam--;
+    }
+    if (num_ac) {
+      if (enchant(o_ptr, 1, ENCH_TOAC | ENCH_FORCE, power)) okay = TRUE;
+      num_ac--;
+    }
+  }
 	if (enchant(o_ptr, num_hit, ENCH_TOHIT, power)) okay = TRUE;
 	if (enchant(o_ptr, num_dam, ENCH_TODAM, power)) okay = TRUE;
 	if (enchant(o_ptr, num_ac, ENCH_TOAC, power)) okay = TRUE;
@@ -3693,8 +3747,11 @@ bool spell_okay(const spell_external sp, int known)
 	s_ptr = &s_info[sp.r][sp.s].info[p_ptr->rp.pclass];
 
 	/* Spell is illegal */
-	if (s_ptr->slevel > p_ptr->lev) return (FALSE);
-
+  if (s_ptr->slevel > p_ptr->lev) {
+    //return (FALSE);
+    /* allow browsing of future spells to help with planning - Brett */
+    return (known == 2);
+  }
 	/* Bad realm */
 	if (sp.r != p_ptr->spell.realm[0] - 1 &&
 		sp.r != p_ptr->spell.realm[1] - 1) return (FALSE);
@@ -4672,11 +4729,6 @@ static int inven_damage_aux(inven_func typ, int perc, int start_o_idx)
 		/* Skip artifacts */
 		if (FLAG(o_ptr, TR_INSTA_ART)) continue;
 
-		/* Handle container contents */
-		if (o_ptr->tval == TV_CONTAINER) {
-			k += inven_damage_aux(typ, perc, o_ptr->contents_o_idx);
-		}
-
 		/* Give this item slot a shot at death */
 		if ((*typ) (o_ptr))
 		{
@@ -4689,7 +4741,14 @@ static int inven_damage_aux(inven_func typ, int perc, int start_o_idx)
 			/* Some casualities */
 			if (amt)
 			{
-				/* Get slot */
+		    /* Handle container contents */
+		    /* moved from above "if ((*typ) (o_ptr))" because there it would */
+        /* damage contents even if the container is protected or missed - Brett */
+		    if (o_ptr->tval == TV_CONTAINER) {
+			    k += inven_damage_aux(typ, perc, o_ptr->contents_o_idx);
+		    }
+
+        /* Get slot */
 				slot = get_item_position(p_ptr->inventory, o_ptr);
 
 				/* Message */
@@ -6061,4 +6120,311 @@ bool do_stasis(int x, int y, int dam)
 	m_ptr->csleep += 500;
 
 	return (TRUE);
+}
+/*
+ * Request a "number" from the user
+ */
+u32b get_number(cptr prompt, u32b initial)
+{
+  u32b amt;
+
+	char tmp[80];
+
+	char buf[80];
+
+	/* Build a prompt if needed */
+	if (!prompt)
+	{
+		/* Build a prompt */
+		strnfmt(tmp, 80, "Enter a number: ");
+
+		/* Use that prompt */
+		prompt = tmp;
+	}
+
+
+	/* Default to zero */
+	amt = initial;
+
+	/* Build the default */
+	strnfmt(buf, 80, "%d", amt);
+
+	/* Ask for a quantity */
+	if (!get_string(buf, 20, prompt)) return (0);
+
+	/* Extract a number */
+	amt = (u32b) atol(buf);
+
+	if (amt) repeat_push(amt);
+
+	/* Return the result */
+	return (amt);
+}
+
+/*
+ * Enchant an item (in the inventory or on the floor)
+ * Returns TRUE if attempted, FALSE if cancelled
+ */
+bool enchant_pval(int num_try, int force)
+{
+	bool okay = FALSE;
+	object_type *o_ptr;
+	cptr q, s;
+  int i,chance,change;
+
+	/* enchant weapons or armour */
+	item_tester_hook = item_tester_hook_weapon_armour;
+
+
+	/* Get an item */
+	q = "Infuse which item? ";
+	s = "You have nothing to infuse.";
+
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+
+	/* Not a valid item */
+	if (!o_ptr) return (FALSE);
+
+  if (!o_ptr->pval) {
+    /* only items that have a nonzero pval can be infused */
+	  msgf("You cannot infuse the %v!", OBJECT_FMT(o_ptr, FALSE, 0));
+    return (FALSE);
+  }
+	/* Describe */
+	msgf("The %v glow%s brightly!", OBJECT_FMT(o_ptr, FALSE, 0),
+			   ((o_ptr->number > 1) ? "" : "s"));
+
+	/* Enchant */
+  if (o_ptr->pval < 0) {
+    o_ptr->pval = 1;
+	  msgf("The %v ends up with a soft glow.", OBJECT_FMT(o_ptr, FALSE, 0));
+	  /* Something Happened */
+	  return (TRUE);
+  }
+	/* Large piles resist enchantment */
+	//prob = o_ptr->number * 100;
+
+	/* Missiles are easy to enchant */
+	/*if ((o_ptr->tval == TV_BOLT) ||
+		(o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_SHOT))
+	{
+		prob = prob / 50;
+	}*/
+
+	/* Try "n" times */
+	for (i = 0; i < num_try; i++)
+	{
+		if (o_ptr->pval < 0) 
+      chance = 0;
+		else if (o_ptr->pval > ENCHANT_MAX) 
+      chance = 1000;
+		else
+			chance = enchant_table[o_ptr->pval];
+
+		if (force || ((randint1(1000) > chance) && (one_in_(2))))
+		{
+  		change = 1;
+
+      o_ptr->pval += change;
+			okay = TRUE;
+      if (o_ptr->pval == 0)
+        o_ptr->pval = 1;
+		}
+  }
+	/* Failure */
+	if (!okay)
+	{
+		/* Flush */
+		if (flush_failure) flush();
+
+		/* Message */
+		msgf("The enchantment failed.");
+
+		if (one_in_(3)) chg_virtue(V_ENCHANT, -1);
+	}
+	else
+		chg_virtue(V_ENCHANT, 1);
+
+	/* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Combine / Reorder the pack (later) */
+	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER);
+
+	/* Something Happened */
+	return (TRUE);
+}
+
+bool shadow_jump(void)
+{
+  u32b seed;
+	cptr q;
+	int i, n;
+	monster_race *r_ptr;
+  store_type *home;
+  s16b temp_list;
+  object_type *o_ptr;
+
+  msgf("Warning: If you jump between shadows you will lose everything all houses except your main one!");
+
+	if (!get_check("Jump to another shadow?"))
+	{
+		msgf("You decide to stay in this shadow.");
+		return FALSE;
+	}
+	q = "What number do you focus on? (0 to let your mind wander) ";
+  seed = get_number(q,0);
+  if (seed) {
+  	msgf("You clear your mind, focus on the number %d, and change the layers of shadow.", seed);
+  }
+  else
+  {
+  	msgf("You clear your mind and change the layers of shadow.");
+	  // Basic seed 
+	  seed = (time(NULL));
+  	msgf("The number %d comes to mind.", seed);
+  }
+
+  /* Process fields under the player. */
+  // this is not needed anymore? Brett
+	//field_script(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_LEAVE, "");
+	//field_hook(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_LEAVE);
+
+  /* go through the monster list and clear questor flags and unique kills */
+	for (n = 0, i = 1; i < z_info->r_max; i++)
+	{
+		r_ptr = &r_info[i];
+    if (FLAG(r_ptr, RF_QUESTOR))
+    {
+  		r_ptr->flags[0] &= ~(RF0_QUESTOR);
+    }
+    if (FLAG(r_ptr, RF_UNIQUE) || FLAG(r_ptr, RF_UNIQUE_7))
+    {
+      r_ptr->cur_num = 0;
+    }
+  }
+  /* copy the current recall house inventory */
+  temp_list=0;
+  home = NULL;
+  if (p_ptr->home_place_num)
+  //if (p_ptr->home_place_num && p_ptr->home_store_num)
+  {
+    home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
+  }
+  if (home) {
+    if (home->type == BUILD_STORE_HOME) {
+	    o_ptr = get_list_item(home->stock, 0);
+      while (o_ptr) {
+	      /* Move the item to the temporary list */
+        move_object(&temp_list, &home->stock, o_ptr);
+        o_ptr->allocated = 2;
+        o_ptr = get_list_item(home->stock, 0);
+      }
+    }
+  }
+  /* reset artifacts not in player's inventory or starting house inventory */
+
+  message_flush();
+  //messages_free();
+  //messages_init();
+	// Wipe everything - to keep inventory, comment out a line in wipe all list
+	wipe_all_list();
+
+  // Use the complex RNG 
+	Rand_quick = FALSE;
+
+	// Seed the "complex" RNG 
+	Rand_state_init(seed);
+	/* Reinitialise the quests  */
+	init_player_quests();
+	// Seed the "complex" RNG 
+	Rand_state_init(seed);
+	/* Create a new wilderness for the player */ 
+	create_wilderness();
+	
+  /* restore the players house inventory */
+  /* find the index of the home - Paranoia */
+  if (p_ptr->home_place_num == 0)
+  //if ((p_ptr->home_place_num == 0) || (p_ptr->home_store_num == 0))
+  {
+    for (i=0; i<place[p_ptr->place_num].numstores; i++)
+    {
+      if (place[p_ptr->place_num].store[i].type == BUILD_STORE_HOME)
+      {
+        p_ptr->home_place_num = p_ptr->place_num;
+        p_ptr->home_store_num = i;
+        break;
+      }
+    }
+  }
+  home = NULL;
+  if (p_ptr->home_place_num)
+  //if (p_ptr->home_place_num && p_ptr->home_store_num)
+  {
+    home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
+  }
+  if (home && temp_list) {
+    if (home->type == BUILD_STORE_HOME) {
+	    chg_virtue(V_SACRIFICE, -1);
+	    o_ptr = get_list_item(temp_list, 0);
+      while (o_ptr) {
+	      /* Move the item to the home stock list */
+        move_object(&home->stock, &temp_list, o_ptr);
+
+        /* Forget location */
+        o_ptr->iy = o_ptr->ix = 0;
+
+	      /* Forget Region */
+	      o_ptr->region = 0;
+
+	      /* No longer marked */
+	      o_ptr->info &= ~(OB_SEEN);
+
+	      o_ptr = get_list_item(temp_list, 0);
+      }
+    }
+  }
+  /* clear the inventory lists */
+  delete_object_list(&temp_list);
+
+  /* from teleport_player */
+	/* Notice movement */
+	Term_move_player();
+
+	if (!p_ptr->depth)
+	{
+		/* Scroll wilderness */
+		move_wild();
+	}
+	/* Redraw the new spot */
+	lite_spot(p_ptr->px, p_ptr->py);
+
+	/* Process fields under the player. */
+  field_script(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER, "");
+  //field_hook(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER);
+
+	/* Check for new panel (redraw map) */
+	verify_panel();
+
+	/* Update stuff */
+	p_ptr->update |= (PU_VIEW | PU_FLOW | PU_MON_LITE);
+
+	/* Update the monsters */
+	p_ptr->update |= (PU_DISTANCE);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_OVERHEAD | PW_DUNGEON);
+
+	/* Handle stuff XXX XXX XXX */
+	handle_stuff();
+
+  //p_ptr->update |= (PU_VIEW | PU_MON_LITE);
+	p_ptr->window |= (PW_MONSTER);
+
+	msgf("You look around at this shadow.");
+
+	return TRUE;
 }

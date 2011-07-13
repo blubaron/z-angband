@@ -2728,7 +2728,7 @@ static bool cast_life_spell(int spell, int power)
 			(void)detect_stairs();
 			break;
 		case 5:				/* Cure Medium Wounds */
-			(void)hp_player(POWER(12+damroll(2, 8),power));
+			(void)hp_player(POWER(12+damroll(2, plev),power));
 			(void)inc_cut(POWER(-30,power));
 			(void)inc_poisoned(POWER(-query_timed(TIMED_POISONED)/2,power));
 			break;
@@ -2741,16 +2741,16 @@ static bool cast_life_spell(int spell, int power)
 			(void)remove_curse();
 			break;
 		case 8:				/* Holy Prayer */
-			(void)inc_blessed(POWER(rand_range(50, 100),power));
+			(void)inc_blessed(POWER(rand_range(50, 100)*(plev/10),power));
 			break;
 		case 9:				/* Cure Critical Wounds */
-			(void)hp_player(POWER(24+damroll(4, 8),power));
+			(void)hp_player(POWER(24+damroll(4, plev),power));
 			(void)clear_stun();
 			(void)clear_cut();
 			(void)clear_poisoned();
 			break;
 		case 10:				/* Sense Unseen */
-			(void)inc_tim_invis(POWER(rand_range(24, 48),power));
+			(void)inc_tim_invis(POWER(rand_range(24, 48)*(plev/10),power));
 			break;
 		case 11:				/* Holy Orb */
 			if (!get_aim_dir(&dir)) return FALSE;
@@ -2764,7 +2764,7 @@ static bool cast_life_spell(int spell, int power)
 			(void)inc_protevil(POWER(randint1(25) + 3 * plev,power));
 			break;
 		case 13:				/* Healing */
-			(void)hp_player(POWER(190 + damroll(10,8),power));
+			(void)hp_player(POWER(190 + damroll(10,plev),power));
 			(void)clear_stun();
 			(void)clear_cut();
 			(void)clear_poisoned();
@@ -2780,7 +2780,7 @@ static bool cast_life_spell(int spell, int power)
 			(void)set_food(PY_FOOD_MAX - 1);
 			break;
 		case 17:				/* Cure Mortal Wounds */
-			(void)hp_player(POWER(48 + damroll(8,8),power));
+			(void)hp_player(POWER(48 + damroll(8,plev),power));
 			(void)clear_stun();
 			(void)clear_cut();
 			(void)clear_poisoned();
@@ -2821,13 +2821,13 @@ static bool cast_life_spell(int spell, int power)
 			(void)hp_player(POWER(100,power));
 			break;
 		case 24:				/* Holy Armor */
-			(void)inc_shield(POWER(rand_range(30, 50),power));
+			(void)inc_shield(POWER(rand_range(30, 50)*(plev/10),power));
 			break;
 		case 25:				/* Dispel Curse */
 			(void)remove_all_curse();
 			break;
 		case 26: 				/* Flame Strike */
-			(void)fire_ball(GF_FIRE, 0, POWER(150,power), 6);
+			(void)fire_ball(GF_FIRE, 0, POWER(150*(plev/10),power), 6);
 			break;
 		case 27:				/* Bless Weapon */
 			if (p_ptr->au < 1000) {
@@ -3108,7 +3108,7 @@ static bool cast_nature_spell(int spell, int power)
 			(void)detect_monsters_normal();
 			break;
 		case 1:				/* First Aid */
-			(void)hp_player(POWER(6+damroll(1, 8),power));
+			(void)hp_player(POWER(6+damroll(1, plev),power));
 			(void)inc_cut(POWER(-15,power));
 			break;
 		case 2:				/* Detect Doors + Traps */

@@ -17,10 +17,10 @@ V:0.3.3
 M:g:98
 
 # Maximum number of feature types
-M:F:145
+M:F:161
 
 # Maximum number of object kinds
-M:K:684
+M:K:702
 
 # Maximum number of artifacts
 M:A:134

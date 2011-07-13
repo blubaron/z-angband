@@ -1331,8 +1331,9 @@ void test_field_data_integrity(void)
 void set_corpse_size(field_type *f_ptr, int size)
 {
 	/* Initialise the graphic */
-	if ((use_graphics == GRAPHICS_ADAM_BOLT) ||
-			(use_graphics == GRAPHICS_DAVID_GERVAIS))
+	//if ((use_graphics == GRAPHICS_ADAM_BOLT) ||
+	//		(use_graphics == GRAPHICS_DAVID_GERVAIS))
+  if (use_graphics > 1)
 	{
 		/* Paranoia */
 		if ((size > 0) && (size < 7))
@@ -1676,19 +1677,22 @@ void drain_magic(void)
 /*
  * Make a locked or jammed door on a square
  */
-void make_lockjam_door(int x, int y, int power, bool jam)
+void make_lockjam_door(int x, int y, u16b door_feat, int power, bool jam)
 {
 	cave_type *c_ptr;
 	field_type *f_ptr;
 
 	int old_power = 0;
-
+  if (door_feat == 0) door_feat = FEAT_CLOSED;
 
 	/* Overlays are simpler */
 	if (ri_list[cur_region].flags & REGION_OVER)
 	{
 		/* Make a closed door on the square */
-		set_feat_bold(x, y, FEAT_CLOSED);
+		//set_feat_bold(x, y, FEAT_CLOSED);
+    if (door_feat != 0xFFFF) {
+		  set_feat_bold(x, y, door_feat);
+    }
 
 		/* Make a new field */
 		if (jam)
@@ -1706,9 +1710,11 @@ void make_lockjam_door(int x, int y, int power, bool jam)
 	}
 
 	/* Make a closed door on the square */
-	cave_set_feat(x, y, FEAT_CLOSED);
+  if (door_feat != 0xFFFF) {
+	  cave_set_feat(x, y, door_feat);
+  }
 
-	c_ptr = area(x, y);
+  c_ptr = area(x, y);
 
 	f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
 

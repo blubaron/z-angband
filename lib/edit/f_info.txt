@@ -46,83 +46,91 @@ V:0.3.3
 
 N:0:nothing
 G: :w
+P:2
+F:MWALK | MPASS
 
 
 # 0x01 --> open floor
 
 N:1:open floor
 G:.:w
-F:USE_TRANS
+P:5
+F:PWALK | PPASS | MWALK | MPASS
 
 # 0x02 --> invisible trap (drawn as open floor)
 
 N:2:invisible trap
 G:.:w
-F:USE_TRANS
+M:1
+P:5
+F:PWALK | PPASS | MWALK | MPASS | TRAP | HIDDEN
 
 # 0x03 --> glyph of warding
 
 N:3:glyph of warding
 G:^:y
-F:USE_TRANS
+P:20
+F:PWALK | PPASS
 
 # 0x04 --> open door
 
 N:4:open door
 G:':U
-F:ICKY | OBJECT | MARK
+P:15
+M:32
+F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
 
 # 0x05 --> broken door
 
 N:5:broken door
 G:':u
-F:ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 # 0x06 --> up stairs
 
 N:6:up staircase
 G:<:w
-F:USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
 
 # 0x07 --> down stairs
 
 N:7:down staircase
 G:>:w
-F:USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
 N:8:sand
 G:.:y
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:9:salt
 G:.:W
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:10:wet mud
 G:.:u
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:11:dry mud
 G:.:D
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:12:tiled floor
 G:.:r
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:13:wooden floor
 G:.:s
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:14:pebbles
 G:.:D
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 # was "solidified lava"
 
 N:15:basalt
 G:.:D
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 
 # Gap for old traps
@@ -132,329 +140,447 @@ F:USE_TRANS
 
 N:32:door
 G:+:U
-F:BLOCK | ICKY | OBJECT | MARK
+P:17
+M:4
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
 
 # Pillar
 N:33:pillar
 G:#:D
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:17:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 
 # 0x30 --> secret door
 
 N:48:granite wall
 G:#:W
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
-
+M:146
+P:10:30
+F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
 # 0x31 --> rubble
 
 N:49:pile of rubble
 G:::w
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:10:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
 
 # 0x32 --> magma vein
 
 N:50:magma vein
 G:#:s
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:12:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x33 --> quartz vein
 
 N:51:quartz vein
 G:#:s
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:11:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x34 --> magma vein + treasure
 # This terrain type may not actually be needed...
 N:52:magma vein
 G:#:s
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:12:10
+M:54
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD | HIDDEN
 
 # 0x35 --> quartz vein + treasure
 # This terrain type may not actually be needed...
 N:53:quartz vein
 G:#:s
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:11:20
+M:55
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD | HIDDEN
 
 # 0x36 --> magma vein + known treasure
 
 N:54:magma vein with treasure
 G:*:o
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:19:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD
 
 # 0x37 --> quartz vein + known treasure
 
 N:55:quartz vein with treasure
 G:*:o
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:19:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD
 
 # 0x38 --> granite wall -- basic
 
 N:56:granite wall
 G:#:W
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x39 --> granite wall -- inner
 
 N:57:granite wall
 G:#:W
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x3A --> granite wall -- outer
 
 N:58:granite wall
 G:#:W
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x3B --> granite wall -- solid
 
 N:59:granite wall
 G:#:W
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # 0x3C --> permanent wall -- basic
 
 N:60:permanent wall
 G:#:w
-F:BLOCK | USE_TRANS | ICKY | PERM | OBJECT | MARK
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
 
 # 0x3D --> permanent wall -- inner
 
 N:61:permanent wall
 G:#:w
-F:BLOCK | USE_TRANS | ICKY | PERM | OBJECT | MARK
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
 
 # 0x3E --> permanent wall -- outer
 
 N:62:permanent wall
 G:#:w
-F:BLOCK | USE_TRANS | ICKY | PERM | OBJECT | MARK
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
 
 # 0x3F --> permanent wall -- solid
 
 N:63:permanent wall
 G:#:w
-F:BLOCK | USE_TRANS | ICKY | PERM | OBJECT | MARK
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
 
 N:64:explosive rune
 G:^:R
-F:USE_TRANS | OBJECT | MARK
+P:20
+F:PWALK | PPASS | MWALK | MPASS | TRAP | OBJECT | MARK
 
 N:65:Pattern startpoint
 G:*:w
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:66:section of the Pattern
 G:*:B
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:67:section of the Pattern
 G:*:b
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:68:section of the Pattern
 G:*:B
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:69:section of the Pattern
 G:*:b
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:70:section of the Pattern
 G:*:W
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:71:section of the Pattern (discharged)
 G:*:W
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:72:Pattern exit
 G:*:w
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:73:corrupted section of the Pattern
 G:*:D
-F:ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 # 0x53 --> terrain -- deep water
 
 N:83:deep water
 G:~:b
-F:USE_TRANS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
 
 N:84:shallow water
 G:~:B
-F:USE_TRANS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK
 
 N:85:deep lava
 G:~:R
-F:USE_TRANS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
 
 N:86:shallow lava
 G:~:r
-F:USE_TRANS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK
 
 N:87:dark pit
 G:#:D
-F:USE_TRANS | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK
 
 N:88:dirt
 G:.:u
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:89:patch of grass
 G:.:g
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | OBJECT
 
 N:90:compact rune
 G:^:D
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | TRAP | OBJECT
 
 N:91:invisible wall
 G:.:w
-F:USE_TRANS | ICKY
+F:PWALK | PPASS | MWALK | MPASS | ICKY
 
 N:92:very deep water
 G:~:D
-F:USE_TRANS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
 
 N:93:deep acid
 G:~:g
-F:USE_TRANS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
 
 N:94:shallow acid
 G:~:G
-F:USE_TRANS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK
 
 N:95:submerged tree
 G:.:b
-F:USE_TRANS | ICKY | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | WILD
 
 N:96:tree
 G:%:G
-F:HALF_LOS | USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:97:rock face
 G:%:u
-F:HALF_LOS | USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:98:snow covered rock face
 G:%:W
-F:HALF_LOS | USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:99:boulder
 G:%:y
-F:HALF_LOS | USE_TRANS | ICKY | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | WILD
 
 N:100:pine tree
 G:%:g
-F:HALF_LOS | USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:101:snow covered tree
 G:%:w
-F:HALF_LOS | USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:102:obelisk
 G:%:b
-F:HALF_LOS | USE_TRANS | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | MARK
 
 N:103:pillar
 G:%:w
-F:HALF_LOS | USE_TRANS | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | MARK
 
 N:112:stone fence
 G:%:b
-F:HALF_LOS | USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | PERM | OBJECT | MARK
 
 N:113:well
 G:~:v
-F:HALF_LOS | USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | PERM | OBJECT | MARK
 
 N:114:fountain
 G:~:U
-F:HALF_LOS | USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | PERM | OBJECT | MARK
 
 N:115:jungle
 G:#:D
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | MARK | WILD
 
 
 
 
 N:128:bush
 G:.:y
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | OBJECT
 
 N:129:dead bush
 G:.:s
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | OBJECT
 
 N:130:long grass
 G:.:U
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 #rock on general terrain
 
 N:131:rock
 G:.:U
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | OBJECT
 
 #rock on snow
 
 N:132:rock
 G:.:U
-F:USE_TRANS | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | OBJECT
 
 # dead tree on general terrain
 
 N:133:dead tree
 G:.:u
-F:USE_TRANS | ICKY | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT
 
 # dead tree on snow
 
 N:134:dead tree
 G:.:u
-F:USE_TRANS | ICKY | OBJECT
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT
 
 N:135:snow
 G:.:W
-F:USE_TRANS
+F:PWALK | PPASS | MWALK | MPASS
 
 N:136:thick swamp
 G:~:g
-F:USE_TRANS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | WILD
 
 N:137:swamp
 G:~:G
-F:USE_TRANS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK
 
 # impassible jungle
 N:138:jungle
 G:#:D
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK | PERM
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | PERM | WILD
 
 N:139:mountain
 G:#:D
-F:BLOCK | USE_TRANS | ICKY | OBJECT | MARK | PERM
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | PERM | WILD
 
 # quest stairs
 N:140:up staircase
 G:<:y
-F:USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | QUEST | ICKY | PERM | OBJECT | MARK
 
 N:141:down staircase
 G:>:y
-F:USE_TRANS | ICKY | PERM | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | QUEST | ICKY | PERM | OBJECT | MARK
 
 N:142:smoke
 G:~:w
-F:USE_TRANS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK
 
 N:143:thick smoke
 G:~:D
-F:USE_TRANS | HALF_LOS | MARK
+F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | MARK
 
 N:144:chasm
 G:.:d
-F:ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK
+
+# 145, 146 --> visible secret door
+
+N:145:open door
+G:':U
+P:15
+M:146
+F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+
+N:146:door
+G:+:U
+P:17
+M:145
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+# gate doors 
+N:147:door
+G:+:U
+P:17
+M:148
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:148:open door
+G:':U
+P:15
+M:147
+F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+
+N:149:broken door
+G:':u
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
+
+# cavern dungeons
+# walls
+N:150:granite wall
+G:#:W
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+N:151:permanent wall
+G:#:w
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
+
+# doors
+N:152:door
+G:+:U
+P:17
+M:4
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:153:open door
+G:':U
+P:15
+M:32
+F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+
+N:154:broken door
+G:':u
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
+
+# secret door
+N:155:granite wall
+G:#:W
+M:157
+P:10:30
+F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+
+N:156:door
+G:+:U
+P:17
+M:157
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:157:open door
+G:':U
+P:15
+M:156
+F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+
+# stairs
+N:158:up staircase
+G:<:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
+
+N:159:down staircase
+G:>:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
+
+# pillar/other
+N:160:pillar
+G:#:D
+P:17:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+
