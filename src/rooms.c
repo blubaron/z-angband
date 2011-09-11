@@ -2063,7 +2063,7 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					break;
 				}
 
-				case '*':
+				case '&':
 				{
 					/* Treasure/trap */
 					if (randint0(100) < 75)
@@ -2077,14 +2077,43 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					break;
 				}
 
-				case '+':
+				case '=':
 				{
 					/* Secret doors */
 					place_secret_door(x, y);
 					break;
 				}
 
-				case '^':
+				case '+':
+				{
+					/* Closed doors (locked) */
+		      //make_lockjam_door(x, y, FEAT_CLOSED, randint1(10) + p_ptr->depth / 10, FALSE);
+					set_feat_grid(c_ptr, FEAT_CLOSED);
+					break;
+				}
+
+        case '\'':
+				{
+					/* Open doors */
+					set_feat_grid(c_ptr, FEAT_OPEN);
+					break;
+				}
+
+        case '|':
+				{
+					/* Pillar */
+					set_feat_grid(c_ptr, FEAT_PILLAR);
+					break;
+				}
+
+				case ':':
+				{
+					/* Rubble */
+					set_feat_grid(c_ptr, FEAT_RUBBLE);
+					break;
+				}
+
+        case '^':
 				{
 					/* Trap */
 					place_trap(x, y);
@@ -2132,6 +2161,11 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					set_feat_grid(c_ptr, FEAT_PATTERN_XTRA1);
 					break;
 				}
+				case 'A':
+          { /*object is placed on here */
+					set_feat_grid(c_ptr, FEAT_PATTERN_OLD);
+					break;
+				}
 			}
 		}
 	}
@@ -2169,37 +2203,14 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 			/* Analyze the symbol */
 			switch (*t)
 			{
-				case '&':
+				case '1':
 				{
 					/* Monster */
-					(void)place_monster(x, y, TRUE, TRUE, 4);
+					(void)place_monster(x, y, TRUE, TRUE, 5);
 					break;
 				}
 
-				case '@':
-				{
-					/* Meaner monster */
-					(void)place_monster(x, y, TRUE, TRUE, 8);
-					break;
-				}
-
-				case '9':
-				{
-					/* Meaner monster, plus treasure */
-					(void)place_monster(x, y, TRUE, TRUE, 6);
-					place_object(x, y, TRUE, FALSE, 6);
-					break;
-				}
-
-				case '8':
-				{
-					/* Nasty monster and treasure */
-					(void)place_monster(x, y, TRUE, TRUE, 25);
-					place_object(x, y, TRUE, TRUE, 20);
-					break;
-				}
-
-				case ',':
+				case '2':
 				{
 					/* Monster and/or object */
 					if (randint0(100) < 50)
@@ -2208,7 +2219,80 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					}
 					if (randint0(100) < 50)
 					{
-						place_object(x, y, FALSE, FALSE, 5);
+						place_object(x, y, FALSE, FALSE, 7);
+					}
+					break;
+				}
+
+				case '3':
+				{
+					/* Meaner monster */
+					(void)place_monster(x, y, TRUE, TRUE, 8);
+					break;
+				}
+
+				case '4':
+				{
+					/* Meaner monster, plus treasure */
+					(void)place_monster(x, y, TRUE, TRUE, 9);
+					place_object(x, y, TRUE, FALSE, 7);
+					break;
+				}
+
+				case '5':
+				{
+					/* Meaner monster */
+					(void)place_monster(x, y, TRUE, TRUE, 16);
+					break;
+				}
+
+				case '6':
+				{
+					/* Meaner monster, plus treasure */
+					(void)place_monster(x, y, TRUE, TRUE, 16);
+					place_object(x, y, TRUE, FALSE, 10);
+					break;
+				}
+
+				case '7':
+				{
+					/* Meaner monster */
+					(void)place_monster(x, y, TRUE, TRUE, 23);
+					break;
+				}
+
+				case '8':
+				{
+					/* Meaner monster, plus treasure */
+					(void)place_monster(x, y, TRUE, TRUE, 23);
+					place_object(x, y, TRUE, FALSE, 15);
+					break;
+				}
+
+				case '9':
+				{
+					/* Nasty monster */
+					(void)place_monster(x, y, TRUE, TRUE, 30);
+					break;
+				}
+				case '0':
+				{
+					/* Nasty monster and treasure */
+					(void)place_monster(x, y, TRUE, TRUE, 30);
+					place_object(x, y, TRUE, TRUE, 20);
+					break;
+				}
+
+				case '$':
+				{
+					/* ordinary treasure */
+					if (randint0(100) < 50)
+					{
+						(void)place_gold(x, y);
+					}
+					if (randint0(100) < 50)
+					{
+						place_object(x, y, FALSE, FALSE, 0);
 					}
 					break;
 				}
