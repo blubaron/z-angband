@@ -1406,6 +1406,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 			/* Bows get a special "damage string" */
 
 			/* Extract the "base power" */
+      if ((o_ptr->dd ==0) && (o_ptr->ds > 0)) {
+					power = o_ptr->ds;
+      } else
 			switch (o_ptr->sval)
 			{
 				case SV_SLING:
@@ -1443,9 +1446,27 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 				}
 				default:
 				{
+
 					msgf("Unknown firing multiplier.");
 					power = 0;
-				}
+          if (o_ptr->sval < 10) {
+  			    p_ptr->ammo_mult = (o_ptr->sval%10);
+          } else
+          if (o_ptr->sval < 20) {
+            if (p_ptr->stat[A_STR].use >= o_ptr->weight*3/2) {
+    			    power = (o_ptr->sval%10)+2;
+            } else {
+    			    power = (o_ptr->sval%10)+1;
+            }
+          } else
+          if (o_ptr->sval < 30) {
+  			    power = (o_ptr->sval%10)+2;
+          } else
+          {
+  			    power = (o_ptr->sval%10)+(o_ptr->sval/10);
+          }
+          if (power < 2) power = 2;
+        }
 			}
 
 			/* Apply the "Extra Might" flag */

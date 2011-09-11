@@ -3472,7 +3472,43 @@ static void calc_bonuses(void)
 				}
 				break;
 			}
+      default:
+      {
+        if (o_ptr->sval < 10) {
+          p_ptr->ammo_tval = TV_SHOT;
+  			  p_ptr->ammo_mult = (o_ptr->sval%10);
+					p_ptr->bow_energy = 50;
+        } else
+        if (o_ptr->sval < 20) {
+          p_ptr->ammo_tval = TV_ARROW;
+          if (p_ptr->stat[A_STR].use >= o_ptr->weight*3/2) {
+    			  p_ptr->ammo_mult = (o_ptr->sval%10)+2;
+          } else {
+    			  p_ptr->ammo_mult = (o_ptr->sval%10)+1;
+          }
+					p_ptr->bow_energy = 100;
+        } else
+        if (o_ptr->sval < 30) {
+          p_ptr->ammo_tval = TV_BOLT;
+  			  p_ptr->ammo_mult = (o_ptr->sval%10)+2;
+          if (p_ptr->stat[A_DEX].use >= o_ptr->weight) {
+					  p_ptr->bow_energy = 200 -(20*(p_ptr->stat[A_DEX].use/o_ptr->weight));
+          } else {
+					  p_ptr->bow_energy = 160;
+          }
+        } else
+        {
+          p_ptr->ammo_tval = TV_BOLT;
+  			  p_ptr->ammo_mult = (o_ptr->sval%10)+(o_ptr->sval/10);
+					p_ptr->bow_energy = 160;
+        }
+        if (p_ptr->bow_energy < 50) p_ptr->bow_energy = 50;
+        if (p_ptr->ammo_mult < 2) p_ptr->ammo_mult = 2;
+      }
 		}
+    if ((o_ptr->dd ==0) && (o_ptr->ds > 0)) {
+				p_ptr->ammo_mult = o_ptr->ds;
+    }
 
 		/* Apply special flags */
 		if (o_ptr->k_idx && !p_ptr->state.heavy_shoot)
