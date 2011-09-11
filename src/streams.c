@@ -211,7 +211,7 @@ void add_river(int feat1, int feat2, int size)
  * basic vein, one with hidden gold, and one with known gold.  The
  * hidden gold types are currently unused.
  */
-void build_streamer(int feat, int chance, int size)
+void build_streamer(int feat, int feat_treasure, int chance, int size)
 {
 	int i, tx, ty;
 	int y, x, dir, x0, y0;
@@ -258,7 +258,7 @@ void build_streamer(int feat, int chance, int size)
 			set_feat_grid(c_ptr, feat);
 
 			/* Hack XXX XXX -- Add some (known) treasure */
-			if (chance && one_in_(chance)) c_ptr->feat += 0x04;
+			if (chance && one_in_(chance)) c_ptr->feat = feat_treasure;
 
 			/*
 			 * So this means that all the treasure is known as soon as it is
