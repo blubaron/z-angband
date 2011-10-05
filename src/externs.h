@@ -264,6 +264,9 @@ extern cptr ANGBAND_DIR_PREF;
 extern cptr ANGBAND_DIR_SAVE;
 extern cptr ANGBAND_DIR_USER;
 extern cptr ANGBAND_DIR_XTRA;
+extern cptr ANGBAND_DIR_XTRA_FONT;
+extern cptr ANGBAND_DIR_XTRA_GRAF;
+extern cptr ANGBAND_DIR_XTRA_SOUND;
 extern bool item_tester_full;
 extern byte item_tester_tval;
 extern bool (*item_tester_hook) (const object_type *o_ptr);
@@ -468,7 +471,7 @@ extern void set_region(int rg_idx);
 extern void wipe_rg_list(void);
 extern void create_region_aux(s16b *region, int x, int y, byte flags);
 extern void generate_cave(void);
-extern void pick_dungeon(dun_type *d_ptr, u32b dun_types);
+extern void pick_dungeon(dun_type *d_ptr, u32b dun_types, s16b idx);
 
 /* hero.c */
 extern void restore_hero (s16b hero_idx);
@@ -1237,6 +1240,7 @@ extern cptr building_name(byte build_type);
 extern void building_char(byte build_type, byte *a, char *c);
 extern cptr dungeon_type_name(u32b dun);
 extern dun_gen_type dungeons[];
+//extern dun_gen_type *dungeons;
 extern void draw_quest_stair(place_type *pl_ptr);
 extern void refresh_quest_stair(place_type *pl_ptr);
 

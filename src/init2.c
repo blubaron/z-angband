@@ -117,6 +117,9 @@ void init_file_paths(char *path)
 	string_free(ANGBAND_DIR_USER);
 	string_free(ANGBAND_DIR_XTRA);
 
+	string_free(ANGBAND_DIR_XTRA_FONT);
+	string_free(ANGBAND_DIR_XTRA_GRAF);
+	string_free(ANGBAND_DIR_XTRA_SOUND);
 
 	/*** Prepare the "path" ***/
 
@@ -146,6 +149,9 @@ void init_file_paths(char *path)
 	ANGBAND_DIR_USER = string_make("");
 	ANGBAND_DIR_XTRA = string_make("");
 
+	ANGBAND_DIR_XTRA_FONT = string_make("");
+	ANGBAND_DIR_XTRA_GRAF = string_make("");
+	ANGBAND_DIR_XTRA_SOUND = string_make("");
 
 #else  /* VM */
 
@@ -233,6 +239,18 @@ void init_file_paths(char *path)
 	/* Build a path name */
 	strcpy(tail, "xtra");
 	ANGBAND_DIR_XTRA = string_make(path);
+
+	/* Build a path name */
+	strcpy(tail, "xtra/font");
+	ANGBAND_DIR_XTRA_FONT = string_make(path);
+
+	/* Build a path name */
+	strcpy(tail, "xtra/graf");
+	ANGBAND_DIR_XTRA_GRAF = string_make(path);
+
+	/* Build a path name */
+	strcpy(tail, "xtra/sound");
+	ANGBAND_DIR_XTRA_SOUND = string_make(path);
 
 #endif /* VM */
 }
@@ -714,7 +732,7 @@ static errr init_z_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	return init_info("misc", &z_head, (void *)&z_info, NULL, NULL);
+	return init_info("limits", &z_head, (void *)&z_info, NULL, NULL);
 }
 
 
@@ -775,7 +793,7 @@ static errr init_a_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	return init_info("a_info", &a_head,
+	return init_info("artifact", &a_head,
 					 (void *)&a_info, (void *)&a_name, (void *)&a_text);
 }
 
@@ -796,7 +814,7 @@ static errr init_e_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	return init_info("e_info", &e_head,
+	return init_info("ego_item", &e_head,
 					 (void *)&e_info, (void *)&e_name, (void *)&e_text);
 }
 
@@ -841,7 +859,7 @@ static errr init_v_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	return init_info("v_info", &v_head,
+	return init_info("vault", &v_head,
 					 (void *)&v_info, (void *)&v_name, (void *)&v_text);
 }
 
@@ -864,7 +882,7 @@ static errr init_s_info(void)
 
 #endif /* ALLOW_TEMPLATES */
 
-	rv = init_info("s_info", &s_head, (void *)&s_tmp_info, (void *)&s_name, (void *)&s_text);
+	rv = init_info("spells", &s_head, (void *)&s_tmp_info, (void *)&s_name, (void *)&s_text);
 
 	/* If there's an error, return now. */
 	if (rv) return (rv);
@@ -928,13 +946,13 @@ errr init_w_info(void)
 	/*** Load the ascii template file ***/
 
 	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_EDIT, "w_info.txt");
+	path_make(buf, ANGBAND_DIR_EDIT, "wilderns.txt");
 
 	/* Open the file */
 	fp = my_fopen(buf, "r");
 
 	/* Parse it */
-	if (!fp) quit("Cannot open 'w_info.txt' file.");
+	if (!fp) quit("Cannot open 'wilderns.txt' file.");
 
 	/* Parse the file */
 	err = init_w_info_txt(fp, buf);
@@ -958,7 +976,7 @@ errr init_w_info(void)
 		message_flush();
 
 		/* Quit */
-		quit("Error in 'w_info.txt' file.");
+		quit("Error in 'wilderns.txt' file.");
 	}
 
 	/* Success */
@@ -1039,13 +1057,13 @@ static errr init_mg_info(void)
 	/*** Load the ascii template file ***/
 
 	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_EDIT, "mg_info.txt");
+	path_make(buf, ANGBAND_DIR_EDIT, "mon_grp.txt");
 
 	/* Open the file */
 	fp = my_fopen(buf, "r");
 
 	/* Parse it */
-	if (!fp) quit("Cannot open 'mg_info.txt' file.");
+	if (!fp) quit("Cannot open 'mon_grp.txt' file.");
 
 
 
@@ -1065,17 +1083,45 @@ static errr init_mg_info(void)
 			(((err > 0) && (err < PARSE_ERROR_MAX)) ? err_str[err] : "unknown");
 
 		/* Oops */
-		msgf("Error %d at line %d of 'mg_info.txt'.", err, error_line);
+		msgf("Error %d at line %d of 'mon_grp.txt'.", err, error_line);
 		msgf("Record %d contains a '%s' error.", error_idx, oops);
 		msgf("Parsing '%s'.", buf);
 		message_flush();
 
 		/* Quit */
-		quit("Error in 't_info.txt' file.");
+		quit("Error in 'mon_grp.txt' file.");
 	}
 
 	/* Success */
 	return (0);
+}
+/*
+ * Initialize the "dungeons" array
+ */
+static errr init_dun_info(void)
+{
+  int i;
+  int max  = z_info->dun_max-1;
+  for (i = 0 ;i < max; ++i) {
+    dungeons[i].next = &(dungeons[i+1]);
+  }
+  dungeons[max].next = NULL;
+  return (0);
+  /* still using hardcoded dungeons */
+#if (0)
+	/* Init the header */
+	init_header(&dun_head, z_info->dun_max, sizeof(dun_gen_type));
+
+#ifdef ALLOW_TEMPLATES
+
+	/* Save a pointer to the parsing function */
+	dun_head.parse_info_txt = parse_dun_info;
+
+#endif /* ALLOW_TEMPLATES */
+
+	return init_info("dungeons", &dun_head,
+					 (void *)&dun_info, (void *)&dun_name, (void *)&dun_text);
+#endif
 }
 
 /*
@@ -1717,6 +1763,22 @@ void init_angband(void)
 	note("[Initializing arrays... (spells)]");
 	if (init_s_info()) quit("Cannot initialize spells");
 
+ 	/*
+	 * Initialize wilderness info
+	 * This needs to be done before old savefiles are loaded.
+	 */
+	note("[Initializing arrays... (wilderness)]");
+	if (init_w_info()) quit("Cannot initialize wilderness");
+
+	/* Initialize field info */
+	note("[Initializing arrays... (fields)]");
+	if (init_t_info()) quit("Cannot initialize fields");
+
+	/* Initialize dungeon info */
+	note("[Initializing arrays... (dungeons)]");
+	if (init_dun_info()) quit("Cannot initialize dungeons");
+
+
 	/*** Load default user pref files ***/
 
 	/* Initialize feature info */
@@ -1856,6 +1918,18 @@ void cleanup_angband(void)
 	free_info(&f_head);
 	free_info(&z_head);
 
+  /* free stuff from init_w_info */
+	FREE(wild_choice_tree);
+	FREE(wild_gen_data);
+  /* free stuff from init_t_info */
+  FREE(t_info);
+  FREE(fld_list);
+  /* free stuff from init_mg_info */
+  FREE(mg_info);
+  /* free stuff from init_dun_info */
+  /* still using hardcoded dungeons */
+  //FREE(dungeons);
+
 	/* Free the interface callbacks */
 	free_term_callbacks();
 
@@ -1873,4 +1947,7 @@ void cleanup_angband(void)
 	string_free(ANGBAND_DIR_PREF);
 	string_free(ANGBAND_DIR_USER);
 	string_free(ANGBAND_DIR_XTRA);
+	string_free(ANGBAND_DIR_XTRA_FONT);
+	string_free(ANGBAND_DIR_XTRA_GRAF);
+	string_free(ANGBAND_DIR_XTRA_SOUND);
 }

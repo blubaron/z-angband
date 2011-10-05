@@ -75,6 +75,7 @@
 
 #include "maid-grf.h"
 
+#include "grafmode.h"
 
 #ifdef WINDOWS
 
@@ -204,11 +205,12 @@
 #define IDM_OPTIONS_GRAPHICS_DAVID_6  404
 #define IDM_OPTIONS_GRAPHICS_DAVID_7  405
 #define IDM_OPTIONS_GRAPHICS_DAVID_8  406
-#define IDM_OPTIONS_BIGTILE         409
-#define IDM_OPTIONS_SOUND           410
+#define IDM_OPTIONS_BIGTILE         445
+#define IDM_OPTIONS_SOUND           446
 #define IDM_OPTIONS_LOW_PRIORITY    420
 #define IDM_OPTIONS_SAVER           430
 #define IDM_OPTIONS_MAP             440
+#define IDM_OPTIONS_SCREENSHOT      441
 
 #define IDM_HELP_GENERAL		901
 #define IDM_HELP_SPOILERS		902
@@ -533,6 +535,12 @@ static DIBINIT infGraph;
  */
 static DIBINIT infMask;
 
+static int overdraw = 0;
+static int overdrawmax = -1;
+
+static int alphablend = 0;
+static BLENDFUNCTION blendfn;
+
 #endif /* USE_GRAPHICS */
 
 
@@ -571,9 +579,9 @@ static cptr AngList = "AngList";
 /*
  * Directory names
  */
-static cptr ANGBAND_DIR_XTRA_FONT;
-static cptr ANGBAND_DIR_XTRA_GRAF;
-static cptr ANGBAND_DIR_XTRA_SOUND;
+//static cptr ANGBAND_DIR_XTRA_FONT;
+//static cptr ANGBAND_DIR_XTRA_GRAF;
+//static cptr ANGBAND_DIR_XTRA_SOUND;
 static cptr ANGBAND_DIR_XTRA_HELP;
 #if USE_MUSIC
 static cptr ANGBAND_DIR_XTRA_MUSIC;
@@ -1419,6 +1427,19 @@ static bool init_graphics(void)
 		cptr name;
 		cptr mask = NULL;
 
+    current_graphics_mode = get_graphics_mode(arg_graphics);
+    if (current_graphics_mode) {
+			wid = current_graphics_mode->cell_width;
+			hgt = current_graphics_mode->cell_height;
+			name = current_graphics_mode->file;
+			use_transparency = TRUE;
+    } else {
+			wid = 8;
+			hgt = 8;
+			name = "8x8.png";
+			use_transparency = TRUE;
+    }
+#if (0)
 		if (graf_width && graf_height)
 		{
 			wid = graf_width;
@@ -1459,7 +1480,7 @@ static bool init_graphics(void)
 
 			name = "8X8.BMP";
 		}
-
+#endif
 		/* Access the bitmap file */
 		path_make(buf, ANGBAND_DIR_XTRA_GRAF, name);
 
@@ -1903,7 +1924,17 @@ static errr Term_xtra_win_react(void)
 		FreeDIB(&infGraph);
 		FreeDIB(&infMask);
 
-		/* Change setting */
+    /* Initialize (if needed) */
+		if (arg_graphics && !init_graphics())
+		{
+			/* Warning */
+			plog("Cannot initialize graphics!");
+
+			/* Cannot enable */
+			arg_graphics = GRAPHICS_NONE;
+		}
+    
+    /* Change setting */
 		use_graphics = arg_graphics;
 
 		/* Reset visuals */
@@ -1913,6 +1944,7 @@ static errr Term_xtra_win_react(void)
 		  reset_visuals(TRUE);
     #endif /* ANGBAND_2_8_1 */
 
+#if (0)
     /* Initialize (if needed) */
     /* moved this down here because prefs are set in reset_visuals and I want
      * info loaded there in init_graphics - Brett */
@@ -1930,6 +1962,7 @@ static errr Term_xtra_win_react(void)
 		    reset_visuals(TRUE);
       #endif /* ANGBAND_2_8_1 */
 		}
+#endif
 	}
 
 #endif /* USE_GRAPHICS */
@@ -2849,6 +2882,9 @@ static void init_windows(void)
 
 	char buf[1024];
 
+	MENUITEMINFO mii;
+	HMENU hm;
+  graphics_mode *mode;
 
 	/* Main window */
 	td = &data[0];
@@ -3007,6 +3043,34 @@ static void init_windows(void)
 	/* Create a "brush" for drawing the "cursor" */
 	hbrYellow = CreateSolidBrush(win_clr[TERM_YELLOW]);
 
+	/* Populate the graphic options sub menu with the graphics modes */
+	hm = GetMenu(data[0].w);
+	mii.cbSize = sizeof(MENUITEMINFO);
+	mii.fMask = MIIM_ID | MIIM_TYPE;
+	mii.fType = MFT_STRING;
+  mode = graphics_modes;
+	while (mode) {
+    if (mode->grafID != GRAPHICS_NONE) {
+		  mii.wID = mode->grafID + IDM_OPTIONS_GRAPHICS_NONE;
+		  mii.dwTypeData = mode->menuname;
+		  mii.cch = strlen(mode->menuname);
+		  InsertMenuItem(hm,IDM_OPTIONS_BIGTILE, FALSE, &mii);
+    }
+		mode = mode->pNext;
+	}
+	//mii.cbSize = sizeof(MENUITEMINFO);
+	mii.fMask = MIIM_TYPE;
+	mii.fType = MFT_SEPARATOR;
+	mii.wID = 399;
+	mii.dwTypeData = 0;
+	mii.cch = 0;
+	InsertMenuItem(hm,IDM_OPTIONS_BIGTILE, FALSE, &mii);
+
+	/* setup the alpha blending function */
+	blendfn.BlendOp = AC_SRC_OVER;
+	blendfn.BlendFlags = 0;
+	blendfn.AlphaFormat = AC_SRC_NO_PREMULT_ALPHA;//AC_SRC_ALPHA;
+	blendfn.SourceConstantAlpha = 255;
 
 	/* Process pending messages */
 	(void)Term_xtra_win_flush();
@@ -3037,6 +3101,7 @@ static void setup_menus(void)
 	int i;
 
 	HMENU hm = GetMenu(data[0].w);
+  graphics_mode *mode;
 
 #ifdef USE_SAVER
 	main_menu = hm;
@@ -3169,7 +3234,13 @@ static void setup_menus(void)
 	}
 
 	/* Menu "Options", disable all */
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
+	mode = graphics_modes;
+  while (mode) {
+		EnableMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE,
+					   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+    mode = mode->pNext;
+	} 
+	/*EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
@@ -3182,7 +3253,7 @@ static void setup_menus(void)
 	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);*/
 	EnableMenuItem(hm, IDM_OPTIONS_BIGTILE,
 				   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_SOUND,
@@ -3201,7 +3272,13 @@ static void setup_menus(void)
 
 
 	/* Menu "Options", update all */
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
+	mode = graphics_modes;
+  while (mode) {
+  	CheckMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE,
+	                (arg_graphics == mode->grafID ? MF_CHECKED : MF_UNCHECKED));
+    mode = mode->pNext;
+	} 
+	/*CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
 	              (arg_graphics == GRAPHICS_NONE ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD,
 	              (arg_graphics == GRAPHICS_ORIGINAL ? MF_CHECKED : MF_UNCHECKED));
@@ -3214,7 +3291,7 @@ static void setup_menus(void)
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
 	              (arg_graphics == 7 ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
-	              (arg_graphics == 8 ? MF_CHECKED : MF_UNCHECKED));
+	              (arg_graphics == 8 ? MF_CHECKED : MF_UNCHECKED));*/
 
 	CheckMenuItem(hm, IDM_OPTIONS_BIGTILE,
 	              (use_bigtile ? MF_CHECKED : MF_UNCHECKED));
@@ -3231,13 +3308,24 @@ static void setup_menus(void)
 #ifdef USE_GRAPHICS
 	if (initialized && p_ptr->cmd.inkey_flag)
 	{
-		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
+		i = 0;
+		do {
+			EnableMenuItem(hm, graphics_modes[i].grafID + IDM_OPTIONS_GRAPHICS_NONE,MF_ENABLED );
+		} while (graphics_modes[i++].grafID != 0); 
+	  mode = graphics_modes;
+    while (mode) {
+      if ((mode->grafID == 0) || (mode->file && mode->file[0])) {
+		    EnableMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
+      }
+      mode = mode->pNext;
+	  } 
+		/*EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7, MF_ENABLED);
-		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8, MF_ENABLED);
+		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8, MF_ENABLED);*/
 		EnableMenuItem(hm, IDM_OPTIONS_BIGTILE, MF_ENABLED);
 	}
 #endif /* USE_GRAPHICS */
@@ -3868,7 +3956,7 @@ static void process_menus(WORD wCmd)
 
 			break;
 		}
-
+#if (0)
     /*case IDM_OPTIONS_GRAPHICS_NONE:
     case IDM_OPTIONS_GRAPHICS_OLD:
     case IDM_OPTIONS_GRAPHICS_ADAM:
@@ -4069,7 +4157,7 @@ static void process_menus(WORD wCmd)
 
 			break;
 		}
-
+#endif
 		case IDM_OPTIONS_BIGTILE:
 		{
 			/* Paranoia */
@@ -4218,6 +4306,40 @@ static void process_menus(WORD wCmd)
 		case IDM_HELP_SPOILERS:
 		{
 			display_help(HELP_SPOILERS);
+			break;
+		}
+		default: {
+			if ((wCmd >= IDM_OPTIONS_GRAPHICS_NONE) && (wCmd <= IDM_OPTIONS_GRAPHICS_NONE+graphics_mode_high_id)) {
+        graphics_mode *mode;
+				int selected_mode = 0;
+				int desired_mode = wCmd - IDM_OPTIONS_GRAPHICS_NONE;
+
+				/* Paranoia */
+				if (!p_ptr->cmd.inkey_flag || !initialized) {
+					plog("You may not do that right now.");
+					break;
+				}
+
+        mode = graphics_modes;
+        while (mode) {
+					if (mode->grafID == desired_mode) {
+						selected_mode = desired_mode;
+						break;
+					}
+          mode = mode->pNext;
+        }
+
+				/* Toggle "arg_graphics" */
+				if (arg_graphics != selected_mode) {
+					arg_graphics = selected_mode;
+
+					/* React to changes */
+					Term_xtra_win_react();
+
+					/* Hack -- Force redraw */
+					Term_key_push(KTRL('R'));
+				}
+			}
 			break;
 		}
 	}
@@ -5068,6 +5190,8 @@ static void hook_quit(cptr str)
 	FreeDIB(&infMask);
 #endif /* USE_GRAPHICS */
 
+	close_graphics_modes();
+
 #ifdef USE_SOUND
 	/* Free the sound names */
 	for (i = 0; i < SOUND_MAX; i++)
@@ -5094,9 +5218,9 @@ static void hook_quit(cptr str)
 	/* Free strings */
 	string_free(ini_file);
 	string_free(argv0);
-	string_free(ANGBAND_DIR_XTRA_FONT);
-	string_free(ANGBAND_DIR_XTRA_GRAF);
-	string_free(ANGBAND_DIR_XTRA_SOUND);
+	//string_free(ANGBAND_DIR_XTRA_FONT);
+	//string_free(ANGBAND_DIR_XTRA_GRAF);
+	//string_free(ANGBAND_DIR_XTRA_SOUND);
 	string_free(ANGBAND_DIR_XTRA_HELP);
 
 #ifdef USE_MUSIC
@@ -5204,10 +5328,10 @@ static void init_stuff(void)
 
 
 	/* Build the "font" path */
-	path_make(path, ANGBAND_DIR_XTRA, "font");
+	//path_make(path, ANGBAND_DIR_XTRA, "font");
 
 	/* Allocate the path */
-	ANGBAND_DIR_XTRA_FONT = string_make(path);
+	//ANGBAND_DIR_XTRA_FONT = string_make(path);
 
 	/* Validate the "font" directory */
 	validate_dir(ANGBAND_DIR_XTRA_FONT);
@@ -5222,10 +5346,10 @@ static void init_stuff(void)
 #ifdef USE_GRAPHICS
 
 	/* Build the "graf" path */
-	path_make(path, ANGBAND_DIR_XTRA, "graf");
+	//path_make(path, ANGBAND_DIR_XTRA, "graf");
 
 	/* Allocate the path */
-	ANGBAND_DIR_XTRA_GRAF = string_make(path);
+	//ANGBAND_DIR_XTRA_GRAF = string_make(path);
 
 	/* Validate the "graf" directory */
 	validate_dir(ANGBAND_DIR_XTRA_GRAF);
@@ -5236,10 +5360,10 @@ static void init_stuff(void)
 #ifdef USE_SOUND
 
 	/* Build the "sound" path */
-	path_make(path, ANGBAND_DIR_XTRA, "sound");
+	//path_make(path, ANGBAND_DIR_XTRA, "sound");
 
 	/* Allocate the path */
-	ANGBAND_DIR_XTRA_SOUND = string_make(path);
+	//ANGBAND_DIR_XTRA_SOUND = string_make(path);
 
 	/* Validate the "sound" directory */
 	validate_dir(ANGBAND_DIR_XTRA_SOUND);
@@ -5428,7 +5552,12 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		angband_color_table[i][0] = win_pal[i];
 	}
 
-	/* Prepare the windows */
+	/* load the possible graphics modes */
+	if (!init_graphics_modes("graphics.txt")) {
+		plog_fmt("Graphics list load failed");
+	}
+
+  /* Prepare the windows */
 	init_windows();
 
 	/* Activate hooks */

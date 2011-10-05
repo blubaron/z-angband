@@ -730,6 +730,9 @@ cptr ANGBAND_DIR_USER;
  * These files are rarely portable between platforms
  */
 cptr ANGBAND_DIR_XTRA;
+cptr ANGBAND_DIR_XTRA_FONT;
+cptr ANGBAND_DIR_XTRA_GRAF;
+cptr ANGBAND_DIR_XTRA_SOUND;
 
 
 /* Can these inventory hacks be cleaned up somehow? */

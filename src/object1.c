@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "grafmode.h"
 
 /* Hack: For use in get_item & subroutines.  */
 s16b curr_container = 0;
@@ -100,8 +101,13 @@ void reset_visuals(void)
 
   if (use_graphics)
 	{
+    graphics_mode *mode = get_graphics_mode(use_graphics);
+    if (mode && strstr(mode->pref,".prf")) {
+      (void)process_pref_file(mode->pref);
+    } else {
 		/* Process "graf.prf" */
 		(void)process_pref_file("graf.prf");
+    }
 	}
 
 	/* Normal symbols */
