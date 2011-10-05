@@ -2527,3 +2527,11 @@ W:100:6:0
 I:FEAT | VIS | NO_OBJECT | TRANS | NO_MPLACE
 D:0:0:0:0:0:0:0:0
 
+# buyable spot
+N:159:Empty Building
+G:0:G
+W:100:3:0
+I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
+D:7:0:0:100:100:100:100:0
+#L:SBINIT:place_sb(100, 0)
+#L:PENTER:do_cmd_blank(field) end

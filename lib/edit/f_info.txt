@@ -78,7 +78,7 @@ N:4:open door
 G:':U
 P:15
 M:32
-F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
 
 # 0x05 --> broken door
 
@@ -272,7 +272,7 @@ F:PWALK | PPASS | MWALK | MPASS | TRAP | OBJECT | MARK
 
 N:65:Pattern startpoint
 G:*:w
-F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | QUEST
 
 N:66:section of the Pattern
 G:*:B
@@ -292,37 +292,37 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
 
 N:70:section of the Pattern
 G:*:W
-F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | TRAP | BROKEN
 
 N:71:section of the Pattern (discharged)
 G:*:W
-F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | TRAP
 
 N:72:Pattern exit
 G:*:w
-F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | QUEST | TRAP
 
 N:73:corrupted section of the Pattern
 G:*:D
-F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | BROKEN
 
 # 0x53 --> terrain -- deep water
 
 N:83:deep water
 G:~:b
-F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | LIQUID | DEEP
 
 N:84:shallow water
 G:~:B
-F:PWALK | PPASS | MWALK | MPASS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK | LIQUID
 
 N:85:deep lava
 G:~:R
-F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | LIQUID | DEEP | DAMAGES | FIERY
 
 N:86:shallow lava
 G:~:r
-F:PWALK | PPASS | MWALK | MPASS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK | LIQUID | FIERY
 
 N:87:dark pit
 G:#:D
@@ -346,15 +346,15 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY
 
 N:92:very deep water
 G:~:D
-F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | LIQUID | DEEP | ACID
 
 N:93:deep acid
 G:~:g
-F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | LIQUID | DEEP | DAMAGES | ACID
 
 N:94:shallow acid
 G:~:G
-F:PWALK | PPASS | MWALK | MPASS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK | LIQUID
 
 N:95:submerged tree
 G:.:b
@@ -453,11 +453,11 @@ F:PWALK | PPASS | MWALK | MPASS
 
 N:136:thick swamp
 G:~:g
-F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | WILD
+F:PWALK | PPASS | MWALK | MPASS | ICKY | MARK | WILD | DAMAGES | DEEP | POISON
 
 N:137:swamp
 G:~:G
-F:PWALK | PPASS | MWALK | MPASS | MARK
+F:PWALK | PPASS | MWALK | MPASS | MARK | WILD | DAMAGES | POISON
 
 # impassible jungle
 N:138:jungle
@@ -495,7 +495,7 @@ N:145:open door
 G:':U
 P:15
 M:146
-F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
 
 N:146:door
 G:+:U
@@ -503,7 +503,7 @@ P:17
 M:145
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
 
-# gate doors 
+#### gate doors w/ normal walls
 N:147:door
 G:+:U
 P:17
@@ -514,13 +514,13 @@ N:148:open door
 G:':U
 P:15
 M:147
-F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
 
 N:149:broken door
 G:':u
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
-# cavern dungeons
+#### cavern dungeons
 # walls
 N:150:granite wall
 G:#:W
@@ -536,14 +536,14 @@ F:NO_LOS | ICKY | PERM | OBJECT | MARK
 N:152:door
 G:+:U
 P:17
-M:4
+M:153
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
 
 N:153:open door
 G:':U
 P:15
-M:32
-F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+M:152
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
 
 N:154:broken door
 G:':u
@@ -552,7 +552,7 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 # secret door
 N:155:granite wall
 G:#:W
-M:157
+M:156
 P:10:30
 F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
 
@@ -566,7 +566,7 @@ N:157:open door
 G:':U
 P:15
 M:156
-F:PWALK | PPASS | MWALK | MPASS | DOOR | ICKY | OBJECT | MARK
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
 
 # stairs
 N:158:up staircase
@@ -577,10 +577,199 @@ N:159:down staircase
 G:>:w
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
-# pillar/other
-N:160:pillar
+#### end cavern dungeons
+
+#### horror dungeons
+# walls
+N:160:granite wall
+G:#:W
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+N:161:permanent wall
+G:#:w
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
+
+# doors
+N:162:door
+G:+:U
+P:17
+M:163
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:163:open door
+G:':U
+P:15
+M:162
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+
+N:164:broken door
+G:':u
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
+
+# secret door
+N:165:granite wall
+G:#:W
+M:166
+P:10:30
+F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+
+N:166:door
+G:+:U
+P:17
+M:167
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:167:open door
+G:':U
+P:15
+M:168
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+
+# stairs
+N:168:up staircase
+G:<:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
+
+N:169:down staircase
+G:>:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
+
+#### end horror dungeons
+
+#### temple dungeons
+# walls
+N:170:granite wall
+G:#:W
+P:10:40
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+N:171:permanent wall
+G:#:w
+P:10
+F:NO_LOS | ICKY | PERM | OBJECT | MARK
+
+# doors
+N:172:door
+G:+:U
+P:17
+M:173
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:173:open door
+G:':U
+P:15
+M:172
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+
+N:174:broken door
+G:':u
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
+
+# secret door
+N:175:granite wall
+G:#:W
+M:176
+P:10:30
+F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+
+N:176:door
+G:+:U
+P:17
+M:177
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:177:open door
+G:':U
+P:15
+M:178
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+
+# stairs
+N:178:up staircase
+G:<:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
+
+N:179:down staircase
+G:>:w
+F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
+
+#### end temple dungeons
+
+# dark tiled floor for horror dungeons
+N:180:tiled floor
+G:.:r
+F:PWALK | PPASS | MWALK | MPASS
+
+
+#### pillars of a certain type on various floors
+#### rubble on various floors
+# rock column on dirt for caverns
+N:181:pillar on dirt floor
 G:#:D
 P:17:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+# pile of rubble for dirt floors
+N:182:pile of rubble
+G:::w
+P:10:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
+
+# pillar on dark tiled floor
+N:183:pillar
+G:#:D
+P:17:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+# pile of rubble on dark tiled floor
+N:184:pile of rubble
+G:::w
+P:10:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
+
+# pillar on light tiled floor
+N:185:pillar
+G:#:D
+P:17:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+# pile of rubble on light tiled floor
+N:186:pile of rubble
+G:::w
+P:10:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
+
+# pillar on wood floor
+N:187:pillar
+G:#:D
+P:17:20
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+
+# pile of rubble on wood floor
+N:188:pile of rubble
+G:::w
+P:10:10
+F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
+
+#### end rubble/pillars
+
+#### normal doors w/ light small brick walls
+N:189:door
+G:+:U
+P:17
+M:148
+F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+
+N:190:open door
+G:':U
+P:15
+M:147
+F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+
+N:191:broken door
+G:':u
+F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 
