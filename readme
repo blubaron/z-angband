@@ -1,7 +1,9 @@
 The is my personal copy of z+angband. It is based on z+angband 0.3.3beta.
 
 It has some severe balance changes from the released Z+, some of which may
-or may not work. Some notes about my changes area innotes_changes.txt. Some
+or may not work. Some notes about my changes area in notes_changes.txt. Some
 of my notes about things I am thinking about doing are in notes_maybe_do.txt.
+
+Some of these changes are not well tested.
 
 The orignial readme for Z+Angband 0.3.3beta is in z_readme.
