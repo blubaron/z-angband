@@ -1588,10 +1588,12 @@ void py_attack(int x, int y)
 		{
 			/* Can't backstab creatures that we can't see, right? */
 			sleeping_bonus = 10 + 2 * p_ptr->lev / 5;
+      blows++;
 		}
 		else if (m_ptr->monfear && m_ptr->ml)
 		{
 			sleeping_bonus = 5 + p_ptr->lev / 5;
+      blows++;
 		}
 	}
 
@@ -1676,9 +1678,13 @@ void py_attack(int x, int y)
 
 	/* Monsters in rubble can take advantage of cover. -LM- */
 	//if (c_ptr->feat == FEAT_RUBBLE)
-  if (feat_ptr->flags & FF_HALF_LOS)
+  if ((feat_ptr->flags & FF_HALF_LOS) || (feat_ptr->flags2 & FF_PROTECT))
 	{
 		terrain_bonus = r_ptr->ac / 7 + 5;
+	}
+  else if (feat_ptr->flags2 & FF_EXPOSE)
+	{
+		terrain_bonus -= r_ptr->ac / 5;
 	}
 	/* Monsters in water are vulnerable. -LM- */
 	//else if (c_ptr->feat == FEAT_DEEP_WATER)
@@ -1943,14 +1949,20 @@ void py_attack(int x, int y)
 				/* Hack -- High-level warriors can spread their attacks out
 				 * among weaker foes. -LM-
 				 */
-				if (((p_ptr->rp.pclass == CLASS_WARRIOR) ||
-					 (p_ptr->rp.pclass == CLASS_CHAOS_WARRIOR)) &&
-					(p_ptr->lev > 39) && (num < p_ptr->num_blow) &&
-					(p_ptr->state.energy_use))
+				if (((p_ptr->rp.pclass == CLASS_WARRIOR)
+          || (p_ptr->rp.pclass == CLASS_CHAOS_WARRIOR))
+					&& (p_ptr->lev > 39) && (num < blows)
+					&& (p_ptr->state.energy_use))
 				{
 					p_ptr->state.energy_use =
-						p_ptr->state.energy_use * num / p_ptr->num_blow;
-				}
+						p_ptr->state.energy_use * num / blows;
+        } else
+        if (((blows-num)>2) && (p_ptr->state.energy_use)) 
+        {
+          num+=2;// += (blows-num)/2;
+					p_ptr->state.energy_use =
+						p_ptr->state.energy_use * num / blows;
+        }
 
 				mdeath = TRUE;
 				break;
@@ -2184,6 +2196,177 @@ static void summon_pattern_vortex(int x, int y)
 	}
 }
 
+
+/*static bool pattern_seq(int c_x, int c_y, int n_x, int n_y)
+{
+	cave_type *c1_ptr, *c2_ptr;
+  feature_type *f1_ptr, *f2_ptr;
+
+	c1_ptr = area(c_x, c_y);
+	c2_ptr = area(n_x, n_y);
+
+  f1_ptr = &f_info[c1_ptr->feat];
+  f2_ptr = &f_info[c2_ptr->feat];
+
+
+	if (!(f1_ptr->flags & FF_PATTERN) && !(f2_ptr->flags & FF_PATTERN))
+		return TRUE;
+
+  if (f1_ptr == f2_ptr)
+    return TRUE;
+
+	if ((f1_ptr->flags & FF_PATTERN) && (f2_ptr->flags & FF_PATTERN)) {
+    // we are moving from one pattern square to another
+    if (f2_ptr->flags & FF_QUEST) {
+      if (f2_ptr->flags & FF_TRAP) {
+        // we are moving onto an end square
+        return TRUE;
+      } else {
+        // we are moving onto a start square
+        return TRUE;
+      }
+    } else
+    if (f2_ptr->flags & FF_TRAP) {
+      if (f2_ptr->flags & FF_BROKEN) {
+        // we are moving onto an old square
+        return TRUE;
+      } else {
+        // we are moving onto a teleport square
+        return TRUE;
+      }
+    } else
+    if (f2_ptr->flags & FF_BROKEN) {
+      // we are moving onto a corrupted square
+      return TRUE;
+    } else
+    {
+      // we are moving onto a path square
+      if (c2_ptr->feat == (c1_ptr->feat+1)) {
+				return TRUE;
+      } else
+      if ((c1_ptr->feat < (z_info->f_max-1)) && (c2_ptr->feat > 1)
+        && (f_info[c1_ptr->feat+1].flags & FF_PATTERN)
+        && (f_info[c1_ptr->feat+1].flags & FF_QUEST)
+        && (f_info[c2_ptr->feat-1].flags & FF_PATTERN)
+        && (f_info[c2_ptr->feat-1].flags & FF_QUEST)) {
+        return TRUE;
+			} else
+      if (get_check("Really stray from the proper path? "))
+			{
+				take_hit(25, "Walking backwards along the Pattern");
+
+				if (one_in_(5)) summon_pattern_vortex(n_x, n_y);
+
+				return TRUE;
+			}
+
+			return FALSE;
+    }
+  } else
+
+  if (f2_ptr->flags & FF_PATTERN)) {
+    // we are moving on the pattern from some other square
+    if (f2_ptr->flags & FF_QUEST) {
+      if (f2_ptr->flags & (FF_TRAP|FF_BROKEN)) {
+        // we are moving onto an end square
+			  if (get_check("Really step onto the Pattern here? "))
+			  {
+				  take_hit(100, "Stepping onto the Pattern");
+
+				  if (one_in_(3)) summon_pattern_vortex(n_x, n_y);
+
+				  return TRUE;
+			  }
+			  return FALSE;
+      } else {
+        // we are moving onto a start square
+		    if (!query_timed(TIMED_CONFUSED) && !query_timed(TIMED_STUN) && !query_timed(TIMED_IMAGE))
+		    {
+			    if (get_check
+				    ("If you start walking the Pattern, you must walk the whole way. Ok? "))
+				    return TRUE;
+			    else
+				    return FALSE;
+		    }
+		    return TRUE;
+      }
+    } else
+    {
+			if (get_check("Really step onto the Pattern here? "))
+			{
+				take_hit(100, "Stepping onto the Pattern");
+
+				if (one_in_(2)) summon_pattern_vortex(n_x, n_y);
+
+				return TRUE;
+			}
+			return FALSE;
+    }
+  } else
+
+  {
+    // we are moving off the pattern
+    if (f2_ptr->flags & FF_QUEST) {
+      if (f2_ptr->flags & FF_TRAP) {
+        // we are moving off an end square
+			  if (get_check("Really step off of the Pattern? "))
+			  {
+				  take_hit(50, "Stepping off of the Pattern");
+
+				  if (one_in_(4)) summon_pattern_vortex(n_x, n_y);
+
+				  return TRUE;
+			  }
+			  return FALSE;
+      } else {
+        // we are moving off a start square
+			  if (get_check("Really step off of the Pattern? "))
+			  {
+				  take_hit(10, "Stepping off of the Pattern");
+
+				  if (one_in_(6)) summon_pattern_vortex(n_x, n_y);
+
+				  return TRUE;
+			  }
+
+			  return FALSE;
+      }
+    } else
+    if (f2_ptr->flags & FF_TRAP) {
+      // we are moving off an old or teleport square
+			if (get_check("Really step off of the Pattern? "))
+			{
+				return TRUE;
+			}
+      return FALSE;
+    } else
+    if (f2_ptr->flags & FF_BROKEN) {
+      // we are moving off a corrupted square
+			if (get_check("Really step off of the Pattern? "))
+			{
+				take_hit(100, "Stepping off of the Pattern");
+
+				if (one_in_(3)) summon_pattern_vortex(n_x, n_y);
+
+				return TRUE;
+			}
+      return FALSE;
+    } else
+    {
+      // we are moving off a path square
+			if (get_check("Really step off of the Pattern? "))
+			{
+				take_hit(50, "Stepping off of the Pattern");
+
+				if (one_in_(3)) summon_pattern_vortex(n_x, n_y);
+
+				return TRUE;
+			}
+      return FALSE;
+    }
+  }
+  return FALSE;
+}*/
 
 static bool pattern_seq(int c_x, int c_y, int n_x, int n_y)
 {

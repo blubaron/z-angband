@@ -13,13 +13,13 @@
 # === Understanding dungeons.txt ===
 
 # N: serial number : default dungeon name
-# L: min level : max level : chance : population : height : room limits
+# L: min level : max level : level_progression : chance : population : height : room limits
 # H: Habitat Flag | Habitat Flag | etc
 # R: Roomtype Flag | Roomtype Flag | etc
 # O: treasure : combat items: magic items : tools
 # W: floor_feat : wall_feat : perm_wall_feat : rubble_feat
-# d: closed : open : broken : secret_closed
-# w: stair_up : stair_down : quest_stair : pillar_feat
+# d: door_closed_feat : open : broken : secret_closed
+# w: stair_up_feat : stair_down : quest_stair : pillar_feat
 # C: monsters : objects : doors : traps : rubble : stairs : tunnels
 # c: small_levels : arena_levels : cavern_levels : labrinth_levels : vault_levels : city_levels
 # S: streamer1feat : s1_t_feat : s1_size : s1_number : s1_t_chance
@@ -27,7 +27,7 @@
 # V: river1feat_shallow : r1_deep : r1_rarity : r1_size
 # v: river2feat_shallow : r2_deep : r2_rarity : r2_size
 # l: lake_feat_shallow : lake_deep : lake_rarity : lake_size
-# n: chance : name generator string
+# n: chance : name generator id : format string
 # F: flag | flag | etc
 # D: Description
 
@@ -104,17 +104,51 @@
 # ends to prevent words from running together in the monster memory.
 
 
+# WARNING: this file is not used yet. To modify dungeons you would need to
+# modify the dungeons array at the bottom of tables.c. Or for their names,
+# modify name_dungeons in wild4.c
+
+
 # Version stamp (required)
 
 V:0.3.3
 
-##### The Player #####
+# 0 -> Placeholder for stuff used in towns
+# W: not used, building wall, city wall, not used
+# d: city wall door closed, city wall door open, not used, not used
+# S: town ground 1, town ground 2, not used, not used, chance ground will be type 2
+# s: road 1, road 2, not used, not used, chance road will be type 2
+N:0:Town
+W:1:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:84:83:20:2
+l:84:83:10:25
 
-N:0:Player
-G:@:w
+# 0 -> Vanilla Dungeon
+N:1:Dungeon
+L:1:127:1:1:100:100:0
+H:HABITAT_ALL
+R:SIMPLE | VAULT | DENSE
+W:1:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:100:100:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:84:83:20:2
+l:84:83:10:25
+F:TRACK | ROAD
+D:A typical dungeon.
 
-N:1:Sewers
-L:1:30:1:100:0:0
+N:2:Sewers
+L:1:30:1:1:100:0:0
 H:DUN_DARKWATER
 R:SIMPLE | NATURAL | ANIMAL | STRANGE
 W:11:56:60:49
@@ -124,15 +158,15 @@ O:7:16:7:40
 C:100:90:100:50:150:60:100
 c:0:0:150:0:0:0
 S:50:54:2:3:100
-s:51:55:2:2:100
+s:50:54:2:2:100
 V:84:83:20:2
 v:137:136:20:2
 l:137:136:10:50
-F:DF_TRACK | DF_ROAD
+F:TRACK | ROAD
 D:A foul smell comes up from the sewers
 
-N:2:Lair
-L:10:50:1:100:100:0
+N:3:Lair
+L:10:50:1:1:100:100:0
 H:DUN_LAIR
 R:SIMPLE | NATURAL | COMPLEX | RUIN
 W:88:56:60:49
@@ -148,11 +182,11 @@ v:94:93:20:2
 l:137:136:10:50
 D:You hear various noises coming from the lair.
 
-N:3:Evil Temple
+N:4:Evil Temple
 L:20:60:1:250:250:0
 H:DUN_TEMPLE
 R:SIMPLE | COMPLEX | DENSE | FANCY | BUILDING | CRYPT
-W:12:56:60:49
+W:12:56:1:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:10:30:30:30
@@ -166,38 +200,38 @@ l:86:85:15:15
 n:33:0:"%s Monestary"
 n:34:0:"Temple of %s"
 n:33:0:"%s Temple"
-F:DF_ROAD
+F:ROAD
 D:A malignant aura comes from this building.
 
-N:3:Evil Tower
+N:5:Evil Tower
 L:20:60:1:250:200:0
 H:DUN_TOWER
 R:SIMPLE | COMPLEX | BUILDING | VAULT
-W:13:56:60:49
+W:13:56:1:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:20:0:80:0
 C:100:100:100:200:0:150:100
 c:0:0:0:0:0:0
-S:50:54:2:3:100
-s:51:55:2:2:100
+S:50:54:2:3:0
+s:51:55:2:2:0
 V:94:93:20:1
 v:86:85:30:1
 l:86:85:15:15
 n:50:0:"Tower of %s"
 n:50:0:"%s Tower"
-F:DF_TRACK
+F:TRACK
 D:A malignant aura comes from this building.
 
-N:3:Ruins
+N:6:Ruins
 L:20:80:1:0:150:0
 H:DUN_RUIN
 R:RUIN
-W:14:56:60:49
+W:14:56:1:60:49
 w:6:7:141:33
 d:32:4:5:48
-O:20:0:80:0
-C:100:100:100:200:0:150:100
+O:20:30:30:0
+C:100:70:100:100:200:100:100
 c:0:0:0:0:0:0
 S:50:54:2:3:100
 s:51:55:2:2:100
@@ -206,7 +240,485 @@ v:86:85:30:2
 l:137:136:10:50
 n:50:0:"Ruins of %s"
 n:50:0:"Ruins"
-F:DF_TRACK | DF_ROAD
+F:TRACK | ROAD
 D:You see some ancient ruins.
+
+N:7:Graveyard
+L:30:100:1:50:150:0
+H:DUN_GRAVE
+R:SIMPLE | COMPLEX | FANCY | CRYPT
+W:12:56:1:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:50:20:20:0
+C:120:100:100:80:60:70:100
+c:0:0:250:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:137:136:20:1
+l:137:136:10:66
+n:50:0:"%s Cemetary"
+n:50:0:"Graveyard"
+F:TRACK | ROAD
+D:You see get an erie feeling from this graveyard.
+
+N:8:Cavern
+L:40:80:1:1:50:200:0
+H:DUN_CAVERN
+R:NATURAL | ANIMAL | DENSE | RUIN | VAULT
+W:88:150:151:49
+w:6:7:141:33
+d:32:4:5:48
+O:30:30:30:10
+C:100:100:0:33:150:80:100
+c:0:0:100:0:0:0
+S:50:54:2:3:150
+s:51:55:2:2:150
+V:84:83:20:2
+v:94:93:20:2
+l:86:85:15:15
+n:25:0:"Caves of %s"
+n:25:0:"%s Caves"
+n:25:0:"%s's Hole"
+n:25:0:"%s Cavern"
+F:TRACK
+D:You see a gaping hole that leads to a cavern.
+
+N:9:Planar Gate
+L:40:127:1:1:0:250:0
+H:DUN_PLANAR
+R:SIMPLE | NATURAL | DENSE | FANCY | VAULT
+W:8:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:30:30:40:0
+C:100:100:100:150:0:100:100
+c:0:0:250:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:94:93:20:2
+l:137:136:10:50
+F:TRACK
+D:This is a planar gate.
+
+N:10:Gate to Hell
+L:60:127:1:1:0:0:0
+H:DUN_HELL
+R:SIMPLE | NATURAL | ANIMAL | DENSE | RUIN
+R:FANCY | VAULT | STRANGE
+W:15:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:20:40:40:0
+C:150:100:100:100:100:100:100
+c:0:0:250:0:0:0
+S:50:54:2:3:200
+s:51:55:2:2:200
+V:86:85:20:3
+v:86:85:0:2
+l:86:85:10:75
+D:You see an evil red glow coming from this entrance.
+
+N:11:Dungeon of Horror
+L:80:127:1:1:0:150:0
+H:DUN_HORROR
+R:SIMPLE | NATURAL | ANIMAL | DENSE | RUIN | STRANGE
+W:9:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:5:30:30:0
+C:90:90:100:100:150:130:100
+c:0:0:250:0:0:0
+S:50:54:2:3:50
+s:51:55:2:2:50
+V:94:93:20:2
+v:86:85:30:2
+l:86:85:15:30
+F:TRACK
+D:You hear various noises coming from the lair.
+
+N:12:Mine
+L:1:40:1:1:200:200:0
+H:DUN_MINE
+R:SIMPLE | NATURAL | ANIMAL | RUIN | STRANGE
+W:88:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:20:10:40
+C:110:100:100:100:100:100:100
+c:0:0:150:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:20:2
+v:86:85:30:2
+l:84:83:10:50
+n:50:0:"Mines of %s"
+n:50:0:"%s Mine"
+F:ROAD
+D:You see an abandoned mine.
+
+N:13:Evil City
+L:20:60:1:1:200:200:0
+H:DUN_CITY
+R:SIMPLE | COMPLEX | DENSE | FANCY | BUILDING
+R:CRYPT | VAULT | STRANGE
+W:12:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:50:10:10:0
+C:120:120:100:100:100:140:100
+c:0:10:0:0:0:0
+S:50:54:2:3:0
+s:51:55:2:2:0
+V:84:83:20:2
+v:84:83:20:2
+l:84:83:10:30
+n:50:0:"Bal %s"
+n:50:0:"%s Fel"
+F:TRACK | ROAD
+D:This city gives you a bad feeling
+
+##### Quest Dungeons #####
+
+N:14:Desert
+L:1:70:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL
+W:8:60:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:25:5:10
+C:100:100:0:25:100:100:100
+c:0:0:250:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:84:83:0:2
+v:84:83:0:2
+l:84:83:0:25
+F:FORCE_LIT
+D:You see an expanse of desert.
+
+N:15:Swamp
+L:1:70:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL
+W:10:95:138:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:15:35:20
+C:100:100:0:25:100:100:25
+c:0:0:250:0:0:0
+S:84:0:4:5:100
+s:51:55:2:0:100
+V:137:136:1:3
+v:84:83:3:2
+l:137:136:2:60
+D:You see an expanse of swamp.
+
+N:16:Sandy Burrow
+L:1:70:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:NATURAL | FRACTAL
+W:8:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:30:30:30:10
+C:100:100:0:33:50:80:100
+c:0:0:100:0:0:0
+S:50:54:0:3:150
+s:51:55:0:2:150
+V:84:83:20:2
+v:94:93:0:2
+l:86:85:0:15
+D:You see a sandy burrow.
+
+N:17:Forest
+L:1:70:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL
+W:89:96:138:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:15:35:20
+C:100:100:0:25:100:100:30
+c:0:0:250:0:0:0
+S:128:0:0:3:100
+s:115:0:0:2:100
+V:137:136:10:3
+v:84:83:3:3
+l:137:136:0:60
+D:You see a forest glade.
+
+N:18:Mountain
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:NATURAL | FRACTAL
+W:88:98:139:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:84:83:0:2
+v:84:83:0:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a mountain plateau.
+
+N:19:Tundra
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:NATURAL | FRACTAL
+W:135:135:139:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:15:35:20
+C:100:100:0:100:100:100:100
+c:0:25:250:0:0:0
+S:134:0:1:2:100
+s:51:55:1:2:100
+V:134:101:0:2
+v:99:98:0:2
+l:84:83:10:25
+F:FORCE_LIT
+D:You see an expanse of tundra.
+
+N:20:Castle
+L:1:127:1:0:100:100:1
+H:HABITAT_DUNGEON
+R:VAULT
+W:88:63:63:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:100:200:100:100:100
+c:0:0:0:0:0:0
+S:50:54:1:2:100
+s:51:55:1:2:100
+V:84:83:0:2
+v:84:83:0:2
+l:84:83:0:25
+F:CASTLE | PURE_CASTLE | MEDIUM
+D:You see an imposing castle.
+
+N:21:Plane of Fire
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:142:86:139:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:10
+c:0:25:0:0:0:0
+S:50:54:4:3:100
+s:51:55:4:2:100
+V:86:85:2:2
+v:84:83:0:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a portal to a plane of fire.
+
+N:22:Plane of Water
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:15:83:63:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:10
+c:0:25:250:0:0:0
+S:8:0:2:1:100
+s:51:55:2:0:100
+V:86:85:1:2
+v:84:83:1:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a portal to a plane of water.
+
+N:23:Ice Cave
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:135:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:100:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:84:83:3:2
+v:84:83:3:2
+l:84:83:10:25
+F:TRACK | ROAD
+D:You see an ice cave.
+
+N:24:Plane of Acid
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:142:94:138:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:10
+c:0:25:0:0:0:0
+S:93:0:4:3:100
+s:51:55:4:0:100
+V:94:93:1:10
+v:94:93:1:10
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a portal to a plane of acid.
+
+N:25:Smoke Cave
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:142:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:100:100:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:3:100
+s:51:55:2:2:100
+V:142:143:1:2
+v:142:143:5:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a lot of smoke coming from this cave.
+
+N:26:Plane of Cold
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:135:135:139:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:100:100:100:100
+c:0:25:250:0:0:0
+S:134:0:8:1:100
+s:51:55:2:2:100
+V:134:101:1:2
+v:99:98:1:2
+l:84:83:10:25
+F:FORCE_LIT
+D:You see a portal to a plane of cold.
+
+N:27:Plane of Earth
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:15:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:100:100:255:100:25
+c:0:25:250:0:0:0
+S:50:54:5:4:100
+s:51:55:5:4:100
+V:50:50:3:2
+v:49:49:3:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a portal to a plane of earth.
+
+N:28:Heaven
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:SIMPLE | COMPLEX | FANCY
+W:9:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:100:25:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:142:142:10:2
+v:84:83:0:2
+l:9:9:1:90
+F:FORCE_LIT
+D:You see a portal to a heaven.
+
+N:29:Grassland
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:142:86:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:10
+c:0:0:250:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:84:83:4:2
+v:84:83:0:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see an expanse of grassland.
+
+N:30:Plane of Air
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL | NATRUAL | COMPLEX
+W:88:98:139:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:0:100:100:100
+c:0:25:250:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:84:83:0:2
+v:84:83:0:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a portal to a plane of air.
+
+N:31:House
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:SIMPLE
+W:13:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:10:5:5:50
+C:100:100:100:100:100:100:100
+c:0:0:0:0:0:0
+S:50:54:2:0:100
+s:51:55:2:0:100
+V:84:83:0:2
+v:84:83:0:2
+l:84:83:0:25
+F:TRACK | ROAD
+D:You see a house.
+
+N:32:Flooded Cave
+L:1:127:1:0:100:100:0
+H:HABITAT_DUNGEON
+R:FRACTAL
+W:84:56:60:49
+w:6:7:141:33
+d:32:4:5:48
+O:23:23:23:23
+C:100:100:0:100:100:100:100
+c:0:25:250:0:0:0
+S:8:0:2:2:100
+s:51:55:2:2:100
+V:84:83:3:2
+v:84:83:3:2
+l:84:83:10:25
+F:TRACK | ROAD
+D:You see a flooded cave.
 
 

@@ -976,6 +976,15 @@ static int dam_pois_adjust(void)
 	return dam_adjust(res_pois_lvl());
 }
 
+static int dam_cold_adjust(void)
+{
+	return dam_adjust(res_cold_lvl());
+}
+
+static int dam_elec_adjust(void)
+{
+	return dam_adjust(res_elec_lvl());
+}
 
 /*
  * Handle certain things once every 10 game turns
@@ -992,6 +1001,8 @@ static void process_world(void)
 	object_type *o_ptr;
 	int temp;
 	object_kind *k_ptr;
+  feature_type *f_ptr;
+
 	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
 	const mutation_type *mut_ptr;
 
@@ -1131,7 +1142,123 @@ static void process_world(void)
 		}
 	}
 
-	if ((c_ptr->feat == FEAT_SHAL_LAVA) && !(FLAG(p_ptr, TR_FEATHER)))
+  f_ptr = &(f_info[c_ptr->feat]);
+  if ((f_ptr->flags & FF_DAMAGING) && !query_timed(TIMED_INVULN)) {
+    int damage = 0;
+		cptr message;
+		//cptr hit_from;
+    if (f_ptr->flags & FF_DEEP) {
+      if (f_ptr->flags2 & FF_FIERY) {
+		    damage = resist(adj_depth-dam_fire_adjust(), res_fire_lvl);
+		    if (FLAG(p_ptr, TR_FEATHER))
+		    {
+			    damage = damage / 5;
+
+			    message = "The heat of the %s burns you!";
+		    } else {
+			    message = "The %s burns you!";
+		    }
+      } else
+      if (f_ptr->flags2 & FF_ICY) {
+		    damage = resist(adj_depth-dam_cold_adjust(), res_cold_lvl);
+		    if (FLAG(p_ptr, TR_FEATHER))
+		    {
+			    damage = damage / 5;
+
+			    message = "The cold of the %s chills you!";
+		    } else {
+			    message = "The %s freezes you!";
+		    }
+      } else
+      if (f_ptr->flags2 & FF_ACID) {
+		    damage = resist(adj_depth-dam_acid_adjust(), res_acid_lvl);
+		    if (FLAG(p_ptr, TR_FEATHER))
+		    {
+			    damage = damage / 5;
+
+			    message = "The fumes of the %s burn you!";
+		    } else {
+			    message = "The %s burns you!";
+		    }
+      } else
+      if (f_ptr->flags2 & FF_ELEC) {
+		    damage = resist(adj_depth-dam_elec_adjust(), res_elec_lvl);
+		    if (FLAG(p_ptr, TR_FEATHER))
+		    {
+			    damage = damage / 5;
+
+			    message = "The heat of the %s shocks you!";
+		    } else {
+			    message = "The %s shocks you!";
+		    }
+      } else
+      if (f_ptr->flags2 & FF_POISON) {
+		    damage = resist((adj_depth / 2 + 1) - dam_pois_adjust(), res_pois_lvl);
+		    if (FLAG(p_ptr, TR_FEATHER)) {
+			    damage = damage / 5;
+		    }
+		    message = "The fumes of the %s poison you!";
+      } else
+      {
+		    damage = (adj_depth / 3 + 1);
+		    message = "The %s hurts you!";
+      }
+    } else 
+    if (!(FLAG(p_ptr, TR_FEATHER))) {
+      if (f_ptr->flags2 & FF_FIERY) {
+		    damage = resist((adj_depth / 2 + 1)-dam_fire_adjust(), res_fire_lvl);
+		    message = "The %s burns you!";
+      } else
+      if (f_ptr->flags2 & FF_ICY) {
+		    damage = resist((adj_depth / 2 + 1)-dam_cold_adjust(), res_cold_lvl);
+		    message = "The %s freezes you!";
+      } else
+      if (f_ptr->flags2 & FF_ACID) {
+		    damage = resist((adj_depth / 2 + 1)-dam_acid_adjust(), res_acid_lvl);
+		    message = "The %s burns you!";
+      } else
+      if (f_ptr->flags2 & FF_ELEC) {
+		    damage = resist((adj_depth / 2 + 1)-dam_elec_adjust(), res_elec_lvl);
+		    message = "The %s shocks you!";
+      } else
+      if (f_ptr->flags2 & FF_POISON) {
+		    damage = resist((adj_depth / 4 + 1) - dam_pois_adjust(), res_pois_lvl);
+		    message = "The fumes of the %s poison you!";
+      } else
+      {
+		    damage = (adj_depth / 6 + 1);
+		    message = "The %s hurts you!";
+      }
+    }
+ 		if (damage && (f_ptr->flags & FF_WILD) && FLAG(p_ptr, TR_WILD_WALK)) {
+      damage = 0;
+    }
+ 		if (damage && (f_ptr->flags & FF_ROCKY) && FLAG(p_ptr, TR_PASS_WALL)) {
+      damage = 0;
+    }
+ 		if (damage) {
+			/* Take damage */
+			msgf(message, f_name + f_ptr->name);
+			take_hit(damage, f_name + f_ptr->name);
+
+			cave_no_regen = TRUE;
+		}
+  }
+
+  if ((f_ptr->flags & FF_LIQUID) && (f_ptr->flags & FF_DEEP)
+    && !(FLAG(p_ptr, TR_FEATHER))) {
+ 		if (p_ptr->total_weight >
+			((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2))
+		{
+			/* Take damage */
+			msgf("You are drowning!");
+			take_hit(randint1(adj_depth + 1), "drowning");
+			cave_no_regen = TRUE;
+		}
+  }
+
+#if (0)
+  if ((c_ptr->feat == FEAT_SHAL_LAVA) && !(FLAG(p_ptr, TR_FEATHER)))
 	{
 		int damage = resist((adj_depth / 2 + 1)-dam_fire_adjust(), res_fire_lvl);
 
@@ -1259,7 +1386,6 @@ static void process_world(void)
 			cave_no_regen = TRUE;
 		}
 	}
-
 	else if (((c_ptr->feat == FEAT_DEEP_WATER) ||
 			  (c_ptr->feat == FEAT_OCEAN_WATER)) &&
 			  !(FLAG(p_ptr, TR_FEATHER)))
@@ -1273,7 +1399,7 @@ static void process_world(void)
 			cave_no_regen = TRUE;
 		}
 	}
-
+#endif
 	/* Spectres -- take damage when moving through walls */
 	/*
 	 * Added: ANYBODY takes damage if inside through walls
@@ -3367,16 +3493,6 @@ void play_game(bool new_game)
 
 	/* Hack -- turn off the cursor */
 	(void)Term_set_cursor(0);
-
-	/*
-	 * Initialize wilderness info
-	 * This needs to be done before old savefiles are loaded.
-	 */
-	if (init_w_info()) quit("Cannot initialize wilderness");
-
-	/* Initialize field info */
-	if (init_t_info()) quit("Cannot initialize fields");
-
 
 	/* Attempt to load */
 	if (!load_player())

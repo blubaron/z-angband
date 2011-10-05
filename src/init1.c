@@ -92,7 +92,45 @@ static cptr f_info_flags[] =
   "BROKEN",
   "WILD",
   "LIQUID",
-  "DAMAGES"
+  "DAMAGES",
+  "CLOSEABLE",
+  "DEEP",
+  "NO_FLYING",
+  "PROJECT",
+
+	"FLOOR",
+	"WALL",
+	"TREE",
+	"ROCK",
+	"WATERY",
+	"FIERY",
+	"ICY",
+	"ACID",
+	"ELEC",
+	"POISON",
+	"FALL",
+	"TRAPPABLE",
+	"NO_SCENT",
+	"NO_NOISE",
+	"PROTECT",
+	"EXPOSE",
+	"HIDES_OBJ",
+	"BURNS",
+	"FREEZES",
+	"MELTS",
+	"CONDUCTS",
+	"SMELLS",
+	"LIGHTSUP",
+	"DARKENS",
+	"STONE",
+	"RUN1",
+	"RUN2",
+	"FOUNTAIN",
+	"STATUE",
+	"SUPPORT",
+	"TEXT",
+	"ORGANIC"
+
 };
 
 
@@ -807,6 +845,7 @@ static cptr t_info_triggers[] =
  */
 static cptr mg_info_dungeon_types[] =
 {
+	"VANILLA",
 	"SEWER",
 	"LAIR",
 	"TEMPLE",
@@ -819,7 +858,6 @@ static cptr mg_info_dungeon_types[] =
 	"HORROR",
 	"MINE",
 	"CITY",
-	"VANILLA",
 	"DESERT",
 	"SWAMP",
 	"SANDY_BURROW",
@@ -859,11 +897,11 @@ static cptr mg_info_dungeon_flags[] =
 	"SPARSE",
 	"DENSE",
 	"POOLS",
-	"XXX1",
+	"PURE_CASTLE",
 	"XXX2",
 	"XXX3",
-	"XXX4",
-	"XXX5",
+	"BASIC",
+	"GUARDED",
 	"XXX6",
 	"XXX7",
 	"XXX8",
@@ -1266,6 +1304,30 @@ errr parse_z_info(char *buf, header *head)
 
 	}
 
+	/* Process 'Y' for "Maximum d_info[] index for dungeon types" */
+	else if (buf[2] == 'Y')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf + 4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->dun_max = max;
+	}
+
+	/* Process 'L' for "Maximum l_info[] index for landmarks" */
+	else if (buf[2] == 'L')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf + 4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->lmk_max = max;
+	}
+
 	else
 	{
 		/* Oops */
@@ -1319,6 +1381,11 @@ errr parse_v_info(char *buf, header *head)
 
 		/* Point at the "info" */
 		v_ptr = &v_info[i];
+    /*
+    v_ptr = CMAKE(vault_type);
+    v_ptr->next = v_info;
+    v_info = v_ptr;
+    */
 
 		/* Store the name */
 		if (!(v_ptr->name = add_name(head, s)))
@@ -1388,6 +1455,26 @@ static errr grab_one_feat_flag(u32b *flags, cptr names[], cptr what)
 	return (-1);
 }
 
+static errr grab_two_feat_flag(u32b *flags, u32b *flags2, cptr names[], cptr what)
+{
+	int i;
+
+	/* Check flags */
+	for (i = 0; i < 56; i++)
+	{
+		if (streq(what, names[i]))
+		{
+      if (i > 31) {
+			  *flags2 |= (1L << (i-32));
+      } else {
+			  *flags |= (1L << i);
+      }
+			return (0);
+		}
+	}
+
+	return (-1);
+}
 
 /*
  * Initialize the "f_info" array, by parsing an ascii "template" file
@@ -1479,7 +1566,7 @@ errr parse_f_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_feat_flag(&f_ptr->flags, f_info_flags, s))
+			if (0 != grab_two_feat_flag(&f_ptr->flags, &f_ptr->flags2, f_info_flags, s))
 			{
 				return (PARSE_ERROR_INVALID_FLAG);
 			}
@@ -4847,4 +4934,467 @@ errr parse_s_info(char *buf, header *head)
 	return (0);
 }
 
+#if (0)
 
+/*
+ * Grab one flag in an object_kind from a textual string
+ */
+static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
+{
+	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
+		return (0);
+
+	/* Oops */
+	msgf("Unknown dungeon flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
+{
+	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
+		return (0);
+
+	/* Oops */
+	msgf("Unknown dungeon flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
+{
+	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
+		return (0);
+
+	/* Oops */
+	msgf("Unknown dungeon flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+/*
+ * Initialize the "dungeons" array, by parsing an ascii "template" file
+ */
+errr parse_dun_info(char *buf, header *head)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	static dun_gen_type *dun_ptr = NULL;
+
+
+	/* Process 'N' for "New/Number/Name" */
+	if (buf[0] == 'N')
+	{
+		/* Find the colon before the name */
+		s = strchr(buf + 2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf + 2);
+
+		/* Verify information */
+		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Verify information */
+		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+
+		/* Save the index */
+		error_idx = i;
+
+		/* Point at the "info" */
+		dun_ptr = dungeons[i];
+    dun_ptr->didx = i;
+
+		/* Store the name */
+		if (!(dun_ptr->name = add_name(head, s)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+
+	/* Process 'L' for "level information" (one line only) */
+	else if (buf[0] == 'L')
+	{
+    int min, max, chance, pop, height, rlimit
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (6 != sscanf(buf + 2, "%d:%d:%d:%d:%d:%d",
+						&min, &max, &chance, &pop, &height, &rlimit) {
+      return (PARSE_ERROR_GENERIC);
+    }
+    dun_ptr->min_level = min;
+    dun_ptr->max_level = min;
+    dun_ptr->chance = min;
+    dun_ptr->pop = pop;
+    dun_ptr->height = height;
+    dun_ptr->room_limit = rlimit;
+	}
+
+	/* Process 'O' for "object theme" (one line only) */
+	else if (buf[0] == 'O')
+	{
+    int treasure, combat_items, magic_items, tools
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&treasure, &combat_items, &magic_items, &tools) {
+      return (PARSE_ERROR_GENERIC);
+    }
+    dun_ptr->theme.treasure = treasure;
+    dun_ptr->theme.combat = combat_items;
+    dun_ptr->theme.magic = magic_items;
+    dun_ptr->theme.tools = tools;
+	}
+
+	/* Process 'W' for "Wall feats" (one line only) */
+	else if (buf[0] == 'W')
+	{
+		int floor, wall, perm_wall, rubble;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&floor, &wall, &perm_wall, &rubble)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->floor = floor;
+		dun_ptr->wall = wall;
+		dun_ptr->perm_wall = perm_wall;
+		dun_ptr->rubble = rubble;
+	}
+
+	/* Process 'd' for "door feats" (one line only) */
+	else if (buf[0] == 'd')
+	{
+		int open, closed, broken, secret;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&closed, &open, &broken, &secret)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->door_open = open;
+		dun_ptr->door_closed = closed;
+		dun_ptr->door_broken = broken;
+		dun_ptr->door_secret = secret;
+	}
+
+	/* Process 'W' for "More Info" (one line only) */
+	else if (buf[0] == 'W')
+	{
+		int level, extra, wgt;
+		long cost;
+
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%ld",
+						&level, &extra, &wgt,
+						&cost)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		k_ptr->level = level;
+		k_ptr->extra = extra;
+		k_ptr->weight = wgt;
+		k_ptr->cost = cost;
+	}
+
+	/* Process 'A' for "Allocation" (one line only) */
+	else if (buf[0] == 'A')
+	{
+		int i;
+
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* XXX Simply read each number following a colon */
+		for (i = 0, s = buf + 1; s && (s[0] == ':') && s[1]; ++i)
+		{
+			/* Sanity check */
+			if (i > 3) return (PARSE_ERROR_TOO_MANY_ALLOCATIONS);
+
+			/* Default chance */
+			k_ptr->chance[i] = 1;
+
+			/* Store the attack damage index */
+			k_ptr->locale[i] = atoi(s + 1);
+
+			/* Find the slash */
+			t = strchr(s + 1, '/');
+
+			/* Find the next colon */
+			s = strchr(s + 1, ':');
+
+			/* If the slash is "nearby", use it */
+			if (t && (!s || t < s))
+			{
+				int chance = atoi(t + 1);
+				if (chance >= 0) k_ptr->chance[i] = chance;
+			}
+		}
+	}
+
+	/* Hack -- Process 'P' for "power" and such */
+	else if (buf[0] == 'P')
+	{
+		int ac, hd1, hd2, th, td, ta;
+
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (6 != sscanf(buf + 2, "%d:%dd%d:%d:%d:%d",
+						&ac, &hd1, &hd2, &th, &td,
+						&ta)) return (PARSE_ERROR_GENERIC);
+
+		k_ptr->ac = ac;
+		k_ptr->dd = hd1;
+		k_ptr->ds = hd2;
+		k_ptr->to_h = th;
+		k_ptr->to_d = td;
+		k_ptr->to_a = ta;
+	}
+
+	/* Hack -- Process 'H' for habitat flags */
+	else if (buf[0] == 'H')
+	{
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s;)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */ ;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_habitat_flag(k_ptr, s))
+			{
+				return (PARSE_ERROR_INVALID_FLAG);
+			}
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Hack -- Process 'R' for room type flags */
+	else if (buf[0] == 'R')
+	{
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s;)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */ ;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_kind_flag(k_ptr, s))
+			{
+				return (PARSE_ERROR_INVALID_FLAG);
+			}
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Hack -- Process 'F' for flags */
+	else if (buf[0] == 'F')
+	{
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s;)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */ ;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_kind_flag(k_ptr, s))
+			{
+				return (PARSE_ERROR_INVALID_FLAG);
+			}
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Process 'D' for "Description" */
+	else if (buf[0] == 'D')
+	{
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the text */
+		s = buf + 2;
+
+		/* Store the text */
+		if (!add_text(&(dun_ptr->text), head, s))
+		{
+			msgf("Icky Description!!");
+			message_flush();
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+	}
+
+	/* Process 'L' for "Lua script" */
+	else if (buf[0] == 'L')
+	{
+		int n;
+
+		/* There better be a current k_ptr */
+		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Analyze the first field */
+		for (s = t = buf + 2; *t && (*t != ':'); t++) /* loop */ ;
+
+		/* Terminate the field (if necessary) */
+		if (*t == ':') *t++ = '\0';
+
+		/* Analyze the trigger */
+		for (n = 0; k_info_triggers[n]; n++)
+		{
+			if (streq(s, k_info_triggers[n])) break;
+		}
+
+		/* Invalid trigger */
+		if (!k_info_triggers[n]) return (PARSE_ERROR_GENERIC);
+
+		/* Get the text */
+		s = t;
+
+		/* Store the text */
+		if (!add_text(&(k_ptr->trigger[n]), head, s))
+		{
+			msgf("Icky Trigger 1!!");
+			message_flush();
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+	}
+
+	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+}
+
+errr init_dun_info_txt(FILE *fp, char *buf)
+{
+	char *s, *t;
+
+	u16b i = 0;
+
+	byte hook_num = 0;
+
+	/* Current entry */
+	dun_gen_type *dun_ptr = NULL;
+
+	/* Just before the first line */
+	error_line = -1;
+
+	/* The last index used */
+	error_idx = -1;
+
+
+
+	/* Parse */
+	while (0 == my_fgets(fp, buf, 1024))
+	{
+		/* Advance the line number */
+		error_line++;
+
+		/* Skip comments and blank lines */
+		if (!buf[0] || (buf[0] == '#')) continue;
+
+		/* Verify correct "colon" format */
+		if (buf[1] != ':') return (PARSE_ERROR_GENERIC);
+
+    errr parse_dun_info(char *buf, header *head, &dun_ptr)
+
+	}
+
+	/* Success */
+	return (0);
+}
+
+#endif

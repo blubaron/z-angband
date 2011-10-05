@@ -613,10 +613,15 @@ static void display_monster_quest(quest_type *q_ptr)
 		if (q_ptr->type == QUEST_TYPE_BOUNTY)
 		{
 			/* One at a time */
-      if (q_ptr->data.dun.max_num - q_ptr->data.dun.cur_num > 3) 
-        number = randint1((q_ptr->data.dun.max_num - q_ptr->data.dun.cur_num)/3);
+      if (q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num > 3) 
+        number = randint1((q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num)/3);
       else
   			number = 1;
+
+      if (q_ptr->level +25 < p_ptr->depth) {
+			  /* probably getting tired of this quest - All remaining at once */
+			  number = q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num;
+      }
 
 			/* Which monster? */
 			r_idx = q_ptr->data.bnt.r_idx;

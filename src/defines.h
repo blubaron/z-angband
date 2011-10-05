@@ -60,7 +60,7 @@
 #endif /* !DEBUG */
 
 /* Savefile version */
-#define SAVEFILE_VERSION 62
+#define SAVEFILE_VERSION 63
 
 
 /*
@@ -124,6 +124,8 @@
 #define DF_PURE_CASTLE	0x00010000  /* Castle occupies the whole level */
 //#define DF_CAVERN 	0x00020000  /* Cavern occupies the whole level*/
 //#define DF_LABRINTH	0x00040000  /* Labrinth occupies the whole level */
+#define DF_BASIC  	0x00080000  /* this type is a regular dungeon, that appears in the wilderness */
+#define DF_GUARDED	0x00100000  /* this dungeon is always guarded in the wilderness */
 
 
 
@@ -165,41 +167,42 @@
 #define WILD_SEA	65471
 
 /* Place types */
-#define PL_TOWN_OLD		1
-#define PL_TOWN_FRACT	2
-#define PL_QUEST_PIT	3
+#define PL_TOWN_OLD     1
+#define PL_TOWN_FRACT   2
+#define PL_QUEST_PIT    3
 #define PL_DUNGEON      4
-#define PL_FARM			5
-#define PL_TOWN_MINI	6
-#define PL_QUEST_STAIR	7
+#define PL_FARM         5
+#define PL_TOWN_MINI    6
+#define PL_QUEST_STAIR  7
 
 /*
  * Guild membership types.
  * Note that GS_NONE is 0, so that a "!" test can be used
  * to check if membership has been initialized.
  */
-#define GS_NONE			0
-#define GS_NONMEMBER	1
-#define GS_LOW_MEMBER	2
-#define GS_MEMBER		3
+#define GS_NONE       0
+#define GS_NONMEMBER  1
+#define GS_LOW_MEMBER 2
+#define GS_MEMBER     3
 
 /*
  * Quest type
  */
-#define QUEST_TYPE_NONE				0
-#define QUEST_TYPE_BOUNTY			1
-#define QUEST_TYPE_DUNGEON			2
-#define QUEST_TYPE_WILD				3
-#define QUEST_TYPE_MESSAGE			4
-#define QUEST_TYPE_FIND_ITEM		5
-#define QUEST_TYPE_FIND_PLACE		6
-#define QUEST_TYPE_LOAN				7
-#define QUEST_TYPE_FIXED_KILL		8
-#define QUEST_TYPE_DEFEND			9
-#define QUEST_TYPE_FIXED_BOSS		10
-#define QUEST_TYPE_FIXED_CLEAROUT	11
-#define QUEST_TYPE_FIXED_DEN		12
-
+enum {
+  QUEST_TYPE_NONE           =  0,
+  QUEST_TYPE_BOUNTY         =  1,
+  QUEST_TYPE_DUNGEON        =  2,
+  QUEST_TYPE_WILD           =  3,
+  QUEST_TYPE_MESSAGE        =  4,
+  QUEST_TYPE_FIND_ITEM      =  5,
+  QUEST_TYPE_FIND_PLACE     =  6,
+  QUEST_TYPE_LOAN           =  7,
+  QUEST_TYPE_FIXED_KILL     =  8,
+  QUEST_TYPE_DEFEND         =  9,
+  QUEST_TYPE_FIXED_BOSS     = 10,
+  QUEST_TYPE_FIXED_CLEAROUT = 11,
+  QUEST_TYPE_FIXED_DEN      = 12
+};
 #define QUEST_MAX					13
 /*
  * Quest creation types
@@ -1549,6 +1552,7 @@
 #define FT_BUILD_CASTLE2		0x009C
 #define FT_GLYPH_HYPNO			0x009D
 #define FT_GLYPH_ABSORB			0x009E
+#define FT_BUILD_EMPTY          0x009F
 
 
 /*** Artifact indexes (see "lib/edit/a_info.txt") ***/
@@ -2541,7 +2545,12 @@
 #define CAVE_MNLT       0x20	/* Illuminated by monster */
 #define CAVE_TEMP       0x40	/* temp flag */
 #define CAVE_XTRA       0x80	/* misc flag */
-
+//from vanilla:
+//#define CAVE_MARK		0x01 	/* memorized feature */
+//#define CAVE_SEEN		0x10 	/* seen flag */
+//#define CAVE_VIEW		0x20 	/* view flag */
+//#define CAVE_TEMP		0x40 	/* temp flag */
+//#define CAVE_WALL		0x80 	/* wall flag */
 
 /*
  * Cave grid flags that are player-specific
@@ -2595,7 +2604,7 @@ enum
 	FF_QUEST        = 0x00000800, /* player can enter a quest level here */
 	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature */
 	FF_MARK         = 0x00002000, /* memorized on map when seen*/
-	//FF_BORING       = 0x00002000, /* not marked if not currently seen? (!MARK)*/
+	//FF_INTERESTING  = 0x00002000, /* allow stopping here when looking around  */
 	FF_OVERLAY      = 0x00004000, /* draw on top of base feature */
 	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path */
 	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold */
@@ -2609,9 +2618,53 @@ enum
 	FF_BROKEN       = 0x01000000, /* Terrain (usually door) is broken */
 	FF_WILD         = 0x02000000, /* Terrain takes additional time to cross */
 	FF_LIQUID       = 0x04000000, /* Terrain is water, lava, or acid */
-	FF_DAMAGING     = 0x08000000  /* Terrain damages player like deep lava or acid, uses dig for damage amount */
+	FF_DAMAGING     = 0x08000000, /* Terrain damages player like deep lava or acid, uses dig for damage amount */
+	FF_CLOSEABLE    = 0x10000000, /* Terrain (usually door) is open (from FA) */
+	FF_DEEP         = 0x20000000, /* Terrain does double damage or damage to flyers */
+	FF_NO_FLYING    = 0x40000000, /* Terrain prohibits levitation,flying monsters cannot pass */
+	FF_PROJECT      = 0x80000000  /* projections (bolt,beam,ball,breath) can pass through here (from FA) */
+};
+enum
+{
+	FF_FLOOR        = 0x00000001, /* Terrain is some type of floor (from FA) */
+	FF_WALL         = 0x00000002, /* Terrain is some type of wall (from FA) */
+	FF_TREE         = 0x00000004, /* Terrain is some type of tree (from FA) */
+	FF_ROCKY        = 0x00000008, /* Terrain is some type of rock (from FA) */
+	FF_WATERY       = 0x00000010, /* Terrain is water based (from FA) */
+	FF_FIERY        = 0x00000020, /* Terrain is fire based (from FA) */
+	FF_ICY          = 0x00000040, /* Terrain is cold based (from FA) */
+	FF_ACID         = 0x00000080, /* Terrain is acid based */
+	FF_ELEC         = 0x00000100, /* Terrain is electricity based */
+	FF_POISON       = 0x00000200, /* Terrain is poisonous */
+	FF_FALL         = 0x00000400, /* Terrain has a sharp height difference (from FA) */
+	FF_TRAPPABLE    = 0x00000800, /* Traps can be put on the terrain (from FA) */
+	FF_NO_SCENT     = 0x00001000, /* terrain blocks monster discovery by scent (from FA) */
+	FF_NO_NOISE     = 0x00002000, /* terrain blocks monster discovery by noise (from FA) */
+	FF_PROTECT      = 0x00004000, /* terrain protects occupant from others' melee/arrows (from FA) */
+	FF_EXPOSE       = 0x00008000, /* terrain makes occupant take more damage from melee/arrows (from FA) */
+	FF_HIDES_OBJ    = 0x00010000, /* no objects are shown on this terrain (but can be still picked up) (from FA) */
+	FF_BURNS        = 0x00020000, /* switches to base when attacked with fire */
+	FF_FREEZES      = 0x00040000, /* switches to base when attacked with frost */
+	FF_MELTS        = 0x00080000, /* switches to base when attacked with acid */
+	FF_CONDUCTS     = 0x00100000, /* switches to base when attacked with electricity */
+	FF_SMELLS       = 0x00200000, /* switches to base when attacked with poison */
+	FF_LIGHTSUP     = 0x00400000, /* switches to base when attacked with light */
+	FF_DARKENS      = 0x00800000, /* switches to base when attacked with darkness */
+	FF_STONE        = 0x01000000, /* switches to base when attacked with stone to mud */
+	FF_RUN1         = 0x02000000, /* when starting to run, uses algorithm 2? (from FA) */
+	FF_RUN2         = 0x04000000, /* when starting to run, uses algorithm 3? (from FA) */
+	FF_FOUNTAIN     = 0x08000000, /* if terrain is a fountain */
+	FF_STATUE       = 0x10000000, /* if terrain is a statue of some sort */
+	FF_SUPPORT      = 0x20000000, /* if terrain is a wall support of some sort */
+	FF_TEXT         = 0x40000000, /* if terrain displays custom text of some sort */
+	FF_ORGANIC      = 0x80000000, /* from FA, nothing expected of it, here to fill out bits */
 };
 
+#define FF_MASK_INTERESTING FF_QUEST | FF_TRAP | FF_CLOSED | FF_CLOSEABLE | \
+                            FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | \
+                            FF_EXIT_UP | FF_EXIT_DOWN | FF_PATTERN | FF_BROKEN |\
+                            FF_DIG_CUSTOM | FF_DIG_FOOD // | FF_INTERESTING
+#define FF_MASK_INTERESTING2 FF_FOUNTAIN | FF_STATUE | FF_TEXT
 /*
  * Bit flags for the "project()" function
  *
@@ -4962,8 +5015,8 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 /*
  * Is the grid worth remembering?
  */
-#define cave_mem_grid(C) \
-	(f_info[(C)->feat].flags & FF_MARK)
+//#define cave_mem_grid(C) \
+//	(f_info[(C)->feat].flags & FF_MARK)
 
 /*
  * Determine if a "legal" grid is within "los" of the player
@@ -5468,19 +5521,19 @@ extern int PlayerUID;
  * Dungeon theme types
  */
 #define DUN_TYPE_NONE				0x00000000
-#define DUN_TYPE_SEWER				0x00000001
-#define DUN_TYPE_LAIR				0x00000002
-#define DUN_TYPE_TEMPLE				0x00000004
-#define DUN_TYPE_TOWER				0x00000008
-#define DUN_TYPE_RUIN				0x00000010
-#define DUN_TYPE_GRAVE				0x00000020
-#define DUN_TYPE_CAVERN				0x00000040
-#define DUN_TYPE_PLANAR				0x00000080
-#define DUN_TYPE_HELL				0x00000100
-#define DUN_TYPE_HORROR				0x00000200
-#define DUN_TYPE_MINE				0x00000400
-#define DUN_TYPE_CITY				0x00000800
-#define DUN_TYPE_VANILLA			0x00001000
+#define DUN_TYPE_VANILLA			0x00000001
+#define DUN_TYPE_SEWER				0x00000002
+#define DUN_TYPE_LAIR				0x00000004
+#define DUN_TYPE_TEMPLE				0x00000008
+#define DUN_TYPE_TOWER				0x00000010
+#define DUN_TYPE_RUIN				0x00000020
+#define DUN_TYPE_GRAVE				0x00000040
+#define DUN_TYPE_CAVERN				0x00000080
+#define DUN_TYPE_PLANAR				0x00000100
+#define DUN_TYPE_HELL				0x00000200
+#define DUN_TYPE_HORROR				0x00000400
+#define DUN_TYPE_MINE				0x00000800
+#define DUN_TYPE_CITY				0x00001000
 #define DUN_TYPE_DESERT				0x00002000
 #define DUN_TYPE_SWAMP				0x00004000
 #define DUN_TYPE_SANDY_BURROW		0x00008000
@@ -5501,8 +5554,8 @@ extern int PlayerUID;
 #define DUN_TYPE_HOUSE				0x40000000
 #define DUN_TYPE_FLOOD_CAVE			0x80000000
 
-#define NUM_DUN_TYPES 32
-#define NUM_DUN_TYPES_BASIC 12
+//#define NUM_DUN_TYPES 32
+//#define NUM_DUN_TYPES_BASIC 12
 
 /*
  * Monster group theme flags

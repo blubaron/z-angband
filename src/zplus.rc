@@ -109,17 +109,17 @@ ANGBAND MENU
 		POPUP "&Graphics"
 		{
 			MENUITEM "&None", 400
-			MENUITEM "&Old tiles", 401
-			MENUITEM "&Adam Bolt's tiles", 402
-			MENUITEM "&David Gervais's tiles", 403
-			MENUITEM "&16x16 Combined tiles", 405
-			MENUITEM "&Resized tiles", 404
-			MENUITEM "&Test Tiles", 406
+			//MENUITEM "&Old tiles", 401
+			//MENUITEM "&Adam Bolt's tiles", 402
+			//MENUITEM "&David Gervais's tiles", 403
+			//MENUITEM "&16x16 Combined tiles", 405
+			//MENUITEM "&Resized tiles", 404
+			//MENUITEM "&Test Tiles", 406
   	  MENUITEM SEPARATOR
-			MENUITEM "&Bigtile Mode", 409
+			MENUITEM "&Bigtile Mode", 445
 		}
 
-		MENUITEM "&Sound", 410
+		MENUITEM "&Sound", 446
 		MENUITEM SEPARATOR
 		MENUITEM "Low Priority", 420
 		MENUITEM "Activate Screensaver", 430

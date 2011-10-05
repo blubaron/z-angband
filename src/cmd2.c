@@ -320,20 +320,33 @@ static void chest_death(int x, int y, object_type *o_ptr)
 	/* Small chests often hold "gold" */
 	small_chest = (o_ptr->sval < SV_CHEST_MIN_LARGE);
 
+	/* Determine the "value" of the items */
+	//level = ABS(o_ptr->pval); // = randint1(get_object_level(o_ptr))
+	/* From Vanilla value = o_ptr->origin_depth - 10 + 2 * o_ptr->sval;*/
+  /* combined */
+  /*level = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + get_object_level(o_ptr))/2;*/
+  /* another combined with some shallower depth items at deeper depths */
+  level = get_object_level(o_ptr);
+  number = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + level)/2;
+  if (number > level) {
+    level = rand_range(level/2, number);
+  } else {
+    level = rand_range(number/2, level);
+  }
+	if (level < 1)
+		level = 1; 
+
+	/* Prepare for object memory */
+	current_object_source.type = OM_CHEST;
+	current_object_source.place_num = o_ptr->mem.place_num;//p_ptr->place_num;
+	current_object_source.depth = o_ptr->mem.depth;//p_ptr->depth;
+	current_object_source.data = (u32b)o_ptr->sval;
+
 	/* Determine how much to drop (see above) */
 	number = (o_ptr->sval % SV_CHEST_MIN_LARGE) * 2;
 
 	/* Zero pval means empty chest */
 	if (!o_ptr->pval) number = 0;
-
-	/* Determine the "value" of the items */
-	level = ABS(o_ptr->pval);
-
-	/* Prepare for object memory */
-	current_object_source.type = OM_CHEST;
-	current_object_source.place_num = p_ptr->place_num;
-	current_object_source.depth = p_ptr->depth;
-	current_object_source.data = (u32b)o_ptr->sval;
 
 	/* Drop some objects (non-chests) */
 	for (; number > 0; --number)
@@ -714,14 +727,28 @@ bool do_cmd_open_aux(int x, int y)
 
 	/* Must be a closed door */
 	//if (c_ptr->feat != FEAT_CLOSED)
-	if (!(feat->flags & FF_DOOR) || !(feat->flags & FF_CLOSED))
-	{
+	//if (!(feat->flags & FF_DOOR) || !(feat->flags & FF_CLOSED))
+	//{
+	//	/* Nope */
+	//	return (FALSE);
+	//}
+
+	///* Get fields */
+	//f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
+
+	/* Must be  closed */
+	if (!(feat->flags & FF_CLOSED))	{
 		/* Nope */
 		return (FALSE);
 	}
 
-	/* Get fields */
-	f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
+  /* if a door, check if it is locked or jammed */
+  if (feat->flags & FF_DOOR) {
+	  /* Get fields */
+	  f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
+  } else {
+    f_ptr = NULL;
+  }
 
 	/* If the door is locked / jammed */
 	if (f_ptr)
@@ -774,7 +801,7 @@ bool do_cmd_open_aux(int x, int y)
 		/* Open the door */
 		//cave_set_feat(x, y, FEAT_OPEN);
     if (feat->base_feat) {
-		  cave_set_feat(x, y, feat->base_feat);
+		  cave_set_feat(x, y, the_feat(feat->base_feat));
     } else {
       cave_set_feat(x, y, the_feat(FEAT_OPEN));
     }
@@ -858,16 +885,15 @@ void do_cmd_open(void)
 		o_ptr = chest_check(x, y);
 
 		/* Nothing useful */
-		//if (!((c_ptr->feat == FEAT_CLOSED) || o_ptr))
-		if (!(((feat->flags & FF_DOOR) && (feat->flags & FF_CLOSED)) || o_ptr))
-		{
+		//if (!((c_ptr->feat == FEAT_CLOSED) || o_ptr)) {
+		//if (!(((feat->flags & FF_DOOR) && (feat->flags & FF_CLOSED)) || o_ptr)) {
+		if (!((feat->flags & FF_CLOSED) || o_ptr)) {
 			/* Message */
 			msgf(MSGT_NOTHING_TO_OPEN, "You see nothing there to open.");
 		}
 
 		/* Monster in the way */
-		else if (c_ptr->m_idx)
-		{
+		else if (c_ptr->m_idx) {
 			/* Take a turn */
 			p_ptr->state.energy_use = 100;
 
@@ -879,8 +905,7 @@ void do_cmd_open(void)
 		}
 
 		/* Handle chests */
-		else if (o_ptr)
-		{
+		else if (o_ptr)	{
 			/* Open the chest */
 			more = do_cmd_open_chest(x, y, o_ptr);
 		}
@@ -946,7 +971,7 @@ static bool do_cmd_close_aux(int x, int y)
 		/* Close the door */
 		//cave_set_feat(x, y, FEAT_CLOSED);
     if (feat->base_feat) {
-		  cave_set_feat(x, y, feat->base_feat);
+		  cave_set_feat(x, y, the_feat(feat->base_feat));
     } else {
       cave_set_feat(x, y, the_feat(FEAT_CLOSED));
     }
@@ -1023,7 +1048,8 @@ void do_cmd_close(void)
 
 		/* Require open/broken door */
 		//if ((c_ptr->feat != FEAT_OPEN) && (c_ptr->feat != FEAT_BROKEN))
-    if (!(feat->flags & FF_DOOR) || (feat->flags & FF_CLOSED))
+    //if (!(feat->flags & FF_DOOR) || (feat->flags & FF_CLOSED))
+    if (!(feat->flags & FF_CLOSEABLE) || (feat->flags & FF_BROKEN))
     {
 			/* Message */
 			msgf("You see nothing there to close.");

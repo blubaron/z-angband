@@ -48,7 +48,7 @@ bool new_player_spot(void)
 	if (p_ptr->state.create_up_stair || p_ptr->state.create_down_stair)
 	{
 		byte feat = p_ptr->state.create_up_stair ? FEAT_LESS : FEAT_MORE;
-		
+		feat = the_feat(feat);
 		for (y = p_ptr->min_hgt; y < p_ptr->max_hgt; y++)
 		{
 			for (x = p_ptr->min_wid; x < p_ptr->max_wid; x++)
@@ -161,11 +161,11 @@ void place_random_stairs(int x, int y)
 	/* Place the stairs */
 	if (up_stairs)
 	{
-		set_feat_grid(c_ptr, FEAT_LESS);
+		set_feat_grid(c_ptr, the_feat(FEAT_LESS));
 	}
 	else if (down_stairs)
 	{
-		set_feat_grid(c_ptr, FEAT_MORE);
+		set_feat_grid(c_ptr, the_feat(FEAT_MORE));
 	}
 }
 
@@ -198,21 +198,21 @@ void place_random_door(int x, int y)
 	if (tmp < 300)
 	{
 		/* Create open door */
-		set_feat_grid(c_ptr, FEAT_OPEN);
+		set_feat_grid(c_ptr, the_feat(FEAT_OPEN));
 	}
 
 	/* Broken doors (100/1000) */
 	else if (tmp < 400)
 	{
 		/* Create broken door */
-		set_feat_grid(c_ptr, FEAT_BROKEN);
+		set_feat_grid(c_ptr, the_feat(FEAT_BROKEN));
 	}
 
 	/* Secret doors (200/1000) */
 	else if (tmp < 600)
 	{
 		/* Create secret door */
-		set_feat_grid(c_ptr, FEAT_SECRET);
+		set_feat_grid(c_ptr, the_feat(FEAT_SECRET));
 	}
 
 	/* Closed, locked, or stuck doors (400/1000) */
@@ -245,7 +245,7 @@ void place_closed_door(int x, int y)
 	if (tmp < 300)
 	{
 		/* Create closed door */
-		set_feat_bold(x, y, FEAT_CLOSED);
+		set_feat_bold(x, y, the_feat(FEAT_CLOSED));
 	}
 
 	/* Locked doors (99/400) */

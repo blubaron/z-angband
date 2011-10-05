@@ -1,10 +1,6 @@
 
 
   Maybe Todo:
-    add random approximate level bounty quests back to castle. this would be
-      generated on the fly with quest levels .9*plvl - 1.5*plvl. rewards only
-      gold and xp, no items. maybe add to alchemists as well? (rare potion ingredients)
-
     Finish enchant_pval? what is left to do?
 
     Be able to abandon a quest and get another from the same quest giver after
@@ -35,10 +31,11 @@
       inventory to use, identify, etc. Pickup direct to, fire from, inspect in
       container should still work without using energy.
 
-    change chests so that they are containers, and their objects are generated at drop
-
     want set of tiles per dungeon that use floor, wall, door (open, closed,
       broken), stair up, stair down
+    add generation (incl. vault spec.) and redirection of fountain,
+      window, wall support, and statue.
+
 
     Want new featue types: road a,b town ground a,b, 
 
@@ -63,59 +60,76 @@
       bonus in dungeons so no. After tile multipliers, put to right of
       wilderness name and don't care if it is shown or not.
 
-    Move dungeon type info from tables.c (line 5191) to a file (dungeons.txt and dungeons.raw)
-      use dun_gen_type structure
-      since we have seperate attr/char pairs for each lighting level in
-        features, remove the USE_TRANS flag and add EXIT_DOWN and EXIT_UP flags
-        also add QUEST_DOWN flag.
-      add door, stair, and pillar redirection (8 more bytes per type)
-      add generation (incl. vault spec.) and redirection of rubble, 
-        fountain, window, wall support, and statue.
-
-
     vault symbol changes:
-#    v - treasure or trap
-#    0 - quest boss or item, or monster up to 9 levels OOD and treasure up to 7 levels OOD
-#    1 - monster up to 5 levels out of depth (OOD)
-#    2 - monster up to 12 levels OOD
-#    3 - monster up to 19 levels OOD
-#    4 - monster up to 26 levels OOD
-#    5 - monster up to 33 levels OOD
-#    6 - monster up to 40 levels OOD
-#    7 - monster up to 3 levels OOD and/or treasure up to 7 levels OOD
-#    8 - monster up to 9 levels OOD and treasure up to 7 levels OOD
-#    9 - monster up to 20 levels OOD and treasure up to 10 levels OOD
-#    E - monster up to 30 levels OOD and treasure up to 15 levels OOD
-#    F - monster up to 40 levels OOD and treasure up to 20 levels OOD
+#    & - 50% chance of treasure or trap  formerly *
+#    1 - monster up to 5 levels out of depth (OOD) 4 
+#    2 - monster up to 3 levels OOD and/or treasure up to 7 levels OOD 3/5
+#    3 - monster up to 12 levels OOD 8
+#    4 - monster up to 9 levels OOD and treasure up to 7 levels OOD 6/6
+#    5 - monster up to 16 levels OOD
+#    6 - monster up to 16 levels OOD and treasure up to 10 levels OOD
+#    7 - monster up to 23 levels OOD
+#    8 - monster up to 23 levels OOD and treasure up to 15 levels OOD
+#    9 - monster up to 30 levels OOD
+#    0 - monster up to 30 levels OOD and treasure up to 20 levels OOD
+
+#    = - secret door  formerly +
 
 #    p - pattern start point
 #    a-d - pattern path
 #    P - pattern end - only heals once?
-#    A - pattern ??
+#    A - pattern ?? - normal floor - object 10 levels ood
 #    B - pattern teleport point??
+# A pattern point can only be stepped on from another feature if the feature
+# stepped from has the pattern flag or if the feature stepped from is the
+# floor and the feature with the index before the feature stepped to does
+# not have the pattern flag. A pattern point does damage when stepped
+# on unless the previous point has index-1.
+# 
+# A pattern end point may be stepped on from any feature between two pattern
+# end points or that has the pattern flag.
+# A pattern end point will heal when stepped on (once?) or use another
+# feature for this (non-pattern)?
+# need to hard code pattern start and pattern end? or use pattern|quest|trap
+# to specify start, and pattern|quest to mark end?
 
     vault symbol additions:
-#    = - visible door, locked
-#    - - visible door, unlocked but closed - or open?
+#    Q - quest boss or item, or monster up to 9 levels OOD and treasure up to 7 levels OOD
+#    + - visible door, locked
+#    ' - visible door, open
 #    | - pillar
-#    @ - rubble
+#    : - rubble from FA
 #    < - preferred connection point for corridors, or entry stairs if vault is the level
 #    > - exit stairs if vault is the level, or preferred connection point for corridors
-#    * - vein (quartz or magma)
+#    * - vein (quartz or magma, whichever matches the most adjacent tiles?)
+
+#    $ - "ordinary treasure" from FA
+#    x - chest
+#    ; - tree from FA
+#    ~ - water (river1 type)
+#    @ - water (lake type)
+#    - - water hide monster? (up to 9 levels OOD?)
 
 #    / - ramp up part
 #    \ - ramp down part
 #    o - nothing
-#    ; - fence? (border between floor and nothing)
+#    , - fence? (border between floor and nothing)
 
     vault symbols unchanged
 #    % - outside of the vault, where corridors may be connected
 #    # - granite
 #    X - impenetrable rock
-#    + - secret door
 #    ^ - trap
+#    . - floor
+#   ' '- not part of room
 # other symbols vault specific defined by:
 # V:<sym>:<type>:<id> where type is R, K, F, or T (or g for monster group)
+# M: Message that replaces the normal level feeling?
 FA/DaJangband have extra vault types/chars incorporate, modify above?
 
+
+  Stuff I decided not to do:
+    change chests so that they are containers, and their objects are generated
+      at drop? now that items depend on depth the chest was found at, this is
+      too much work for too little gain.
 

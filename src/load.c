@@ -70,7 +70,7 @@ static u32b x_check = 0L;
  */
 static u32b checksum_base;
 static u32b checksum;
-
+dun_gen_type old_dungeons[];
 
 /*
  * Hack -- Show information on the screen, one line at a time.
@@ -1394,7 +1394,7 @@ static void rd_extra(void)
 
 	/* 48 byte future use area - Brett */
 	/* Read some location information - Brett*/
-  if (sf_version > 61) 
+  if (sf_version >= 62) 
   {
     /* The main home info - Brett*/
 	  rd_s16b(&p_ptr->home_place_num);
@@ -3200,6 +3200,39 @@ static errr rd_savefile_new_aux(void)
 				MAKE(place[i].dungeon, dun_type);
 			}
 			else
+//#if (0)
+      if (sf_version >= 63) {
+				byte dungeon;
+
+				rd_byte(&dungeon);
+        if (dungeon) {
+					dun_type *dun_ptr;
+				  /* Create a dungeon here */
+  				//rd_byte(&tmp8u);
+          //init_dungeon(&(place[i]), &(dungeons[tmp8u]));
+				  MAKE(place[i].dungeon, dun_type);
+
+				  dun_ptr = place[i].dungeon;
+
+          rd_byte(&(dun_ptr->didx));
+          /* load the dungeon info */
+          pick_dungeon(dun_ptr, 0, dun_ptr->didx);
+
+          /* read the stuff that can be overwritten for specific dungeons */
+          /* Levels in dungeon */
+			    rd_byte(&dun_ptr->min_level);
+			    rd_byte(&dun_ptr->max_level);
+			    rd_byte(&dun_ptr->level_change_step);
+          /* dungeon flags */
+				  rd_u32b(&dun_ptr->flags);
+			    /* Rating + feeling */
+			    rd_s16b(&dun_ptr->rating);
+          /* Recall depth */
+			    rd_byte(&dun_ptr->recall_depth);
+
+        }
+      } else
+//#endif
 			{
 				byte dungeon;
 
@@ -3232,23 +3265,24 @@ static errr rd_savefile_new_aux(void)
 						dun_ptr->min_level = 1;
 						dun_ptr->max_level = MAX_DEPTH - 1;
 					}
-
-
+          dun_ptr->level_change_step = 1;
 					/* Rating */
 					rd_s16b(&dun_ptr->rating);
-
 
 					/* Extra dungeon info */
 					if (sf_version > 43)
 					{
 						rd_u16b(&dun_ptr->rooms);
+						rd_byte(&tmp8u);
+            dun_ptr->floor = tmp8u;
+						rd_byte(&tmp8u);
+            dun_ptr->wall = tmp8u;
+						rd_byte(&tmp8u);
+            dun_ptr->perm_wall = tmp8u;
 
-						rd_byte(&dun_ptr->floor);
-						rd_byte(&dun_ptr->wall);
-						rd_byte(&dun_ptr->perm_wall);
-
-						for (j = 0; j < 2; j++) {
-							rd_byte(&dun_ptr->vein[j].deep);
+            for (j = 0; j < 2; j++) {
+							rd_byte(&dun_ptr->vein[j].shal);
+              dun_ptr->vein[j].deep = dun_ptr->vein[j].shal+4;
 							rd_byte(&dun_ptr->vein[j].size);
 							rd_byte(&dun_ptr->vein[j].number);
 						}
@@ -3277,6 +3311,64 @@ static errr rd_savefile_new_aux(void)
 						rd_byte(&dun_ptr->freq_tunnel);
 
 						rd_byte(&dun_ptr->room_limit);
+
+            /* get the dungeon index */
+            for (j=0; j < 32; j++) {
+              dun_gen_type *dg_ptr = &old_dungeons[j];
+              if ((dun_ptr->rooms == dg_ptr->rooms)
+                && (dun_ptr->habitat == dg_ptr->habitat)
+                && (dun_ptr->theme.treasure == dg_ptr->theme.treasure)
+                && (dun_ptr->theme.combat == dg_ptr->theme.combat)
+                && (dun_ptr->theme.magic == dg_ptr->theme.magic)
+                && (dun_ptr->theme.tools == dg_ptr->theme.tools)
+                && (dun_ptr->floor == dg_ptr->floor)
+                && (dun_ptr->wall == dg_ptr->wall)
+                && (dun_ptr->perm_wall == dg_ptr->perm_wall)
+                && (dun_ptr->vein[0].shal == dg_ptr->vein[0].shal)
+                && (dun_ptr->vein[0].size == dg_ptr->vein[0].size)
+                && (dun_ptr->vein[0].number == dg_ptr->vein[0].number)
+                && (dun_ptr->vein[1].deep == dg_ptr->vein[1].shal)
+                && (dun_ptr->vein[1].size == dg_ptr->vein[1].size)
+                && (dun_ptr->vein[1].number == dg_ptr->vein[1].number)
+                && (dun_ptr->river[0].shal == dg_ptr->river[0].shal)
+                && (dun_ptr->river[0].deep == dg_ptr->river[0].deep)
+                && (dun_ptr->river[0].rarity == dg_ptr->river[0].rarity)
+                && (dun_ptr->river[0].size == dg_ptr->river[0].size)
+                && (dun_ptr->river[1].shal == dg_ptr->river[1].shal)
+                && (dun_ptr->river[1].deep == dg_ptr->river[1].deep)
+                && (dun_ptr->river[1].rarity == dg_ptr->river[1].rarity)
+                && (dun_ptr->river[1].size == dg_ptr->river[1].size)
+                && (dun_ptr->lake.shal == dg_ptr->lake.shal)
+                && (dun_ptr->lake.deep == dg_ptr->lake.deep)
+                && (dun_ptr->lake.rarity == dg_ptr->lake.rarity)
+                && (dun_ptr->lake.size == dg_ptr->lake.size)) {
+                dun_ptr->didx = dg_ptr->didx;
+                dun_ptr->rubble = dg_ptr->rubble;
+                dun_ptr->door_closed = dg_ptr->door_closed;
+                dun_ptr->door_open = dg_ptr->door_open;
+                dun_ptr->door_broken = dg_ptr->door_broken;
+                dun_ptr->door_secret = dg_ptr->door_secret;
+                dun_ptr->stairs_up = dg_ptr->stairs_up;
+                dun_ptr->stairs_down = dg_ptr->stairs_down;
+                dun_ptr->stairs_closed = dg_ptr->stairs_closed;
+                dun_ptr->pillar = dg_ptr->pillar;
+                dun_ptr->level_change_step = dg_ptr->level_change_step;
+                break;
+              }
+            }
+            if (j == z_info->dun_max+1) {
+              dun_ptr->didx = 1;
+              dun_ptr->rubble = dungeons[1].rubble;
+              dun_ptr->door_closed = dungeons[1].door_closed;
+              dun_ptr->door_open = dungeons[1].door_open;
+              dun_ptr->door_broken = dungeons[1].door_broken;
+              dun_ptr->door_secret = dungeons[1].door_secret;
+              dun_ptr->stairs_up = dungeons[1].stairs_up;
+              dun_ptr->stairs_down = dungeons[1].stairs_down;
+              dun_ptr->stairs_closed = dungeons[1].stairs_closed;
+              dun_ptr->pillar = dungeons[1].pillar;
+              dun_ptr->level_change_step = 1;
+            }
 
 						rd_u32b(&dun_ptr->flags);
 

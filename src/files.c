@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "grafmode.h"
 
 
 /*
@@ -839,7 +840,20 @@ static cptr process_pref_file_expr(char **sp, char *fp)
 			/* Graphics */
 			else if (streq(b + 1, "GRAF"))
 			{
-				switch (use_graphics)
+        graphics_mode *mode = NULL;
+
+        if (current_graphics_mode
+          && (current_graphics_mode->grafID == use_graphics)) {
+          v = current_graphics_mode->pref;
+        } else {
+          mode = get_graphics_mode(use_graphics);
+          if (mode) {
+            v = mode->pref;
+          } else {
+            v = "error";
+          }
+        }
+				/*switch (use_graphics)
 				{
 					case GRAPHICS_NONE: v = "none";
 						break;
@@ -853,13 +867,13 @@ static cptr process_pref_file_expr(char **sp, char *fp)
 						break;
 					case GRAPHICS_HALF_3D: v = "none";
 						break;
-				}
+				}*/
 			}
-			else if (streq(b + 1, "GRAFC"))
+			/*else if (streq(b + 1, "GRAFC"))
 			{
 				strnfmt(temp_string,32,"%d",use_graphics);
         v = temp_string; /* temp_string will not be used again before the comparison - Brett */
-			}
+			//}
 
 			/* Monochrome mode */
 			else if (streq(b + 1, "MONOCHROME"))
@@ -4125,10 +4139,13 @@ void do_cmd_save_game(int is_autosave)
 	/* Autosaves do not disturb */
 	if (is_autosave)
 	{
-		msgf("Autosaving the game...");
+	  prtf(0, 0, "Autosaving the game...");
+		//msgf("Autosaving the game...");
 	}
 	else
 	{
+  	prtf(0, 0, "Saving the game...");
+		//msgf("Saving the game...");
 		/* Disturb the player */
 		disturb(TRUE);
 	}
@@ -4140,7 +4157,7 @@ void do_cmd_save_game(int is_autosave)
 	handle_stuff();
 
 	/* Message */
-	prtf(0, 0, "Saving game...");
+	//prtf(0, 0, "Saving game...");
 
 	/* Refresh */
 	Term_fresh();
@@ -4154,7 +4171,7 @@ void do_cmd_save_game(int is_autosave)
 	/* Save the player */
 	if (save_player())
 	{
-		prtf(0, 0, "Saving game... done.");
+		prtf(0, 0, "Saving the game... done.");
 	}
 
 	/* Save failed (oops) */
@@ -4184,17 +4201,18 @@ void do_cmd_save_game(int is_autosave)
 		/* Copy the file */
 		char newsf[1024];
 		char oldsf[1024];
-		char buf[1024];
+		//char buf[1024];
 
 		strnfmt(oldsf, 1024, "%s", savefile);
 		/*strnfmt(newsf, 1024, "%s.auto", savefile);
      * add a second autosave slot, for additional protection */
-    if (autosave_freq & 1) {
+    //if (autosave_freq & 1) {
+    if (sf_saves & 1) {
   		strnfmt(newsf, 1024, "%s.auto1", savefile);
-      autosave_freq -= 1;
+      //autosave_freq -= 1;
     } else {
   		strnfmt(newsf, 1024, "%s.auto", savefile);
-      autosave_freq += 1;
+      //autosave_freq += 1;
     }
 
 		/* Grab permissions */
@@ -4216,7 +4234,10 @@ void do_cmd_save_game(int is_autosave)
 			safe_setuid_grab();
 			(void)fd_kill(oldsf);
 			(void)fd_move(newsf,oldsf);
-		}
+    } else {
+      /* do not include this in save count */
+      sf_saves--;
+    }
 	}
 }
 

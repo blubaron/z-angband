@@ -1546,12 +1546,13 @@ static bool cave_gen(dun_type *d_ptr)
 	/* Add some streamers */
 	for (i = 0; i < 2; i++)
 	{
-		treasure_chance = (d_ptr->vein[i].deep == FEAT_MAGMA ? DUN_STR_MC :
-			(d_ptr->vein[i].deep == FEAT_QUARTZ ? DUN_STR_QC : 0));
-		treasure_chance *= (d_ptr->freq_treasure / 100);
+		//treasure_chance = (d_ptr->vein[i].rarity == FEAT_MAGMA ? DUN_STR_MC :
+		//	(d_ptr->vein[i].deep == FEAT_QUARTZ ? DUN_STR_QC : 0));
+    treasure_chance = d_ptr->vein[i].rarity;
+    treasure_chance *= (d_ptr->freq_treasure / 100);
 		for (j = 0; j < d_ptr->vein[i].number; j++)
 		{
-			build_streamer(d_ptr->vein[i].deep, treasure_chance, d_ptr->vein[i].size);
+			build_streamer(d_ptr->vein[i].shal,d_ptr->vein[i].deep, treasure_chance, d_ptr->vein[i].size);
 		}
 	}
 
@@ -1690,6 +1691,11 @@ static bool cave_gen(dun_type *d_ptr)
 				delete_field_location(c_ptr);
 				set_feat_grid(c_ptr, d_ptr->perm_wall);
 			}
+      else
+      {
+				delete_field_location(c_ptr);
+				set_feat_grid(c_ptr, the_feat(c_ptr->feat));
+      }
 		}
 	}
 
@@ -2530,10 +2536,14 @@ void generate_cave(void)
 		dundata->floor = d_ptr->floor;
 
 		/* Default streamer settings */
-		dundata->vein[0].deep = FEAT_MAGMA;
+		dundata->vein[0].shal = FEAT_MAGMA;
+		dundata->vein[0].deep = FEAT_MAGMA_K;
+		dundata->vein[0].rarity = DUN_STR_MC;
 		dundata->vein[0].number = DUN_STR_MAG;
 		dundata->vein[0].size = DUN_STR_RNG;
-		dundata->vein[1].deep = FEAT_QUARTZ;
+		dundata->vein[1].shal = FEAT_QUARTZ;
+		dundata->vein[1].deep = FEAT_QUARTZ_K;
+		dundata->vein[1].rarity = DUN_STR_QC;
 		dundata->vein[1].number = DUN_STR_QUA;
 		dundata->vein[1].size = DUN_STR_RNG;
 
@@ -2631,7 +2641,7 @@ void generate_cave(void)
  * Interprets DUN_TYPES as a set of bits, picks one at random, and uses it to select
  * a dungeon type, and the default dungeon parameters are then copied into d_ptr.
  */
-void pick_dungeon(dun_type * d_ptr, u32b dun_types)
+void pick_dungeon(dun_type * d_ptr, u32b dun_types, s16b idx)
 {
 	byte b = 0;
 	byte num_bits = 0;
@@ -2641,34 +2651,38 @@ void pick_dungeon(dun_type * d_ptr, u32b dun_types)
 	int d_num  = 13;
 	int i;
 
-	/* Hack: make sure there is a type. */
-	if (!dun_types) dun_types = DUN_TYPE_VANILLA;
+  if ((idx >=0 ) && (idx < z_info->dun_max)) {
+	  dg_ptr = &dungeons[idx];
+  } else {
+	  /* Hack: make sure there is a type. */
+	  if (!dun_types) dun_types = DUN_TYPE_VANILLA;
 
-	/* Count the number of bits in dun_types */
-	for (i = 0; i < 32; i++)
-	{
-		if (dun_types & (1 << i)) num_bits++;
-	}
+	  /* Count the number of bits in dun_types */
+	  for (i = 0; i < 32; i++)
+	  {
+		  if (dun_types & (1 << i)) num_bits++;
+	  }
 
-	/* Pick a bit */
-	b = randint0(num_bits);
+	  /* Pick a bit */
+	  b = randint0(num_bits);
 
-	/* Figure out which bit we picked, and set d_num to the number of that bit. */
-	for (i = 0; i < 32; i++)
-	{
-		if (dun_types & (1 << i)) b++;
+	  /* Figure out which bit we picked, and set d_num to the number of that bit. */
+	  for (i = 0; i < 32; i++)
+	  {
+		  if (dun_types & (1 << i)) b++;
 
-		if (b == num_bits)
-		{
-			d_num = i;
-			break;
-		}
-	}
+		  if (b == num_bits)
+		  {
+			  d_num = i+1;
+			  break;
+		  }
+	  }
 
-	/* Find the "gen type */
-	dg_ptr = &dungeons[d_num];
-
+	  /* Find the "gen type */
+	  dg_ptr = &dungeons[d_num];
+  }
 	/* Copy / initialize stuff */
+	d_ptr->didx = dg_ptr->didx;
 	d_ptr->theme.treasure = dg_ptr->theme.treasure;
 	d_ptr->theme.combat = dg_ptr->theme.combat;
 	d_ptr->theme.magic = dg_ptr->theme.magic;
@@ -2678,6 +2692,7 @@ void pick_dungeon(dun_type * d_ptr, u32b dun_types)
 
 	d_ptr->min_level = dg_ptr->min_level;
 	d_ptr->max_level = dg_ptr->max_level;
+	d_ptr->level_change_step = dg_ptr->level_change_step;
 
 	d_ptr->rating = 0;
 	d_ptr->region = 0;
@@ -2691,6 +2706,15 @@ void pick_dungeon(dun_type * d_ptr, u32b dun_types)
 	d_ptr->floor = dg_ptr->floor;
 	d_ptr->wall = dg_ptr->wall;
 	d_ptr->perm_wall = dg_ptr->perm_wall;
+	d_ptr->rubble = dg_ptr->rubble;
+	d_ptr->door_closed = dg_ptr->door_closed;
+	d_ptr->door_open = dg_ptr->door_open;
+	d_ptr->door_broken = dg_ptr->door_broken;
+	d_ptr->door_secret = dg_ptr->door_secret;
+	d_ptr->stairs_up = dg_ptr->stairs_up;
+	d_ptr->stairs_down = dg_ptr->stairs_down;
+	d_ptr->stairs_closed = dg_ptr->stairs_closed;
+	d_ptr->pillar = dg_ptr->pillar;
 
 	for (i = 0; i < 2; i++)
 	{

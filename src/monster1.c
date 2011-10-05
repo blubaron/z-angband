@@ -1518,34 +1518,34 @@ static void roff_mon_aux(int r_idx, int remem)
 
 	/* Collect habitats */
 	vn = 0;
-	if (FLAG(mf_ptr, RF_DUN_DARKWATER)) vp[vn++] = "sewers";
-	if (FLAG(mf_ptr, RF_DUN_LAIR)) vp[vn++] = "lairs";
-	if (FLAG(mf_ptr, RF_DUN_TEMPLE)) vp[vn++] = "evil temples";
-	if (FLAG(mf_ptr, RF_DUN_TOWER)) vp[vn++] = "evil towers";
-	if (FLAG(mf_ptr, RF_DUN_RUIN)) vp[vn++] = "ruins";
-	if (FLAG(mf_ptr, RF_DUN_GRAVE)) vp[vn++] = "graveyards";
-	if (FLAG(mf_ptr, RF_DUN_CAVERN)) vp[vn++] = "caverns";
-	if (FLAG(mf_ptr, RF_DUN_PLANAR)) vp[vn++] = "planar gates";
-	if (FLAG(mf_ptr, RF_DUN_HELL)) vp[vn++] = "gates to hell";
-	if (FLAG(mf_ptr, RF_DUN_HORROR)) vp[vn++] = "dungeons of horror";
-	if (FLAG(mf_ptr, RF_DUN_MINE)) vp[vn++] = "mines";
-	if (FLAG(mf_ptr, RF_DUN_CITY)) vp[vn++] = "outlaw towns";
-	if (FLAG(mf_ptr, RF_WILD_FOREST1)) vp[vn++] = "forests";
-	if (FLAG(mf_ptr, RF_WILD_FOREST2)) vp[vn++] = "thick forests";
-	if (FLAG(mf_ptr, RF_WILD_MOUNT1)) vp[vn++] = "mountains";
-	if (FLAG(mf_ptr, RF_WILD_MOUNT2)) vp[vn++] = "mountains";
-	if (FLAG(mf_ptr, RF_WILD_WASTE1)) vp[vn++] = "deserts";
-	if (FLAG(mf_ptr, RF_WILD_WASTE2)) vp[vn++] = "wastelands";
-	if (FLAG(mf_ptr, RF_WILD_SWAMP1)) vp[vn++] = "marshes";
-	if (FLAG(mf_ptr, RF_WILD_SWAMP2)) vp[vn++] = "swamps";
-	if (FLAG(mf_ptr, RF_WILD_SHORE)) vp[vn++] = "shorelines";
-	if (FLAG(mf_ptr, RF_WILD_OCEAN)) vp[vn++] = "oceans";
-	if (FLAG(mf_ptr, RF_WILD_GRASS)) vp[vn++] = "grasslands";
-	if (FLAG(mf_ptr, RF_WILD_TOWN)) vp[vn++] = "towns";
-	if ((FLAG(mf_ptr, RF_DUN_XTRA1)) || (FLAG(mf_ptr, RF_DUN_XTRA2))
-   || (FLAG(mf_ptr, RF_DUN_XTRA3)) || (FLAG(mf_ptr, RF_DUN_XTRA4))
-   || (FLAG(mf_ptr, RF_DUN_XTRA5)) || (FLAG(mf_ptr, RF_DUN_XTRA6))
-   || (FLAG(mf_ptr, RF_DUN_XTRA7)) || (FLAG(mf_ptr, RF_DUN_XTRA8)))
+	if (FLAG(r_ptr, RF_DUN_DARKWATER)) vp[vn++] = "sewers";
+	if (FLAG(r_ptr, RF_DUN_LAIR)) vp[vn++] = "lairs";
+	if (FLAG(r_ptr, RF_DUN_TEMPLE)) vp[vn++] = "evil temples";
+	if (FLAG(r_ptr, RF_DUN_TOWER)) vp[vn++] = "evil towers";
+	if (FLAG(r_ptr, RF_DUN_RUIN)) vp[vn++] = "ruins";
+	if (FLAG(r_ptr, RF_DUN_GRAVE)) vp[vn++] = "graveyards";
+	if (FLAG(r_ptr, RF_DUN_CAVERN)) vp[vn++] = "caverns";
+	if (FLAG(r_ptr, RF_DUN_PLANAR)) vp[vn++] = "planar gates";
+	if (FLAG(r_ptr, RF_DUN_HELL)) vp[vn++] = "gates to hell";
+	if (FLAG(r_ptr, RF_DUN_HORROR)) vp[vn++] = "dungeons of horror";
+	if (FLAG(r_ptr, RF_DUN_MINE)) vp[vn++] = "mines";
+	if (FLAG(r_ptr, RF_DUN_CITY)) vp[vn++] = "outlaw towns";
+	if (FLAG(r_ptr, RF_WILD_FOREST1)) vp[vn++] = "forests";
+	if (FLAG(r_ptr, RF_WILD_FOREST2)) vp[vn++] = "thick forests";
+	if (FLAG(r_ptr, RF_WILD_MOUNT1)) vp[vn++] = "mountains";
+	if (FLAG(r_ptr, RF_WILD_MOUNT2)) vp[vn++] = "mountains";
+	if (FLAG(r_ptr, RF_WILD_WASTE1)) vp[vn++] = "deserts";
+	if (FLAG(r_ptr, RF_WILD_WASTE2)) vp[vn++] = "wastelands";
+	if (FLAG(r_ptr, RF_WILD_SWAMP1)) vp[vn++] = "marshes";
+	if (FLAG(r_ptr, RF_WILD_SWAMP2)) vp[vn++] = "swamps";
+	if (FLAG(r_ptr, RF_WILD_SHORE)) vp[vn++] = "shorelines";
+	if (FLAG(r_ptr, RF_WILD_OCEAN)) vp[vn++] = "oceans";
+	if (FLAG(r_ptr, RF_WILD_GRASS)) vp[vn++] = "grasslands";
+	if (FLAG(r_ptr, RF_WILD_TOWN)) vp[vn++] = "towns";
+	if ((FLAG(r_ptr, RF_DUN_XTRA1)) || (FLAG(r_ptr, RF_DUN_XTRA2))
+   || (FLAG(r_ptr, RF_DUN_XTRA3)) || (FLAG(r_ptr, RF_DUN_XTRA4))
+   || (FLAG(r_ptr, RF_DUN_XTRA5)) || (FLAG(r_ptr, RF_DUN_XTRA6))
+   || (FLAG(r_ptr, RF_DUN_XTRA7)) || (FLAG(r_ptr, RF_DUN_XTRA8)))
     vp[vn++] = "other places";
 	/* Describe non-effects */
 	if (vn)

@@ -1683,7 +1683,7 @@ void make_lockjam_door(int x, int y, u16b door_feat, int power, bool jam)
 	field_type *f_ptr;
 
 	int old_power = 0;
-  if (door_feat == 0) door_feat = FEAT_CLOSED;
+  if (door_feat == 0) door_feat = the_feat(FEAT_CLOSED);
 
 	/* Overlays are simpler */
 	if (ri_list[cur_region].flags & REGION_OVER)

@@ -72,7 +72,7 @@ static void dump_wild_tile_summary(FILE *fff, int x, int y, int setting)
 				case PL_DUNGEON:
 				{
 					dun_type *d_ptr = pl_ptr->dungeon;
-					froff(fff, "%s %s \n", pos, dungeon_type_name(d_ptr->habitat));
+					froff(fff, "%s %s \n", pos, pl_ptr->name);//dungeon_type_name(d_ptr->habitat));
 					return;
 				}
 				case PL_FARM:

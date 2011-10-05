@@ -47,7 +47,7 @@ wild_building_type wild_build[MAX_CITY_BUILD] =
 	{0, 0, FT_BUILD_PLUS_WEAPON, BT_BUILD, 200, 150, 200, 8},
 	{0, 0, FT_BUILD_PLUS_ARMOUR, BT_BUILD, 200, 150, 200, 8},
 	{0, 0, FT_BUILD_MUTATE, BT_BUILD, 200, 150, 50, 15},
-	{0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
+	{0, 0, FT_BUILD_EMPTY, BT_BUILD, 150, 150, 150, 1},
 	{0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
 	{0, 0, FT_BUILD_MAP, BT_BUILD, 150, 150, 150, 5},
 	{0, 0, FT_STORE_WEAPON1, BT_STORE, 100, 100, 100, 10},
@@ -1614,7 +1614,7 @@ void draw_quest_stair(place_type *pl_ptr)
 		return;
 
 	/* Add special down stairs */
-	set_feat_bold(x, y, FEAT_QUEST_MORE);
+	set_feat_bold(x, y, pl_ptr->dungeon->stairs_closed);//FEAT_QUEST_MORE);
 }
 
 
@@ -1962,7 +1962,7 @@ static void make_dun_buildings(int count, int x_max, int y_max)
  *
  * These draw the entrance on a pre-allocated region.
  */
-static void draw_dun_dark_water(void)
+static void draw_dun_dark_water(dun_type *dun)
 {
 	int i, j;
 
@@ -1984,11 +1984,11 @@ static void draw_dun_dark_water(void)
 		x = rand_range(16 - 4, 16 + 4);
 		y = rand_range(16 - 4, 16 + 4);
 
-		set_feat_bold(x, y, FEAT_RUBBLE);
+		set_feat_bold(x, y, dun->rubble);//FEAT_RUBBLE);
 	}
 
 	/* Add stairs */
-	set_feat_bold(16, 16, FEAT_MORE);
+	set_feat_bold(16, 16, dun->stairs_down);//FEAT_MORE);
 
 	/* Make grids near the stairs "icky" to prevent teleportation */
 	for (i = -8; i <= 8; i++)
@@ -2004,7 +2004,7 @@ static void draw_dun_dark_water(void)
 	entrance_monsters(32, 32);
 }
 
-static void draw_dun_cave(void)
+static void draw_dun_cave(dun_type *dun)
 {
 	int xsize, ysize;
 
@@ -2137,6 +2137,28 @@ static void draw_dun_cave(void)
 		}
 	}
 
+  /* replace the features with dungeon specific ones */
+	for (i = 1; i <= xsize-1; i++) {
+		for (j = 1; j <= ysize-1; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_DIRT) {
+        c_ptr->feat = dun->floor;
+      } else
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->perm_wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
+
 	/* XXX XXX XXX Hack - make sure we have the correct sized region later on */
 	set_feat_bold(xsize, ysize, FEAT_DIRT);
 
@@ -2145,7 +2167,7 @@ static void draw_dun_cave(void)
 	entrance_monsters(xsize, ysize);
 }
 
-static void draw_dun_temple(void)
+static void draw_dun_temple(dun_type *dun)
 {
 	int xsize, ysize;
 	int x0, y0;
@@ -2225,12 +2247,34 @@ static void draw_dun_temple(void)
 		}
 	}
 
+  /* replace the features with dungeon specific ones */
+	for (i = 0; i <= xsize; i++) {
+		for (j = 0; j <= ysize; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_FLOOR_TILE) {
+        c_ptr->feat = dun->floor;
+      } else
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->perm_wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
+
 	/* Add monsters */
 	entrance_monsters(xsize, ysize);
 
 }
 
-static void draw_dun_tower(void)
+static void draw_dun_tower(dun_type *dun)
 {
 	int xsize, ysize;
 	int x0, y0;
@@ -2279,6 +2323,28 @@ static void draw_dun_tower(void)
 		}
 	}
 
+  /* replace the features with dungeon specific ones */
+	for (i = 0; i <= xsize; i++) {
+		for (j = 0; j <= ysize; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_FLOOR_WOOD) {
+        c_ptr->feat = dun->floor;
+      } else
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->perm_wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
+
 	/* Add stairs */
 	set_feat_bold(xsize / 2, ysize / 2, FEAT_MORE);
 
@@ -2286,7 +2352,7 @@ static void draw_dun_tower(void)
 	entrance_monsters(xsize, ysize);
 }
 
-static void draw_dun_ruin(void)
+static void draw_dun_ruin(dun_type *dun)
 {
 	int xsize, ysize;
 	int x0, y0;
@@ -2376,12 +2442,40 @@ static void draw_dun_ruin(void)
 		}
 	}
 
+  /* replace the features with dungeon specific ones */
+	for (i = 0; i <= xsize; i++) {
+		for (j = 0; j <= ysize; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_FLOOR_WOOD) {
+        c_ptr->feat = dun->floor;
+      } else
+      if (c_ptr->feat == FEAT_WALL_OUTER) {
+        c_ptr->feat = dun->wall;
+      } else
+      if (c_ptr->feat == FEAT_RUBBLE) {
+        c_ptr->feat = dun->rubble;
+      } else
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->perm_wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
+
 
 	/* Add monsters */
 	entrance_monsters(xsize, ysize);
 }
 
-static void draw_dun_grave(void)
+static void draw_dun_grave(dun_type *dun)
 {
 	int xsize, ysize;
 	int x0, y0;
@@ -2457,6 +2551,25 @@ static void draw_dun_grave(void)
 		out:;
 	}
 
+  /* replace the features with dungeon specific ones */
+	for (i = 0; i <= xsize; i++) {
+		for (j = 0; j <= ysize; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
+
 	/* Add monsters */
 	entrance_monsters(xsize, ysize);
 }
@@ -2466,7 +2579,7 @@ static void draw_dun_grave(void)
  *
  * XXX XXX Should we have tracks?
  */
-static void draw_dun_mine(void)
+static void draw_dun_mine(dun_type *dun)
 {
 	int x0 = 8, y0 = 8;
 	int i, j;
@@ -2488,6 +2601,19 @@ static void draw_dun_mine(void)
 		{
 			c_ptr = cave_p(x0+i,y0+j);
 			c_ptr->info |= CAVE_ICKY;
+      /* replace the features with dungeon specific ones */
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
 		}
 	}
 
@@ -2495,7 +2621,7 @@ static void draw_dun_mine(void)
 	entrance_monsters(16, 16);
 }
 
-static void draw_dun_city(void)
+static void draw_dun_city(dun_type *dun)
 {
 	int xsize, ysize;
 	int x0, y0;
@@ -2536,6 +2662,23 @@ static void draw_dun_city(void)
 			c_ptr->info |= CAVE_ICKY;
 		}
 	}
+	for (i = 0; i <= xsize; i++) {
+		for (j = 0; j <= ysize; j++) {
+			c_ptr = cave_p(i,j);
+      if (c_ptr->feat == FEAT_PERM_OUTER) {
+        c_ptr->feat = dun->perm_wall;
+      } else
+      if (c_ptr->feat == FEAT_CLOSED) {
+        c_ptr->feat = dun->door_closed;
+      } else
+      if (c_ptr->feat == FEAT_SECRET) {
+        c_ptr->feat = dun->door_secret;
+      } else
+      if (c_ptr->feat == FEAT_MORE) {
+        c_ptr->feat = dun->stairs_down;
+      }
+		}
+	}
 
 	/* Add monsters */
 	entrance_monsters(xsize, ysize);
@@ -2570,13 +2713,15 @@ void draw_dungeon(place_type *pl_ptr)
 	dun_level = pl_ptr->dungeon->min_level + 1;
 
 	/* Hack - no monsters if have been here before */
-	if (pl_ptr->dungeon->recall_depth) dun_habitat = 0;
+  if (pl_ptr->dungeon->recall_depth && !(pl_ptr->dungeon->flags & DF_GUARDED)) {
+    dun_habitat = 0;
+  }
 
 	switch (pl_ptr->dungeon->habitat)
 	{
 		case RF7_DUN_DARKWATER:
 		{
-			draw_dun_dark_water();
+			draw_dun_dark_water(pl_ptr->dungeon);
 
 			break;
 		}
@@ -2585,14 +2730,14 @@ void draw_dungeon(place_type *pl_ptr)
 		case RF7_DUN_CAVERN:
 		case RF7_DUN_HELL:
 		{
-			draw_dun_cave();
+			draw_dun_cave(pl_ptr->dungeon);
 
 			break;
 		}
 
 		case RF7_DUN_TEMPLE:
 		{
-			draw_dun_temple();
+			draw_dun_temple(pl_ptr->dungeon);
 
 			break;
 		}
@@ -2602,35 +2747,35 @@ void draw_dungeon(place_type *pl_ptr)
 		case RF7_DUN_HORROR:
 		case RF7_DUN:
 		{
-			draw_dun_tower();
+			draw_dun_tower(pl_ptr->dungeon);
 
 			break;
 		}
 
 		case RF7_DUN_RUIN:
 		{
-			draw_dun_ruin();
+			draw_dun_ruin(pl_ptr->dungeon);
 
 			break;
 		}
 
 		case RF7_DUN_GRAVE:
 		{
-			draw_dun_grave();
+			draw_dun_grave(pl_ptr->dungeon);
 
 			break;
 		}
 
 		case RF7_DUN_MINE:
 		{
-			draw_dun_mine();
+			draw_dun_mine(pl_ptr->dungeon);
 
 			break;
 		}
 
 		case RF7_DUN_CITY:
 		{
-			draw_dun_city();
+			draw_dun_city(pl_ptr->dungeon);
 
 			break;
 		}
@@ -2649,12 +2794,12 @@ void draw_dungeon(place_type *pl_ptr)
 				for (j = -1; j <= 1; j++)
 				{
 					/* Convert square to dungeon floor */
-					set_feat_bold(x + i, y + j, FEAT_FLOOR);
+					set_feat_bold(x + i, y + j, pl_ptr->dungeon->floor);//FEAT_FLOOR);
 				}
 			}
 
 			/* Add down stairs */
-			set_feat_bold(x, y, FEAT_MORE);
+			set_feat_bold(x, y, pl_ptr->dungeon->stairs_down);//FEAT_MORE);
 		}
 	}
 
@@ -2776,46 +2921,96 @@ static bool blank_spot_nodist(int x, int y, int xsize, int ysize, int town_num, 
 }
 
 
-#define DUN_LIST_NUM		12
-
 /*
  * Pick a type of dungeon from the dungeon list
+ * I do not understand the use of the player depth here
  */
 const dun_gen_type *pick_dungeon_type(void)
 {
 	int tmp, total;
+  int i;
 
+	//const dun_gen_type *d_ptr;
 	const dun_gen_type *d_ptr;
 
 	/* Calculate the total possibilities */
-	for (d_ptr = dungeons, total = 0; d_ptr->habitat; d_ptr++)
-	{
-		/* Count this possibility */
-		if (d_ptr->min_level > p_ptr->depth) continue;
+	//for (d_ptr = dungeons, total = 0; d_ptr->habitat; d_ptr++)
+	//{
+  for (i = 0; i < z_info->dun_max; i++) {
+    if ((dungeons[i].flags) & DF_BASIC) {
+      d_ptr = &(dungeons[i]);
+		  /* Count this possibility */
+		  //if (d_ptr->min_level > p_ptr->depth) continue;
 
-		/* Normal selection */
-		total += MAX_DEPTH * 10 /
-				(p_ptr->depth - d_ptr->min_level + 5);
+		  /* Normal selection */
+		  //total += d_ptr->chance * MAX_DEPTH * 10 /
+		  //		(p_ptr->depth - d_ptr->min_level + 5);
+      total += d_ptr->chance;
+    }
 	}
 
 	/* Pick a random type */
 	tmp = randint0(total);
 
 	/* Find this type */
-	for (d_ptr = dungeons, total = 0; d_ptr->habitat; d_ptr++)
-	{
-		/* Count this possibility */
-		if (d_ptr->min_level > p_ptr->depth) continue;
+	//for (d_ptr = dungeons, total = 0; d_ptr->habitat; d_ptr++)
+	//{
+  for (i = 0; i < z_info->dun_max; i++) {
+    if ((dungeons[i].flags) & DF_BASIC) {
+		  /* Count this possibility */
+		  //if (d_ptr->min_level > p_ptr->depth) continue;
 
-		total += d_ptr->chance * MAX_DEPTH * 10 /
-			(p_ptr->depth - d_ptr->min_level + 5);
+		  //total += d_ptr->chance * MAX_DEPTH * 10 /
+		  //	(p_ptr->depth - d_ptr->min_level + 5);
+      total += d_ptr->chance;
 
-		/* Found the type */
-		if (tmp < total) break;
+		  /* Found the type */
+		  if (tmp < total) break;
+    }
 	}
 
 	/* Return the index of the chosen dungeon */
 	return (d_ptr);
+}
+static int pick_dungeon_type_index(int *rettot)
+{
+	int tmp, total;
+  int i;
+
+  if (rettot) {
+    total = *rettot;
+  } else {
+    total = 0;
+  }
+	/* Calculate the total possibilities */
+  if (total == 0) {
+    for (i = 0; i < z_info->dun_max; i++) {
+      if ((dungeons[i].flags) & DF_BASIC) {
+		    /* Count this possibility */
+        total += dungeons[i].chance;
+      }
+	  }
+    if (rettot) {
+      *rettot = total;
+    }
+  }
+
+	/* Pick a random type */
+	tmp = randint0(total);
+  total = 0;
+	/* Find this type */
+  for (i = 0; i < z_info->dun_max; i++) {
+    if ((dungeons[i].flags) & DF_BASIC) {
+		  /* Count this possibility */
+      total += dungeons[i].chance;
+
+		  /* Found the type */
+		  if (tmp < total) return i;
+    }
+	}
+
+	/* Return the index of the chosen dungeon */
+	return (2);
 }
 
 
@@ -2864,6 +3059,12 @@ static void init_dungeon(place_type *pl_ptr, const dun_gen_type *d_ptr)
 	MAKE(pl_ptr->dungeon, dun_type);
 
 	dt_ptr = pl_ptr->dungeon;
+	
+  dt_ptr->didx = d_ptr->didx;
+	
+  //dt_ptr->rating = 0;
+	//dt_ptr->region = 0;
+	//dt_ptr->recall_depth = 0;
 
 	/* Set the object theme (structure copy) */
 	dt_ptr->theme = d_ptr->theme;
@@ -2874,18 +3075,31 @@ static void init_dungeon(place_type *pl_ptr, const dun_gen_type *d_ptr)
 	/* Save level bounds */
 	dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-20,20));
 	dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-20,20));
+	dt_ptr->level_change_step = d_ptr->level_change_step;
 
 	/* Cap min/max level */
 	if (dt_ptr->min_level < 1)
 		dt_ptr->min_level = 1;
 	if (dt_ptr->max_level > 127)
 		dt_ptr->max_level = 127;
+	if (dt_ptr->level_change_step < 1)
+		dt_ptr->level_change_step = 1;
 
 	/* Copy dungeon creation info */
 	dt_ptr->rooms = d_ptr->rooms;
 	dt_ptr->floor = d_ptr->floor;
 	dt_ptr->wall = d_ptr->wall;
 	dt_ptr->perm_wall = d_ptr->perm_wall;
+
+	dt_ptr->rubble = d_ptr->rubble;
+	dt_ptr->door_closed = d_ptr->door_closed;
+	dt_ptr->door_open = d_ptr->door_open;
+	dt_ptr->door_broken = d_ptr->door_broken;
+	dt_ptr->door_secret = d_ptr->door_secret;
+	dt_ptr->stairs_up = d_ptr->stairs_up;
+	dt_ptr->stairs_down = d_ptr->stairs_down;
+	dt_ptr->stairs_closed = d_ptr->stairs_closed;
+	dt_ptr->pillar = d_ptr->pillar;
 
 	for (i = 0; i < 2; i++)
 	{
@@ -2956,39 +3170,40 @@ byte the_wall_perm(void)
 /* Hack - return the current type of "closed door" */
 byte the_door_closed(void)
 {
-  return FEAT_CLOSED;
+  //return FEAT_CLOSED;
 	/* In the wilderness */
-	//if (!p_ptr->depth) return (FEAT_DIRT);
+	if (!p_ptr->depth) return (FEAT_CLOSED);
 
 	/* In the dungeon */
-	//return (place[p_ptr->place_num].dungeon->floor);
+	return (place[p_ptr->place_num].dungeon->door_closed);
 }
 
 /* Hack - return the current type of "broken door" */
 byte the_door_broken(void)
 {
-  return FEAT_BROKEN;
+  //return FEAT_BROKEN;
 	/* In the wilderness */
-	//if (!p_ptr->depth) return (FEAT_DIRT);
+	if (!p_ptr->depth) return (FEAT_BROKEN);
 
 	/* In the dungeon */
-	//return (place[p_ptr->place_num].dungeon->floor);
+	return (place[p_ptr->place_num].dungeon->door_broken);
 }
 /* Hack - return the current type of "pillar" */
 byte the_pillar(void)
 {
-  return FEAT_PILLAR;
+  //return FEAT_PILLAR;
 	/* In the wilderness */
-	//if (!p_ptr->depth) return (FEAT_DIRT);
+	if (!p_ptr->depth) return (FEAT_PILLAR);
 
 	/* In the dungeon */
-	//return (place[p_ptr->place_num].dungeon->floor);
+	return (place[p_ptr->place_num].dungeon->pillar);
 }
 
 u16b the_feat(u16b feat)
 {
 	if (!p_ptr->depth) 
-  {if (feat == FEAT_FLOOR) return (FEAT_DIRT); 
+  {
+    if (feat == FEAT_FLOOR) return (FEAT_DIRT); 
     return feat;
   }
   switch (feat) {
@@ -2998,6 +3213,27 @@ u16b the_feat(u16b feat)
     return (place[p_ptr->place_num].dungeon->wall);
   case FEAT_PERM_EXTRA:
     return (place[p_ptr->place_num].dungeon->perm_wall);
+  case FEAT_RUBBLE:
+    return (place[p_ptr->place_num].dungeon->rubble);
+
+  case FEAT_CLOSED:
+    return (place[p_ptr->place_num].dungeon->door_closed);
+  case FEAT_OPEN:
+    return (place[p_ptr->place_num].dungeon->door_open);
+  case FEAT_BROKEN:
+    return (place[p_ptr->place_num].dungeon->door_broken);
+  case FEAT_SECRET:
+    return (place[p_ptr->place_num].dungeon->door_secret);
+
+  case FEAT_LESS:
+    return (place[p_ptr->place_num].dungeon->stairs_up);
+  case FEAT_MORE:
+    return (place[p_ptr->place_num].dungeon->stairs_down);
+  case FEAT_QUEST_MORE:
+    return (place[p_ptr->place_num].dungeon->stairs_closed);
+  case FEAT_PILLAR:
+    return (place[p_ptr->place_num].dungeon->pillar);
+
   }
   return feat;
 }
@@ -3072,7 +3308,7 @@ static bool create_towns(int *xx, int *yy)
 				if (!pl_ptr->dungeon)
 				{
 					/* Use sewer */
-					init_dungeon(pl_ptr, &dungeons[0]);
+					init_dungeon(pl_ptr, &dungeons[2]);
 				}
 
 
@@ -3290,6 +3526,7 @@ static void create_dungeons(int xx, int yy)
 	int x, y;
 
 	int best;
+  int basic_count, basic_chance;
 
 	long best_val, score;
 
@@ -3336,17 +3573,38 @@ static void create_dungeons(int xx, int yy)
 		place_count++;
 	}
 
+  basic_count = 0;
+  basic_chance = 0;
+  for (i = 0; i < z_info->dun_max; i++) {
+    if ((dungeons[i].flags) & DF_BASIC) {
+      basic_count++;
+      basic_chance += dungeons[i].chance;
+    }
+	}
+
+
 	/* Select list of dungeon types to use */
 	for (i = 0; i <	NUM_DUNGEON; i++)
 	{
 		/* Make sure we have at least one of each */
-		if (i < DUN_LIST_NUM)
+    /* TODO change this to use basic flags */
+		if (i < basic_count)
 		{
-			dungeon_list[i] = i;
+			dungeon_list[i] = i+2;
+      x = 0;
+      for (j = 0; j < z_info->dun_max; j++) {
+        if ((dungeons[j].flags) & DF_BASIC) {
+          if (x == i) {
+      			dungeon_list[i] = j;
+            break;
+          }
+          x++;
+        }
+	    }
 		}
 		else
 		{
-			dungeon_list[i] = randint0(DUN_LIST_NUM);
+			dungeon_list[i] = pick_dungeon_type_index(&basic_chance);
 		}
 	}
 
@@ -3918,16 +4176,33 @@ void init_vanilla_town(void)
 	}
 
 	/* Create dungeon */
-	MAKE(pl_ptr->dungeon, dun_type);
+  init_dungeon(pl_ptr, &dungeons[1]);
+	d_ptr = pl_ptr->dungeon;
+	d_ptr->max_level = MAX_DEPTH - 1;
+	d_ptr->min_level = 1;
+	d_ptr->level_change_step = 1;
+/*	MAKE(pl_ptr->dungeon, dun_type);
 
 	d_ptr = pl_ptr->dungeon;
 
 	/* Set dungeon depths */
+	/*d_ptr->didx = 13;
 	d_ptr->max_level = MAX_DEPTH - 1;
 	d_ptr->min_level = 1;
 	d_ptr->floor = FEAT_DIRT;
 	d_ptr->wall = FEAT_WALL_EXTRA;
 	d_ptr->perm_wall = FEAT_PERM_EXTRA;
+
+	d_ptr->rubble = FEAT_RUBBLE;
+	d_ptr->door_closed = FEAT_CLOSED;
+	d_ptr->door_open = FEAT_OPEN;
+	d_ptr->door_broken = FEAT_BROKEN;
+	d_ptr->door_secret = FEAT_SECRET;
+	d_ptr->stairs_up = FEAT_LESS;
+	d_ptr->stairs_down = FEAT_MORE;
+	d_ptr->stairs_closed = FEAT_QUEST_MORE;
+	d_ptr->pillar = FEAT_PILLAR;
+
 	d_ptr->habitat = RF7_DUN;
 	d_ptr->rooms = RT_SIMPLE | RT_RVAULT | RT_DENSE | RT_COMPLEX;
 
@@ -3942,10 +4217,14 @@ void init_vanilla_town(void)
 	d_ptr->freq_cavern = 250;
 	d_ptr->freq_tunnel = 100;
 
-	d_ptr->vein[0].deep = FEAT_MAGMA;
+	d_ptr->vein[0].shal = FEAT_MAGMA;
+	d_ptr->vein[0].deep = FEAT_MAGMA_K;
+	d_ptr->river[1].rarity = 90;
 	d_ptr->vein[0].number = 3;
 	d_ptr->vein[0].size = 2;
-	d_ptr->vein[1].deep = FEAT_QUARTZ;
+	d_ptr->vein[1].shal = FEAT_QUARTZ;
+	d_ptr->vein[1].deep = FEAT_QUARTZ_K;
+	d_ptr->river[1].rarity = 40;
 	d_ptr->vein[1].number = 2;
 	d_ptr->vein[1].size = 2;
 
@@ -3958,10 +4237,10 @@ void init_vanilla_town(void)
 	d_ptr->lake.deep = FEAT_DEEP_WATER;
 	d_ptr->lake.shal = FEAT_SHAL_WATER;
 	d_ptr->lake.rarity = 15;
-	d_ptr->lake.size = 66;
+	d_ptr->lake.size = 66;*/
 
 	/* Make the town - and get the location of the stairs */
-	van_town_gen(&place[1]);
+	van_town_gen(pl_ptr);
 
 	place_player_start(&p_ptr->wilderness_x, &p_ptr->wilderness_y, 1);
 

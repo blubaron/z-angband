@@ -304,7 +304,7 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Destroy all open doors */
 			//if ((c_ptr->feat == FEAT_OPEN) || (c_ptr->feat == FEAT_BROKEN) ||
 			//	(c_ptr->feat == FEAT_CLOSED))
-      if ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & FF_HIDDEN))
+      if ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & FF_PERM|FF_HIDDEN))
 			{
 				/* Check line of sight */
 				if (known)
@@ -382,7 +382,7 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) break;
 
       /* general substitution */
-      if (feat_ptr->flags & FF_DIG)
+      if ((feat_ptr->flags & FF_DIG) || (feat_ptr->flags2 & FF_STONE))
       {
 				/* Destroy the wall */
         if (feat_ptr->base_feat) {

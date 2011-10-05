@@ -2358,11 +2358,11 @@ void update_view(void)
 		if (!(player & (GRID_SEEN)))
 		{
 			/* Forget memorized floor grids from view_torch_grids */
-			if (!(info & (CAVE_GLOW)) && !view_torch_grids
+			/*if (!(info & (CAVE_GLOW)) && !view_torch_grids
 				&& !cave_mem_grid(c_ptr))
 			{
 				forget_grid(pc_ptr);
-			}
+			}*/
 
 			/* Clear the GRID_LITE flag */
 			player &= ~(GRID_LITE);
@@ -3239,11 +3239,11 @@ void change_wiz_lite(void)
 			c_ptr = area(x, y);
 
 			/* Forget memorized floor grids from view_torch_grids */
-			if (!(c_ptr->info & (CAVE_GLOW)) && !view_torch_grids
+			/*if (!(c_ptr->info & (CAVE_GLOW)) && !view_torch_grids
 				&& !cave_mem_grid(c_ptr))
 			{
 				forget_grid(parea(x, y));
-			}
+			}*/
 
 			/* Notice the change */
 			note_spot(x, y);

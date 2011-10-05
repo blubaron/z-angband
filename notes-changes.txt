@@ -140,14 +140,6 @@ magic scrolls and general backpacks.
     Implemented 4 sizes of jewelry pouches, food sacks, and weapon belts. Also
       a high level general backpack.
 
-    Allow specifing which graphic files load with a pref line: 
-      I:<elementwidth>:<elementheight>:<filename>{:<filemaskname>}
-      rather than the hard coded sizes and file names in maid-win.c and maid-grf.c
-      .prf files are read in reset_visuals,so need to make sure the images are loaded
-      after reset_visuals is called. I have not changed the code for platforms
-      other than Windows. * this will be reverted and the code will be changed to load
-      a graphics list from a text file, like I wrote for angband.
-
     Also, added a number based test the graf test. So instead of none,old,new,david
       you would have 0,1,2,3. so $GRAF new would be $GRAFC 2
       in the ini file, there is a line Graphics = <number> use this number
@@ -195,7 +187,11 @@ magic scrolls and general backpacks.
       chance of offering find place quests (if not everything has been found),
       mage and thief guilds have a 10% chance of offering find artifact quests,
       as does the large castle. Bounties are offered only if the building does
-      not have any other quest available.
+      not have any other quest available. If on a appropiate level twice as
+      deep as quest level, all remaining creatures for bounty are generated.
+      rewards only gold and xp, no items. maybe add to alchemists as well? (rare
+      potion ingredients)
+
 
     Wrote a tile picker. can load the working tiles and pref file, also tiles and 
         pref file for 2 placeholder sources.
@@ -287,7 +283,7 @@ enum
 	FF_TRAP         = 0x00000400, /* there is a field action here 
 	FF_QUEST        = 0x00000800, /* player can enter a quest level here or it is a quest target itself
 	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature 
-	FF_MARK         = 0x00002000, /* memorized on map when seen
+	FF_MARK         = 0x00002000, /* memorized on map when seen * change to INTERESTING, and all mark
 	//FF_BORING       = 0x00002000, /* not marked if not currently seen? (!MARK)
 	FF_OVERLAY      = 0x00004000, /* draw on top of base feature
 	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path 
@@ -303,15 +299,100 @@ enum
 	FF_WILD         = 0x02000000, /* does this terrain take additional time to cross 
 	FF_LIQUID       = 0x04000000, /* Terrain is water, lava, or acid 
 	FF_DAMAGING     = 0x08000000  /* Terrain damages player like swamp, lava or acid 
-}; ugg. only 4 flags spots left.  trap can be removed? make all features mark?
-      player/monster flying allowed in the terrain?
-      swimming would be liquid+pwalk/mwalk
+	FF_CLOSEABLE    = 0x10000000  /* Terrain (usually door) is open (from FA) 
+	FF_DEEP         = 0x20000000  /* Terrain does double damage or damage to flyers
+	FF_NO_FLYING    = 0x40000000  /* Terrain prohibits levitation,flying monsters cannot pass
+	FF_PROJECT      = 0x80000000, /* projections (bolt,beam,ball,breath) can pass through here (from FA) 
+};
+enum
+{
+	FF_FLOOR        = 0x00000001, /* Terrain is some type of floor (from FA) 
+	FF_WALL         = 0x00000002, /* Terrain is some type of wall (from FA) 
+	FF_TREE         = 0x00000004, /* Terrain is some type of tree (from FA) 
+	FF_ROCK         = 0x00000008, /* Terrain is some type of rock (from FA) 
+	FF_WATERY       = 0x00000010, /* Terrain is water based (from FA) 
+	FF_FIERY        = 0x00000020, /* Terrain is fire based (from FA) 
+	FF_ICY          = 0x00000040, /* Terrain is cold based (from FA) 
+	FF_ACID         = 0x00000080, /* Terrain is acid based
+	FF_ELEC         = 0x00000100, /* Terrain is electricity based 
+	FF_POISON       = 0x00000200, /* Terrain is poisonous 
+	FF_FALL         = 0x00000400, /* Terrain has a sharp height difference (from FA) 
+	FF_TRAPPABLE    = 0x00000800  /* Traps can be put on the terrain (from FA) 
+	FF_NO_SCENT     = 0x00001000, /* terrain blocks monster discovery by scent (from FA) 
+	FF_NO_NOISE     = 0x00002000, /* terrain blocks monster discovery by noise (from FA) 
+	FF_PROTECT      = 0x00004000, /* terrain protects occupant from others' melee/arrows(from FA) 
+	FF_EXPOSE       = 0x00008000, /* terrain makes occupant take more damage from melee/arrows (from FA) 
+	FF_HIDES_OBJ    = 0x00010000, /* no objects are shown on this terrain (but can be still picked up) (from FA) 
+	FF_BURNS        = 0x00020000, /* switches to base when attacked with fire
+	FF_FREEZES      = 0x00040000, /* switches to base when attacked with frost
+	FF_MELTS        = 0x00080000, /* switches to base when attacked with acid 
+	FF_CONDUCTS     = 0x00100000, /* switches to base when attacked with electricity
+	FF_SMELLS       = 0x00200000, /* switches to base when attacked with poison
+	FF_LIGHTSUP     = 0x00400000, /* switches to base when attacked with light
+	FF_DARKENS      = 0x00800000, /* switches to base when attacked with darkness
+	FF_STONE        = 0x01000000, /* switches to base when attacked with stone to mud
+	FF_RUN1         = 0x01000000, /* when starting to run, uses algorithm 2? (from FA) 
+	FF_RUN2         = 0x02000000, /* when starting to run, uses algorithm 3? (from FA) 
+};
+    *added FA flags that seem interesting, not used yet (used all flag and flag2 bits)
 
     *Added GF_PURG_CURSE spell effect, when it hits an object on the ground, if
       cursed, the curse is removed. added effect to purge_area, before the
       kill curse effect. 
      *finish working on project_f
 
+    Chest items now depend on the depth the chest was found at, rather than
+      the difficulty level of the chest's trap. The level used is the average
+      of the depth the chest was found at and the native depth of the chest.
+
+    vault symbol changes:
+#    & - 50% chance of treasure or trap  formerly *
+#    1 - monster up to 5 levels out of depth (OOD) 4 
+#    2 - monster up to 3 levels OOD and/or treasure up to 7 levels OOD 3/5
+#    3 - monster up to 12 levels OOD 8
+#    4 - monster up to 9 levels OOD and treasure up to 7 levels OOD 6/6
+#    5 - monster up to 16 levels OOD
+#    6 - monster up to 16 levels OOD and treasure up to 10 levels OOD
+#    7 - monster up to 23 levels OOD
+#    8 - monster up to 23 levels OOD and treasure up to 15 levels OOD
+#    9 - monster up to 30 levels OOD
+#    0 - monster up to 30 levels OOD and treasure up to 20 levels OOD
+
+#    = - secret door  formerly +
+
+    vault symbol additions:
+#    + - visible door, locked
+#    ' - visible door, open
+#    | - pillar
+#    : - rubble from FA
+#    $ - "ordinary treasure" from FA
+
+    modified main map display so it always uses tile multipliers of 1, whether
+      or not bigtile mode is used.
+
+    *Move dungeon type info from tables.c (line 5191) to a file (dungeons.txt and dungeons.raw)
+      use dun_gen_type structure
+      since we have seperate attr/char pairs for each lighting level in
+        features, remove the USE_TRANS flag and add EXIT_DOWN and EXIT_UP flags
+        also add QUEST_DOWN flag.
+      added door, stair, rubble, and pillar redirection (8 more bytes per type)
+      added dungeon index and level step to dungeon structure
+      added new features and test graphics for cavern and mine dungeons
+      added new features and test graphics for graveyard doors
+      added new features and test graphics for horror/pit dungeons
+      added new features and test graphics for temple/city dungeons
+      *still using static array in tables.c
+
+    renamed edit files not used by tilepicker to more readable name.
+
+    added a graphics mode array that will eventually be populated from
+      a text file for less hardcoded graphics.
+
+    added some code, not tested yet, to specify the damage multiplier on bows.
+
+    moved wilderness and field array initialization from play_game() to init_angband()
+
+    gave empty buildings a door in preparation of being able to buy buildings
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the
@@ -364,4 +445,14 @@ enum
       also made message show all the time when a bounty  monster is generated.
       reverted back to 50% since only one is generated at a time. Since then 
       allow up to a third of what remains to be generated
+    Allow specifing which graphic files load with a pref line: 
+      I:<elementwidth>:<elementheight>:<filename>{:<filemaskname>}
+      rather than the hard coded sizes and file names in maid-win.c and maid-grf.c
+      .prf files are read in reset_visuals,so need to make sure the images are loaded
+      after reset_visuals is called. I have not changed the code for platforms
+      other than Windows. * this will be reverted and the code will be changed to load
+      a graphics list from a text file, like I wrote for angband.
+      removed and added a graphics mode array that will eventually be populated from
+      a text file.
+
 

@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "maid-grf.h"
+#include "grafmode.h"
 
 #ifdef SUPPORT_GAMMA
 
@@ -235,6 +236,39 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 	use_graphics = GRAPHICS_NONE;
 	use_transparency = FALSE;
 
+  current_graphics_mode = get_graphics_mode(graphics);
+  if (current_graphics_mode && current_graphics_mode->file) {
+		/* Try the file */
+		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/%s",current_graphics_mode->file);
+
+		/* Use the file if it exists */
+		if (0 == fd_close(fd_open(filename, O_RDONLY)))
+		{
+			use_transparency = TRUE;
+
+			*xsize = current_graphics_mode->cell_width;
+			*ysize = current_graphics_mode->cell_height;
+		}
+
+		use_graphics = current_graphics_mode->grafID;
+
+		/* Did we change the graphics? */
+		return (old_graphics != use_graphics);
+  } else {
+		/* Try the "8x8.bmp" file */
+		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/8x8.png");
+
+		/* Use the "8x8.bmp" file if it exists */
+		if (0 == fd_close(fd_open(filename, O_RDONLY)))
+		{
+			/* Use graphics */
+			use_graphics = 1;
+
+			*xsize = 8;
+			*ysize = 8;
+		}
+  }
+#if (0)
 	if (graf_width && graf_height)
 	{
     /* WARNING - this assumes that graphics is correct, may not be if
@@ -322,7 +356,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 			*ysize = 8;
 		}
 	}
-
+#endif
 	/* Did we change the graphics? */
 	return (old_graphics != use_graphics);
 }
@@ -351,10 +385,14 @@ void toggle_bigtile(void)
 		Term_bigregion(-1, -1, -1);
 
 		use_bigtile = FALSE;
+    tile_width_mult = 1;
+    tile_height_mult = 1;
 	}
 	else
 	{
 		use_bigtile = TRUE;
+    tile_width_mult = 2;
+    tile_height_mult = 1;
 	}
 
 	/* Hack - redraw everything + recalc bigtile regions */
@@ -1192,6 +1230,8 @@ void do_cmd_view_map(void)
 
 	int cy, cx;
 	int wid, hgt;
+  
+  int tw/*,th*/;
 
 	void (*hook) (void);
 
@@ -1212,6 +1252,10 @@ void do_cmd_view_map(void)
 
 	/* Clear the screen */
 	Term_clear();
+
+  /* store the tile multipliers */
+  tw = use_bigtile;
+  use_bigtile = 0;
 
 	if (p_ptr->depth)
 	{
@@ -1345,6 +1389,9 @@ void do_cmd_view_map(void)
 			}
 		}
 	}
+
+  /* restore the tile multipliers */
+  use_bigtile = tw;
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = hook;
@@ -2106,7 +2153,7 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 	pcave_type *pc_ptr = parea(x, y);
 
 	/* Get the memorized feature */
-	byte feat = pc_ptr->feat;
+	u16b feat = pc_ptr->feat;
 
 	/* Info flags */
 	byte player = pc_ptr->player;
@@ -2114,6 +2161,7 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 	byte a;
 	char c;
 
+  byte lighting = 0;
 	s16b halluc = query_timed(TIMED_IMAGE);
 	bool visible = player & GRID_SEEN;
 	bool glow = c_ptr->info & CAVE_GLOW;
@@ -2179,19 +2227,21 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 		if (view_bright_lite && !query_timed(TIMED_BLIND)
 			//&& (!(f_ptr->flags & FF_BLOCK)
 			&& ((f_ptr->flags & (FF_PWALK|FF_MWALK))
-				|| (view_granite_lite && !view_torch_grids)))
-		{
+				|| (p_ptr->depth && (view_granite_lite && view_torch_grids)))
+		) {
 			/* It's not in view or no lighting effects? */
 			if (((!(player & (GRID_VIEW))) && view_special_lite)
 				|| !visible)
 			{
 		    a = f_ptr->xd_attr;
 		    c = f_ptr->xd_char;
+        lighting = 1;
 			}
 			else if (lite && view_yellow_lite)
 			{
 		    a = f_ptr->xl_attr;
 		    c = f_ptr->xl_char;
+        lighting = 2;
 			}
 		}
 

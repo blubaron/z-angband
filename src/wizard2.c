@@ -151,6 +151,7 @@ static void do_cmd_wiz_hack_mango(int arg)
 /*
  * Learn the whole wilderness map
  */
+void wild_discover(int wx, int wy);
 static void learn_map(void)
 {
 	int i, j;

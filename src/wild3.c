@@ -2212,6 +2212,21 @@ void move_dun_level(int direction, bool magic)
 		set_timed(TIMED_WORD_RECALL, 0, "The air about you becomes charged...",
 			"A tension leaves the air around you...");
 
+  /* modify the levels changed by dungeon */
+  /*if (d_ptr->level_change_step > 1) {
+    int align;
+    direction *= d_ptr->level_change_step;
+    if (p_ptr->depth-d_ptr->min_level == d_ptr->level_change_step) {
+    }
+    align = (p_ptr->depth+direction)%d_ptr->level_change_step;
+    if (align != 0) {
+      //if (direction < 0) {
+      //  direction += align;
+      //} else {
+        direction -= align;
+      //}
+    }
+  }*/
 	/* Change depth */
 	p_ptr->depth += direction;
 
@@ -2222,7 +2237,7 @@ void move_dun_level(int direction, bool magic)
 	if (p_ptr->depth < d_ptr->min_level)
 	{
 		/* We have just decended - and have to decend more? */
-		if (direction == 1)
+		if (direction > 0)
 		{
 			p_ptr->depth = d_ptr->min_level;
 

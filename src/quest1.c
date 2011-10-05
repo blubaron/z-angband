@@ -476,7 +476,7 @@ static u16b insert_boss_quest(u16b r_idx, int x, int y, int p_num)
 		quit ("Couldn't allocate dungeon.");
 	}
 
-	pick_dungeon(d_ptr, d_type);
+	pick_dungeon(d_ptr, d_type, -1);
 
 	/* One level always */
 	d_ptr->min_level = d_ptr->max_level = r_ptr->level;
@@ -556,7 +556,7 @@ static u16b insert_clearout_quest(u16b d_idx, int level, int x, int y, int p_num
 	}
 
 	/* Use dungeon type d_idx */
-	pick_dungeon(d_ptr, 1 << d_idx);
+	pick_dungeon(d_ptr, 1 << d_idx, -1);
 
 	/* Set up level bounds */
 	d_ptr->min_level = level;
@@ -642,7 +642,7 @@ static u16b insert_den_quest(u16b mg_idx, int level, int x, int y, int p_num)
 	}
 
 	/* Pick a dungeon matching the group */
-	pick_dungeon(d_ptr, mg_ptr->d_type);
+	pick_dungeon(d_ptr, mg_ptr->d_type, -1);
 
 	/* Levels */
 	d_ptr->min_level = level;
@@ -770,7 +770,7 @@ static u16b insert_kill_quest(u16b r_idx, int x, int y, int p_num)
 	}
 
 	/* Always use the "Pure Castle" dungeon for this quest type */
-	pick_dungeon(d_ptr, d_type);
+	pick_dungeon(d_ptr, d_type, -1);
 
 	/* One level always */
 	d_ptr->min_level = d_ptr->max_level = r_ptr->level;
@@ -791,7 +791,7 @@ static bool ambiguous (int place_num)
 {
 	static bool init = FALSE;
 	int i, j;
-	char * town_name;
+	//char * town_name;
 	char town_dir[20];
 	char buf1[80];
 	char buf2[80];
@@ -811,10 +811,12 @@ static bool ambiguous (int place_num)
 		{
 			pl_ptr2 = &place[NUM_TOWNS+j];
 
-			strnfmt(buf1, 80, "%s %s of %s", dungeon_type_name(pl_ptr->dungeon->habitat), town_dir,
+			//strnfmt(buf1, 80, "%s %s of %s", dungeon_type_name(pl_ptr->dungeon->habitat), town_dir,
+			strnfmt(buf1, 80, "%s %s of %s", pl_ptr->name, town_dir,
 				describe_quest_location(town_dir, pl_ptr->x, pl_ptr->y, FALSE));
 
-			strnfmt(buf2, 80, "%s %s of %s", dungeon_type_name(pl_ptr2->dungeon->habitat), town_dir,
+			//strnfmt(buf2, 80, "%s %s of %s", dungeon_type_name(pl_ptr2->dungeon->habitat), town_dir,
+			strnfmt(buf2, 80, "%s %s of %s", pl_ptr2->name, town_dir,
 				describe_quest_location(town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
 
 			if (streq(buf1, buf2))
@@ -2217,12 +2219,15 @@ static int create_quest_clearout(store_type * st_ptr, int x, int y, int p_num)
 	(void)st_ptr;
 
 
-	for (i = 0; i < NUM_DUN_TYPES_BASIC; i++)
+	//for (i = 0; i < NUM_DUN_TYPES_BASIC; i++)
+	for (i = 0; i < z_info->dun_max; i++)
 	{
-		/* Is this type going to generate levels at the required depth? */
-		if (dungeons[i].min_level > lev || dungeons[i].max_level < lev) continue;
+    if ((dungeons[i].flags) & DF_BASIC) {
+		  /* Is this type going to generate levels at the required depth? */
+		  if (dungeons[i].min_level > lev || dungeons[i].max_level < lev) continue;
 
-		tot++;
+		  tot++;
+    }
 	}
 
 	/* Paranoia */
@@ -2234,17 +2239,20 @@ static int create_quest_clearout(store_type * st_ptr, int x, int y, int p_num)
 
 	choice = randint1(tot);
 
-	for (i = 0; i < NUM_DUN_TYPES_BASIC; i++)
+	//for (i = 0; i < NUM_DUN_TYPES_BASIC; i++)
+	for (i = 0; i < z_info->dun_max; i++)
 	{
-		/* Is this type going to generate levels at the required depth? */
-		if (dungeons[i].min_level > lev || dungeons[i].max_level < lev) continue;
+    if ((dungeons[i].flags) & DF_BASIC) {
+		  /* Is this type going to generate levels at the required depth? */
+		  if (dungeons[i].min_level > lev || dungeons[i].max_level < lev) continue;
 
-		choice--;
-		if (choice == 0)
-		{
-			d_idx = i;
-			break;
-		}
+		  choice--;
+		  if (choice == 0)
+		  {
+			  d_idx = i;
+			  break;
+		  }
+    }
 	}
 
 	return(insert_clearout_quest(d_idx, lev, x, y, p_num));
@@ -2874,15 +2882,27 @@ void wipe_all_quest_flags(void)
 		a_info[i].flags[2] &= ~TR2_QUESTITEM;
 	}
 	
-	for (i = 0; i < z_info->r_max; i++)
-	{
-		/* Reserve Oberon and the Serpent */
-		if (i == QW_OBERON || i == QW_SERPENT)
-			continue;
-		
-		/* Remove QUESTOR flag */
-		r_info[i].flags[0] &= ~RF0_QUESTOR;
-	}
+	if (amber_monsters) {
+	  for (i = 0; i < z_info->r_max; i++)
+	  {
+		  /* Reserve Oberon and the Serpent */
+		  if (i == QW_OBERON || i == QW_SERPENT)
+			  continue;
+		  
+		  /* Remove QUESTOR flag */
+		  r_info[i].flags[0] &= ~RF0_QUESTOR;
+	  }
+  } else {
+	  for (i = 0; i < z_info->r_max; i++)
+	  {
+		  /* Reserve Oberon and the Serpent */
+		  if (i == QW_SAURON || i == QW_MORGOTH)
+			  continue;
+		  
+		  /* Remove QUESTOR flag */
+		  r_info[i].flags[0] &= ~RF0_QUESTOR;
+	  }
+  }
 }
 	
 	
