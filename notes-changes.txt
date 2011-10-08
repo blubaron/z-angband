@@ -232,8 +232,9 @@ magic scrolls and general backpacks.
         looks for the game name in the path, and does not present the initial
         open dialog box.
       loads flags from an ini file that tell how to load pref files, and which
-        file names to use. flags = 0 for zpa, 847 for angband. the ini file is
-        written using flags determined when the tile picker is run and the ini
+        file names to use, so the game name does not need to be in the path.
+        flags = 0 for zpa, 847 for angband. the ini file is written using flags
+        determined from the file path when the tile picker is run and the ini
         file does not exist.
 
     Changed F: lines in graf-new to add specific dark/bright tiles, same for
@@ -393,6 +394,9 @@ enum
     moved wilderness and field array initialization from play_game() to init_angband()
 
     gave empty buildings a door in preparation of being able to buy buildings
+
+    zymurgists will fully identify an item for a lot of gold (6 times what
+     they charge to identify a pack).
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the
