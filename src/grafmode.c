@@ -53,26 +53,14 @@ graphics_mode graphics_modes[] =
     0,0,0,
     16,16,
     "mod10b-graf.prf",
-    "16x16mod10b.png",
+    "16x16mod.png",
     "16x16 Combined Tiles"},
   {NULL, 5,
     0,0,0,
     32,32,
     "mod10b-graf.prf",
-    "32x32mod10b.png",
-    "32x32 Combined Tiles"},
-  {NULL, 6,
-    0,0,0,
-    12,13,
-    "graf-dvg_old.prf",
-    "12x13.png",
-    "Reduced Gervais Tiles"},
-  {NULL, 7,
-    0,0,0,
-    16,16,
-    "graf-dvg_mod5.prf",
-    "16x16mod5.png",
-    "old 16x16 Combined Tiles"}
+    "32x32mod.png",
+    "32x32 Combined Tiles"}
 };
 int graphics_mode_high_id = 7;
 bool init_graphics_modes(const char *filename) {
