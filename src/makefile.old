@@ -82,7 +82,7 @@ ANGOBJS := $(LUAWOBJS) \
         wizard1.obj wizard2.obj grid.obj streams.obj rooms.obj \
         generate.obj dungeon.obj init1.obj init2.obj \
         effects.obj quest1.obj quest2.obj racial.obj run.obj script.obj \
-        artifact.obj mutation.obj flavor.obj spells3.obj \
+        artifact.obj mutation.obj flavor.obj spells3.obj wild4.obj grafmode.obj\
         mspells1.obj mspells2.obj scores.obj mind.obj maid-x11.obj\
         bldg.obj obj_kind.obj wild1.obj wild2.obj wild3.obj avatar.obj notes.obj\
         main-cap.obj main-gcu.obj main-x11.obj main-xaw.obj main-xpj.obj\
@@ -330,6 +330,8 @@ z-rand.obj: z-rand.h
 z-term.obj: z-term.h z-virt.h
 z-util.obj: z-util.h
 z-virt.obj: z-virt.h z-util.h
+wild4.obj: wild.h grid.h
+grafmode.obj: grafmode.h
 
 ##
 ## Compiling angband.rc

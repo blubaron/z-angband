@@ -43,7 +43,7 @@ OBJS := variable.o tables.o util.o cave.o \
 	artifact.o mutation.o flavor.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o maid-x11.o\
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o\
-	maid-grf.o main-ros.o \
+	maid-grf.o main-ros.o wild4.o grafmode.o\
 	z-util.o z-virt.o z-form.o z-rand.o z-term.o\
 	l-monst.o l-object.o l-player.o l-random.o l-ui.o l-misc.o\
 	l-spell.o l-field.o

@@ -60,6 +60,8 @@ TOLUAOBJS = \
   $(LUAOBJS)
 
 OBJ = \
+	wild4.obj \
+	grafmode.obj \
 	z-virt.obj \
 	z-util.obj \
 	z-term.obj \

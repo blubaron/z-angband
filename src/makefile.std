@@ -98,6 +98,7 @@ ANGOBJS := $(LUAWOBJS) \
 	artifact.o mutation.o flavor.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o maid-x11.o\
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o\
+  grafmode.o wild4.o\
 	main-cap.o main-gcu.o main-x11.o main-xaw.o main-xpj.o\
 	main-lsl.o main-vcs.o main-gtk.o main-win.o main.o \
 	maid-grf.o main-dos.o main-ibm.o main-emx.o \
@@ -718,6 +719,8 @@ z-rand.o: z-rand.h
 z-term.o: z-term.h z-virt.h
 z-util.o: z-util.h
 z-virt.o: z-virt.h z-util.h
+wild4.o: wild.h grid.h
+grafmode.o: grafmode.h
 
 ## Each borg file depends on the ones before it.
 ## Hack - the dependance on the .o files encodes this.

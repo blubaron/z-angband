@@ -24,7 +24,7 @@ NORMOBJS := $(addprefix src/,\
 	generate.o dungeon.o init1.o init2.o \
 	effects.o quest1.o quest2.o racial.o run.o script.o \
 	artifact.o mutation.o flavor.o spells3.o \
-	mspells1.o mspells2.o scores.o mind.o \
+	mspells1.o mspells2.o scores.o mind.o grafmode.o wild4.o \
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o)
 
 ANGOBJS := $(NORMOBJS) $(addprefix src/,\
@@ -163,6 +163,8 @@ src/z-rand.o: src/z-rand.h
 src/z-term.o: src/z-term.h src/z-virt.h
 src/z-util.o: src/z-util.h
 src/z-virt.o: src/z-virt.h src/z-util.h
+src/wild4.o: src/wild.h src/grid.h
+src/grafmode.o: src/grafmode.h
 
 ##
 ## Build wrappers

@@ -25,14 +25,14 @@ COREOBJS := $(LUAWOBJS) \
 	init2.o effects.o quest1.o quest2.o racial.o run.o \
 	artifact.o mutation.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o maid-x11.o bldg.o \
-	obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o maid-grf.o \
+	obj_kind.o wild1.o wild2.o wild3.o wild4.o avatar.o notes.o maid-grf.o \
 	main-cap.o main-gcu.o \
 	main-x11.o main-xaw.o main-xpj.o \
 	main-lsl.o main-vcs.o main-gtk.o main-win.o main.o \
 	main-dos.o main-ibm.o main-emx.o main-ami.o main-tnb.o \
 	z-util.o z-virt.o z-rand.o z-term.o readdib.o \
 	ui.o cmd4.o files.o xtra1.o monster2.o util.o \
-	script.o flavor.o z-form.o
+	script.o flavor.o z-form.o grafmode.o
 
 LUAOBJS := \
 	lua\lapi.o lua\ldebug.o lua\lmem.o lua\lstrlib.o lua\lvm.o \
