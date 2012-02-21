@@ -3,6 +3,8 @@
   Maybe Todo:
     Finish enchant_pval? what is left to do?
 
+    When you die you loose 10% of total exp? 25%?
+
     Be able to abandon a quest and get another from the same quest giver after
       a period of time.
 
@@ -124,6 +126,14 @@
 #   ' '- not part of room
 # other symbols vault specific defined by:
 # V:<sym>:<type>:<id> where type is R, K, F, or T (or g for monster group)
+# V:<sym>:<feat>:<feat_mod_flags>:<r_idx>:<k_idx>:<ego>:<trap>? from Z2.4.0
+# if r_idx < 0 make hero from -r_idx
+# if k_idx < 0 make randart from -k_idx
+# if ego > 0, if k_idx > 0, use k_idx as base if appropiate tval for ego
+# if ego > 0, if k_idx < 0, make randart that includes ego
+# if ego > 0, if k_idx = 0, pick random object for ego
+# if ego < 0 make artifact from -ego?
+# if r_idx, k_idx, or trap start with '*', then the number means out of depth rather than index 
 # M: Message that replaces the normal level feeling?
 FA/DaJangband have extra vault types/chars incorporate, modify above?
 

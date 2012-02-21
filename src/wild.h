@@ -125,6 +125,7 @@ struct wild_building_type
     u16b num;   /* Number in existence */
 	u16b gen;	/* Created */
 	u16b field;	/* Field type, if applicable */
+	u16b base_field;	/* building this one can be upgraded from (0 if cannot be built, itself if from empty) */
 
 	byte type;	/* Type of building */
 
@@ -134,6 +135,9 @@ struct wild_building_type
 	byte law;
 
 	u16b rarity;	/* Rarity of store */
+  /*u16b price;*/ /* price is tens of thousand of gold, upgrade price is price diff * 1.1 */
+  /* price as current would be 10 * rarity */
+  /* effective monster (health/armor/attacks) */
 };
 
 /* Quest generation helper */

@@ -5795,7 +5795,7 @@ dun_gen_type dungeons[] =
 		DF_TRACK | DF_ROAD, NULL},
 
 	/* DUN_TYPE_SEWER */
-	{2,{7, 16, 7, 40}, RF7_DUN_DARKWATER, 1, 30, 1, 1,
+	{2,{7, 16, 7, 40}, RF7_DUN_DARKWATER, 1, 30, 3, 1,
 		100, 0,
 		RT_SIMPLE | RT_NATURAL | RT_ANIMAL | RT_STRANGE,
 		FEAT_DRY_MUD,
@@ -5813,7 +5813,7 @@ dun_gen_type dungeons[] =
 		DF_TRACK | DF_ROAD, NULL},
 
 	/* DUN_TYPE_LAIR */
-	{3,{50, 10, 10, 0}, RF7_DUN_LAIR, 10, 50, 1, 1,
+	{3,{50, 10, 10, 0}, RF7_DUN_LAIR, 10, 50, 3, 1,
 		100, 100,
 		RT_SIMPLE | RT_NATURAL | RT_COMPLEX | RT_RUIN,
 		FEAT_DIRT,
@@ -5831,7 +5831,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC, NULL},
 
 	/* DUN_TYPE_TEMPLE */
-	{4,{10, 30, 30, 30}, RF7_DUN_TEMPLE, 20, 60, 1, 1,
+	{4,{10, 30, 30, 30}, RF7_DUN_TEMPLE, 20, 60, 3, 1,
 		250, 250,
 		RT_SIMPLE | RT_COMPLEX | RT_DENSE | RT_FANCY | RT_BUILDING | RT_CRYPT,
 		180,//FEAT_FLOOR_TILE,
@@ -5849,7 +5849,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_ROAD, NULL},
 
 	/* DUN_TYPE_TOWER */
-	{5,{20, 0, 80, 0}, RF7_DUN_TOWER, 20, 60, 1, 1,
+	{5,{20, 0, 80, 0}, RF7_DUN_TOWER, 20, 60, 3, 1,
 		250, 200,
 		RT_SIMPLE | RT_COMPLEX | RT_BUILDING | RT_RVAULT,
 		FEAT_FLOOR_WOOD,
@@ -5867,7 +5867,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK, NULL},
 
 	/* DUN_TYPE_RUIN */
-	{6,{20, 30, 30, 0}, RF7_DUN_RUIN, 20, 80, 1, 1,
+	{6,{20, 30, 30, 0}, RF7_DUN_RUIN, 20, 80, 3, 1,
 		0, 150,
 		RT_RUIN,
 		FEAT_PEBBLES,
@@ -5885,7 +5885,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK | DF_ROAD, NULL},
 
 	/* DUN_TYPE_GRAVE */
-	{7,{50, 20, 20, 0}, RF7_DUN_GRAVE, 30, 100, 1, 1,
+	{7,{50, 20, 20, 0}, RF7_DUN_GRAVE, 30, 100, 3, 1,
 		50, 150,
 		RT_SIMPLE | RT_COMPLEX | RT_FANCY | RT_CRYPT,
 		FEAT_FLOOR,
@@ -5903,7 +5903,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK | DF_ROAD, NULL},
 
 	/* DUN_TYPE_CAVERN */
-	{8,{30, 30, 30, 10}, RF7_DUN_CAVERN, 40, 80, 1, 1,
+	{8,{30, 30, 30, 10}, RF7_DUN_CAVERN, 40, 80, 3, 1,
 		50, 200,
 		RT_NATURAL | RT_ANIMAL | RT_DENSE | RT_RUIN | RT_RVAULT,
 		FEAT_DIRT,
@@ -5921,7 +5921,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK, NULL},
 
 	/* DUN_TYPE_PLANAR */
-	{9,{30, 30, 40, 0}, RF7_DUN_PLANAR, 40, 127, 1, 1,
+	{9,{30, 30, 40, 0}, RF7_DUN_PLANAR, 40, 127, 3, 1,
 		0, 250,
 		RT_SIMPLE | RT_COMPLEX | RT_DENSE | RT_FANCY | RT_RVAULT,
 		FEAT_SAND,
@@ -5939,7 +5939,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK, NULL},
 
 	/* DUN_TYPE_HELL */
-	{10,{20, 40, 40, 0}, RF7_DUN_HELL, 60, 127, 1, 1,
+	{10,{20, 40, 40, 0}, RF7_DUN_HELL, 60, 127, 3, 1,
 		0, 0,
 		RT_SIMPLE | RT_NATURAL | RT_ANIMAL | RT_DENSE | RT_RUIN |
 		RT_FANCY | RT_RVAULT | RT_STRANGE,
@@ -5958,7 +5958,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC, NULL},
 
 	/* DUN_TYPE_HORROR */
-	{11,{5, 30, 30, 0}, RF7_DUN_HORROR, 80, 127, 1, 1,
+	{11,{5, 30, 30, 0}, RF7_DUN_HORROR, 80, 127, 3, 1,
 		0, 150,
 		RT_SIMPLE | RT_NATURAL | RT_ANIMAL | RT_DENSE | RT_RUIN | RT_STRANGE,
 		180,
@@ -5976,7 +5976,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_TRACK, NULL},
 
 	/* DUN_TYPE_MINE */
-	{12,{10, 20, 10, 40}, RF7_DUN_MINE, 1, 40, 1, 1,
+	{12,{10, 20, 10, 40}, RF7_DUN_MINE, 1, 40, 3, 1,
 		200, 200,
 		RT_SIMPLE | RT_NATURAL | RT_ANIMAL | RT_RUIN | RT_STRANGE,
 		FEAT_DIRT,
@@ -5994,7 +5994,7 @@ dun_gen_type dungeons[] =
 		DF_BASIC | DF_ROAD, NULL},
 
 	/* DUN_TYPE_CITY */
-	{13,{30, 30, 10, 10}, RF7_DUN_CITY, 20, 60, 1, 1,
+	{13,{30, 30, 10, 10}, RF7_DUN_CITY, 20, 60, 3, 1,
 		200, 200,
 		RT_SIMPLE | RT_COMPLEX | RT_DENSE | RT_FANCY | RT_BUILDING |
 		RT_CRYPT | RT_RVAULT | RT_STRANGE,

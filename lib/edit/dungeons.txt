@@ -111,7 +111,7 @@
 
 # Version stamp (required)
 
-V:0.3.3
+V:0.3.4
 
 # 0 -> Placeholder for stuff used in towns
 # W: not used, building wall, city wall, not used

@@ -792,7 +792,8 @@ static bool ambiguous (int place_num)
 	static bool init = FALSE;
 	int i, j;
 	//char * town_name;
-	char town_dir[20];
+	//char town_dir[20];
+	cptr town_dir;
 	char buf1[80];
 	char buf2[80];
 	place_type * pl_ptr;
@@ -812,12 +813,14 @@ static bool ambiguous (int place_num)
 			pl_ptr2 = &place[NUM_TOWNS+j];
 
 			//strnfmt(buf1, 80, "%s %s of %s", dungeon_type_name(pl_ptr->dungeon->habitat), town_dir,
+			//	describe_quest_location(town_dir, pl_ptr->x, pl_ptr->y, FALSE));
 			strnfmt(buf1, 80, "%s %s of %s", pl_ptr->name, town_dir,
-				describe_quest_location(town_dir, pl_ptr->x, pl_ptr->y, FALSE));
+				describe_quest_location(&town_dir, pl_ptr->x, pl_ptr->y, FALSE));
 
 			//strnfmt(buf2, 80, "%s %s of %s", dungeon_type_name(pl_ptr2->dungeon->habitat), town_dir,
+			//	describe_quest_location(&town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
 			strnfmt(buf2, 80, "%s %s of %s", pl_ptr2->name, town_dir,
-				describe_quest_location(town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
+				describe_quest_location(&town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
 
 			if (streq(buf1, buf2))
 			{

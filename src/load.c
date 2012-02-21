@@ -1394,38 +1394,46 @@ static void rd_extra(void)
 
 	/* 48 byte future use area - Brett */
 	/* Read some location information - Brett*/
-  if (sf_version >= 62) 
-  {
+  if (sf_version >= 62) {
     /* The main home info - Brett*/
 	  rd_s16b(&p_ptr->home_place_num);
 	  rd_s16b(&p_ptr->home_store_num);
   } else {
-    place_type *pl_ptr;
+    /* skip the bytes that would be used for the home
+     * and mark to look for an appropriate place later */
     for (i = 0; i < 4; i++) rd_byte(&tmp8u);
-    /* set the home to the first one found */
-	  for (i = 0; i < place_count; i++)
-	  {
-		  pl_ptr = &place[i];
-      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-      {
-	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
-	      {
-          if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
-          {
-            p_ptr->home_place_num = i;
-            p_ptr->home_store_num = tmp16s;
-            break;
-          }
-        }
-        if (i < pl_ptr->numstores)
-        {
-          break;
-        }
-      }
-    }
+    p_ptr->home_place_num = 0;
+    p_ptr->home_store_num = 0;
+  }
+  if (sf_version >= 63) {
+    /* read the palace information */
+	  rd_s16b(&p_ptr->capital_place_num);
+	  rd_s16b(&p_ptr->capital_store_num);
+	  rd_s16b(&p_ptr->capital_dun_num);
+    /* Read the amount of gold in the bank */
+	  rd_u32b(&p_ptr->bank_gold);
+    /* Read the number of owned buildings */
+    rd_byte(&p_ptr->ob_count);
+    /* Read the number of death chests */
+    rd_byte(&p_ptr->dc_count);
+  } else {
+    /* skip the bytes and mark to look for an appropriate place later */
+    for (i = 0; i < 6; i++) rd_byte(&tmp8u);
+    p_ptr->capital_place_num = 0;
+    p_ptr->capital_store_num = 0;
+    p_ptr->capital_dun_num = 0;
+    /* Read the amount of gold in the bank */
+    for (i = 0; i < 4; i++) rd_byte(&tmp8u);
+    p_ptr->bank_gold = 0;
+    /* Read the number of owned buildings */
+    rd_byte(&tmp8u);
+    p_ptr->ob_count = 0;
+    /* Read the number of death chests */
+    rd_byte(&tmp8u);
+    p_ptr->dc_count = 0;
   }
 	/* Future use */
-	for (i = 0; i < 44; i++) rd_byte(&tmp8u);
+	for (i = 0; i < 32; i++) rd_byte(&tmp8u);
 
 	/* Skip the flags */
 	strip_bytes(12);
@@ -3410,6 +3418,127 @@ static errr rd_savefile_new_aux(void)
 		}
 	}
 
+  /* make sure we have a home place set */
+  if ((p_ptr->home_place_num == 0) && p_ptr->place_num) {
+    /* check the place the player is in */
+    place_type *pl_ptr;
+  	s16b tmp16s;
+
+    pl_ptr = &place[p_ptr->place_num];
+    if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+    {
+	    for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
+	    {
+        if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
+        {
+          p_ptr->home_place_num = i;
+          p_ptr->home_store_num = tmp16s;
+          break;
+        }
+      }
+    }
+  }
+  if (p_ptr->home_place_num == 0) {
+    place_type *pl_ptr;
+  	s16b tmp16s;
+    /* set the home to the first one found */
+	  for (i = 0; i < place_count; i++)
+	  {
+		  pl_ptr = &place[i];
+      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+      {
+	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
+	      {
+          if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
+          {
+            p_ptr->home_place_num = i;
+            p_ptr->home_store_num = tmp16s;
+            break;
+          }
+        }
+        if (p_ptr->home_place_num != 0) {
+          break;
+        }
+      }
+    }
+  }
+  /* make sure we have a capital place set */
+  if (p_ptr->capital_place_num == 0) {
+    place_type *pl_ptr;
+  	s16b tmp16s;
+    /* set the palace to the first large castle found */
+	  for (i = 0; i < place_count; i++)
+	  {
+      place_type *pl_ptr;
+		  pl_ptr = &place[i];
+      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+      {
+	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE1)
+          {
+            p_ptr->capital_place_num = i;
+            p_ptr->capital_store_num = tmp16s;
+  	        p_ptr->capital_dun_num = 0;
+            break;
+          }
+        }
+        if (p_ptr->capital_place_num != 0) {
+          break;
+        }
+      }
+    }
+  }
+  if (p_ptr->capital_place_num == 0) {
+    place_type *pl_ptr;
+  	s16b tmp16s;
+    /* if we still haven't found a palace, set it to the first keep found */
+	  for (i = 0; i < place_count; i++)
+	  {
+      place_type *pl_ptr;
+		  pl_ptr = &place[i];
+      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+      {
+	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE0)
+          {
+            p_ptr->capital_place_num = i;
+            p_ptr->capital_store_num = tmp16s;
+  	        p_ptr->capital_dun_num = 0;
+            break;
+          }
+        }
+        if (p_ptr->capital_place_num != 0) {
+          break;
+        }
+      }
+    }
+  }
+  if (p_ptr->capital_place_num == 0) {
+    place_type *pl_ptr;
+  	s16b tmp16s;
+    /* if we still haven't found a palace, set it to the first town hall
+     * found, which is guranteed to exist in the starting town */
+	  for (i = 0; i < place_count; i++)
+	  {
+      place_type *pl_ptr;
+		  pl_ptr = &place[i];
+      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+      {
+	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE2)
+          {
+            p_ptr->capital_place_num = i;
+            p_ptr->capital_store_num = tmp16s;
+  	        p_ptr->capital_dun_num = 0;
+            break;
+          }
+        }
+        if (p_ptr->capital_place_num != 0) {
+          break;
+        }
+      }
+    }
+  }
 
 	/* Read the pet command settings */
 	if (sf_version > 2)

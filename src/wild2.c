@@ -32,132 +32,132 @@ static int wild_stairs_y = 0;
  */
 wild_building_type wild_build[MAX_CITY_BUILD] =
 {
-	{0, 0, FT_STORE_GENERAL, BT_STORE, 100, 150, 150, 2},
-	{0, 0, FT_STORE_ARMOURY, BT_STORE, 150, 150, 100, 1},
-	{0, 0, FT_STORE_WEAPON, BT_STORE, 150, 150, 100, 1},
-	{0, 0, FT_STORE_TEMPLE, BT_STORE, 150, 150, 200, 1},
-	{0, 0, FT_STORE_ALCHEMIST, BT_STORE, 100, 150, 200, 2},
-	{0, 0, FT_STORE_MAGIC, BT_STORE, 200, 150, 200, 1},
-	{0, 0, FT_STORE_BLACK, BT_STORE, 250, 150, 50, 5},
-	{0, 0, FT_STORE_HOME, BT_STORE, 150, 150, 150, 2},
-	{0, 0, FT_STORE_BOOK, BT_STORE, 250, 150, 150, 2},
-	{0, 0, 0, BT_GENERAL, 150, 150, 150, 10},
-	{0, 0, FT_BUILD_WEAPON, BT_BUILD, 100, 150, 150, 5},
-	{0, 0, FT_BUILD_RECHARGE, BT_BUILD, 200, 150, 150, 8},
-	{0, 0, FT_BUILD_PLUS_WEAPON, BT_BUILD, 200, 150, 200, 8},
-	{0, 0, FT_BUILD_PLUS_ARMOUR, BT_BUILD, 200, 150, 200, 8},
-	{0, 0, FT_BUILD_MUTATE, BT_BUILD, 200, 150, 50, 15},
-	{0, 0, FT_BUILD_EMPTY, BT_BUILD, 150, 150, 150, 1},
-	{0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
-	{0, 0, FT_BUILD_MAP, BT_BUILD, 150, 150, 150, 5},
-	{0, 0, FT_STORE_WEAPON1, BT_STORE, 100, 100, 100, 10},
-	{0, 0, FT_STORE_WEAPON2, BT_STORE, 100, 150, 100, 20},
-	{0, 0, FT_STORE_WEAPON3, BT_STORE, 100, 50, 100, 30},
-	{0, 0, FT_STORE_WEAPON4, BT_STORE, 150, 200, 100, 40},
-	{0, 0, FT_STORE_WEAPON5, BT_STORE, 200, 200, 50, 50},
-	{0, 0, FT_STORE_ARMOUR1, BT_STORE, 100, 100, 100, 10},
-	{0, 0, FT_STORE_ARMOUR2, BT_STORE, 100, 150, 100, 20},
-	{0, 0, FT_STORE_ARMOUR3, BT_STORE, 100, 150, 100, 30},
-	{0, 0, FT_STORE_ARMOUR4, BT_STORE, 150, 200, 100, 40},
-	{0, 0, FT_STORE_ARMOUR5, BT_STORE, 200, 250, 50, 50},
-	{0, 0, FT_STORE_SWORD0, BT_STORE, 100, 50, 100, 3},
-	{0, 0, FT_STORE_SWORD1, BT_STORE, 100, 50, 100, 10},
-	{0, 0, FT_STORE_SWORD2, BT_STORE, 100, 100, 100, 20},
-	{0, 0, FT_STORE_SWORD3, BT_STORE, 150, 150, 100, 30},
-	{0, 0, FT_STORE_SWORD4, BT_STORE, 200, 150, 100, 40},
-	{0, 0, FT_STORE_SWORD5, BT_STORE, 200, 200, 50, 50},
-	{0, 0, FT_STORE_SHIELD0, BT_STORE, 100, 100, 100, 3},
-	{0, 0, FT_STORE_SHIELD1, BT_STORE, 100, 100, 100, 10},
-	{0, 0, FT_STORE_SHIELD2, BT_STORE, 100, 150, 100, 20},
-	{0, 0, FT_STORE_SHIELD3, BT_STORE, 150, 150, 100, 30},
-	{0, 0, FT_STORE_SHIELD4, BT_STORE, 200, 200, 50, 40},
-	{0, 0, FT_STORE_SHIELD5, BT_STORE, 200, 250, 50, 50},
-	{0, 0, FT_STORE_AXE0, BT_STORE, 150, 50, 100, 3},
-	{0, 0, FT_STORE_AXE1, BT_STORE, 150, 50, 100, 10},
-	{0, 0, FT_STORE_AXE2, BT_STORE, 150, 100, 100, 20},
-	{0, 0, FT_STORE_AXE3, BT_STORE, 150, 100, 100, 30},
-	{0, 0, FT_STORE_AXE4, BT_STORE, 200, 150, 100, 40},
-	{0, 0, FT_STORE_AXE5, BT_STORE, 200, 150, 50, 50},
-	{0, 0, FT_STORE_AMMO0, BT_STORE, 150, 100, 100, 2},
-	{0, 0, FT_STORE_AMMO1, BT_STORE, 200, 200, 150, 10},
-	{0, 0, FT_STORE_AMMO2, BT_STORE, 250, 250, 150, 30},
-	{0, 0, FT_STORE_FLET0, BT_STORE, 100, 50, 100, 2},
-	{0, 0, FT_STORE_FLET1, BT_STORE, 100, 100, 100, 10},
-	{0, 0, FT_STORE_FLET2, BT_STORE, 150, 150, 150, 30},
-	{0, 0, FT_STORE_FLET3, BT_STORE, 150, 200, 150, 50},
-	{0, 0, FT_STORE_WARHALL0, BT_STORE, 50, 50, 50, 1},
-	{0, 0, FT_STORE_WARHALL1, BT_STORE, 50, 50, 50, 10},
-	{0, 0, FT_STORE_WARHALL2, BT_STORE, 100, 50, 100, 20},
-	{0, 0, FT_STORE_WARHALL3, BT_STORE, 100, 100, 100, 30},
-	{0, 0, FT_STORE_WARHALL4, BT_STORE, 150, 100, 200, 40},
-	{0, 0, FT_STORE_WARHALL5, BT_STORE, 150, 150, 250, 50},
-	{0, 0, FT_STORE_CLOTH0, BT_STORE, 200, 100, 150, 5},
-	{0, 0, FT_STORE_CLOTH1, BT_STORE, 150, 150, 150, 25},
-	{0, 0, FT_STORE_HARMOUR0, BT_STORE, 150, 100, 100, 8},
-	{0, 0, FT_STORE_HARMOUR1, BT_STORE, 150, 100, 100, 20},
-	{0, 0, FT_STORE_HARMOUR2, BT_STORE, 200, 150, 150, 30},
-	{0, 0, FT_STORE_HARMOUR3, BT_STORE, 200, 150, 150, 45},
-	{0, 0, FT_STORE_HARMOUR4, BT_STORE, 250, 200, 200, 60},
-	{0, 0, FT_STORE_HARMOUR5, BT_STORE, 250, 250, 200, 75},
-	{0, 0, FT_STORE_HAT0, BT_STORE, 200, 50, 150, 8},
-	{0, 0, FT_STORE_HAT1, BT_STORE, 200, 150, 150, 20},
-	{0, 0, FT_STORE_HAT2, BT_STORE, 200, 150, 200, 30},
-	{0, 0, FT_STORE_HAT3, BT_STORE, 250, 200, 200, 50},
-	{0, 0, FT_STORE_JEWEL0, BT_STORE, 150, 150, 150, 6},
-	{0, 0, FT_STORE_JEWEL1, BT_STORE, 150, 200, 150, 25},
-	{0, 0, FT_STORE_JEWEL2, BT_STORE, 200, 200, 200, 35},
-	{0, 0, FT_STORE_JEWEL3, BT_STORE, 200, 250, 200, 45},
-	{0, 0, FT_STORE_JEWEL4, BT_STORE, 200, 250, 250, 60},
-	{0, 0, FT_STORE_STATUE0, BT_STORE, 250, 150, 150, 40},
-	{0, 0, FT_STORE_STATUE1, BT_STORE, 250, 150, 150, 50},
-	{0, 0, FT_STORE_FIGUR0, BT_STORE, 200, 200, 150, 20},
-	{0, 0, FT_STORE_FIGUR1, BT_STORE, 200, 200, 200, 30},
-	{0, 0, FT_STORE_POTION0, BT_STORE, 150, 150, 150, 5},
-	{0, 0, FT_STORE_POTION1, BT_STORE, 150, 150, 150, 20},
-	{0, 0, FT_STORE_POTION2, BT_STORE, 200, 200, 200, 30},
-	{0, 0, FT_STORE_POTION3, BT_STORE, 200, 200, 200, 40},
-	{0, 0, FT_STORE_POTION4, BT_STORE, 200, 200, 200, 50},
-	{0, 0, FT_STORE_SCROLL0, BT_STORE, 150, 150, 150, 5},
-	{0, 0, FT_STORE_SCROLL1, BT_STORE, 150, 150, 150, 30},
-	{0, 0, FT_STORE_SCROLL2, BT_STORE, 200, 200, 200, 40},
-	{0, 0, FT_STORE_SCROLL3, BT_STORE, 200, 200, 200, 50},
-	{0, 0, FT_STORE_SCROLL4, BT_STORE, 200, 200, 200, 60},
-	{0, 0, FT_STORE_MAGIC0, BT_STORE, 50, 150, 200, 15},
-	{0, 0, FT_STORE_MAGIC1, BT_STORE, 100, 200, 200, 25},
-	{0, 0, FT_STORE_MAGIC2, BT_STORE, 100, 200, 200, 35},
-	{0, 0, FT_STORE_MAGIC3, BT_STORE, 150, 250, 250, 45},
-	{0, 0, FT_STORE_MAGIC4, BT_STORE, 200, 250, 250, 55},
-	{0, 0, FT_STORE_BOOK1, BT_STORE, 200, 250, 250, 30},
-	{0, 0, FT_STORE_TEMPLE1, BT_STORE, 50, 100, 150, 25},
-	{0, 0, FT_STORE_TEMPLE2, BT_STORE, 100, 150, 150, 35},
-	{0, 0, FT_STORE_TEMPLE3, BT_STORE, 150, 200, 200, 50},
-	{0, 0, FT_STORE_SUPPLIES0, BT_STORE, 150, 50, 150, 8},
-	{0, 0, FT_STORE_SUPPLIES1, BT_STORE, 100, 100, 150, 15},
-	{0, 0, FT_STORE_BLACK1, BT_STORE, 200, 150, 50, 15},
-	{0, 0, FT_STORE_BLACK2, BT_STORE, 200, 200, 50, 25},
-	{0, 0, FT_STORE_ALCHEMY1, BT_STORE, 100, 150, 150, 20},
-	{0, 0, FT_STORE_ALCHEMY2, BT_STORE, 150, 200, 150, 40},
-	{0, 0, FT_STORE_JUNK, BT_STORE, 200, 50, 150, 10},
-	{0, 0, FT_STORE_FOOD, BT_STORE, 200, 100, 150, 1},
-	{0, 0, FT_BUILD_LIBRARY, BT_BUILD, 200, 200, 200, 8},
-	{0, 0, FT_BUILD_CASINO, BT_BUILD, 100, 200, 200, 30},
-	{0, 0, FT_BUILD_INN, BT_BUILD, 100, 100, 200, 1},
-	{0, 0, FT_BUILD_HEALER, BT_BUILD, 250, 250, 200, 10},
-	{0, 0, FT_STORE_BLACK0, BT_STORE, 100, 100, 100, 10},
-	{0, 0, FT_BUILD_MAGETOWER0, BT_BUILD, 100, 150, 100, 4},
-	{0, 0, FT_BUILD_MAGETOWER1, BT_BUILD, 150, 250, 150, 4},
-	{0, 0, FT_BUILD_CASTLE0, BT_BUILD, 100, 150, 150, 0},
-	{0, 0, FT_BUILD_CASTLE1, BT_BUILD, 200, 150, 250, 0},
-	{0, 0, FT_BUILD_WARRIOR_GUILD, BT_BUILD, 150, 150, 150, 10},
-	{0, 0, FT_BUILD_MAGE_GUILD, BT_BUILD, 200, 250, 200, 10},
-	{0, 0, FT_BUILD_CATHEDRAL, BT_BUILD, 250, 200, 200, 10},
-	{0, 0, FT_BUILD_THIEVES_GUILD, BT_BUILD, 100, 100, 100, 4},
-	{0, 0, FT_BUILD_RANGER_GUILD, BT_BUILD, 100, 150, 100, 10},
-	{0, 0, FT_BUILD_COURIER, BT_BUILD, 150, 150, 150, 8},
-	{0, 0, FT_BUILD_FARM, BT_BUILD, 0, 0, 0, 0},
-	{0, 0, FT_BUILD_BLACKSMITH, BT_BUILD, 150, 150, 150, 10},
-	{0, 0, FT_BUILD_BANK, BT_BUILD, 200, 100, 200, 12},
-	{0, 0, FT_BUILD_CASTLE2, BT_BUILD, 0, 150, 150, 0}
+	{0, 0, FT_STORE_GENERAL, FT_STORE_GENERAL, BT_STORE, 100, 150, 150, 2},
+	{0, 0, FT_STORE_ARMOURY, FT_STORE_ARMOURY, BT_STORE, 150, 150, 100, 1},
+	{0, 0, FT_STORE_WEAPON, FT_STORE_WEAPON, BT_STORE, 150, 150, 100, 1},
+	{0, 0, FT_STORE_TEMPLE, FT_STORE_TEMPLE, BT_STORE, 150, 150, 200, 1},
+	{0, 0, FT_STORE_ALCHEMIST, FT_STORE_ALCHEMIST, BT_STORE, 100, 150, 200, 2},
+	{0, 0, FT_STORE_MAGIC, FT_STORE_MAGIC, BT_STORE, 200, 150, 200, 1},
+	{0, 0, FT_STORE_BLACK, FT_STORE_BLACK, BT_STORE, 250, 150, 50, 5},
+	{0, 0, FT_STORE_HOME, FT_STORE_HOME, BT_STORE, 150, 150, 150, 2},
+	{0, 0, FT_STORE_BOOK, FT_STORE_BOOK, BT_STORE, 250, 150, 150, 2},
+	{0, 0, 0, 0, BT_GENERAL, 150, 150, 150, 10},
+	{0, 0, FT_BUILD_WEAPON, FT_BUILD_WEAPON, BT_BUILD, 100, 150, 150, 5},
+	{0, 0, FT_BUILD_RECHARGE, FT_BUILD_RECHARGE, BT_BUILD, 200, 150, 150, 8},
+	{0, 0, FT_BUILD_PLUS_WEAPON, FT_BUILD_PLUS_WEAPON, BT_BUILD, 200, 150, 200, 8},
+	{0, 0, FT_BUILD_PLUS_ARMOUR, FT_BUILD_PLUS_ARMOUR, BT_BUILD, 200, 150, 200, 8},
+	{0, 0, FT_BUILD_MUTATE, FT_BUILD_MUTATE, BT_BUILD, 200, 150, 50, 15},
+	{0, 0, FT_BUILD_EMPTY, 0, BT_BUILD, 150, 150, 150, 1},
+	{0, 0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
+	{0, 0, FT_BUILD_MAP, FT_BUILD_MAP, BT_BUILD, 150, 150, 150, 5},
+	{0, 0, FT_STORE_WEAPON1, FT_STORE_WEAPON, BT_STORE, 100, 100, 100, 10},
+	{0, 0, FT_STORE_WEAPON2, FT_STORE_WEAPON1, BT_STORE, 100, 150, 100, 20},
+	{0, 0, FT_STORE_WEAPON3, FT_STORE_WEAPON2, BT_STORE, 100, 50, 100, 30},
+	{0, 0, FT_STORE_WEAPON4, FT_STORE_WEAPON3, BT_STORE, 150, 200, 100, 40},
+	{0, 0, FT_STORE_WEAPON5, FT_STORE_WEAPON4, BT_STORE, 200, 200, 50, 50},
+	{0, 0, FT_STORE_ARMOUR1, FT_STORE_ARMOURY, BT_STORE, 100, 100, 100, 10},
+	{0, 0, FT_STORE_ARMOUR2, FT_STORE_ARMOUR1, BT_STORE, 100, 150, 100, 20},
+	{0, 0, FT_STORE_ARMOUR3, FT_STORE_ARMOUR2, BT_STORE, 100, 150, 100, 30},
+	{0, 0, FT_STORE_ARMOUR4, FT_STORE_ARMOUR3, BT_STORE, 150, 200, 100, 40},
+	{0, 0, FT_STORE_ARMOUR5, FT_STORE_ARMOUR4, BT_STORE, 200, 250, 50, 50},
+	{0, 0, FT_STORE_SWORD0, FT_STORE_SWORD0, BT_STORE, 100, 50, 100, 3},
+	{0, 0, FT_STORE_SWORD1, FT_STORE_SWORD0, BT_STORE, 100, 50, 100, 10},
+	{0, 0, FT_STORE_SWORD2, FT_STORE_SWORD1, BT_STORE, 100, 100, 100, 20},
+	{0, 0, FT_STORE_SWORD3, FT_STORE_SWORD2, BT_STORE, 150, 150, 100, 30},
+	{0, 0, FT_STORE_SWORD4, FT_STORE_SWORD3, BT_STORE, 200, 150, 100, 40},
+	{0, 0, FT_STORE_SWORD5, FT_STORE_SWORD4, BT_STORE, 200, 200, 50, 50},
+	{0, 0, FT_STORE_SHIELD0, FT_STORE_SHIELD0, BT_STORE, 100, 100, 100, 3},
+	{0, 0, FT_STORE_SHIELD1, FT_STORE_SHIELD0, BT_STORE, 100, 100, 100, 10},
+	{0, 0, FT_STORE_SHIELD2, FT_STORE_SHIELD1, BT_STORE, 100, 150, 100, 20},
+	{0, 0, FT_STORE_SHIELD3, FT_STORE_SHIELD2, BT_STORE, 150, 150, 100, 30},
+	{0, 0, FT_STORE_SHIELD4, FT_STORE_SHIELD3, BT_STORE, 200, 200, 50, 40},
+	{0, 0, FT_STORE_SHIELD5, FT_STORE_SHIELD4, BT_STORE, 200, 250, 50, 50},
+	{0, 0, FT_STORE_AXE0, FT_STORE_AXE0, BT_STORE, 150, 50, 100, 3},
+	{0, 0, FT_STORE_AXE1, FT_STORE_AXE0, BT_STORE, 150, 50, 100, 10},
+	{0, 0, FT_STORE_AXE2, FT_STORE_AXE1, BT_STORE, 150, 100, 100, 20},
+	{0, 0, FT_STORE_AXE3, FT_STORE_AXE2, BT_STORE, 150, 100, 100, 30},
+	{0, 0, FT_STORE_AXE4, FT_STORE_AXE3, BT_STORE, 200, 150, 100, 40},
+	{0, 0, FT_STORE_AXE5, FT_STORE_AXE4, BT_STORE, 200, 150, 50, 50},
+	{0, 0, FT_STORE_AMMO0, FT_STORE_AMMO0, BT_STORE, 150, 100, 100, 2},
+	{0, 0, FT_STORE_AMMO1, FT_STORE_AMMO0, BT_STORE, 200, 200, 150, 10},
+	{0, 0, FT_STORE_AMMO2, FT_STORE_AMMO1, BT_STORE, 250, 250, 150, 30},
+	{0, 0, FT_STORE_FLET0, FT_STORE_FLET0, BT_STORE, 100, 50, 100, 2},
+	{0, 0, FT_STORE_FLET1, FT_STORE_FLET0, BT_STORE, 100, 100, 100, 10},
+	{0, 0, FT_STORE_FLET2, FT_STORE_FLET1, BT_STORE, 150, 150, 150, 30},
+	{0, 0, FT_STORE_FLET3, FT_STORE_FLET2, BT_STORE, 150, 200, 150, 50},
+	{0, 0, FT_STORE_WARHALL0, FT_STORE_WARHALL0, BT_STORE, 50, 50, 50, 1},
+	{0, 0, FT_STORE_WARHALL1, FT_STORE_WARHALL0, BT_STORE, 50, 50, 50, 10},
+	{0, 0, FT_STORE_WARHALL2, FT_STORE_WARHALL1, BT_STORE, 100, 50, 100, 20},
+	{0, 0, FT_STORE_WARHALL3, FT_STORE_WARHALL2, BT_STORE, 100, 100, 100, 30},
+	{0, 0, FT_STORE_WARHALL4, FT_STORE_WARHALL3, BT_STORE, 150, 100, 200, 40},
+	{0, 0, FT_STORE_WARHALL5, FT_STORE_WARHALL4, BT_STORE, 150, 150, 250, 50},
+	{0, 0, FT_STORE_CLOTH0, FT_STORE_CLOTH0, BT_STORE, 200, 100, 150, 5},
+	{0, 0, FT_STORE_CLOTH1, FT_STORE_CLOTH0, BT_STORE, 150, 150, 150, 25},
+	{0, 0, FT_STORE_HARMOUR0, FT_STORE_HARMOUR0, BT_STORE, 150, 100, 100, 8},
+	{0, 0, FT_STORE_HARMOUR1, FT_STORE_HARMOUR0, BT_STORE, 150, 100, 100, 20},
+	{0, 0, FT_STORE_HARMOUR2, FT_STORE_HARMOUR1, BT_STORE, 200, 150, 150, 30},
+	{0, 0, FT_STORE_HARMOUR3, FT_STORE_HARMOUR2, BT_STORE, 200, 150, 150, 45},
+	{0, 0, FT_STORE_HARMOUR4, FT_STORE_HARMOUR3, BT_STORE, 250, 200, 200, 60},
+	{0, 0, FT_STORE_HARMOUR5, FT_STORE_HARMOUR4, BT_STORE, 250, 250, 200, 75},
+	{0, 0, FT_STORE_HAT0, FT_STORE_HAT0, BT_STORE, 200, 50, 150, 8},
+	{0, 0, FT_STORE_HAT1, FT_STORE_HAT0, BT_STORE, 200, 150, 150, 20},
+	{0, 0, FT_STORE_HAT2, FT_STORE_HAT1, BT_STORE, 200, 150, 200, 30},
+	{0, 0, FT_STORE_HAT3, FT_STORE_HAT2, BT_STORE, 250, 200, 200, 50},
+	{0, 0, FT_STORE_JEWEL0, FT_STORE_JEWEL0, BT_STORE, 150, 150, 150, 6},
+	{0, 0, FT_STORE_JEWEL1, FT_STORE_JEWEL0, BT_STORE, 150, 200, 150, 25},
+	{0, 0, FT_STORE_JEWEL2, FT_STORE_JEWEL1, BT_STORE, 200, 200, 200, 35},
+	{0, 0, FT_STORE_JEWEL3, FT_STORE_JEWEL2, BT_STORE, 200, 250, 200, 45},
+	{0, 0, FT_STORE_JEWEL4, FT_STORE_JEWEL3, BT_STORE, 200, 250, 250, 60},
+	{0, 0, FT_STORE_STATUE0, FT_STORE_STATUE0, BT_STORE, 250, 150, 150, 40},
+	{0, 0, FT_STORE_STATUE1, FT_STORE_STATUE0, BT_STORE, 250, 150, 150, 50},
+	{0, 0, FT_STORE_FIGUR0, FT_STORE_FIGUR0, BT_STORE, 200, 200, 150, 20},
+	{0, 0, FT_STORE_FIGUR1, FT_STORE_FIGUR0, BT_STORE, 200, 200, 200, 30},
+	{0, 0, FT_STORE_POTION0, FT_STORE_POTION0, BT_STORE, 150, 150, 150, 5},
+	{0, 0, FT_STORE_POTION1, FT_STORE_POTION0, BT_STORE, 150, 150, 150, 20},
+	{0, 0, FT_STORE_POTION2, FT_STORE_POTION1, BT_STORE, 200, 200, 200, 30},
+	{0, 0, FT_STORE_POTION3, FT_STORE_POTION2, BT_STORE, 200, 200, 200, 40},
+	{0, 0, FT_STORE_POTION4, FT_STORE_POTION3, BT_STORE, 200, 200, 200, 50},
+	{0, 0, FT_STORE_SCROLL0, FT_STORE_SCROLL0, BT_STORE, 150, 150, 150, 5},
+	{0, 0, FT_STORE_SCROLL1, FT_STORE_SCROLL0, BT_STORE, 150, 150, 150, 30},
+	{0, 0, FT_STORE_SCROLL2, FT_STORE_SCROLL1, BT_STORE, 200, 200, 200, 40},
+	{0, 0, FT_STORE_SCROLL3, FT_STORE_SCROLL2, BT_STORE, 200, 200, 200, 50},
+	{0, 0, FT_STORE_SCROLL4, FT_STORE_SCROLL3, BT_STORE, 200, 200, 200, 60},
+	{0, 0, FT_STORE_MAGIC0, FT_STORE_MAGIC, BT_STORE, 50, 150, 200, 15},
+	{0, 0, FT_STORE_MAGIC1, FT_STORE_MAGIC0, BT_STORE, 100, 200, 200, 25},
+	{0, 0, FT_STORE_MAGIC2, FT_STORE_MAGIC1, BT_STORE, 100, 200, 200, 35},
+	{0, 0, FT_STORE_MAGIC3, FT_STORE_MAGIC2, BT_STORE, 150, 250, 250, 45},
+	{0, 0, FT_STORE_MAGIC4, FT_STORE_MAGIC3, BT_STORE, 200, 250, 250, 55},
+	{0, 0, FT_STORE_BOOK1, FT_STORE_BOOK, BT_STORE, 200, 250, 250, 30},
+	{0, 0, FT_STORE_TEMPLE1, FT_STORE_TEMPLE, BT_STORE, 50, 100, 150, 25},
+	{0, 0, FT_STORE_TEMPLE2, FT_STORE_TEMPLE2, BT_STORE, 100, 150, 150, 35},
+	{0, 0, FT_STORE_TEMPLE3, FT_STORE_TEMPLE3, BT_STORE, 150, 200, 200, 50},
+	{0, 0, FT_STORE_SUPPLIES0, FT_STORE_GENERAL, BT_STORE, 150, 50, 150, 8},
+	{0, 0, FT_STORE_SUPPLIES1, FT_STORE_SUPPLIES0, BT_STORE, 100, 100, 150, 15},
+	{0, 0, FT_STORE_BLACK1, FT_STORE_BLACK, BT_STORE, 200, 150, 50, 15},
+	{0, 0, FT_STORE_BLACK2, FT_STORE_BLACK1, BT_STORE, 200, 200, 50, 25},
+	{0, 0, FT_STORE_ALCHEMY1, FT_STORE_ALCHEMIST, BT_STORE, 100, 150, 150, 20},
+	{0, 0, FT_STORE_ALCHEMY2, FT_STORE_ALCHEMY1, BT_STORE, 150, 200, 150, 40},
+	{0, 0, FT_STORE_JUNK, FT_STORE_JUNK, BT_STORE, 200, 50, 150, 10},
+	{0, 0, FT_STORE_FOOD, FT_STORE_FOOD, BT_STORE, 200, 100, 150, 1},
+	{0, 0, FT_BUILD_LIBRARY, FT_BUILD_LIBRARY, BT_BUILD, 200, 200, 200, 8},
+	{0, 0, FT_BUILD_CASINO, FT_BUILD_CASINO, BT_BUILD, 100, 200, 200, 30},
+	{0, 0, FT_BUILD_INN, FT_BUILD_INN, BT_BUILD, 100, 100, 200, 1},
+	{0, 0, FT_BUILD_HEALER, FT_BUILD_HEALER, BT_BUILD, 250, 250, 200, 10},
+	{0, 0, FT_STORE_BLACK0, FT_STORE_JUNK, BT_STORE, 100, 100, 100, 10},
+	{0, 0, FT_BUILD_MAGETOWER0, FT_BUILD_MAGETOWER0, BT_BUILD, 100, 150, 100, 4},
+	{0, 0, FT_BUILD_MAGETOWER1, FT_BUILD_MAGETOWER1, BT_BUILD, 150, 250, 150, 4},
+	{0, 0, FT_BUILD_CASTLE0, FT_BUILD_CASTLE2, BT_BUILD, 100, 150, 150, 0},
+	{0, 0, FT_BUILD_CASTLE1, FT_BUILD_CASTLE2, BT_BUILD, 200, 150, 250, 0},
+	{0, 0, FT_BUILD_WARRIOR_GUILD, FT_BUILD_WARRIOR_GUILD, BT_BUILD, 150, 150, 150, 10},
+	{0, 0, FT_BUILD_MAGE_GUILD, FT_BUILD_MAGE_GUILD, BT_BUILD, 200, 250, 200, 10},
+	{0, 0, FT_BUILD_CATHEDRAL, FT_BUILD_CATHEDRAL, BT_BUILD, 250, 200, 200, 10},
+	{0, 0, FT_BUILD_THIEVES_GUILD, FT_BUILD_THIEVES_GUILD, BT_BUILD, 100, 100, 100, 4},
+	{0, 0, FT_BUILD_RANGER_GUILD, FT_BUILD_RANGER_GUILD, BT_BUILD, 100, 150, 100, 10},
+	{0, 0, FT_BUILD_COURIER, FT_BUILD_COURIER, BT_BUILD, 150, 150, 150, 8},
+	{0, 0, FT_BUILD_FARM, 0, BT_BUILD, 0, 0, 0, 0},
+	{0, 0, FT_BUILD_BLACKSMITH, FT_BUILD_BLACKSMITH, BT_BUILD, 150, 150, 150, 10},
+	{0, 0, FT_BUILD_BANK, FT_BUILD_BANK, BT_BUILD, 200, 100, 200, 12},
+	{0, 0, FT_BUILD_CASTLE2, FT_BUILD_CASTLE2, BT_BUILD, 0, 150, 150, 0}
 };
 
 /* The stores in the starting town */
@@ -204,7 +204,7 @@ void building_char(byte build_type, byte *a, char *c)
 }
 
 /* Find a place for the player */
-static void place_player_start(s32b *x, s32b *y, u16b this_town)
+static void place_player_start(s32b *x, s32b *y, u16b this_town, u16b capital)
 {
 	int tempx, tempy;
 
@@ -229,11 +229,20 @@ static void place_player_start(s32b *x, s32b *y, u16b this_town)
   p_ptr->home_place_num = this_town;
   p_ptr->home_store_num = 0;
   /* using tempx instead of i for the index because it is already here */
-	for (tempx = 0; tempx < place[this_town].numstores; tempx++)
-	{
+	for (tempx = 0; tempx < place[this_town].numstores; tempx++) {
     if (place[this_town].store[tempx].type == BUILD_STORE_HOME)
     {
       p_ptr->home_store_num = tempx;
+      break;
+    }
+	}
+  p_ptr->capital_place_num = capital;
+  p_ptr->capital_store_num = 0;
+  p_ptr->capital_dun_num = 0;
+  for (tempx = 0; tempx < place[capital].numstores; tempx++) {
+    if (place[capital].store[tempx].type == BUILD_CASTLE1)
+    {
+      p_ptr->capital_store_num = tempx;
       break;
     }
 	}
@@ -3073,15 +3082,52 @@ static void init_dungeon(place_type *pl_ptr, const dun_gen_type *d_ptr)
 	dt_ptr->habitat = d_ptr->habitat;
 
 	/* Save level bounds */
-	dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-20,20));
-	dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-20,20));
+  if(d_ptr->level_change_step > 7) {
+    /* if we are using a large step, use the bounds directly, so hopefully
+     * less alignment will be needed when changing dungeon levels */
+    int align;
+	  dt_ptr->min_level = d_ptr->min_level;
+    align = (d_ptr->max_level-d_ptr->min_level) % d_ptr->level_change_step;
+    if (align != 0) {
+      if (align > (d_ptr->level_change_step>>1)) {
+  	    dt_ptr->max_level = d_ptr->max_level + (d_ptr->level_change_step - align);
+      } else {
+  	    dt_ptr->max_level = d_ptr->max_level - align;
+      }
+    } else {
+	    dt_ptr->max_level = d_ptr->max_level;
+    }
+  } else
+  if(d_ptr->level_change_step > 1) {
+    int align;
+    /* the step is not as large so allow some variation */
+	  dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-5,5));
+	  dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-5,5));
+
+    align = (dt_ptr->max_level-dt_ptr->min_level) % d_ptr->level_change_step;
+    if (align != 0) {
+      if (dt_ptr->max_level < d_ptr->max_level) {
+  	    dt_ptr->max_level = dt_ptr->max_level + (d_ptr->level_change_step - align);
+      } else {
+  	    dt_ptr->max_level = dt_ptr->max_level - align;
+      }
+    }
+  } else {
+	  dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-20,20));
+	  dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-20,20));
+  }
 	dt_ptr->level_change_step = d_ptr->level_change_step;
 
 	/* Cap min/max level */
 	if (dt_ptr->min_level < 1)
 		dt_ptr->min_level = 1;
-	if (dt_ptr->max_level > 127)
-		dt_ptr->max_level = 127;
+  if (dt_ptr->max_level > 127) {
+    int align = 0;
+    if (dt_ptr->level_change_step > 1) {
+      align = (127-dt_ptr->min_level)%dt_ptr->level_change_step;
+    }
+		dt_ptr->max_level = 127-align;
+  }
 	if (dt_ptr->level_change_step < 1)
 		dt_ptr->level_change_step = 1;
 
@@ -3473,10 +3519,16 @@ static bool create_towns(int *xx, int *yy)
      * will just have to do without a library */
   }
 
+  /* scan the largest town for a large castle to make the palace
+   * and promote a small castle, keep or townhall to it if necessary
+   * or make an empty spot the large castle
+   * or make a random building the large castle
+   */
+
 	/* Build starting city / town */
 	draw_city(pl_ptr);
 
-	place_player_start(&p_ptr->wilderness_x, &p_ptr->wilderness_y, best_town);
+	place_player_start(&p_ptr->wilderness_x, &p_ptr->wilderness_y, best_town, high_count_place);
 
 	/* Hack - No current region */
 	set_region(0);
@@ -4242,7 +4294,7 @@ void init_vanilla_town(void)
 	/* Make the town - and get the location of the stairs */
 	van_town_gen(pl_ptr);
 
-	place_player_start(&p_ptr->wilderness_x, &p_ptr->wilderness_y, 1);
+	place_player_start(&p_ptr->wilderness_x, &p_ptr->wilderness_y, 1, 1);
 
 	/* One town + 1 for bounds */
 	place_count = 2;

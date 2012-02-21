@@ -92,13 +92,6 @@ bool use_bigtile = FALSE;	/* Use square map tiles */
 byte tile_width_mult = 1;            /* Tile width in units of font width */
 byte tile_height_mult = 1;           /* Tile height in units of font height */
 
-char temp_string[32] = ""; /* temporary string space - be careful no loop overwrites - Brett  */
-char graf_name[32] = ""; /* name of graphics image file - Brett  */
-char graf_mask[32] = ""; /* name of graphics mask file - Brett  */
-byte graf_width = 0; /* width and height of a graphics element in */
-byte graf_height = 0; /* the graphics image file - Brett */
-
-
 bool use_transparency = FALSE;	/* Use transparent tiles */
 
 s16b signal_count;	/* Hack -- Count interupts */

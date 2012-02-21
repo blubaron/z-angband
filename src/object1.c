@@ -94,19 +94,14 @@ void reset_visuals(void)
 		t_ptr->f_char = t_ptr->d_char;
 	}
 
-  graf_width = 0;
-  graf_height = 0;
-  graf_name[0] = 0;
-  graf_mask[0] = 0;
-
   if (use_graphics)
 	{
     graphics_mode *mode = get_graphics_mode(use_graphics);
     if (mode && strstr(mode->pref,".prf")) {
       (void)process_pref_file(mode->pref);
     } else {
-		/* Process "graf.prf" */
-		(void)process_pref_file("graf.prf");
+		  /* Process "graf.prf" */
+		  (void)process_pref_file("graf.prf");
     }
 	}
 

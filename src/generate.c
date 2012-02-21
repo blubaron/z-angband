@@ -2640,6 +2640,7 @@ void generate_cave(void)
 /*
  * Interprets DUN_TYPES as a set of bits, picks one at random, and uses it to select
  * a dungeon type, and the default dungeon parameters are then copied into d_ptr.
+ * alternatively, a specific dungeon can be given in idx
  */
 void pick_dungeon(dun_type * d_ptr, u32b dun_types, s16b idx)
 {

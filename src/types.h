@@ -444,9 +444,21 @@ typedef struct vault_symbol vault_symbol;
 
 struct vault_symbol
 {
+  struct vault_symbol *pNext;
+
 	byte sym;	/* symbol that will be used */
-	byte type;	/* type of id (feature, field, monster, object, monster group, or object tval) */
-	u16b id;	/* id used with the symbol */
+	//byte type;	/* type of id (feature, field, monster, object, monster group, or object tval) */
+	//u16b id;	/* id used with the symbol */
+  byte flags;
+	u16b feat;	/* feature used */
+	u16b feat_mod_flags;	/* feature used */
+	s16b r_idx;	/* monster race - if r_idx < 0 make hero from -r_idx */
+	s16b k_idx;	/* object kind - if k_idx < 0 make randart from -k_idx */
+	s16b ego;	  /* ego used or artifact idx - if ego < 0 make artifact from -ego */
+	u16b trap;	/* trap/field used on the spot */
+  /* if r_idx, k_idx, or trap start with '*', then the number means out
+   * of depth rather than index
+   */
 };
 
 /*
@@ -470,7 +482,8 @@ struct vault_type
 	byte hgt;	/* Vault height */
 	byte wid;	/* Vault width */
 
-  vault_symbol symbols[8];
+  vault_symbol *pSymbols;
+  //vault_symbol symbols[8];
   u16b vidx;
 };
 
@@ -1630,6 +1643,9 @@ struct player_type
 	s16b place_num;	/* Current place number in the wilderness */
 	s16b home_place_num;	/* Place of primary home - default is starting town */
 	s16b home_store_num;	/* Which building of place is primary home - default is home in starting town */
+	s16b capital_place_num;	/* Place of the palace (capital building) */
+	s16b capital_store_num;	/* Which building of capital place is the actual capital */
+	s16b capital_dun_num;	/* Which building of capital place is the dungeon of the capital building */
 
 	s32b wilderness_x;	/* Coordinates in the wilderness */
 	s32b wilderness_y;
@@ -1771,7 +1787,30 @@ struct player_type
 	bool options[OPT_PLAYER];
 	bool birth[OPT_BIRTH];
 	u32b squelch[(SQUELCHMAX/32)];
+
+  u32b bank_gold;
+  byte ob_count;
+  byte dc_count;
+  //byte qb_count;
+  //byte ql_count;
+  //struct quest_building_info *quest_buildings;
+  //struct quest_building_info *owned_buildings;
+  //struct quest_level_info *quest_levels;
+  //struct quest_level_info *death_chests;
 };
+/*typedef struct quest_building_info {
+  byte questid;
+  byte flags;
+  s16b place;
+  s16b building;
+};
+typedef struct quest_level_info {
+  byte questid;
+  byte flags;
+  s16b place;
+  s16b level;
+};
+*/
 
 typedef struct player_rebirth_type player_rebirth_type;
 

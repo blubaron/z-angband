@@ -239,7 +239,8 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
   current_graphics_mode = get_graphics_mode(graphics);
   if (current_graphics_mode && current_graphics_mode->file) {
 		/* Try the file */
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/%s",current_graphics_mode->file);
+		//path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/%s",current_graphics_mode->file);
+		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",current_graphics_mode->file));
 
 		/* Use the file if it exists */
 		if (0 == fd_close(fd_open(filename, O_RDONLY)))

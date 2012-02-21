@@ -140,15 +140,6 @@ magic scrolls and general backpacks.
     Implemented 4 sizes of jewelry pouches, food sacks, and weapon belts. Also
       a high level general backpack.
 
-    Also, added a number based test the graf test. So instead of none,old,new,david
-      you would have 0,1,2,3. so $GRAF new would be $GRAFC 2
-      in the ini file, there is a line Graphics = <number> use this number
-      with the [EQU $GRAFC <number>] test in graf-win.prf. Works so don't need
-      to recompile except to add a number to the graphics list, which we don't
-      need to do if we do not change the graphics. I left $GRAF in for backwards
-      compatibility. * this will be reverted and the code will be changed to load
-      a graphics list from a text file, like I wrote for angband.
- 
    Added a second backup to rotate with for autosave_b. tests if autosave_freq
       is odd or even when deciding which suffix to use, and adds or subtracts 1
       so that the other suffix would be used next time. odd is even+1
@@ -386,8 +377,8 @@ enum
 
     renamed edit files not used by tilepicker to more readable name.
 
-    added a graphics mode array that will eventually be populated from
-      a text file for less hardcoded graphics.
+    added a graphics mode array that is populated from a text file for
+      less hardcoded graphics.
 
     added some code, not tested yet, to specify the damage multiplier on bows.
 
@@ -396,7 +387,16 @@ enum
     gave empty buildings a door in preparation of being able to buy buildings
 
     zymurgists will fully identify an item for a lot of gold (6 times what
-     they charge to identify a pack).
+      they charge to identify a pack).
+
+    dungeons can skip levels within their range. the dungeon level skip is
+      given just after the max dungeon level in the dungeon type info.
+      Tested with sewers, but what happens around dl 99,100 has not been tested.
+
+    added functions to load a graphics list from a text file, like I wrote for angband.
+
+    store and save the largest town, so a castle in it could be used as a palace for quest purposes.
+    store and save the number of owned buildings and death chests, for future use.
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the
@@ -458,5 +458,14 @@ enum
       a graphics list from a text file, like I wrote for angband.
       removed and added a graphics mode array that will eventually be populated from
       a text file.
+    Also, added a number based test the graf test. So instead of none,old,new,david
+      you would have 0,1,2,3. so $GRAF new would be $GRAFC 2
+      in the ini file, there is a line Graphics = <number> use this number
+      with the [EQU $GRAFC <number>] test in graf-win.prf. Works so don't need
+      to recompile except to add a number to the graphics list, which we don't
+      need to do if we do not change the graphics. I left $GRAF in for backwards
+      compatibility. * this will be reverted and the code will be changed to load
+      a graphics list from a text file, like I wrote for angband.
+ 
 
 

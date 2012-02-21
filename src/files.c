@@ -638,32 +638,6 @@ errr process_pref_file_command(char *buf)
 		}
 	}
 
-	/* Process "I:<elementwidth>:<elementheight>:<filename>:<maskname>"
-     -- image info used with graphic files */
-	else if (buf[0] == 'I')
-	{
-    byte count = tokenize(buf + 2, 4, zz, TOKENIZE_CHECKQUOTE);
-		if (count > 2)
-		{
-      graf_width = (byte)strtol(zz[0], NULL, 0);
-      graf_height = (byte)strtol(zz[1], NULL, 0);
-      if (strlen(zz[2]) >= 32) {
-      	/* Failure */
-        return (1);
-      }
-   	  text_to_ascii(graf_name, zz[2]);
-	  	if (count > 3) {
-        if (strlen(zz[3]) >= 32) {
-      	  /* Failure */
-          return (1);
-        }
-	  	  text_to_ascii(graf_mask, zz[3]);
-      }
-			/* Success */
-			return (0);
-		}
-	}
-
 
 	/* Failure */
 	return (1);
@@ -853,27 +827,7 @@ static cptr process_pref_file_expr(char **sp, char *fp)
             v = "error";
           }
         }
-				/*switch (use_graphics)
-				{
-					case GRAPHICS_NONE: v = "none";
-						break;
-					case GRAPHICS_ORIGINAL: v = "old";
-						break;
-					case GRAPHICS_ADAM_BOLT: v = "new";
-						break;
-					case GRAPHICS_DAVID_GERVAIS: v = "david";
-						break;
-					case GRAPHICS_ANY: v = "error";
-						break;
-					case GRAPHICS_HALF_3D: v = "none";
-						break;
-				}*/
-			}
-			/*else if (streq(b + 1, "GRAFC"))
-			{
-				strnfmt(temp_string,32,"%d",use_graphics);
-        v = temp_string; /* temp_string will not be used again before the comparison - Brett */
-			//}
+      }
 
 			/* Monochrome mode */
 			else if (streq(b + 1, "MONOCHROME"))

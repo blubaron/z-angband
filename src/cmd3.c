@@ -2160,7 +2160,7 @@ bool destroy_squelched_item(object_type *o_ptr, int amt)
 static bool item_tester_hook_organizable(const object_type *o_ptr)
 {
 	byte amt = o_ptr->number;
-	byte *num = &o_ptr->number;
+	byte *num = &(o_ptr->number);
 	bool test = FALSE;
 	object_type * j_ptr;
 

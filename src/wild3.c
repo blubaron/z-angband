@@ -2213,21 +2213,25 @@ void move_dun_level(int direction, bool magic)
 			"A tension leaves the air around you...");
 
   /* modify the levels changed by dungeon */
-  /*if (d_ptr->level_change_step > 1) {
-    int align;
-    direction *= d_ptr->level_change_step;
-    if (p_ptr->depth-d_ptr->min_level == d_ptr->level_change_step) {
+  if (d_ptr->level_change_step > 1) {
+   	if ((p_ptr->depth < d_ptr->min_level) && (direction > 0)) {
+      direction = d_ptr->min_level-p_ptr->depth;
+    } else {
+      int align;
+      direction *= d_ptr->level_change_step;
+
+      align = (p_ptr->depth-d_ptr->min_level)%d_ptr->level_change_step;
+      if (align != 0) {
+        if (direction < 0) {
+          direction += (d_ptr->level_change_step - align);
+        } else {
+          direction -= align;
+        }
+      }
     }
-    align = (p_ptr->depth+direction)%d_ptr->level_change_step;
-    if (align != 0) {
-      //if (direction < 0) {
-      //  direction += align;
-      //} else {
-        direction -= align;
-      //}
-    }
-  }*/
-	/* Change depth */
+  }
+
+  /* Change depth */
 	p_ptr->depth += direction;
 
 	/* Leaving */
