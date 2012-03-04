@@ -1512,7 +1512,7 @@ void Term_draw(int x, int y, byte a, char c)
 void Term_addch(byte a, char c)
 {
 	int w = Term->wid;
-
+  int x,y;
 	/* Handle "unusable" cursor */
 	if (Term->scr->cu) return;
 
@@ -1520,7 +1520,12 @@ void Term_addch(byte a, char c)
 	if (!c) return;
 
 	/* Notice bigtile region changes */
+  // Note this can adjust the cursor point so save and restore afterwards
+  x = Term->scr->cx;
+  y = Term->scr->cy;
 	Term_bigtile_expand(Term->scr->cx, Term->scr->cy);
+  Term->scr->cx = x;
+  Term->scr->cy = y;
 	
 	/* Queue the given character for display */
 	Term_queue_char(Term->scr->cx, Term->scr->cy, a, c, 0, 0);

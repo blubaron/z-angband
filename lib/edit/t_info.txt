@@ -2297,7 +2297,7 @@ L:BUILD2:       if (is_member() == TRUE) then cost = 5 else cost = 0 end
 L:BUILD2:	build_cmd_quest(cost, field)
 L:BUILD2:	done = TRUE end
 L:BUILD2:if (command == 'C' and is_member() == TRUE) then
-L:BUILD2:       if remove_curse() then
+L:BUILD2:       if remove_all_curse() then
 L:BUILD2:          msgf("You feel as if someone is watching over you.") end
 L:BUILD2:       message_flush()
 L:BUILD2:       done = TRUE end
@@ -2488,13 +2488,41 @@ I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
 D:6:0:0:0:0:0:0:0
 L:SBINIT:place_sb(rand_range(155, 185), 0)
 L:PENTER:do_cmd_bldg(field)
-L:BUILD1:if (get_loan_amount() > 0) then
-L:BUILD1:	building_options("L) Repay loan")
+L:BUILD1:local rstring1, rstring2, rstring3
+L:BUILD1:building_bank_info()
+L:BUILD1:if (player.bank_gold > 0) then
+L:BUILD1: rstring1 = "w) Withdraw gold"
 L:BUILD1:else
-L:BUILD1:	building_options("L) Take Out loan")
+L:BUILD1: rstring1 = ""
 L:BUILD1:end
+L:BUILD1:if (get_loan_amount() > 0) then
+L:BUILD1:	rstring2 = "L) Repay loan"
+L:BUILD1:else
+L:BUILD1:	rstring2 = "L) Take Out loan"
+L:BUILD1:end
+L:BUILD1:if (player.bank_layaway_gold > 0) then
+L:BUILD1:	rstring3 = "p) Buy Layaway Item"
+L:BUILD1:else
+L:BUILD1: rstring3 = ""
+L:BUILD1:end
+L:BUILD1:building_options("d) Deposit gold",rstring1,rstring2,rstring3)
 L:BUILD2:if (command == 'L') then
 L:BUILD2:	build_cmd_loan(factor)
+L:BUILD2:   message_flush()
+L:BUILD2:	done = TRUE
+L:BUILD2:end
+L:BUILD2:if (command == 'd') then
+L:BUILD2:	build_cmd_bank_deposit()
+L:BUILD2:   message_flush()
+L:BUILD2:	done = TRUE
+L:BUILD2:end
+L:BUILD2:if (command == 'w') then
+L:BUILD2:	build_cmd_bank_withdraw()
+L:BUILD2:   message_flush()
+L:BUILD2:	done = TRUE
+L:BUILD2:end
+L:BUILD2:if (command == 'p') then
+L:BUILD2:	build_cmd_item_layaway()
 L:BUILD2:   message_flush()
 L:BUILD2:	done = TRUE
 L:BUILD2:end
@@ -2543,5 +2571,11 @@ G:0:G
 W:100:3:0
 I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
 D:7:0:0:100:100:100:100:0
-#L:SBINIT:place_sb(100, 0)
+L:SBINIT:place_sb(100, 0)
 #L:PENTER:do_cmd_blank(field) end
+L:PENTER:do_cmd_bldg(field)
+L:BUILD1:building_buy_info()
+L:BUILD2:if (command == 'B') then
+#L:BUILD2: building_buy_info()
+L:BUILD2:	done = TRUE
+L:BUILD2:end

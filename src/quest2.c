@@ -302,7 +302,8 @@ bool is_special_level(int level)
 		if (q_ptr->status > QUEST_STATUS_TAKEN) continue;
 
 		/* Does the level match? */
-		if (q_ptr->data.dun.level == level) return (TRUE);
+		if (q_ptr->data.dun.level <= level)
+      return (TRUE);
 	}
 
 	return (FALSE);
@@ -1393,7 +1394,7 @@ static void give_reward(store_type * st_ptr, quest_type * q_ptr)
 			gp = (r/2);
 			get_xp = TRUE;
 			xp = (r/5);
-			stat = randint0(6);
+		  stat = randint0(6);
 			break;
 		/* Some xp, combat item, gain str / int / dex*/
 		case BUILD_RANGER_GUILD:
@@ -1446,6 +1447,11 @@ static void give_reward(store_type * st_ptr, quest_type * q_ptr)
 			gp = r;
 			break;
 	}
+
+  /* only get stats if this is not a bounty quest */
+  if ((q_ptr->type == QUEST_TYPE_BOUNTY) && (stat != -1)) {
+		stat = -1;
+  }
 
 	if (get_gold)
 	{
@@ -2986,7 +2992,7 @@ quest_type * insert_loan(s32b amt)
 	/* Set the reward level, which stores the amount of the loan */
 	q_ptr->timeout = amt;
 
-	q_ptr->flags = QUEST_FLAG_ACTIVE;
+	q_ptr->flags = QUEST_FLAG_ACTIVE | QUEST_FLAG_KNOWN;
 
 	/* Done */
 	return (q_ptr);

@@ -59,7 +59,7 @@ static void copy_race(monster_race * r_ptr, const monster_race * r_ptr_src)
  * Returns the number of non-inate spell abilities
  * the monster has.
  */
-static int count_spells(monster_race * r_ptr)
+static int count_spells(const monster_race * r_ptr)
 {
 	u32b f3 = r_ptr->flags[3] & 0x50000003;
 	u32b f4 = r_ptr->flags[4];

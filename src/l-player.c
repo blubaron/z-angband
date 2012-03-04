@@ -2942,6 +2942,60 @@ static int toluaI_set_player_player_type_pet_pickup_items(lua_State* tolua_S)
  return 0;
 }
 
+/* get function: bank_gold of class  player_type */
+static int toluaI_get_player_player_type_bank_gold(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  tolua_pushnumber(tolua_S,(long)self->bank_gold);
+ return 1;
+}
+
+/* set function: bank_gold of class  player_type */
+static int toluaI_set_player_player_type_bank_gold(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  if (!tolua_istype(tolua_S,2,LUA_TNUMBER,0))
+   TOLUA_ERR_ASSIGN;
+  self->bank_gold = ((u32b)  tolua_getnumber(tolua_S,2,0));
+ return 0;
+}
+
+/* get function: bank_layaway_gold of class  player_type */
+static int toluaI_get_player_player_type_bank_layaway_gold(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  tolua_pushnumber(tolua_S,(long)self->bank_layaway_gold);
+ return 1;
+}
+
+/* set function: bank_layaway_gold of class  player_type */
+static int toluaI_set_player_player_type_bank_layaway_gold(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  if (!tolua_istype(tolua_S,2,LUA_TNUMBER,0))
+   TOLUA_ERR_ASSIGN;
+  self->bank_layaway_gold = ((u32b)  tolua_getnumber(tolua_S,2,0));
+ return 0;
+}
+
+/* get function: bank_layaway_paid of class  player_type */
+static int toluaI_get_player_player_type_bank_layaway_paid(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  tolua_pushnumber(tolua_S,(long)self->bank_layaway_paid);
+ return 1;
+}
+
+/* set function: bank_layaway_paid of class  player_type */
+static int toluaI_set_player_player_type_bank_layaway_paid(lua_State* tolua_S)
+{
+  TOLUA_GET_SELF(player_type);
+  if (!tolua_istype(tolua_S,2,LUA_TNUMBER,0))
+   TOLUA_ERR_ASSIGN;
+  self->bank_layaway_paid = ((u32b)  tolua_getnumber(tolua_S,2,0));
+ return 0;
+}
+
 /* get function: options of class  player_type */
 static int toluaI_get_player_player_type_options(lua_State* tolua_S)
 {
@@ -4456,6 +4510,9 @@ int tolua_player_open (lua_State* tolua_S)
  tolua_globalvar(tolua_S,"ironman_nightmare",toluaI_get_player_ironman_nightmare,toluaI_set_player_ironman_nightmare);
  tolua_globalvar(tolua_S,"disturb_minor",toluaI_get_player_disturb_minor,toluaI_set_player_disturb_minor);
  tolua_globalarray(tolua_S,"adj_str_wgt",toluaI_get_player_adj_str_wgt,NULL);
+ tolua_tablevar(tolua_S,"player_type","bank_gold",toluaI_get_player_player_type_bank_gold,toluaI_set_player_player_type_bank_gold);
+ tolua_tablevar(tolua_S,"player_type","bank_layaway_gold",toluaI_get_player_player_type_bank_layaway_gold,toluaI_set_player_player_type_bank_layaway_gold);
+ tolua_tablevar(tolua_S,"player_type","bank_layaway_paid",toluaI_get_player_player_type_bank_layaway_paid,toluaI_set_player_player_type_bank_layaway_paid);
  TOLUA_FUN(inc_blind,toluaI_player_inc_blind00);
  TOLUA_FUN(clear_blind,toluaI_player_clear_blind00);
  TOLUA_FUN(inc_confused,toluaI_player_inc_confused00);

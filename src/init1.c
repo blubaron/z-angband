@@ -915,6 +915,26 @@ static cptr mg_info_dungeon_flags[] =
 	"XXX16",
 };
 
+static cptr dungeon_room_flags[] =
+{
+	"CROWDED",
+	"NATURAL",
+	"ANIMAL",
+	"COMPLEX",
+	"DENSE",
+	"RUIN",
+	"SIMPLE",
+	"BUILDING",
+	"CRYPT",
+	"VAULT",
+	"STRANGE",
+	"FANCY",
+	"FRACTAL",
+	"XXX14",
+	"XXX15",
+	"XXX16",
+};
+
 /*** Initialize from ascii template files ***/
 
 
@@ -1672,6 +1692,22 @@ static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 
 	/* Check flags */
 	for (i = 0; i < 32; i++)
+	{
+		if (streq(what, names[i]))
+		{
+			*flags |= (1L << i);
+			return (0);
+		}
+	}
+
+	return (-1);
+}
+static errr grab_one_flag_16(u16b *flags, cptr names[], cptr what)
+{
+	int i;
+
+	/* Check flags */
+	for (i = 0; i < 16; i++)
 	{
 		if (streq(what, names[i]))
 		{
@@ -4934,79 +4970,12 @@ errr parse_s_info(char *buf, header *head)
 	return (0);
 }
 
-#if (0)
-
-/*
- * Grab one flag in an object_kind from a textual string
- */
-static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
-{
-	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
-		return (0);
-
-	/* Oops */
-	msgf("Unknown dungeon flag '%s'.", what);
-
-	/* Error */
-	return (PARSE_ERROR_GENERIC);
-}
-
-static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
-{
-	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
-		return (0);
-
-	/* Oops */
-	msgf("Unknown dungeon flag '%s'.", what);
-
-	/* Error */
-	return (PARSE_ERROR_GENERIC);
-}
-
-static errr grab_one_dungeon_flag(dun_gen_type *dun_ptr, cptr what)
-{
-	if (grab_one_flag(&k_ptr->flags[0], k_info_flags1, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[1], k_info_flags2, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[2], k_info_flags3, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&k_ptr->flags[3], k_info_flags4, what) == 0)
-		return (0);
-
-	/* Oops */
-	msgf("Unknown dungeon flag '%s'.", what);
-
-	/* Error */
-	return (PARSE_ERROR_GENERIC);
-}
-
-
 /*
  * Initialize the "dungeons" array, by parsing an ascii "template" file
  */
-errr parse_dun_info(char *buf, header *head)
+extern dun_gen_type *dungeons_n;
+
+errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 {
 	int i;
 
@@ -5019,6 +4988,9 @@ errr parse_dun_info(char *buf, header *head)
 	/* Process 'N' for "New/Number/Name" */
 	if (buf[0] == 'N')
 	{
+		/* Length of name string */
+		u16b length;
+
 		/* Find the colon before the name */
 		s = strchr(buf + 2, ':');
 
@@ -5037,62 +5009,80 @@ errr parse_dun_info(char *buf, header *head)
 		/* Verify information */
 		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
 
-		/* Verify information */
-		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+		/* Check to see if there is room in array */
+		if (i > z_info->dun_max - 1) return (PARSE_ERROR_OUT_OF_MEMORY);
 
 		/* Save the index */
 		error_idx = i;
 
+    /* extend the linked list */
+    if (dun_ptr) {
+      dun_ptr->next = &(dungeons_n[i]);
+    }
+
 		/* Point at the "info" */
-		dun_ptr = dungeons[i];
+		dun_ptr = &(dungeons_n[i]);
     dun_ptr->didx = i;
 
 		/* Store the name */
-		if (!(dun_ptr->name = add_name(head, s)))
-			return (PARSE_ERROR_OUT_OF_MEMORY);
-	}
+		//if (!(dun_ptr->name = add_name(head, s)))
+		//	return (PARSE_ERROR_OUT_OF_MEMORY);
+		/* Name + /0 on the end */
+		length = strlen(s) + 1;
+
+		/* Make some room */
+		C_MAKE(t, length, char);
+
+		if (!t) return (PARSE_ERROR_OUT_OF_MEMORY);	/* Out of memory */
+
+		/* Add the name */
+		dun_ptr->name = strcpy(t, s);
+
+    if (pdun_ptr) *pdun_ptr = dun_ptr;
+    return (0);
+	} else
 
 	/* Process 'L' for "level information" (one line only) */
-	else if (buf[0] == 'L')
-	{
-    int min, max, chance, pop, height, rlimit
+	if (buf[0] == 'L') {
+    int min, max, step, chance, pop, height, rlimit;
 		/* There better be a current dun_ptr */
 		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (6 != sscanf(buf + 2, "%d:%d:%d:%d:%d:%d",
-						&min, &max, &chance, &pop, &height, &rlimit) {
+		if (7 != sscanf(buf + 2, "%d:%d:%d:%d:%d:%d:%d",
+						&min, &max, &step, &chance, &pop, &height, &rlimit)) {
       return (PARSE_ERROR_GENERIC);
     }
     dun_ptr->min_level = min;
     dun_ptr->max_level = min;
+    dun_ptr->level_change_step = step;
     dun_ptr->chance = min;
     dun_ptr->pop = pop;
     dun_ptr->height = height;
     dun_ptr->room_limit = rlimit;
-	}
+    return (0);
+	} else
 
 	/* Process 'O' for "object theme" (one line only) */
-	else if (buf[0] == 'O')
-	{
-    int treasure, combat_items, magic_items, tools
+	if (buf[0] == 'O') {
+    int treasure, combat_items, magic_items, tools;
 		/* There better be a current dun_ptr */
 		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
-						&treasure, &combat_items, &magic_items, &tools) {
+						&treasure, &combat_items, &magic_items, &tools)) {
       return (PARSE_ERROR_GENERIC);
     }
     dun_ptr->theme.treasure = treasure;
     dun_ptr->theme.combat = combat_items;
     dun_ptr->theme.magic = magic_items;
     dun_ptr->theme.tools = tools;
-	}
+    return (0);
+	} else
 
 	/* Process 'W' for "Wall feats" (one line only) */
-	else if (buf[0] == 'W')
-	{
+	if (buf[0] == 'W') {
 		int floor, wall, perm_wall, rubble;
 
 		/* There better be a current dun_ptr */
@@ -5100,18 +5090,19 @@ errr parse_dun_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
-						&floor, &wall, &perm_wall, &rubble)) return (PARSE_ERROR_GENERIC);
+						&floor, &wall, &perm_wall, &rubble))
+      return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		dun_ptr->floor = floor;
 		dun_ptr->wall = wall;
 		dun_ptr->perm_wall = perm_wall;
 		dun_ptr->rubble = rubble;
-	}
+    return (0);
+	} else
 
 	/* Process 'd' for "door feats" (one line only) */
-	else if (buf[0] == 'd')
-	{
+	if (buf[0] == 'd') {
 		int open, closed, broken, secret;
 
 		/* There better be a current dun_ptr */
@@ -5119,97 +5110,196 @@ errr parse_dun_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
-						&closed, &open, &broken, &secret)) return (PARSE_ERROR_GENERIC);
+						&closed, &open, &broken, &secret))
+      return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		dun_ptr->door_open = open;
 		dun_ptr->door_closed = closed;
 		dun_ptr->door_broken = broken;
 		dun_ptr->door_secret = secret;
-	}
+    return (0);
+	} else
 
-	/* Process 'W' for "More Info" (one line only) */
-	else if (buf[0] == 'W')
-	{
-		int level, extra, wgt;
-		long cost;
+	/* Process 'w' for "stair feats" (one line only) */
+	if (buf[0] == 'w') {
+		int up, down, quest, pillar;
 
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf + 2, "%d:%d:%d:%ld",
-						&level, &extra, &wgt,
-						&cost)) return (PARSE_ERROR_GENERIC);
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&up, &down, &quest, &pillar))
+      return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		k_ptr->level = level;
-		k_ptr->extra = extra;
-		k_ptr->weight = wgt;
-		k_ptr->cost = cost;
-	}
+		dun_ptr->stairs_up = up;
+		dun_ptr->stairs_down = down;
+		dun_ptr->stairs_closed = quest;
+		dun_ptr->pillar = pillar;
+    return (0);
+	} else
 
-	/* Process 'A' for "Allocation" (one line only) */
-	else if (buf[0] == 'A')
-	{
-		int i;
+	/* Process 'C' for "Chances per level" (one line only) */
+	if (buf[0] == 'C') {
+		int monster, object, door, trap;
+		int rubble, stairs, tunnels, treasure;
 
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* XXX Simply read each number following a colon */
-		for (i = 0, s = buf + 1; s && (s[0] == ':') && s[1]; ++i)
-		{
-			/* Sanity check */
-			if (i > 3) return (PARSE_ERROR_TOO_MANY_ALLOCATIONS);
-
-			/* Default chance */
-			k_ptr->chance[i] = 1;
-
-			/* Store the attack damage index */
-			k_ptr->locale[i] = atoi(s + 1);
-
-			/* Find the slash */
-			t = strchr(s + 1, '/');
-
-			/* Find the next colon */
-			s = strchr(s + 1, ':');
-
-			/* If the slash is "nearby", use it */
-			if (t && (!s || t < s))
-			{
-				int chance = atoi(t + 1);
-				if (chance >= 0) k_ptr->chance[i] = chance;
-			}
-		}
-	}
-
-	/* Hack -- Process 'P' for "power" and such */
-	else if (buf[0] == 'P')
-	{
-		int ac, hd1, hd2, th, td, ta;
-
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (6 != sscanf(buf + 2, "%d:%dd%d:%d:%d:%d",
-						&ac, &hd1, &hd2, &th, &td,
-						&ta)) return (PARSE_ERROR_GENERIC);
+		if (7 != sscanf(buf + 2, "%d:%d:%d:%d:%d:%d:%d:%d",
+						&monster, &object, &door, &trap,
+            &rubble, &stairs, &tunnels, &treasure))
+      return (PARSE_ERROR_GENERIC);
 
-		k_ptr->ac = ac;
-		k_ptr->dd = hd1;
-		k_ptr->ds = hd2;
-		k_ptr->to_h = th;
-		k_ptr->to_d = td;
-		k_ptr->to_a = ta;
-	}
+		/* Save the values */
+		dun_ptr->freq_monsters = monster;
+		dun_ptr->freq_objects = object;
+		dun_ptr->freq_doors = door;
+		dun_ptr->freq_traps = trap;
+		dun_ptr->freq_rubble = rubble;
+		dun_ptr->freq_stairs = stairs;
+		dun_ptr->freq_tunnel = tunnels;
+		dun_ptr->freq_treasure = treasure;
+    return (0);
+	} else
+
+	/* Process 'c' for "chance of a level type" (one line only) */
+	if (buf[0] == 'c') {
+		int small, arena, cavern, labrinth;
+		int vault, city;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (6 != sscanf(buf + 2, "%d:%d:%d:%d:%d:%d",
+						&small, &arena, &cavern, &labrinth,
+            &vault, &city))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		//dun_ptr->freq_monsters = small;
+		dun_ptr->freq_arena = arena;
+		dun_ptr->freq_cavern = cavern;
+		//dun_ptr->freq_traps = labrinth;
+		//dun_ptr->freq_rubble = vault;
+		//dun_ptr->freq_stairs = city;
+    return (0);
+	} else
+
+	/* Process 'S' for "the first type of streamer" (one line only) */
+	if (buf[0] == 'S') {
+		int feat1, feat2, chance, size, number;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (5 != sscanf(buf + 2, "%d:%d:%d:%d:%d",
+						&feat1, &feat2, &size, &number, &chance))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->vein[0].shal = feat1;
+		dun_ptr->vein[0].deep = feat2;
+		dun_ptr->vein[0].rarity = chance;
+		dun_ptr->vein[0].size = size;
+		dun_ptr->vein[0].number = number;
+    return (0);
+	} else
+
+	/* Process 's' for "the second type of streamer" (one line only) */
+	if (buf[0] == 's') {
+		int feat1, feat2, chance, size, number;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (5 != sscanf(buf + 2, "%d:%d:%d:%d:%d",
+						&feat1, &feat2, &size, &number, &chance))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->vein[1].shal = feat1;
+		dun_ptr->vein[1].deep = feat2;
+		dun_ptr->vein[1].rarity = chance;
+		dun_ptr->vein[1].size = size;
+		dun_ptr->vein[1].number = number;
+    return (0);
+	} else
+
+	/* Process 'V' for "the feats of the first type of river" (one line only) */
+	if (buf[0] == 'V') {
+		int feat1, feat2, rarity, size;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&feat1, &feat2, &rarity, &size))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->river[0].shal = feat1;
+		dun_ptr->river[0].deep = feat2;
+		dun_ptr->river[0].rarity = rarity;
+		dun_ptr->river[0].size = size;
+		dun_ptr->river[0].number = 1;
+    return (0);
+	} else
+
+	/* Process 'v' for "the feats of the second type of river" (one line only) */
+	if (buf[0] == 'v') {
+		int feat1, feat2, rarity, size;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&feat1, &feat2, &rarity, &size))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->river[1].shal = feat1;
+		dun_ptr->river[1].deep = feat2;
+		dun_ptr->river[1].rarity = rarity;
+		dun_ptr->river[1].size = size;
+		dun_ptr->river[1].number = 1;
+    return (0);
+	} else
+
+	/* Process 'l' for "the feats of any lake" (one line only) */
+	if (buf[0] == 'l') {
+		int feat1, feat2, rarity, size;
+
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
+						&feat1, &feat2, &rarity, &size))
+      return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		dun_ptr->lake.shal = feat1;
+		dun_ptr->lake.deep = feat2;
+		dun_ptr->lake.rarity = rarity;
+		dun_ptr->lake.size = size;
+		dun_ptr->lake.number = 1;
+    return (0);
+	} else
 
 	/* Hack -- Process 'H' for habitat flags */
-	else if (buf[0] == 'H')
-	{
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+	if (buf[0] == 'H') {
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Parse every entry textually */
 		for (s = buf + 2; *s;)
@@ -5225,21 +5315,28 @@ errr parse_dun_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_habitat_flag(k_ptr, s))
-			{
-				return (PARSE_ERROR_INVALID_FLAG);
-			}
+   		if (streq(s, "HABITAT_ALL")) {
+        dun_ptr->habitat = RF7_WILD |RF7_DUN;
+      } else
+   		if (streq(s, "HABITAT_WILD")) {
+        dun_ptr->habitat = RF7_WILD;
+      } else
+   		if (streq(s, "HABITAT_DUNGEON")) {
+        dun_ptr->habitat = RF7_DUN;
+      } else
+	    if (grab_one_flag(&(dun_ptr->habitat), r_info_flags8, s) != 0)
+		    return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
 		}
-	}
+    return (0);
+	} else
 
 	/* Hack -- Process 'R' for room type flags */
-	else if (buf[0] == 'R')
-	{
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+	if (buf[0] == 'R') {
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Parse every entry textually */
 		for (s = buf + 2; *s;)
@@ -5255,21 +5352,19 @@ errr parse_dun_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_kind_flag(k_ptr, s))
-			{
-				return (PARSE_ERROR_INVALID_FLAG);
-			}
+	    if (grab_one_flag_16(&(dun_ptr->rooms), dungeon_room_flags, s) != 0)
+		    return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
 		}
-	}
+    return (0);
+	} else
 
 	/* Hack -- Process 'F' for flags */
-	else if (buf[0] == 'F')
-	{
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+	if (buf[0] == 'F') {
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Parse every entry textually */
 		for (s = buf + 2; *s;)
@@ -5285,70 +5380,87 @@ errr parse_dun_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_kind_flag(k_ptr, s))
-			{
-				return (PARSE_ERROR_INVALID_FLAG);
-			}
+	    if (grab_one_flag(&(dun_ptr->flags), mg_info_dungeon_flags, s) != 0)
+		    return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
 		}
-	}
+    return (0);
+  } else
 
 	/* Process 'D' for "Description" */
-	else if (buf[0] == 'D')
-	{
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+	if (buf[0] == 'D') {
+		/* Length of name string */
+		u16b length;
+
+    /* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the text */
 		s = buf + 2;
 
 		/* Store the text */
-		if (!add_text(&(dun_ptr->text), head, s))
+		/*if (!add_text(&(dun_ptr->text), head, s))
 		{
 			msgf("Icky Description!!");
 			message_flush();
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-		}
-	}
+		}*/
+    if (dun_ptr->text) FREE(dun_ptr->text);
+		/* Name + /0 on the end */
+		length = strlen(s) + 1;
 
-	/* Process 'L' for "Lua script" */
-	else if (buf[0] == 'L')
-	{
-		int n;
+		/* Make some room */
+		C_MAKE(t, length, char);
 
-		/* There better be a current k_ptr */
-		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		if (!t) return (PARSE_ERROR_OUT_OF_MEMORY);	/* Out of memory */
 
-		/* Analyze the first field */
-		for (s = t = buf + 2; *t && (*t != ':'); t++) /* loop */ ;
+		/* Add the name */
+		dun_ptr->text = strcpy(t, s);
+    return (0);
+  } else
 
-		/* Terminate the field (if necessary) */
-		if (*t == ':') *t++ = '\0';
+	/* Process 'n' for "possible place Name" */
+	if (buf[0] == 'n') {
+		/* Length of name string */
+		u16b length;
+    int chance, gen;
 
-		/* Analyze the trigger */
-		for (n = 0; k_info_triggers[n]; n++)
-		{
-			if (streq(s, k_info_triggers[n])) break;
-		}
+		/* There better be a current dun_ptr */
+		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Invalid trigger */
-		if (!k_info_triggers[n]) return (PARSE_ERROR_GENERIC);
+    /* Find the colon before the name */
+		s = strchr(buf + 2, ':');
 
-		/* Get the text */
-		s = t;
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
 
-		/* Store the text */
-		if (!add_text(&(k_ptr->trigger[n]), head, s))
-		{
-			msgf("Icky Trigger 1!!");
-			message_flush();
-			return (PARSE_ERROR_OUT_OF_MEMORY);
-		}
-	}
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
 
-	else
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the name generator */
+		chance = atoi(buf + 2);
+
+		/* Store the name */
+		//if (!(dun_ptr->name = add_name(head, s)))
+		//	return (PARSE_ERROR_OUT_OF_MEMORY);
+		/* Name + /0 on the end */
+		length = strlen(s) + 1;
+
+		/* Make some room */
+		//C_MAKE(t, length, char);
+
+		//if (!t) return (PARSE_ERROR_OUT_OF_MEMORY);	/* Out of memory */
+
+		/* Add the name */
+		//dun_ptr->text = strcpy(t, s);
+
+    return (0);
+	}	else
 	{
 		/* Oops */
 		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
@@ -5360,10 +5472,8 @@ errr parse_dun_info(char *buf, header *head)
 
 errr init_dun_info_txt(FILE *fp, char *buf)
 {
-	char *s, *t;
-
 	u16b i = 0;
-
+  errr errorr;
 	byte hook_num = 0;
 
 	/* Current entry */
@@ -5389,12 +5499,15 @@ errr init_dun_info_txt(FILE *fp, char *buf)
 		/* Verify correct "colon" format */
 		if (buf[1] != ':') return (PARSE_ERROR_GENERIC);
 
-    errr parse_dun_info(char *buf, header *head, &dun_ptr)
-
+    errorr = parse_dun_info(buf, &dun_ptr);
+    if (buf[0] == 'N') {
+      error_idx = dun_ptr->didx;
+    }
+    if (errorr) {
+      return errorr;
+    }
 	}
 
 	/* Success */
 	return (0);
 }
-
-#endif

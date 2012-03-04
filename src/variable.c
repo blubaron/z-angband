@@ -640,6 +640,13 @@ field_thaum *t_info;
 quest_type *quest;
 
 /*
+ * The dungeon arrays
+ */
+dun_gen_type *dungeons_n;
+char *dun_name;
+char *dun_text;
+
+/*
  * Hack -- The special Angband "System Suffix"
  * This variable is used to choose an appropriate "pref-xxx" file
  */

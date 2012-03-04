@@ -1327,7 +1327,7 @@ static void roff_spell_death(int spell)
 			roff ("Performs a dark ritual to make you a Lich, permanently. ");
 			roff ("As a Lich, you will have no hit points; instead, you will have a substantially increased amount of ");
 			roff ("mana, which serves as your life force.  Damage done to you reduces your mana, and you die if it goes ");
-			roff ("below 0.  Furthermore, as an inherently magical creature, you receive a permanent 10\% bonus to the ");
+			roff ("below 0.  Furthermore, as an inherently magical creature, you receive a permanent 10%% bonus to the ");
 			roff ("casting cost and power level of all spells.");
 			roff ("Liches have intrinsic abilities, including resistance to cold, poison, and nether, free action, and ");
 			roff ("have their life and all stats sustained.   However, they are vulnerable to fire, cannot eat ");

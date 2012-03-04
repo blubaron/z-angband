@@ -1098,8 +1098,17 @@ static errr init_mg_info(void)
 /*
  * Initialize the "dungeons" array
  */
+extern dun_gen_type *dungeons_n;
+errr init_dun_info_txt(FILE *fp, char *buf);
+
 static errr init_dun_info(void)
 {
+	errr err;
+	FILE *fp;
+
+	/* General buffer */
+	char buf[1024];
+
   int i;
   int max  = z_info->dun_max-1;
   for (i = 0 ;i < max; ++i) {
@@ -1122,6 +1131,53 @@ static errr init_dun_info(void)
 	return init_info("dungeons", &dun_head,
 					 (void *)&dun_info, (void *)&dun_name, (void *)&dun_text);
 #endif
+
+//#if (0)
+
+	/* Later must add in python support. */
+	C_MAKE(dungeons_n, z_info->dun_max, dun_gen_type);
+
+
+	/*** Load the ascii template file ***/
+
+	/* Build the filename */
+	path_make(buf, ANGBAND_DIR_EDIT, "dungeons.txt");
+
+	/* Open the file */
+	fp = my_fopen(buf, "r");
+
+	/* Parse it */
+	if (!fp) quit("Cannot open 'dungeons.txt' file.");
+
+	/* Parse the file */
+	err = init_dun_info_txt(fp, buf);
+
+	/* Close it */
+	my_fclose(fp);
+
+	/* Errors */
+	if (err)
+	{
+		cptr oops;
+
+		/* Error string */
+		oops =
+			(((err > 0) && (err < PARSE_ERROR_MAX)) ? err_str[err] : "unknown");
+
+		/* Oops */
+		msgf("Error %d at line %d of 'dungeons.txt'.", err, error_line);
+		msgf("Record %d contains a '%s' error.", error_idx, oops);
+		msgf("Parsing '%s'.", buf);
+		message_flush();
+
+		/* Quit */
+		quit("Error in 'dungeons.txt' file.");
+	}
+
+	/* Success */
+	return (0);
+
+//#endif
 }
 
 /*
@@ -1928,7 +1984,14 @@ void cleanup_angband(void)
   FREE(mg_info);
   /* free stuff from init_dun_info */
   /* still using hardcoded dungeons */
-  //FREE(dungeons);
+	if (dun_name)
+		FREE(dun_name);
+
+	if (dun_text)
+		FREE(dun_text);
+
+ 	if (dungeons_n)
+		FREE(dungeons_n);
 
 	/* Free the interface callbacks */
 	free_term_callbacks();

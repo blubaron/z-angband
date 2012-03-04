@@ -1155,6 +1155,7 @@ static void display_store(void)
 	{
 		prtf(31, 22, " p) Purchase an item.");
 		prtf(31, 23, " s) Sell an item.");
+  	prtf(56, 23, " L) Buy an item on Lay away.");
 	}
 
 	/* Add in the eXamine option */
@@ -1371,20 +1372,35 @@ static bool store_access_item(const object_type *o_ptr, s32b price, bool buy)
 	if (buy)
 	{
 		/* Describe the object (fully) */
-		put_fstr(0, 1, "%s %v   ", (buy) ? "Buying" : "Selling",
-					OBJECT_STORE_FMT(o_ptr, TRUE, 3));
+		put_fstr(0, 1, "%s %v   ", "Buying", OBJECT_STORE_FMT(o_ptr, TRUE, 3));
 	}
 	else
 	{
 		/* Describe the object (only what we know) */
-		put_fstr(0, 1, "%s %v   ", (buy) ? "Buying" : "Selling",
-					OBJECT_FMT(o_ptr, TRUE, 3));
+		put_fstr(0, 1, "%s %v   ", "Selling",	OBJECT_FMT(o_ptr, TRUE, 3));
 	}
 
 	put_fstr(0, 2, "Offer :  %ld", (long)price);
 
 	/* Ask the user for a response */
 	if (check_transaction && !get_check_ext(TRUE, FALSE, buy ? "Buy? ": "Sell? "))
+	{
+		return (FALSE);
+	}
+
+	/* Chose to make transaction */
+	return (TRUE);
+}
+
+static bool store_layaway_item(const object_type *o_ptr, s32b price)
+{
+	/* Describe the object (fully) */
+	put_fstr(0, 1, "%s %v   ", "Buying on lay away", OBJECT_STORE_FMT(o_ptr, TRUE, 3));
+
+	put_fstr(0, 2, "Offer :  %ld", (long)price);
+
+	/* Ask the user for a response */
+	if (check_transaction && !get_check_ext(TRUE, FALSE, "Buy on lay away? "))
 	{
 		return (FALSE);
 	}
@@ -2052,6 +2068,227 @@ static void store_home(void)
 }
 
 /*
+ * Buy an item from a store on layaway from banks
+ */
+static void store_layaway(void)
+{
+	int i, amt;
+	int item;
+
+	s32b price, best;
+
+	object_type *j_ptr;
+
+	object_type *o_ptr;
+
+	char out_val[160];
+
+  if (st_ptr->type == BUILD_STORE_HOME) {
+  	/* Empty? */
+    if (st_ptr->stock) {
+		  msgf("You already own all of these items.");
+    } else {
+		  msgf("Your home is empty.");
+    }
+		return;
+  }
+	/* Empty? */
+	if (!st_ptr->stock) {
+		msgf("I am currently out of stock.");
+		return;
+	}
+
+	/* Already have something on lay away? */
+	if (p_ptr->bank_layaway_gold) {
+		msgf("You already have something on lay away. Pay for it first.");
+		return;
+	}
+
+	/* Find the number of objects on this and following pages */
+	i = (get_list_length(st_ptr->stock) - p_ptr->state.store_top);
+
+	/* And then restrict it to the current page */
+	if (i > 12) i = 12;
+
+	/* Prompt */
+	strnfmt(out_val, 160, "Which item are you interested in? ");
+
+	/* Get the item number to be bought */
+	if (!get_stock(&item, out_val, i)) return;
+
+	/* Get the actual index */
+	item = item + p_ptr->state.store_top;
+
+	/* Get the actual item */
+	o_ptr = get_list_item(st_ptr->stock, item);
+
+	/* Assume the player wants just one of them */
+	amt = 1;
+
+	/* Get a duplicate of the object */
+	j_ptr = object_dup(o_ptr);
+
+	/* Recalculate charges for a single wand/rod */
+	reduce_charges(j_ptr, j_ptr->number - 1);
+
+	/* Modify quantity */
+	j_ptr->number = amt;
+
+	/* Determine the "best" price (per item) */
+	best = price_item(j_ptr, FALSE);
+
+	/*
+	 * Paranoia - you can only buy one weapon / armour item at a time
+	 *
+	 * This prevents the player getting stacks of weapons etc. in
+	 * his pack.  I suppose we could make an extension to
+	 * inven_carry_okay() to do this properly.
+	 */
+	if ((j_ptr->tval < TV_BOW) || (j_ptr->tval > TV_DRAG_ARMOR))
+	{
+		/* Find out how many the player wants */
+		if (o_ptr->number > 1)
+		{
+			/* Describe the object (fully) */
+			put_fstr(0, 1, "%s %v   ", "Buying on layaway",
+						OBJECT_STORE_FMT(o_ptr, TRUE, 3));
+
+			/* Get a quantity */
+			amt = get_quantity(NULL, o_ptr->number);
+
+			/* Allow user abort */
+			if (amt <= 0) return;
+		}
+	}
+
+	/* Get desired object */
+	j_ptr = object_dup(o_ptr);
+
+	/*
+	 * If a rod or wand, allocate total maximum timeouts or charges
+	 * between those purchased and left on the shelf.
+	 */
+	reduce_charges(j_ptr, j_ptr->number - amt);
+
+	/* Modify quantity */
+	j_ptr->number = amt;
+
+	/* Attempt to buy it */
+	if (!(st_ptr->type == BUILD_STORE_HOME))
+	{
+		/* Get price */
+		price = price_item(j_ptr, FALSE) * amt;
+
+		/* Player wants it? */
+		if (store_layaway_item(j_ptr, price))
+		{
+			/* Say "okay" */
+			say_comment_1();
+
+			/* Make a sound */
+			sound(SOUND_BUY);
+
+			/* Describe the transaction */
+			msgf("%v is on lay away for %ld gold.",
+				 OBJECT_FMT(j_ptr, TRUE, 3), (long)price);
+
+			/* Now, reduce the original stack's pval. */
+			if ((o_ptr->tval == TV_ROD) || (o_ptr->tval == TV_WAND))
+			{
+				o_ptr->pval -= j_ptr->pval;
+
+				/* No used charges in store stock */
+				o_ptr->ac = 0;
+			}
+
+      /* Erase the inscription */
+      quark_remove(&j_ptr->inscription);
+
+			/* Store object memory */
+			if (j_ptr->mem.type == OM_NONE)
+				j_ptr->mem.type = OM_STORE;
+
+			/* Erase the "feeling" */
+			j_ptr->feeling = FEEL_NONE;
+
+      /* move the item to the lay away spot */
+      p_ptr->bank_layaway_gold = price;
+      p_ptr->bank_layaway_paid = 0;
+      if (p_ptr->bank_layaway) {
+  	    object_copy(o_ptr, p_ptr->bank_layaway);
+      } else {
+  	    p_ptr->bank_layaway = object_dup(o_ptr);
+      }
+
+      /* show the results */
+			msgf("You can pay for %v at any bank.", OBJECT_FMT(j_ptr, TRUE, 3));
+
+			/* Handle stuff */
+			handle_stuff();
+
+			/* Note how many slots the store used to have */
+			i = get_list_length(st_ptr->stock);
+
+			/* Remove the bought items from the store */
+			item_increase_silent(o_ptr, -amt);
+
+			/* Store is empty */
+			if (!st_ptr->stock)
+			{
+				/* Shuffle */
+				if (one_in_(STORE_SHUFFLE))
+				{
+					/* Message */
+					msgf("The shopkeeper retires.");
+
+					/* Shuffle the store */
+					store_shuffle(st_ptr);
+				}
+
+				/* Maintain */
+				else
+				{
+					/* Message */
+					msgf("The shopkeeper brings out some new stock.");
+				}
+
+				/* New inventory */
+				current_object_source.type = OM_NONE;
+				current_object_source.place_num = p_ptr->place_num;
+				current_object_source.depth = 0;
+				/* Data set in get_current_store */
+
+				for (i = 0; i < 10; i++)
+				{
+
+					/* Maintain the store */
+					store_maint();
+				}
+
+				/* Start over */
+				p_ptr->state.store_top = 0;
+			}
+
+			/* The item is gone */
+			else if (get_list_length(st_ptr->stock) != i)
+			{
+				/* Pick the correct screen */
+				if (p_ptr->state.store_top >= get_list_length(st_ptr->stock))
+				{
+					p_ptr->state.store_top -= 12;
+				}
+			}
+
+			/* Redraw everything */
+			display_inventory();
+		}
+	}
+
+}
+
+
+
+/*
  * Hack -- set this to leave the store
  */
 static bool leave_store = FALSE;
@@ -2379,6 +2616,14 @@ static void store_process_command(void)
 		{
 			/* Examine */
 			store_examine();
+			break;
+		}
+
+
+		case 'L':
+		{
+			/* give item to bank for layaway (eventual purchase) */
+			store_layaway();
 			break;
 		}
 
@@ -2771,6 +3016,7 @@ void do_cmd_store(const field_type *f1_ptr)
 		{
 			prtf(31, 22, " p) Purchase an item.");
 			prtf(31, 23, " s) Sell an item.");
+			prtf(56, 23, " L) Put an item on layaway.");
 		}
 
 		/* Add in the eXamine option */

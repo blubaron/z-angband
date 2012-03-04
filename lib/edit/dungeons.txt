@@ -108,10 +108,7 @@
 # modify the dungeons array at the bottom of tables.c. Or for their names,
 # modify name_dungeons in wild4.c
 
-
-# Version stamp (required)
-
-V:0.3.4
+# Version stamp is not used in this file
 
 # 0 -> Placeholder for stuff used in towns
 # W: not used, building wall, city wall, not used
@@ -183,10 +180,10 @@ l:137:136:10:50
 D:You hear various noises coming from the lair.
 
 N:4:Evil Temple
-L:20:60:1:250:250:0
+L:20:60:1:1:250:250:0
 H:DUN_TEMPLE
 R:SIMPLE | COMPLEX | DENSE | FANCY | BUILDING | CRYPT
-W:12:56:1:60:49
+W:12:56:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:10:30:30:30
@@ -204,10 +201,10 @@ F:ROAD
 D:A malignant aura comes from this building.
 
 N:5:Evil Tower
-L:20:60:1:250:200:0
+L:20:60:1:1:250:200:0
 H:DUN_TOWER
 R:SIMPLE | COMPLEX | BUILDING | VAULT
-W:13:56:1:60:49
+W:13:56:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:20:0:80:0
@@ -224,10 +221,10 @@ F:TRACK
 D:A malignant aura comes from this building.
 
 N:6:Ruins
-L:20:80:1:0:150:0
+L:20:80:1:1:0:150:0
 H:DUN_RUIN
 R:RUIN
-W:14:56:1:60:49
+W:14:56:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:20:30:30:0
@@ -244,10 +241,10 @@ F:TRACK | ROAD
 D:You see some ancient ruins.
 
 N:7:Graveyard
-L:30:100:1:50:150:0
+L:30:100:1:1:50:150:0
 H:DUN_GRAVE
 R:SIMPLE | COMPLEX | FANCY | CRYPT
-W:12:56:1:60:49
+W:12:56:60:49
 w:6:7:141:33
 d:32:4:5:48
 O:50:20:20:0
@@ -508,7 +505,7 @@ D:You see an imposing castle.
 N:21:Plane of Fire
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:142:86:139:49
 w:6:7:141:33
 d:32:4:5:48
@@ -526,7 +523,7 @@ D:You see a portal to a plane of fire.
 N:22:Plane of Water
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:15:83:63:49
 w:6:7:141:33
 d:32:4:5:48
@@ -544,7 +541,7 @@ D:You see a portal to a plane of water.
 N:23:Ice Cave
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:135:56:60:49
 w:6:7:141:33
 d:32:4:5:48
@@ -562,7 +559,7 @@ D:You see an ice cave.
 N:24:Plane of Acid
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:142:94:138:49
 w:6:7:141:33
 d:32:4:5:48
@@ -580,7 +577,7 @@ D:You see a portal to a plane of acid.
 N:25:Smoke Cave
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:142:56:60:49
 w:6:7:141:33
 d:32:4:5:48
@@ -598,7 +595,7 @@ D:You see a lot of smoke coming from this cave.
 N:26:Plane of Cold
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:135:135:139:49
 w:6:7:141:33
 d:32:4:5:48
@@ -616,7 +613,7 @@ D:You see a portal to a plane of cold.
 N:27:Plane of Earth
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:15:56:60:49
 w:6:7:141:33
 d:32:4:5:48
@@ -652,7 +649,7 @@ D:You see a portal to a heaven.
 N:29:Grassland
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:142:86:60:49
 w:6:7:141:33
 d:32:4:5:48
@@ -670,7 +667,7 @@ D:You see an expanse of grassland.
 N:30:Plane of Air
 L:1:127:1:0:100:100:0
 H:HABITAT_DUNGEON
-R:FRACTAL | NATRUAL | COMPLEX
+R:FRACTAL | NATURAL | COMPLEX
 W:88:98:139:49
 w:6:7:141:33
 d:32:4:5:48

@@ -1070,15 +1070,26 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->capital_store_num);
 	wr_s16b(p_ptr->capital_dun_num);
 
-  /* Dump the amount of gold stored in banks */
+  /* Future use, possible for places/buildings used in static quests */
+	for (i = 0; i < 4; i++) wr_u32b(0L);
+
+  /* Dump the amount of gold stored in banks
+       - uses 4 of the 48 future use bytes */
 	wr_u32b(p_ptr->bank_gold);
-  /* Dump the number of buildings owned by the player */
+  /* Dump the amount of gold needed for any layaway item
+       - uses 4 of the 48 future use bytes */
+ 	wr_u32b(p_ptr->bank_layaway_gold);
+  if (p_ptr->bank_layaway_gold) {
+  	wr_u32b(p_ptr->bank_layaway_paid);
+  	wr_item(p_ptr->bank_layaway);
+  }
+  /* Dump the number of buildings owned by the player - uses 1 future use byte */
  	wr_byte(p_ptr->ob_count);
-  /* Dump the number of player death chests outstanding */
+  /* Dump the number of player death chests outstanding - uses 1 future use byte */
  	wr_byte(p_ptr->dc_count);
 
   /* Future use */
-	for (i = 0; i < 8; i++) wr_u32b(0L);
+	for (i = 0; i < 3; i++) wr_u32b(0L);
 
 	/* Ignore some flags */
 	wr_u32b(0L);				/* oops */

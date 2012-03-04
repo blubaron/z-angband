@@ -413,7 +413,7 @@ static const char listsym[] =
  * We return the number of active options.
  */
 static int show_menu(int num, menu_type *options, int select, bool scroll,
-					 int disp(int), cptr prompt)
+					 int (*disp)(int), cptr prompt)
 {
 	int cnt = 0;
 	int i;
@@ -592,7 +592,7 @@ static int get_choice(char *c, int num, bool *ask)
  *       information when constucting the menu.
  * 'prompt' is an optional prompt.
  */
-bool display_menu(menu_type *options, int select, bool scroll, int disp(int),
+bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 					cptr prompt)
 {
 	int i = -1, j, cnt;

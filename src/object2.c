@@ -444,24 +444,19 @@ void wipe_o_list(void)
 	object_type *o_ptr;
 
 	/* Set all objects to be unallocated */
-	for (i = 1; i < o_max; i++)
-	{
+	for (i = 1; i < o_max; i++) {
 		o_ptr = &o_list[i];
 
-		if (o_ptr->allocated == 2)
-    {
+		if (o_ptr->allocated == 2) {
       o_ptr->allocated = TRUE;
-    }
-    else
-    {
+    } else {
   		o_ptr->allocated = FALSE;
     }
 		//o_ptr->allocated = FALSE;
 	}
 
 	/* Only if inventory exists */
-	if (o_list[p_ptr->inventory].k_idx)
-	{
+	if (o_list[p_ptr->inventory].k_idx) {
 		/* Save players inventory (only objects in a list to save) */
 		OBJ_ITT_START (p_ptr->inventory, o_ptr)
 		{
@@ -471,8 +466,7 @@ void wipe_o_list(void)
 	}
 
 	/* Delete the existing objects */
-	for (i = 1; i < o_max; i++)
-	{
+	for (i = 1; i < o_max; i++) {
 		o_ptr = &o_list[i];
 
 		/* Skip dead objects */
@@ -494,8 +488,7 @@ void wipe_o_list(void)
 		x = o_ptr->ix;
 
 		/* Store item? */
-		if (!x && !y)
-		{
+		if (!x && !y) {
 			/* Hack - just kill it */
 			object_wipe(o_ptr);
 
@@ -530,8 +523,7 @@ void wipe_objects(int rg_idx)
 	object_type *o_ptr;
 
 	/* Delete the existing objects */
-	for (i = 1; i < o_max; i++)
-	{
+	for (i = 1; i < o_max; i++) {
 		o_ptr = &o_list[i];
 
 		/* Skip dead objects */
@@ -587,8 +579,7 @@ static s16b o_pop(void)
 	 *
 	 * Feel free to tune this parameter.
 	 */
-	if ((o_max - (o_cnt + 1)) * 3 < o_max)
-	{
+	if ((o_max - (o_cnt + 1)) * 3 < o_max) {
 		/* Initial allocation */
 		if (o_max < z_info->o_max)
 		{
@@ -604,8 +595,7 @@ static s16b o_pop(void)
 	}
 
 	/* Recycle dead objects */
-	while (TRUE)
-	{
+	while (TRUE) {
 		object_type *o_ptr;
 
 		/* Acquire object */

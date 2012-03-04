@@ -651,6 +651,72 @@ static int toluaI_field_build_cmd_loan00(lua_State* tolua_S)
  return 0;
 }
 
+/* function: build_cmd_bank_deposit */
+static int toluaI_field_build_cmd_bank_deposit00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(build_cmd_bank_deposit);
+  } else {
+    build_cmd_bank_deposit();
+  }
+  return 0;
+}
+
+/* function: build_cmd_bank_withdraw */
+static int toluaI_field_build_cmd_bank_withdraw00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(build_cmd_bank_withdraw);
+  } else {
+    build_cmd_bank_withdraw();
+  }
+  return 0;
+}
+
+/* function: build_cmd_item_layaway */
+static int toluaI_field_build_cmd_item_layaway00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(build_cmd_item_layaway);
+  } else {
+    build_cmd_item_layaway();
+  }
+  return 0;
+}
+
+/* function: building_bank_info */
+static int toluaI_field_building_bank_info00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(building_bank_info);
+  } else {
+    building_bank_info();
+  }
+  return 0;
+}
+
+/* function: building_buy_info */
+static int toluaI_field_building_buy_info00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(building_buy_info);
+  } else {
+    building_buy_info();
+  }
+  return 0;
+}
+
+/* function: building_upgrade_info */
+static int toluaI_field_building_upgrade_info00(lua_State* tolua_S)
+{
+  if (!tolua_isnoobj(tolua_S,1)) {
+    TOLUA_ERR_FN(building_upgrade_info);
+  } else {
+    building_upgrade_info();
+  }
+  return 0;
+}
+
 /* function: build_set_qlevel */
 static int toluaI_field_build_set_qlevel00(lua_State* tolua_S)
 {
@@ -897,6 +963,13 @@ int tolua_field_open (lua_State* tolua_S)
  TOLUA_FUN(enchant_item,toluaI_field_enchant_item00);
  TOLUA_FUN(build_cmd_repair,toluaI_field_build_cmd_repair00);
  TOLUA_FUN(build_cmd_loan,toluaI_field_build_cmd_loan00);
+ TOLUA_FUN(building_bank_info,toluaI_field_building_bank_info00);
+ TOLUA_FUN(build_cmd_bank_withdraw,toluaI_field_build_cmd_bank_withdraw00);
+ TOLUA_FUN(build_cmd_bank_deposit,toluaI_field_build_cmd_bank_deposit00);
+ TOLUA_FUN(build_cmd_bank_withdraw,toluaI_field_build_cmd_bank_withdraw00);
+ TOLUA_FUN(build_cmd_item_layaway,toluaI_field_build_cmd_item_layaway00);
+ TOLUA_FUN(building_buy_info,toluaI_field_building_buy_info00);
+ TOLUA_FUN(building_upgrade_info,toluaI_field_building_upgrade_info00);
  TOLUA_FUN(build_set_qlevel,toluaI_field_build_set_qlevel00);
  TOLUA_FUN(build_get_qlevel,toluaI_field_build_get_qlevel00);
  TOLUA_FUN(place_qinit,toluaI_field_place_qinit00);
@@ -976,6 +1049,12 @@ void tolua_field_close (lua_State* tolua_S)
  TOLUA_UNDEF(enchant_item);
  TOLUA_UNDEF(build_cmd_repair);
  TOLUA_UNDEF(build_cmd_loan);
+ TOLUA_UNDEF(building_bank_info);
+ TOLUA_UNDEF(build_cmd_bank_deposit);
+ TOLUA_UNDEF(build_cmd_bank_withdraw);
+ TOLUA_UNDEF(build_cmd_item_layaway);
+ TOLUA_UNDEF(building_buy_info);
+ TOLUA_UNDEF(building_upgrade_info);
  TOLUA_UNDEF(build_set_qlevel);
  TOLUA_UNDEF(build_get_qlevel);
  TOLUA_UNDEF(place_qinit);

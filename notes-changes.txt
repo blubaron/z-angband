@@ -391,12 +391,23 @@ enum
 
     dungeons can skip levels within their range. the dungeon level skip is
       given just after the max dungeon level in the dungeon type info.
-      Tested with sewers, but what happens around dl 99,100 has not been tested.
+      *Tested with sewers, but what happens around dl 99,100 has not been tested.
 
     added functions to load a graphics list from a text file, like I wrote for angband.
 
     store and save the largest town, so a castle in it could be used as a palace for quest purposes.
     store and save the number of owned buildings and death chests, for future use.
+
+    players can deposit and withdraw gold from banks.
+    fixed bank loan quest (a quest known flag was missing where the quest was inserted).
+    *started to add ability to store an item from stores and pay for it later in banks.
+
+    bounty quest rewards no longer give stat gain.
+
+    fixed display of building options, and some lines that were being distorted
+      by the cursor changing position in term_erase in term_bigtile_expand.
+
+    created bulding list for abandoned buildings. (still cant buy them though.)
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the

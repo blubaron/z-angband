@@ -1797,7 +1797,7 @@ void print_building_options(cptr strings[], int num)
 	int i;
 
 	int max = 0, len;
-
+  int x,y;
 	int wid, hgt;
 
 	/* Get size */
@@ -1814,7 +1814,32 @@ void print_building_options(cptr strings[], int num)
 	/* Print them out */
 	for (i = 0; i < num; i++)
 	{
-		put_fstr(40 - len / 2, 20 - num + i, CLR_YELLOW "%s", strings[i]);
+    if (num < 5) {
+      switch (i) {
+      case 0: x = 10; y = 20; break;
+      case 1: x = 10; y = 21; break;
+      case 2: x = 45; y = 20; break;
+      case 3: x = 45; y = 21; break;
+      }
+		  put_fstr(x, y, CLR_YELLOW "%s", strings[i]);
+    } else
+    if (i < 9) {
+      switch (i) {
+      case 0: x = 28; y = 20; break;
+      case 1: x = 28; y = 21; break;
+      case 2: x = 56; y = 20; break;
+      case 3: x = 56; y = 21; break;
+      case 4: x = 28; y = 22; break;
+      case 5: x = 56; y = 22; break;
+      case 6: x =  1; y = 21; break;
+      case 7: x =  1; y = 22; break;
+      case 8: x =  1; y = 20; break;
+      }
+		  put_fstr(x, y, CLR_YELLOW "%s", strings[i]);
+    } else
+    {
+		  put_fstr(40 - len / 2, 20 - num + i, CLR_YELLOW "%s", strings[i]);
+    }
 	}
 }
 

@@ -1410,8 +1410,40 @@ static void rd_extra(void)
 	  rd_s16b(&p_ptr->capital_place_num);
 	  rd_s16b(&p_ptr->capital_store_num);
 	  rd_s16b(&p_ptr->capital_dun_num);
+
+    /* skip some space that might be used to store additional
+       places/buildings in the future, to place static quests */
+    for (i = 0; i < 16; i++) rd_byte(&tmp8u);
+
     /* Read the amount of gold in the bank */
 	  rd_u32b(&p_ptr->bank_gold);
+	  rd_u32b(&p_ptr->bank_layaway_gold);
+    if (p_ptr->bank_layaway_gold) {
+      object_type temp;
+  	  rd_u32b(&p_ptr->bank_layaway_paid);
+      /* create the layaway object */
+      //p_ptr->bank_layaway = 
+      rd_item(&temp);
+      /*if (!p_ptr->bank_layaway) {
+  	    p_ptr->bank_layaway = object_prep(temp.k_idx);
+      } else {
+	      /* Delete old static object */ /*
+	      object_wipe(p_ptr->bank_layaway);
+      }
+ 	    object_copy(p_ptr->bank_layaway, &temp);
+
+      /* Allocate quarks */ /*
+	    quark_dup(p_ptr->bank_layaway->xtra_name);
+	    quark_dup(p_ptr->bank_layaway->inscription);
+
+	    for (i = 0; i < MAX_TRIGGER; i++)
+		    quark_dup(p_ptr->bank_layaway->trigger[i]);
+
+      delete_static_object(temp);*/
+    } else {
+      p_ptr->bank_layaway_paid = 0;
+      p_ptr->bank_layaway = NULL;
+    }
     /* Read the number of owned buildings */
     rd_byte(&p_ptr->ob_count);
     /* Read the number of death chests */
@@ -1422,9 +1454,17 @@ static void rd_extra(void)
     p_ptr->capital_place_num = 0;
     p_ptr->capital_store_num = 0;
     p_ptr->capital_dun_num = 0;
+
+    /* skip some space that might be used to store additional
+       places/buildings in the future, to place static quests */
+    for (i = 0; i < 16; i++) rd_byte(&tmp8u);
+
     /* Read the amount of gold in the bank */
     for (i = 0; i < 4; i++) rd_byte(&tmp8u);
     p_ptr->bank_gold = 0;
+    p_ptr->bank_layaway_gold = 0;
+    p_ptr->bank_layaway_paid = 0;
+    p_ptr->bank_layaway = NULL;
     /* Read the number of owned buildings */
     rd_byte(&tmp8u);
     p_ptr->ob_count = 0;
@@ -1433,7 +1473,7 @@ static void rd_extra(void)
     p_ptr->dc_count = 0;
   }
 	/* Future use */
-	for (i = 0; i < 32; i++) rd_byte(&tmp8u);
+	for (i = 0; i < 12; i++) rd_byte(&tmp8u);
 
 	/* Skip the flags */
 	strip_bytes(12);
@@ -3469,7 +3509,6 @@ static errr rd_savefile_new_aux(void)
     /* set the palace to the first large castle found */
 	  for (i = 0; i < place_count; i++)
 	  {
-      place_type *pl_ptr;
 		  pl_ptr = &place[i];
       if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
       {
@@ -3494,7 +3533,6 @@ static errr rd_savefile_new_aux(void)
     /* if we still haven't found a palace, set it to the first keep found */
 	  for (i = 0; i < place_count; i++)
 	  {
-      place_type *pl_ptr;
 		  pl_ptr = &place[i];
       if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
       {
@@ -3520,7 +3558,6 @@ static errr rd_savefile_new_aux(void)
      * found, which is guranteed to exist in the starting town */
 	  for (i = 0; i < place_count; i++)
 	  {
-      place_type *pl_ptr;
 		  pl_ptr = &place[i];
       if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
       {

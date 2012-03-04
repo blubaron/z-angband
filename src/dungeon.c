@@ -273,7 +273,13 @@ void sense_item(object_type *o_ptr, bool heavy, bool wield, bool msg)
 	/* Set the "inscription" */
 	o_ptr->feeling = feel;
 
-	/* Notice changes */
+  if (!(p_ptr->muta3 & MUT3_BAD_LUCK) && (feel == FEEL_AVERAGE)) {
+    /* if we don't have bad luck and the item is average, just go ahead and 
+     * id it. */
+    identify_item(o_ptr);
+  }
+
+  /* Notice changes */
 	notice_item();
 }
 

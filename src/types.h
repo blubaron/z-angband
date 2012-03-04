@@ -1788,7 +1788,6 @@ struct player_type
 	bool birth[OPT_BIRTH];
 	u32b squelch[(SQUELCHMAX/32)];
 
-  u32b bank_gold;
   byte ob_count;
   byte dc_count;
   //byte qb_count;
@@ -1797,6 +1796,11 @@ struct player_type
   //struct quest_building_info *owned_buildings;
   //struct quest_level_info *quest_levels;
   //struct quest_level_info *death_chests;
+
+  u32b bank_gold;
+  u32b bank_layaway_gold;
+  u32b bank_layaway_paid;
+  object_type *bank_layaway;
 };
 /*typedef struct quest_building_info {
   byte questid;
@@ -2055,10 +2059,10 @@ struct dun_gen_type
 
 	byte freq_monsters;
 	byte freq_objects;
-    byte freq_doors;
-    byte freq_traps;
+  byte freq_doors;
+  byte freq_traps;
 	byte freq_rubble;
-    byte freq_treasure;  /* Buried treasure */
+  byte freq_treasure;  /* Buried treasure */
 	byte freq_stairs;
 	byte freq_arena;
 	byte freq_cavern;
@@ -2068,8 +2072,11 @@ struct dun_gen_type
 
 	u32b flags;		/* Extra flags */
 
-  u32b name;	/* Name (offset) */
-	u32b text;	/* Text (offset) */
+  //u32b name;	/* Name (offset) */
+	//u32b text;	/* Text (offset) */
+
+  char *name;
+  char *text;
 
   dun_gen_type *next; /* next dungeon type in the linked list */
 };

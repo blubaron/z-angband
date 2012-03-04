@@ -13,11 +13,11 @@
  */
 
 #include "angband.h"
+#include "wild.h"
 
 
 /* Hack - force exit from building */
 static bool force_build_exit = FALSE;
-
 
 static void have_nightmare_aux(int r_idx)
 {
@@ -2053,13 +2053,13 @@ void do_cmd_bldg(const field_type *f_ptr)
 	while (!leave_build)
 	{
 		/* Clear */
-		clear_from(21);
+		//clear_from(21);
 
 		/* Basic commands */
-		prtf(0, 23, " ESC) Exit building");
+		//prtf(0, 23, " ESC) Exit building");
 
 		/* Show your gold */
-		building_prt_gold();
+		//building_prt_gold();
 
 		/* Process the command */
 		leave_build = build_process_command(f_ptr);
@@ -2275,7 +2275,7 @@ void build_cmd_loan(int factor)
 		{
 			/* Can't pay it off.  For now, just boot them.  Later, perhaps implement
 			   a partial pay-off. */
-			msgf ("You owe %i gold pieces.  Come back when you have the money.");
+			msgf ("You owe %i gold pieces.  Come back when you have the money.", amt);
 			return;
 		}
 		if (get_check("Pay off your loan for %i gold pieces? ", amt))
@@ -2295,7 +2295,7 @@ void build_cmd_loan(int factor)
 		int amt;
 
 	   	/* Really simple loan qualification formula */
-	    amt = p_ptr->au + (p_ptr->lev * p_ptr->lev * 25);
+	    amt = p_ptr->bank_gold + p_ptr->au + (p_ptr->lev * p_ptr->lev * 25);
 
 		message_flush();
 
@@ -2476,6 +2476,276 @@ bool build_cmd_recall (void)
 void build_cmd_grave (void)
 {
 	top_twenty();
+}
+
+/*
+ * Show what the player has stored in the bank
+ */
+void building_bank_info(void)
+{
+  int row = 4;
+
+  if (p_ptr->bank_layaway) {
+  	int wid, hgt;
+  	char o_name[256];
+   	
+    Term_get_size(&wid, &hgt);
+ 	  
+    object_desc(o_name, p_ptr->bank_layaway, TRUE, 3, 256);
+    if (wid < 300) {
+      o_name[wid-44] = '\0';
+    }
+
+		put_fstr(2, row, "On layaway: %s for %dgp, paid %dgp.", o_name, p_ptr->bank_layaway_gold, p_ptr->bank_layaway_paid);
+    row += 2;
+	}
+  if (p_ptr->bank_gold > 0) {
+		put_fstr(2, row, "On deposit: %8dgp", p_ptr->bank_gold);
+    row += 2;
+	}
+  if (get_loan_amount()) {
+	  store_type * st_ptr = get_current_store();
+	  store_type * st_ptr2 = get_loaner();
+    if (st_ptr == st_ptr2) {
+		  put_fstr(2, row, CLR_YELLOW "On loan:    %8dgp", get_loan_amount());
+    } else {
+		  put_fstr(2, row, CLR_RED "On loan:    %8dgp", get_loan_amount());
+    }
+	}
+}
+/*
+ * Player puts money into the bank system.
+ */
+void build_cmd_bank_deposit(void)
+{
+	store_type * st_ptr = get_current_store();
+  u32b amt;
+
+	if (p_ptr->au > 0) {
+    amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au);
+    if (amt > p_ptr->au) {
+      amt = p_ptr->au;
+    }
+    if (amt > 0)  {
+      p_ptr->au -= amt;
+      p_ptr->bank_gold += amt;
+  		msgf ("You have deposited %d gold.", amt);
+	  	message_flush();
+    }
+  } else {
+  	if (p_ptr->bank_gold > 0) {
+	  	msgf ("You do not have any money to deposit.");
+    } else {
+	  	msgf ("You do not have any money to deposit. Please do not waste our time.");
+    }
+		message_flush();
+  }
+}
+
+/*
+ * Player takes money out of the bank system.
+ */
+void build_cmd_bank_withdraw(void)
+{
+	store_type * st_ptr = get_current_store();
+  u32b amt;
+
+	if (p_ptr->bank_gold > 0) {
+    amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold);
+    if (amt > p_ptr->bank_gold) {
+      amt = p_ptr->bank_gold;
+    }
+    if (amt > 0)  {
+      p_ptr->bank_gold -= amt;
+      p_ptr->au += amt;
+  		msgf ("You have withdrawn %d gold.", amt);
+	  	message_flush();
+    }
+  } else {
+		msgf ("You do not have any money deposited with us.");
+		message_flush();
+  }
+}
+
+/*
+ * Player takes money out of the bank system.
+ */
+void build_cmd_item_layaway(void)
+{
+	store_type * st_ptr = get_current_store();
+  u32b amt;
+  int item_new;
+
+	if (p_ptr->bank_layaway_gold > 0) {
+    if (p_ptr->au > 0) {
+      amt = get_quantity_big("How much would you like to put towards the item?", p_ptr->au);
+      if (amt > p_ptr->au) {
+        amt = p_ptr->au;
+      }
+      if (amt > p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid) {
+        amt = p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid;
+      }
+      if (amt > 0)  {
+        p_ptr->au -= amt;
+        p_ptr->bank_layaway_paid += amt;
+
+		    /* Make a sound */
+		    sound(SOUND_BUY);
+
+        if (p_ptr->bank_layaway_paid >= p_ptr->bank_layaway_gold) {
+          p_ptr->au += p_ptr->bank_layaway_paid - p_ptr->bank_layaway_gold;
+          p_ptr->bank_layaway_gold = 0;
+          p_ptr->bank_layaway_paid = 0;
+
+			    /* Hack -- buying an item makes you aware of it */
+			    object_aware(p_ptr->bank_layaway);
+			    object_mental(p_ptr->bank_layaway);
+			    p_ptr->bank_layaway->info &= ~(OB_STOREB);
+
+         	/* see if there is room in pack */
+	        if (inven_carry_okay(p_ptr->bank_layaway)) {
+            object_type *j_ptr;
+			      /* Give it to the player */
+			      j_ptr = inven_carry(p_ptr->bank_layaway);
+
+			      /* Paranoia */
+			      if (!j_ptr)
+			      {
+				      msgf("Too many allocated objects!");
+				      return;
+			      }
+
+			      /* Get slot */
+			      item_new = get_item_position(p_ptr->inventory, j_ptr);
+
+			      /* Describe the final result */
+  		      msgf ("You have paid off the item. You here it is.");
+			      msgf("You have %v (%c).", OBJECT_FMT(j_ptr, TRUE, 3), I2A(item_new));
+
+			      /* Handle stuff */
+			      handle_stuff();
+          } else {
+            //drop_near(
+  		      msgf ("You have paid off the item. You can pick it up outside.");
+          }
+          //object_wipe(p_ptr->bank_layaway);
+        } else {
+  		    msgf ("You have paid %d gold towards %s.", amt, "unknown");
+        }
+      }
+    } else {
+		  msgf ("You do not have any gold.");
+    }
+  } else {
+		msgf ("You do not have an item on layaway.");
+  }
+  message_flush();
+}
+
+/*
+ * show a menu to change an abondoned building into an owned building of some type
+ */
+void building_buy_info(void)
+{
+  int row = 3;
+  int numcolumns = 1;
+  int numrows = 16;
+  int numbuildings = 0, i;
+  int j, r, c1, c2, price;
+  /* get the number of buildings that we can build this into */
+  for (i = 0; i < MAX_CITY_BUILD; i++) {
+    if (wild_build[i].base_field
+        && (wild_build[i].base_field == wild_build[i].field)) {
+      numbuildings++;
+    }
+  }
+  if (numbuildings == 0) {
+	  put_fstr( 0, row, CLR_YELLOW " No buildings are currently for sale. In Bank: %dgp", p_ptr->bank_gold);
+    return;
+  }
+  numcolumns = (numbuildings / numrows) + 1;
+  if (numcolumns > 3) {
+    //numrows -= 1;
+    numbuildings = 3 * numrows;
+    numcolumns = 3;
+	  put_fstr(20, 2, CLR_YELLOW "Too many buildings available, showing first %d buildings.", numbuildings);
+    //row += 1;
+  }
+  if (numcolumns == 3) {
+  	put_fstr( 0, row, " Building");
+	  put_fstr(20, row, "Price");
+  	put_fstr(27, row, " Building");
+	  put_fstr(46, row, "Price");
+  	put_fstr(54, row, " Building");
+	  put_fstr(74, row, "Price");
+  } else
+  if (numcolumns == 2) {
+  	put_fstr( 0, row, " Building");
+	  put_fstr(34, row, "Price");
+  	put_fstr(40, row, " Building");
+	  put_fstr(74, row, "Price");
+  } else
+  {
+  	put_fstr( 0, row, " Building");
+	  put_fstr(34, row, "Price");
+  }
+  row += 1;
+  j = 0;
+  for (i = 0; (i < MAX_CITY_BUILD) && (j < numbuildings); i++) {
+    if (wild_build[i].base_field
+        && (wild_build[i].base_field == wild_build[i].field)) {
+      if (numcolumns == 3) {
+        if (j >= 2*numrows) {
+          c1 = 54;
+          c2 = 72;
+        } else
+        if (j >= numrows) {
+          c1 = 27;
+          c2 = 44;
+        } else
+        {
+          c1 = 0;
+          c2 = 18;
+        }
+      } else {
+        if (j >= numrows) {
+          c1 = 40;
+          c2 = 72;
+        } else
+        {
+          c1 = 0;
+          c2 = 32;
+        }
+      }
+      r = row+(j%numrows);
+      price = (wild_build[i].rarity+1) * 100000;
+  	  put_fstr(c1, r, t_info[wild_build[i].field].name);
+      if (price > p_ptr->au + p_ptr->bank_gold) {
+  	    put_fstr(c2, r, CLR_SLATE "%7d", price);
+      } else {
+  	    put_fstr(c2, r, "%7d", price);
+      }
+      j++;
+    }
+  }
+  row += numrows;
+  if (row > 19) {
+ 	  put_fstr( 0, row, "You may: ");
+  }
+  put_fstr(58, row, CLR_SLATE "In banks: %9dau", p_ptr->bank_gold);
+  row++;
+  put_fstr(10, row, CLR_YELLOW "Buildings cannont be purchased yet.");
+}
+/*
+ * show a menu to change an abondoned building into an owned building of some type
+ */
+void building_upgrade_info(void)
+{
+  int row = 4;
+  //for (i = 0; i < FTBUILD_MAX; i++) {
+  //}
+	put_fstr(row, 0, CLR_YELLOW " Deposited: %dgp", p_ptr->bank_gold);
+  row += 2;
 }
 
 /*
