@@ -386,7 +386,7 @@ D:  Provides sustenance for about 500 turns under normal conditions.
 N:28:& Mattock~
 G:\:D
 I:20:7:2
-W:30:0:200:500
+W:30:0:100:500
 A:30/12:50/1
 P:0:1d8:0:0:0
 F:SHOW_MODS | TUNNEL
@@ -928,7 +928,7 @@ D:A well-crafted digging tool, ready to burrow.
 N:86:& Dwarven Shovel~
 G:\:B
 I:20:3:3
-W:55:0:120:300
+W:55:0:80:300
 A:55/1
 P:0:1d3:0:0:0
 F:SHOW_MODS | TUNNEL
@@ -937,7 +937,7 @@ D:An excellent digging tool, guaranteed to quickly shift rock.
 N:87:& Pick~
 G:\:s
 I:20:4:1
-W:17:0:150:50
+W:17:0:80:50
 A:17/16
 P:0:1d3:0:0:0
 F:SHOW_MODS | TUNNEL
@@ -946,7 +946,7 @@ D:A basic digging tool.
 N:88:& Orcish Pick~
 G:\:g
 I:20:5:2
-W:52:0:150:300
+W:52:0:80:300
 A:52/4
 P:0:1d3:0:0:0
 F:SHOW_MODS | TUNNEL
@@ -955,7 +955,7 @@ D:A crude but effective digging tool.
 N:89:& Dwarven Pick~
 G:\:b
 I:20:6:3
-W:75:0:200:600
+W:75:0:100:600
 A:75/1
 P:0:1d4:0:0:0
 F:SHOW_MODS | TUNNEL
@@ -7061,3 +7061,25 @@ P:23:1d1:6:7:0
 F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:It can hold up to 160.0 stones of items
 
+# ankhs should be able to be bought and sold in high level temples
+# ocassionally, but not found in dungeons. I do not know how to do
+# this though. for now, buy in cathedrals or healers.
+N:702:& Ankh~
+G:&:U
+I:41:1:1000
+W:120:0:05:87000
+A:0/0
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:Anchors your soul to this plane. If you have one on you when you
+D: die, you will be returned to the nearest temple or cathedrial.
+D However, your items and gold will remain in the dungeon.
+
+N:703:& Ankh~
+G:&:U
+I:41:2:1000
+W:120:0:05:100
+A:0/0
+F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
+D:Anchors your soul to this plane. If you have one on you when you
+D: die, you will be returned to the nearest temple or cathedrial.
+D However, your items and gold will remain in the dungeon.
