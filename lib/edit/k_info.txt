@@ -7071,7 +7071,7 @@ W:120:0:05:87000
 A:0/0
 F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:Anchors your soul to this plane. If you have one on you when you
-D: die, you will be returned to the nearest temple or cathedrial.
+D: die, you will be returned to the nearest temple or cathedral.
 D: However, your items and gold will remain in the dungeon.
 
 N:703:& Ankh~
@@ -7081,5 +7081,5 @@ W:120:0:05:100
 A:0/0
 F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:Anchors your soul to this plane. If you have one on you when you
-D: die, you will be returned to the nearest temple or cathedrial.
+D: die, you will be returned to the nearest temple or cathedral.
 D: However, your items and gold will remain in the dungeon.
