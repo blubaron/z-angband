@@ -6,4 +6,10 @@ of my notes about things I am thinking about doing are in notes_maybe_do.txt.
 
 Some of these changes are not well tested.
 
+The makefiles may or may not work, since I have added and removed files.
+With an IDE, you might want to follow the visual studio step by step,
+which is in this directory.
+
+I am using a version number of 0.3.4 to distinguish it from the original.
+
 The orignial readme for Z+Angband 0.3.3beta is in z_readme.
