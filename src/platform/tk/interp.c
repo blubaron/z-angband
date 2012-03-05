@@ -240,9 +240,17 @@ static cptr state_state(void)
 	}
 
 	/* Searching */
-	else if (p_ptr->state.searching)
+	else if (p_ptr->state.searching == SEARCH_MODE_SEARCH)
 	{
-		return "Searching";
+		return "Searching ";
+	}
+	else if (p_ptr->state.searching == SEARCH_MODE_SWING)
+	{
+		return "Swinging  ";
+	}
+	else if (p_ptr->state.searching == SEARCH_MODE_STEALTH)
+	{
+		return "Stealthing";
 	}
 
 	/* Nothing interesting */

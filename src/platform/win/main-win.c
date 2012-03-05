@@ -76,6 +76,7 @@
 #include "maid-grf.h"
 
 #include "grafmode.h"
+#include "win-menu.h"
 
 #ifdef WINDOWS
 
@@ -112,109 +113,6 @@
 /* #define USE_SAVER */
 
 #endif /* ALLOW_BORG */
-
-
-/*
- * Menu constants -- see "ANGBAND.RC"
- */
-
-#define IDM_FILE_NEW			100
-#define IDM_FILE_OPEN			101
-#define IDM_FILE_SAVE			110
-#define IDM_FILE_SCORE			120
-#define IDM_FILE_EXIT			130
-
-#define IDM_GRAF_FONT 		180
-#define IDM_GRAF_FILE 		181
-#define IDM_GRAF_08X08		182
-#define IDM_GRAF_16X16		183
-#define IDM_GRAF_32X32		184
-#define IDM_GRAF_12X13		185
-
-#define IDM_TILE_FONT 		190
-#define IDM_TILE_08X08		191
-#define IDM_TILE_16X16		192
-#define IDM_TILE_32X32		193
-#define IDM_TILE_08X16		194
-#define IDM_TILE_10X20		195
-#define IDM_TILE_16X32		196
-#define IDM_TILE_08X13		197
-#define IDM_TILE_10X17		198
-#define IDM_TILE_12X13		199
-#define IDM_TILE_12X20		188
-#define IDM_TILE_16X25		189
-
-#define IDM_WINDOW_VIS_0		200
-#define IDM_WINDOW_VIS_1		201
-#define IDM_WINDOW_VIS_2		202
-#define IDM_WINDOW_VIS_3		203
-#define IDM_WINDOW_VIS_4		204
-#define IDM_WINDOW_VIS_5		205
-#define IDM_WINDOW_VIS_6		206
-#define IDM_WINDOW_VIS_7		207
-
-#define IDM_WINDOW_FONT_0		210
-#define IDM_WINDOW_FONT_1		211
-#define IDM_WINDOW_FONT_2		212
-#define IDM_WINDOW_FONT_3		213
-#define IDM_WINDOW_FONT_4		214
-#define IDM_WINDOW_FONT_5		215
-#define IDM_WINDOW_FONT_6		216
-#define IDM_WINDOW_FONT_7		217
-
-#define IDM_WINDOW_I_WID_0		240
-#define IDM_WINDOW_I_WID_1		241
-#define IDM_WINDOW_I_WID_2		242
-#define IDM_WINDOW_I_WID_3		243
-#define IDM_WINDOW_I_WID_4		244
-#define IDM_WINDOW_I_WID_5		245
-#define IDM_WINDOW_I_WID_6		246
-#define IDM_WINDOW_I_WID_7		247
-
-#define IDM_WINDOW_D_WID_0		250
-#define IDM_WINDOW_D_WID_1		251
-#define IDM_WINDOW_D_WID_2		252
-#define IDM_WINDOW_D_WID_3		253
-#define IDM_WINDOW_D_WID_4		254
-#define IDM_WINDOW_D_WID_5		255
-#define IDM_WINDOW_D_WID_6		256
-#define IDM_WINDOW_D_WID_7		257
-
-#define IDM_WINDOW_I_HGT_0		260
-#define IDM_WINDOW_I_HGT_1		261
-#define IDM_WINDOW_I_HGT_2		262
-#define IDM_WINDOW_I_HGT_3		263
-#define IDM_WINDOW_I_HGT_4		264
-#define IDM_WINDOW_I_HGT_5		265
-#define IDM_WINDOW_I_HGT_6		266
-#define IDM_WINDOW_I_HGT_7		267
-
-#define IDM_WINDOW_D_HGT_0		270
-#define IDM_WINDOW_D_HGT_1		271
-#define IDM_WINDOW_D_HGT_2		272
-#define IDM_WINDOW_D_HGT_3		273
-#define IDM_WINDOW_D_HGT_4		274
-#define IDM_WINDOW_D_HGT_5		275
-#define IDM_WINDOW_D_HGT_6		276
-#define IDM_WINDOW_D_HGT_7		277
-
-#define IDM_OPTIONS_GRAPHICS_NONE   400
-#define IDM_OPTIONS_GRAPHICS_OLD    401
-#define IDM_OPTIONS_GRAPHICS_ADAM   402
-#define IDM_OPTIONS_GRAPHICS_DAVID  403
-#define IDM_OPTIONS_GRAPHICS_DAVID_6  404
-#define IDM_OPTIONS_GRAPHICS_DAVID_7  405
-#define IDM_OPTIONS_GRAPHICS_DAVID_8  406
-#define IDM_OPTIONS_BIGTILE         445
-#define IDM_OPTIONS_SOUND           446
-#define IDM_OPTIONS_LOW_PRIORITY    420
-#define IDM_OPTIONS_SAVER           430
-#define IDM_OPTIONS_MAP             440
-#define IDM_OPTIONS_SCREENSHOT      441
-
-#define IDM_HELP_GENERAL		901
-#define IDM_HELP_SPOILERS		902
-
 
 /*
  * This may need to be removed for some compilers XXX XXX XXX
@@ -453,6 +351,17 @@ static term_data data[MAX_TERM_DATA];
  * Hack -- global "window creation" pointer
  */
 static term_data *my_td;
+
+/*
+ * Default window layout function
+ */
+int default_layout_win(void);
+int default_layout_win(void)
+{
+  Term_keypress('=');
+  Term_keypress('m');
+  return 0;
+}
 
 /*
  * game in progress
@@ -1478,7 +1387,7 @@ static bool init_graphics(void)
 			wid = 8;
 			hgt = 8;
 
-			name = "8X8.BMP";
+			name = "8X8.png";
 		}
 #endif
 		/* Access the bitmap file */
@@ -3308,10 +3217,6 @@ static void setup_menus(void)
 #ifdef USE_GRAPHICS
 	if (initialized && p_ptr->cmd.inkey_flag)
 	{
-		i = 0;
-		do {
-			EnableMenuItem(hm, graphics_modes[i].grafID + IDM_OPTIONS_GRAPHICS_NONE,MF_ENABLED );
-		} while (graphics_modes[i++].grafID != 0); 
 	  mode = graphics_modes;
     while (mode) {
       if ((mode->grafID == 0) || (mode->file && mode->file[0])) {
@@ -3865,6 +3770,21 @@ static void process_menus(WORD wCmd)
 			term_getsize(td);
 
 			term_window_resize(td);
+
+			break;
+		}
+		case IDM_WINDOW_OPT: {
+      Term_keypress('=');
+      Term_keypress('m');
+
+			break;
+		}
+		case IDM_WINDOW_RESET: {
+      if (MessageBox(NULL,
+          "This will reset the size and layout of the angband windows\n based on your screen size. Do you want to continue?",
+          "Angband", MB_YESNO|MB_ICONWARNING) == IDYES) {
+        default_layout_win();
+      }
 
 			break;
 		}
