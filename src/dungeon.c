@@ -1644,7 +1644,7 @@ static void process_world(void)
 
 
 	/* Searching or Resting */
-	if (p_ptr->state.searching || p_ptr->state.resting)
+	if ((p_ptr->state.searching == SEARCH_MODE_SEARCH)|| p_ptr->state.resting)
 	{
 		regen_amount = regen_amount * 2;
 	}
