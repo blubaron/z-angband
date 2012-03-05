@@ -407,7 +407,19 @@ enum
     fixed display of building options, and some lines that were being distorted
       by the cursor changing position in term_erase in term_bigtile_expand.
 
-    created bulding list for abandoned buildings. (still cant buy them though.)
+    *created bulding list for abandoned buildings. (still can't buy them though.)
+
+    adjusted the default weights of the autoroller by the class stat bonus.
+
+    added additional modes (swing and stealth) through the toggle search key.
+      swing mode uses available blows to attack multiple adjacent enemies.
+       warriors get bonus attacks, representing an extra length of swing.
+      stealth mode provide a 7% bonus to stealth when active. rangers get a
+       10% bonus and rogues get a 14% bonus. (+1 for rounding, approx +10%)
+      to use, press the toggle search button (shift-s) within 2 seconds of the
+       previous press of the toggle search button. After two seconds, pressing
+       it turns any mode off.
+      the additional modes use the same speed penalty as search mode.
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the

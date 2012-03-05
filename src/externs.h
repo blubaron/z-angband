@@ -334,6 +334,7 @@ extern bool auto_pickup_okay(const object_type *o_ptr);
 extern void py_pickup_aux(object_type *o_ptr);
 extern void carry(int pickup);
 extern void py_attack(int x, int y);
+extern void py_attack_swing(int x, int y);
 extern void move_player(int dir, int do_pickup);
 extern void run_step(int dir);
 

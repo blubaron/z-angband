@@ -1558,8 +1558,6 @@ void py_attack(int x, int y)
 	/* Access the weapon */
 	o_ptr = &p_ptr->equipment[EQUIP_WIELD];
 
-
-
 	/* Disturb the player */
 	disturb(FALSE);
 
@@ -1602,6 +1600,12 @@ void py_attack(int x, int y)
 
 	/* Extract monster name (or "it") */
 	monster_desc(m_name, m_ptr, 0, 80);
+
+  /* make sure the monster is alive, since swings don't check */
+  if (m_ptr->hp < 0) {
+		msgf("%s is already dead.", m_name);
+		return;
+  }
 
 	/* Auto-Recall if possible and visible */
 	if (m_ptr->ml) monster_race_track(m_ptr->r_idx);
@@ -1946,24 +1950,25 @@ void py_attack(int x, int y)
 			/* Damage, check for fear and death */
 			if (mon_take_hit(c_ptr->m_idx, k, &fear, NULL))
 			{
-				/* Hack -- High-level warriors can spread their attacks out
-				 * among weaker foes. -LM-
-				 */
-				if (((p_ptr->rp.pclass == CLASS_WARRIOR)
-          || (p_ptr->rp.pclass == CLASS_CHAOS_WARRIOR))
-					&& (p_ptr->lev > 39) && (num < blows)
-					&& (p_ptr->state.energy_use))
-				{
-					p_ptr->state.energy_use =
-						p_ptr->state.energy_use * num / blows;
-        } else
-        if (((blows-num)>2) && (p_ptr->state.energy_use)) 
-        {
-          num+=2;// += (blows-num)/2;
-					p_ptr->state.energy_use =
-						p_ptr->state.energy_use * num / blows;
+        if (p_ptr->state.searching != SEARCH_MODE_SWING) {
+				  /* Hack -- High-level warriors can spread their attacks out
+				   * among weaker foes. -LM-
+				   */
+				  if (((p_ptr->rp.pclass == CLASS_WARRIOR)
+            || (p_ptr->rp.pclass == CLASS_CHAOS_WARRIOR))
+					  && (p_ptr->lev > 39) && (num < blows)
+					  && (p_ptr->state.energy_use))
+				  {
+					  p_ptr->state.energy_use =
+						  p_ptr->state.energy_use * num / blows;
+          } else
+          if (((blows-num)>2) && (p_ptr->state.energy_use)) 
+          {
+            num+=2;// += (blows-num)/2;
+					  p_ptr->state.energy_use =
+						  p_ptr->state.energy_use * num / blows;
+          }
         }
-
 				mdeath = TRUE;
 				break;
 			}
@@ -2173,6 +2178,99 @@ void py_attack(int x, int y)
 
 		(void)earthquake(px, py, 10);
 	}
+}
+
+/*
+ * Player attacks many (poor, defenseless) creatures       -Brett-
+ *
+ * use the current weapon on as many surrounding creatures as the
+ * player has blows.
+ */
+void py_attack_swing(int x, int y)
+{
+  int px, py;
+  int num, count, rnd;
+  int blows;
+  
+  px = p_ptr->px;
+  py = p_ptr->py;
+  num = blows = p_ptr->num_blow;
+
+  if (p_ptr->state.energy_use == 0) {
+		p_ptr->state.energy_use = 100;
+  }
+
+  p_ptr->num_blow = 1;
+	
+  /* get the number of adjacent monsters */
+  count = 0;
+  if (area(px-1,py-1)->m_idx) ++count;
+  if (area(px,py-1)->m_idx) ++count;
+  if (area(px+1,py-1)->m_idx) ++count;
+  if (area(px-1,py)->m_idx) ++count;
+  if (area(px+1,py)->m_idx) ++count;
+  if (area(px-1,py+1)->m_idx) ++count;
+  if (area(px,py+1)->m_idx) ++count;
+  if (area(px+1,py+1)->m_idx) ++count;
+
+  if (count == 1) {
+    // this is basically just a regular attack
+    p_ptr->num_blow = blows;
+    py_attack(x,y);
+    return;
+  }
+  /* warriors get extra length on their swing (modeled as extra attacks) */
+  if ((p_ptr->rp.pclass == CLASS_WARRIOR)
+      || (p_ptr->rp.pclass == CLASS_CHAOS_WARRIOR)) {
+    if (count > num) {
+      num += (num/2);
+    }
+    /* high level warriors will attack each adjacent square regardless
+     * of how many blows they have */
+		if (p_ptr->lev > 39) {
+      if (area(px-1,py-1)->m_idx) py_attack(px-1,py-1);
+      if (area(px,py-1)->m_idx) py_attack(px,py-1);
+      if (area(px+1,py-1)->m_idx) py_attack(px+1,py-1);
+      if (area(px-1,py)->m_idx) py_attack(px-1,py);
+      if (area(px+1,py)->m_idx) py_attack(px+1,py);
+      if (area(px-1,py+1)->m_idx) py_attack(px-1,py+1);
+      if (area(px,py+1)->m_idx) py_attack(px,py+1);
+      if (area(px+1,py+1)->m_idx) py_attack(px+1,py+1);
+
+      num -= count;
+      if (num < 0) num = 0;
+    }
+  }
+
+  while (num-- > 0) {
+    rnd = randint1(count);
+    if (area(px-1,py-1)->m_idx && (--rnd == 0)) {
+      py_attack(px-1,py-1);
+    } else
+    if (area(px,py-1)->m_idx && (--rnd == 0)) {
+      py_attack(px,py-1);
+    } else
+    if (area(px+1,py-1)->m_idx && (--rnd == 0)) {
+      py_attack(px+1,py-1);
+    } else
+    if (area(px-1,py)->m_idx && (--rnd == 0)) {
+      py_attack(px-1,py);
+    } else
+    if (area(px+1,py)->m_idx && (--rnd == 0)) {
+      py_attack(px+1,py);
+    } else
+    if (area(px-1,py+1)->m_idx && (--rnd == 0)) {
+      py_attack(px-1,py+1);
+    } else
+    if (area(px,py+1)->m_idx && (--rnd == 0)) {
+      py_attack(px,py+1);
+    } else
+    if (area(px+1,py+1)->m_idx && (--rnd == 0)) {
+      py_attack(px+1,py+1);
+    }
+  }
+
+  p_ptr->num_blow = blows;
 }
 
 
@@ -2677,7 +2775,11 @@ void move_player(int dir, int do_pickup)
 		}
 		else
 		{
-			py_attack(x, y);
+      if (p_ptr->state.searching == SEARCH_MODE_SWING) {
+        py_attack_swing(x,y);
+      } else {
+			  py_attack(x, y);
+      }
 			oktomove = FALSE;
 		}
 	}
@@ -2971,7 +3073,7 @@ void move_player(int dir, int do_pickup)
 		}
 
 		/* Continuous Searching */
-		if (p_ptr->state.searching)
+		if (p_ptr->state.searching == SEARCH_MODE_SEARCH)
 		{
 			search();
 		}

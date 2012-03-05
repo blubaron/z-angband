@@ -678,6 +678,7 @@ const byte adj_str_wgt[] =
 
 /*
  * Stat Table (STR) -- weapon weight limit in pounds
+ *                     another set of numbers might be hold =(1+0.043*str)*str
  */
 const byte adj_str_hold[] =
 {

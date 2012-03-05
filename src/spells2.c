@@ -257,9 +257,17 @@ void self_knowledge(void)
 	{
 		info[i++] = "Your hands are glowing dull red.";
 	}
-	if (p_ptr->state.searching)
+	if (p_ptr->state.searching == SEARCH_MODE_SEARCH)
 	{
 		info[i++] = "You are looking around very carefully.";
+  } else
+	if (p_ptr->state.searching == SEARCH_MODE_SWING)
+	{
+		info[i++] = "You are swinging your weapon around.";
+  } else
+	if (p_ptr->state.searching == SEARCH_MODE_STEALTH)
+	{
+		info[i++] = "You are moving around very carefully.";
 	}
 	if (p_ptr->new_spells)
 	{

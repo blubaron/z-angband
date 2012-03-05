@@ -167,31 +167,33 @@ void do_cmd_search(void)
  */
 void do_cmd_toggle_search(void)
 {
-	/* Stop searching */
-	if (p_ptr->state.searching)
-	{
+  static clock_t last_toggle;
+
+	/* Increase the search mode */
+	if ((p_ptr->state.searching < SEARCH_MODE_MAX)
+      && (clock() < last_toggle + (2*CLOCKS_PER_SEC))) {
 		/* Clear the searching flag */
-		p_ptr->state.searching = FALSE;
+		p_ptr->state.searching++;
+  } else
 
-		/* Recalculate bonuses */
-		p_ptr->update |= (PU_BONUS);
-
-		/* Redraw the state */
-		p_ptr->redraw |= (PR_STATE);
-	}
+	/* Stop searching */
+	if (p_ptr->state.searching) {
+		/* Clear the searching flag */
+		p_ptr->state.searching = SEARCH_MODE_NONE;
+  } else
 
 	/* Start searching */
-	else
 	{
 		/* Set the searching flag */
-		p_ptr->state.searching = TRUE;
-
-		/* Update stuff */
-		p_ptr->update |= (PU_BONUS);
-
-		/* Redraw stuff */
-		p_ptr->redraw |= (PR_STATE | PR_SPEED);
+		p_ptr->state.searching = SEARCH_MODE_SEARCH;
 	}
+  last_toggle = clock();
+
+  /* Recalculate bonuses */
+	p_ptr->update |= (PU_BONUS);
+
+	/* Redraw the state */
+	p_ptr->redraw |= (PR_STATE | PR_SPEED);
 }
 
 
@@ -2043,7 +2045,11 @@ void do_cmd_alter(void)
 		if (c_ptr->m_idx)
 		{
 			/* Attack */
-			py_attack(x, y);
+      if (p_ptr->state.searching == SEARCH_MODE_SWING) {
+        py_attack_swing(x,y);
+      } else {
+  			py_attack(x, y);
+      }
 		}
 		else if (field_script_find(c_ptr,
 									FIELD_ACT_INTERACT_TEST,
@@ -2329,7 +2335,7 @@ void do_cmd_stay(int pickup)
 	}
 
 	/* Continuous Searching */
-	if (p_ptr->state.searching)
+	if (p_ptr->state.searching == SEARCH_MODE_SEARCH)
 	{
 		search();
 	}
@@ -2410,7 +2416,7 @@ void do_cmd_rest(void)
 	p_ptr->state.resting = p_ptr->cmd.arg;
 
 	/* Cancel searching */
-	p_ptr->state.searching = FALSE;
+	p_ptr->state.searching = SEARCH_MODE_NONE;
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);

@@ -5293,3 +5293,11 @@ extern int PlayerUID;
 #define HF_KNOWN		0x04	/* Killed in a previous life */
 #define HF_AVENGE		0x08	/* Killed by this in a previous life */
 #define HF_AWARE		0x10	/* Has been seen */
+
+
+#define SEARCH_MODE_NONE      0
+#define SEARCH_MODE_SEARCH    1
+#define SEARCH_MODE_SWING     2
+#define SEARCH_MODE_STEALTH   3
+#define SEARCH_MODE_MAX   3
+

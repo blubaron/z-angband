@@ -2941,7 +2941,7 @@ void disturb(bool stop_search)
 	if (stop_search && p_ptr->state.searching)
 	{
 		/* Cancel */
-		p_ptr->state.searching = FALSE;
+		p_ptr->state.searching = SEARCH_MODE_NONE;
 
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);

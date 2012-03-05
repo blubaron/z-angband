@@ -1255,7 +1255,11 @@ void mutation_power_aux(const mutation_type *mut_ptr)
 
 		if (area(x, y)->m_idx)
 		{
-			py_attack(x, y);
+      if (p_ptr->state.searching == SEARCH_MODE_SWING) {
+        py_attack_swing(x,y);
+      } else {
+  			py_attack(x, y);
+      }
 			teleport_player(30);
 		}
 		else
