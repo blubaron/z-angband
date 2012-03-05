@@ -1403,7 +1403,10 @@ static bool player_birth_aux_3(void)
 		for (i = 0; i < A_MAX; i++)
 		{
 			/* In the Antiband version this is dependent on class & stat */
-			int def_weight = 50;
+			int def_weight = 50 + 5*cp_ptr->c_adj[i];
+			/* soften the extremes */
+			if(cp_ptr->c_adj[i] > 4) def_weight -= 5;
+			if(cp_ptr->c_adj[i] < -4) def_weight += 5;
 
 			/* Get a minimum stat */
 			while (TRUE)
@@ -1867,6 +1870,7 @@ static bool player_birth_aux(void)
 
 	/* Display the player */
 	display_player(DISPLAY_PLAYER_STANDARD);
+
 
 	/* Prompt for it */
 	prtf(10, 23,
