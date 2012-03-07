@@ -722,6 +722,19 @@ static void player_outfit(void)
 		(void)inven_carry(q_ptr);
 	}
 
+  /* give the player a word of recall scroll so the player can start diving */
+	q_ptr = object_prep(lookup_kind(TV_SCROLL, SV_SCROLL_WORD_OF_RECALL));
+
+	q_ptr->number = 1;
+
+	object_aware(q_ptr);
+	object_known(q_ptr);
+
+	/* These objects give no score */
+	q_ptr->info |= OB_NO_EXP;
+
+	(void)inven_carry(q_ptr);
+
 	/* Hack -- Give the player three useful objects */
 	for (i = 0; i < 3; i++)
 	{
@@ -1405,8 +1418,8 @@ static bool player_birth_aux_3(void)
 			/* In the Antiband version this is dependent on class & stat */
 			int def_weight = 50 + 5*cp_ptr->c_adj[i];
 			/* soften the extremes */
-			if(cp_ptr->c_adj[i] > 4) def_weight -= 5;
-			if(cp_ptr->c_adj[i] < -4) def_weight += 5;
+			if (cp_ptr->c_adj[i] > 4) def_weight -= 5;
+			if (cp_ptr->c_adj[i] < -4) def_weight += 5;
 
 			/* Get a minimum stat */
 			while (TRUE)
@@ -1870,7 +1883,6 @@ static bool player_birth_aux(void)
 
 	/* Display the player */
 	display_player(DISPLAY_PLAYER_STANDARD);
-
 
 	/* Prompt for it */
 	prtf(10, 23,
