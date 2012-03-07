@@ -1153,6 +1153,7 @@ static bool do_cmd_view_map_aux(char c, int town)
 	switch (c)
 	{
 		case '*':
+		case 't':
 		{
 			/* Display the list of shops */
 			dump_town_info(fff, town, FALSE);
@@ -1348,7 +1349,7 @@ void do_cmd_view_map(void)
 			}
       else
 			/* Accept '*' or a direction -- MT */
-			if ((c == '*') || (c == 'h') || (c == 'q'))
+			if ((c == '*') || (c == 't') || (c == 'h') || (c == 'q'))
       { 
         // key is checked here, to trap the key press, so it does not
         // leave the map when not on a town
