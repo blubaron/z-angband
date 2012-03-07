@@ -1073,6 +1073,7 @@ static bool dump_info_test(char c, int town)
 	switch (c)
 	{
 		case '*':
+		case 't':
 		{
 			/* Display the list of shops always works */
 			return (TRUE);
