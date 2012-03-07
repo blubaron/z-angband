@@ -2061,7 +2061,9 @@ static void calc_mana(void)
 	if (levels < 0) levels = 0;
 
 	/* Extract total mana */
-	msp = adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] * levels / 25;
+	msp = (adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] * levels / 25);
+  if (levels > 0)
+    msp += (adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] / 20);
 
 	/* Hack -- usually add one mana */
 	if (msp) msp++;
