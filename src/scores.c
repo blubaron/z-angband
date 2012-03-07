@@ -710,9 +710,20 @@ void top_twenty(void)
 {
 	int from, to;
 	bool cont;
+  bool opened = FALSE;
 
 	/* Clear screen */
 	Term_clear();
+
+	if (highscore_fd < 0)
+	{
+	  char buf[1024];
+
+	  /* Build the filename */
+	  path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
+  	highscore_fd = fd_open(buf, O_RDONLY);
+    opened = TRUE;
+	}
 
 	/* No score file */
 	if (highscore_fd < 0)
@@ -734,6 +745,11 @@ void top_twenty(void)
 		/* Show the second page */
 		(void)display_scores_aux(from, to, score_idx, NULL);
 	}
+
+  if (opened) {
+ 	  (void)fd_close(highscore_fd);
+	  highscore_fd = -1;
+  }
 
 	/* Success */
 	return;
@@ -1324,52 +1340,10 @@ static void show_info(void)
 	}
 }
 
-
-
-static void close_game_handle_death(void)
+void tomb_menu(bool dump)
 {
 	char ch;
 	bool auto_done = FALSE;
-
-	/* Handle retirement */
-	if (p_ptr->state.total_winner)
-	{
-		/* Save winning message to notes file. */
-		if (take_notes)
-		{
-			add_note_type(NOTE_WINNER);
-		}
-
-		kingly();
-	}
-
-	/* Save memories */
-	if (!munchkin_death || get_check("Save death? "))
-	{
-		if (!save_player()) msgf("death save failed!");
-	}
-
-#if 0
-	/* Dump bones file */
-	make_bones();
-#endif
-
-	/* Inform notes file that you are dead */
-	if (take_notes)
-	{
-		char long_day[30];
-		time_t ct = time((time_t *) NULL);
-
-		/* Get the date */
-		(void)strftime(long_day, 30, "%Y-%m-%d at %H:%M:%S", localtime(&ct));
-
-		/* Output to the notes file */
-		output_note("\n%s was killed by %s on %s\n", player_name,
-				p_ptr->state.died_from, long_day);
-	}
-
-	/* Enter player in high score list */
-	enter_score();
 
 	/* You are dead */
 	print_tomb();
@@ -1394,7 +1368,7 @@ static void close_game_handle_death(void)
 		flush();
 
 		/* Hack: select 'd' the first time if auto_dump is on */
-		if (auto_dump && !auto_done) {
+		if (dump && !auto_done) {
 			ch = 'd';
 			auto_done = TRUE;
 		}
@@ -1407,7 +1381,7 @@ static void close_game_handle_death(void)
 				/* Flush the keys */
 				flush();
 
-				if (get_check("Do you really want to exit? "))
+				//if (get_check("Do you really want to exit? "))
 				{
 					/* Save dead player */
 					if (!save_player())
@@ -1416,21 +1390,16 @@ static void close_game_handle_death(void)
 						message_flush();
 					}
 
-#if 0
-					/* Dump bones file */
-					make_bones();
-#endif
-
 					/* XXX We now have an unmatched Term_save() */
 					Term_load();
 
 					/* Go home, we're done */
 					return;
 				}
-				else
-				{
-					break;
-				}
+				//else
+				//{
+				//	break;
+				//}
 			}
 
 			case 'd':
@@ -1480,6 +1449,51 @@ static void close_game_handle_death(void)
 		/* Restore the screen */
 		Term_load();
 	}
+}
+
+static void close_game_handle_death(void)
+{
+	/* Handle retirement */
+	if (p_ptr->state.total_winner)
+	{
+		/* Save winning message to notes file. */
+		if (take_notes)
+		{
+			add_note_type(NOTE_WINNER);
+		}
+
+		kingly();
+	}
+
+	/* Save memories */
+	if (!munchkin_death || get_check("Save death? "))
+	{
+		if (!save_player()) msgf("death save failed!");
+	}
+
+#if 0
+	/* Dump bones file */
+	make_bones();
+#endif
+
+	/* Inform notes file that you are dead */
+	if (take_notes)
+	{
+		char long_day[30];
+		time_t ct = time((time_t *) NULL);
+
+		/* Get the date */
+		(void)strftime(long_day, 30, "%Y-%m-%d at %H:%M:%S", localtime(&ct));
+
+		/* Output to the notes file */
+		output_note("\n%s was killed by %s on %s\n", player_name,
+				p_ptr->state.died_from, long_day);
+	}
+
+	/* Enter player in high score list */
+	enter_score();
+
+  tomb_menu(auto_dump);
 }
 
 

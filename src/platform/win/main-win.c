@@ -3508,9 +3508,9 @@ static void process_menus(WORD wCmd)
 			else
 			{
 				game_in_progress = TRUE;
-				Term_flush();
-				play_game(TRUE);
-				quit(NULL);
+				//Term_flush();
+				//play_game(TRUE);
+				//quit(NULL);
 			}
 			break;
 		}
@@ -3543,9 +3543,9 @@ static void process_menus(WORD wCmd)
 					/* Load 'savefile' */
 					validate_file(savefile);
 					game_in_progress = TRUE;
-					Term_flush();
-					play_game(FALSE);
-					quit(NULL);
+					//Term_flush();
+					//play_game(FALSE);
+					//quit(NULL);
 				}
 			}
 			break;
@@ -5339,6 +5339,8 @@ bool broken_ascii(void)
 }
 
 
+extern void display_introduction();
+extern void tomb_menu(bool dump);
 
 int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
                        LPSTR lpCmdLine, int nCmdShow)
@@ -5519,18 +5521,149 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* Save player movement hook */
 	set_callback((callback_type) win_player_move, CALL_PLAYER_MOVE, NULL);
 
-	/* Prompt the user */
-	prtf(17, 23, "[Choose 'New' or 'Open' from the 'File' menu]");
-	Term_fresh();
+  /* This section to play repeated games without exiting first was
+   * modified from Sil */
+	while (1)
+  {
+		bool new_game = FALSE;
+    
+		/* Let the player choose a savefile or start a new game */
+    if (!game_in_progress) {
+			//int choice = 0;
+			//int highlight = 1;
+      char key;
 
-	/* Process messages forever */
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+			//if (p_ptr->state.is_dead) highlight = 4;
+	    /* Prompt the user */
+      if (savefile[0] != 0) {
+  	    prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+        prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+      } else {
+  	    prtf(10, 23, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+      }
+	    Term_fresh();
+
+
+			/* Process Events until "new" or "open" is selected */
+			while (!game_in_progress)
+			{
+				//OPENFILENAME ofn;
+
+        /* process any windows messages */
+	      while (PeekMessage(&msg, NULL, 0, 0,PM_REMOVE)) {
+		      TranslateMessage(&msg);
+		      DispatchMessage(&msg);
+	      }
+        /* see if there is a key press on the queue */
+        Term_inkey(&key, FALSE,TRUE);
+        if ((key == 'n') || (key == 'N')) {
+					/* New game */
+          if (savefile[0] != 0) {
+            quit("Quiting because repeated play is not working yet.");
+          }
+          savefile[0] = 0;
+          process_menus(IDM_FILE_NEW);
+        } else
+        if ((key == 'o') || (key == 'O')) {
+					/* Load a save game */
+          if (savefile[0] != 0) {
+            quit("Quiting because repeated play is not working yet.");
+          }
+          process_menus(IDM_FILE_OPEN);
+        } else
+        if ((key == 'l') || (key == 'L')) {
+          if (savefile[0] != 0) {
+					  /* Load the last game */
+					  game_in_progress = TRUE;
+					  new_game = FALSE;
+          }
+        } else
+        if ((key == 'g') || (key == 'G')) {
+          if (savefile[0] != 0) {
+					  /* show the graveyard */
+            tomb_menu(FALSE);
+
+            /* Show the initial screen again */
+            display_introduction();
+
+	          /* Prompt the user */
+	          prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+	          prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+
+            /* Flush it */
+	          Term_fresh();
+          }
+        } else
+        /*if ((key == 't') || (key == 'T')) {
+					/* Start the tutorial */ /*
+					game_in_progress = TRUE;
+					new_game = FALSE;
+        } else*/
+        if ((key == 'x') || (key == 'X')) {
+					/* Quit */
+					quit(NULL);
+        }
+			}
+		}
+
+		/* Handle pending events (most notably update) and flush input */
+		Term_flush();
+
+    if (savefile[0] != 0) {
+      new_game = FALSE;
+    } else {
+      new_game = TRUE;
+    }
+		/*
+		 * Play a game -- "new_game" is set by "new", "open" or the open document
+		 * even handler as appropriate
+		 */
+		play_game(new_game);
+
+		// game no longer in progress
+		game_in_progress = FALSE;
+
+	/* Free the messages */
+	messages_free();
+
+	/* Free the "quarks" */
+	//quarks_free();
+
+  //cleanup_angband();
+
+    // clear the region used for big tiles
+    Term_bigregion(-1, -1, -1);
+	  /* Hack - redraw everything + recalc bigtile regions */
+	  angband_term[0]->resize_hook();
+    
+    // reset some globals that start at 0
+	  character_loaded = FALSE;
+
+		// rerun the first initialization routine
+		//init_stuff();
+		
+		// do some more between-games initialization
+		//re_init_some_things();
+  /* Initialize the "quark" package */
+	//(void)quarks_init();
+
+	/* Initialize the "message" package */
+	(void)messages_init();
+
+	/* Show the initial screen again */
+  display_introduction();
+
+	/* Flush it */
+	Term_fresh();
+  //init_angband();
+
+  /* reinitialize arrays that use quarks */
+	//note("[Initializing arrays... (wilderness)]");
+	//if (init_w_info()) quit("Cannot initialize wilderness");
+
 	}
 
-	/* Paranoia */
+  /* Paranoia */
 	quit(NULL);
 
 	/* Paranoia */

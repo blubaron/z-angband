@@ -1586,7 +1586,6 @@ static void note(cptr str)
 }
 
 
-
 /*
  * Hack -- Explain a broken "lib" folder and quit (see below).
  *
@@ -1607,6 +1606,73 @@ static void init_angband_fail(void)
 
 	/* Quit with error */
 	quit("Fatal Error.");
+}
+
+
+/*
+ * Display the introductory text
+ */
+void display_introduction()
+{
+	int fd = -1;
+
+	int mode = 0644;
+
+	FILE *fp;
+
+	char buf[1024];
+
+  /*** Verify the "news" file ***/
+
+	/* Build the filename */
+	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
+
+	/* Attempt to open the file */
+	fd = fd_open(buf, O_RDONLY);
+
+	/* Failure */
+	if (fd < 0)
+	{
+		/* Message */
+		plog_fmt("Cannot access the '%s' file!", buf);
+
+		/* Crash and burn */
+		init_angband_fail();
+	}
+
+	/* Close it */
+	(void)fd_close(fd);
+
+
+	/*** Display the "news" file ***/
+
+	/* Clear screen */
+	Term_clear();
+
+	/* Build the filename */
+	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
+
+	/* Open the News file */
+	fp = my_fopen(buf, "r");
+
+	/* Dump */
+	if (fp)
+	{
+		int i = 0;
+
+		/* Dump the file to the screen */
+		while (0 == my_fgets(fp, buf, 1024))
+		{
+			/* Display and advance */
+			put_fstr(0, i++, buf);
+		}
+
+		/* Close */
+		my_fclose(fp);
+	}
+
+	/* Display version number */
+	put_fstr(42, 3, "%d.%d.%d", VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
 
@@ -1663,62 +1729,9 @@ void init_angband(void)
 
 	int mode = 0644;
 
-	FILE *fp;
-
 	char buf[1024];
 
-
-	/*** Verify the "news" file ***/
-
-	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
-
-	/* Attempt to open the file */
-	fd = fd_open(buf, O_RDONLY);
-
-	/* Failure */
-	if (fd < 0)
-	{
-		/* Message */
-		plog_fmt("Cannot access the '%s' file!", buf);
-
-		/* Crash and burn */
-		init_angband_fail();
-	}
-
-	/* Close it */
-	(void)fd_close(fd);
-
-
-	/*** Display the "news" file ***/
-
-	/* Clear screen */
-	Term_clear();
-
-	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
-
-	/* Open the News file */
-	fp = my_fopen(buf, "r");
-
-	/* Dump */
-	if (fp)
-	{
-		int i = 0;
-
-		/* Dump the file to the screen */
-		while (0 == my_fgets(fp, buf, 1024))
-		{
-			/* Display and advance */
-			put_fstr(0, i++, buf);
-		}
-
-		/* Close */
-		my_fclose(fp);
-	}
-
-	/* Display version number */
-	put_fstr(42, 3, "%d.%d.%d", VER_MAJOR, VER_MINOR, VER_PATCH);
+  display_introduction();
 
 	/* Flush it */
 	Term_fresh();
@@ -1761,6 +1774,7 @@ void init_angband(void)
 	/* Close it */
 	(void)fd_close(fd);
 
+	Term_fresh();
 
 	/*** Initialize some arrays ***/
 
@@ -2013,4 +2027,232 @@ void cleanup_angband(void)
 	string_free(ANGBAND_DIR_XTRA_FONT);
 	string_free(ANGBAND_DIR_XTRA_GRAF);
 	string_free(ANGBAND_DIR_XTRA_SOUND);
+}
+
+
+/*
+ * Reinitialize some things between games
+ *
+ * Needed because rerunning the whole of init_angband() causes crashes.
+ * From Sil
+ */
+void re_init_some_things(void)
+{
+  int i;
+
+	Rand_quick = FALSE;
+	
+	// wipe the whole player structure
+	(void)WIPE(p_ptr, player_type);
+				
+  #if (0)
+	// clear some additional things
+	savefile[0] = '\0';
+	turn = 0;
+	turn_offset = 0;
+	//op_ptr->full_name[0] = '\0';
+
+	// clear the terms
+	for (i = 0; i < ANGBAND_TERM_MAX; i++)
+	{
+		term *old = Term;
+
+		/* Dead window */
+		if (!angband_term[i]) continue;
+
+		/* Activate */
+		Term_activate(angband_term[i]);
+
+		/* Erase */
+		Term_clear();
+
+		/* Refresh */
+		Term_fresh();
+
+		/* Restore */
+		Term_activate(old);
+	}
+#endif
+
+  /* Free the messages */
+	messages_free();
+	/* Initialize the "message" package */
+	(void)messages_init();
+
+  #if (0)
+  /* reinitialize arrays that use quarks */
+	//note("[Initializing arrays... (wilderness)]");
+	//if (init_w_info()) quit("Cannot initialize wilderness");
+	// Reset the autoinscriptions
+	//autoinscribe_clean();
+	//autoinscribe_init();
+	/* Free the messages */
+	messages_free();
+
+	/* Free the "quarks" */
+	quarks_free();
+
+  /* Free the macros */
+	for (i = 0; i < macro__num; ++i)
+	{
+		string_free(macro__pat[i]);
+		string_free(macro__act[i]);
+	}
+
+	FREE((void *)macro__pat);
+	FREE((void *)macro__act);
+
+	/* Free the keymaps */
+	for (i = 0; i < KEYMAP_MODES; ++i)
+	{
+		for (j = 0; j < 256; ++j)
+		{
+			string_free(keymap_act[i][j]);
+		}
+	}
+
+	/* Delete the overhead map */
+	//del_overhead_map();
+
+	/* Initialise the overhead map */
+	//init_overhead_map();
+
+	/*** Prepare the various "bizarre" arrays ***/
+
+	/* Macro variables */
+	C_MAKE(macro__pat, MACRO_MAX, cptr);
+	C_MAKE(macro__act, MACRO_MAX, cptr);
+	C_MAKE(macro__cmd, MACRO_MAX, bool);
+
+	/* Macro action buffer */
+	C_MAKE(macro__buf, 1024, char);
+
+
+	/* Clear the spell colour strings */
+	(void)C_WIPE(gf_color, MAX_GF, cptr);
+
+
+	/* Initialize the "quark" package */
+	(void)quarks_init();
+
+	/* Initialize the "message" package */
+	(void)messages_init();
+#endif
+  character_loaded = FALSE;
+
+  // display the introduction message again
+  display_introduction();
+
+
+	/* Flush it */
+	Term_fresh();
+  
+#if (0)
+
+	/* Array of grids */
+	FREE(view_g);
+	C_MAKE(view_g, VIEW_MAX, u16b);
+
+	/* Array of grids */
+	FREE(temp_g);
+	C_MAKE(temp_g, TEMP_MAX, u16b);
+
+    /* has_lite patch causes both temp_g and temp_x/y to be used
+    in targetting mode: can't use the same memory any more. */
+	FREE(temp_y);
+	FREE(temp_x);
+    C_MAKE(temp_y, TEMP_MAX, byte);
+    C_MAKE(temp_x, TEMP_MAX, byte);
+
+	/*** Prepare dungeon arrays ***/
+
+	/* Padded into array */
+	FREE(cave_info);
+	C_MAKE(cave_info, MAX_DUNGEON_HGT, u16b_256);
+
+	/* Feature array */
+	FREE(cave_feat);
+	C_MAKE(cave_feat, MAX_DUNGEON_HGT, byte_wid);
+
+	/* Light array */
+	FREE(cave_light);
+	C_MAKE(cave_light, MAX_DUNGEON_HGT, s16b_wid);
+	
+	/* Entity arrays */
+	FREE(cave_o_idx);
+	FREE(cave_m_idx);
+	C_MAKE(cave_o_idx, MAX_DUNGEON_HGT, s16b_wid);
+	C_MAKE(cave_m_idx, MAX_DUNGEON_HGT, s16b_wid);
+
+	/* Flow arrays */
+	FREE(cave_when);
+	C_MAKE(cave_when, MAX_DUNGEON_HGT, byte_wid);
+
+	/*start with cost at center 0*/
+	for (i = 0; i < MAX_FLOWS; i++)
+	{
+		cost_at_center[i] = 0;
+	}
+
+	/*** Prepare "vinfo" array ***/
+
+	/* Used by "update_view()" */
+	(void)vinfo_init();
+
+
+	/*** Prepare entity arrays ***/
+
+	/* Objects */
+	FREE(o_list);
+	C_MAKE(o_list, z_info->o_max, object_type);
+
+	/* Monsters */
+	FREE(mon_list);
+	C_MAKE(mon_list, z_info->m_max, monster_type);
+
+
+	/*** Prepare lore array ***/
+
+	/* Lore */
+	FREE(l_list);
+	C_MAKE(l_list, z_info->r_max, monster_lore);
+
+
+	/*** Prepare the inventory ***/
+
+	/* Allocate it */
+	FREE(inventory);
+	C_MAKE(inventory, INVEN_TOTAL, object_type);
+
+	/*** Prepare the options ***/
+
+	/* Initialize the options */
+	for (i = 0; i < OPT_MAX; i++)
+	{
+		/* Default value */
+		op_ptr->opt[i] = option_norm[i];
+	}
+
+	/* Initialize the window flags */
+	for (i = 0; i < ANGBAND_TERM_MAX; i++)
+	{
+		/* Assume no flags */
+		op_ptr->window_flag[i] = 0L;
+	}
+	
+	// Set some sensible defaults
+	op_ptr->window_flag[1] |= (PW_INVEN);
+	op_ptr->window_flag[2] |= (PW_EQUIP);
+	op_ptr->window_flag[3] |= (PW_COMBAT_ROLLS);
+	op_ptr->window_flag[4] |= (PW_MONSTER);
+	op_ptr->window_flag[5] |= (PW_PLAYER_0);
+	op_ptr->window_flag[6] |= (PW_MESSAGE);
+	op_ptr->window_flag[7] |= (PW_MONLIST);
+	
+	// re-initialize the objects and flavors
+	if (init_k_info()) quit("Cannot initialize objects");
+	if (init_flavor_info()) quit("Cannot initialize flavors");
+	if (init_e_info()) quit("Cannot initialize special items");
+#endif
+	
 }

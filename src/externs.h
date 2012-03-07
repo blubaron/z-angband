@@ -498,6 +498,7 @@ extern void init_angband(void);
 extern void cleanup_angband(void);
 extern errr check_modification_date(int fd, cptr template_file);
 extern void reinit_alloc(void);
+extern void re_init_some_things(void);
 
 /* load.c */
 extern errr rd_savefile_new(void);

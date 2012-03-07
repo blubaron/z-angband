@@ -942,11 +942,15 @@ bool home_rest(void)
   {
 	  /* Rest until sunset */
     turn += (day_len>>1)-tick;
+	  /* Save the number of turns skipped; they don't "count" */
+	  turn_offset += (day_len>>1)-tick;
   }
   else
   {
     /* Rest all night */
 	  turn += day_len-tick;
+	  /* Save the number of turns skipped; they don't "count" */
+	  turn_offset += day_len-tick;
   }
 	p_ptr->chp = p_ptr->mhp;
 
@@ -2718,7 +2722,8 @@ void building_buy_info(void)
         }
       }
       r = row+(j%numrows);
-      price = (wild_build[i].rarity+1) * 100000;
+      price = (wild_build[i].rarity+3) * 100000;
+      //TODO adjust home price if no home in place if ((i==BUILD_HOME) && (pl_ptr))
   	  put_fstr(c1, r, t_info[wild_build[i].field].name);
       if (price > p_ptr->au + p_ptr->bank_gold) {
   	    put_fstr(c2, r, CLR_SLATE "%7d", price);

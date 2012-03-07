@@ -47,7 +47,7 @@ wild_building_type wild_build[MAX_CITY_BUILD] =
 	{0, 0, FT_BUILD_PLUS_WEAPON, FT_BUILD_PLUS_WEAPON, BT_BUILD, 200, 150, 200, 8},
 	{0, 0, FT_BUILD_PLUS_ARMOUR, FT_BUILD_PLUS_ARMOUR, BT_BUILD, 200, 150, 200, 8},
 	{0, 0, FT_BUILD_MUTATE, FT_BUILD_MUTATE, BT_BUILD, 200, 150, 50, 15},
-	{0, 0, FT_BUILD_EMPTY, 0, BT_BUILD, 150, 150, 150, 1},
+	{0, 0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
 	{0, 0, 0, 0, BT_GENERAL, 150, 150, 150, 1},
 	{0, 0, FT_BUILD_MAP, FT_BUILD_MAP, BT_BUILD, 150, 150, 150, 5},
 	{0, 0, FT_STORE_WEAPON1, FT_STORE_WEAPON, BT_STORE, 100, 100, 100, 10},
@@ -157,7 +157,8 @@ wild_building_type wild_build[MAX_CITY_BUILD] =
 	{0, 0, FT_BUILD_FARM, 0, BT_BUILD, 0, 0, 0, 0},
 	{0, 0, FT_BUILD_BLACKSMITH, FT_BUILD_BLACKSMITH, BT_BUILD, 150, 150, 150, 10},
 	{0, 0, FT_BUILD_BANK, FT_BUILD_BANK, BT_BUILD, 200, 100, 200, 12},
-	{0, 0, FT_BUILD_CASTLE2, FT_BUILD_CASTLE2, BT_BUILD, 0, 150, 150, 0}
+	{0, 0, FT_BUILD_CASTLE2, FT_BUILD_CASTLE2, BT_BUILD, 0, 150, 150, 0},
+	{0, 0, FT_BUILD_EMPTY, 0, BT_BUILD, 150, 150, 150, 1}
 };
 
 /* The stores in the starting town */
@@ -171,6 +172,7 @@ static byte wild_first_town[START_STORE_NUM] =
 	BUILD_STORE_TEMPLE,
 	BUILD_STORE_MAGIC,
 	BUILD_BLACK0,
+	BUILD_EMPTY,
 };
 
 
@@ -395,43 +397,41 @@ static void select_building_restrictions(byte pop, byte magic, int law, u16b *bu
 	/* Note that cities of size 12 have a small chance to have stairs. */
 
 	/* Effects for cities */
-	if (build_num > 16)
-	{
+	if (build_num > 16) {
 		/* Hack - Dungeons are not in large cities */
 		wild_build[BUILD_STAIRS].gen = 0;
 
 		/* Hack - Increase possibility of 'general' features */
-		for (i = 0; i < MAX_CITY_BUILD; i++)
-		{
-			if (build_is_general(i))
-			{
+		for (i = 0; i < MAX_CITY_BUILD; i++) {
+			if (build_is_general(i)) {
 				wild_build[i].gen *= ((build_num - 5) / 6);
 			}
 		}
+	  wild_build[BUILD_EMPTY].gen *= ((build_num - 5) / 6);
 	}
 
 	/* Some buildings don't exist for small towns */
 	else
 	{
-		for (i = 0; i < MAX_CITY_BUILD; i++)
-		{
+	  /* Not more than one empty building per small town */
+	  if (build[BUILD_EMPTY]) {
+		  wild_build[BUILD_EMPTY].gen = 0;
+	  }
+		for (i = 0; i < MAX_CITY_BUILD; i++) {
 			/* No 'filler' buildings in small towns. */
-			if (build_is_general(i))
-			{
+			if (build_is_general(i)) {
 				wild_build[i].gen = 0;
 			}
 		}
 	}
 
 	/* Not more than one home per city */
-	if (build[BUILD_STORE_HOME])
-	{
+	if (build[BUILD_STORE_HOME]) {
 		wild_build[BUILD_STORE_HOME].gen = 0;
 	}
 
 	/* Not more than one magetower per city */
-	if (build[BUILD_MAGETOWER0] || build[BUILD_MAGETOWER1])
-	{
+	if (build[BUILD_MAGETOWER0] || build[BUILD_MAGETOWER1]) {
 		wild_build[BUILD_MAGETOWER0].gen = 0;
 		wild_build[BUILD_MAGETOWER1].gen = 0;
 	}
@@ -3456,14 +3456,18 @@ static bool create_towns(int *xx, int *yy)
 					break;
 				case CLASS_MINDCRAFTER:
 				default:
-					general_init(best_town, i, BUILD_NONE);
+					general_init(best_town, i, BUILD_EMPTY);
 					break;
 			}
 		}
 		else
 		{
 			/* Blank spot */
-			general_init(best_town, i, BUILD_NONE);
+      if (randint0(2) == 0) {
+			  general_init(best_town, i, BUILD_NONE);
+      } else {
+				build_init(best_town, i, BUILD_EMPTY);
+      }
 		}
 	}
 

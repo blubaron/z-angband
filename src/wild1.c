@@ -3697,7 +3697,7 @@ void create_wilderness(void)
 #ifndef DEBUG
 
 	/* Free up memory used to create the wilderness */
-	FREE(wild_choice_tree);
+	//FREE(wild_choice_tree);
 
 #endif /* !DEBUG */
 
