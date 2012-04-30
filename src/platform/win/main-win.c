@@ -167,6 +167,7 @@
  * Include the "windows" support file
  */
 #include <windows.h>
+#include <windowsx.h>
 
 #ifdef USE_SOUND
 
@@ -271,11 +272,6 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
 
 
 /*
- * Forward declare
- */
-typedef struct _term_data term_data;
-
-/*
  * Extra "term" data
  *
  * Note the use of "font_want" for the names of the font file requested by
@@ -285,62 +281,7 @@ typedef struct _term_data term_data;
  * "font_want" can be in almost any form as long as it could be construed
  * as attempting to represent the name of a font.
  */
-struct _term_data
-{
-	term t;
-
-	cptr s;
-
-	HWND w;
-
-	DWORD dwStyle;
-	DWORD dwExStyle;
-
-	uint keys;
-
-	byte rows;
-	byte cols;
-
-	uint pos_x;
-	uint pos_y;
-	uint size_wid;
-	uint size_hgt;
-	uint size_ow1;
-	uint size_oh1;
-	uint size_ow2;
-	uint size_oh2;
-
-	bool size_hack;
-
-	bool xtra_hack;
-
-	bool visible;
-	bool maximized;
-
-	cptr font_want;
-
-	cptr font_file;
-
-	HFONT font_id;
-
-	uint font_wid;
-	uint font_hgt;
-
-	uint tile_wid;
-	uint tile_hgt;
-	
-	uint map_tile_wid;
-	uint map_tile_hgt;
-	
-	bool map_active;
-};
-
-
-/*
- * Maximum number of windows XXX XXX XXX
- */
-#define MAX_TERM_DATA 8
-
+#include "win-term.h"
 
 /*
  * An array of term_data's
@@ -355,13 +296,7 @@ static term_data *my_td;
 /*
  * Default window layout function
  */
-int default_layout_win(void);
-int default_layout_win(void)
-{
-  Term_keypress('=');
-  Term_keypress('m');
-  return 0;
-}
+int default_layout_win(term_data *data, int maxterms);
 
 /*
  * game in progress
@@ -1031,6 +966,16 @@ static void load_prefs(void)
 	int i;
 
 	char buf[1024];
+	bool first_start;
+	FILE *exists;
+
+	exists = my_fopen(ini_file, "r");
+	if (exists) {
+		my_fclose(exists);
+		first_start = FALSE;
+	} else {
+		first_start = TRUE;
+	}
 
 	/* Extract the "arg_graphics" flag */
 	GetPrivateProfileString("Angband", "Graphics", "0", buf, 1024, ini_file);
@@ -1078,6 +1023,10 @@ static void load_prefs(void)
 		strnfmt(buf, 1024, "Term-%d", i);
 
 		load_prefs_aux(td, buf);
+	}
+
+	if (first_start) {
+		default_layout_win(data,MAX_TERM_DATA);
 	}
 
 	/* Paranoia */
@@ -3780,11 +3729,84 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 		case IDM_WINDOW_RESET: {
-      if (MessageBox(NULL,
-          "This will reset the size and layout of the angband windows\n based on your screen size. Do you want to continue?",
-          "Angband", MB_YESNO|MB_ICONWARNING) == IDYES) {
-        default_layout_win();
-      }
+			if (MessageBox(NULL,
+				  "This will reset the size and layout of the angband windows\n based on your screen size. Do you want to continue?",
+				  "z+Angband", MB_YESNO|MB_ICONWARNING) == IDYES) {
+				term *old = Term;
+				int i;
+				RECT rc;
+
+				(void)default_layout_win(data,MAX_TERM_DATA);
+        
+				for (i=0; i < MAX_TERM_DATA; i++) {
+					/* Activate */
+					Term_activate(&(data[i].t));
+	        
+					/* Resize the term */
+					Term_resize(data[i].cols, data[i].rows);
+				}
+				/* Restore */
+				Term_activate(old);
+
+				/* Do something to sub-windows */
+				for (i = MAX_TERM_DATA - 1; i >= 0; i--) {
+					if (!(data[i].w)) continue;
+					/* Client window size */
+					rc.left = 0;
+					rc.top = 0;
+					rc.right = rc.left + data[i].cols * data[i].tile_wid + data[i].size_ow1 + data[i].size_ow2;
+					rc.bottom = rc.top + data[i].rows * data[i].tile_hgt + data[i].size_oh1 + data[i].size_oh2;
+
+					/* Get total window size (without menu for sub-windows) */
+					AdjustWindowRectEx(&rc, data[i].dwStyle, TRUE, data[i].dwExStyle);
+
+					/* Total size */
+					data[i].size_wid = rc.right - rc.left;
+					data[i].size_hgt = rc.bottom - rc.top;
+
+					if (i==0) {
+						SetWindowPos(data[i].w, 0, data[i].pos_x, data[i].pos_y,
+							data[i].size_wid, data[i].size_hgt, 0);
+					} else {
+						SetWindowPos(data[i].w, data[0].w, data[i].pos_x, data[i].pos_y,
+							data[i].size_wid, data[i].size_hgt, 0);
+					}
+					if (data[i].visible) {
+						char buf[1024];
+
+						/* Access the standard font file */
+						path_make(buf, ANGBAND_DIR_XTRA_FONT, data[i].font_want);
+
+						/* Activate the chosen font */
+						if (term_force_font(&data[i], buf)) {
+							/* Access the standard font file */
+							path_make(buf, ANGBAND_DIR_XTRA_FONT, "8X13.FON");
+
+							/* Force the use of that font */
+							(void)term_force_font(&data[i], buf);
+
+							/* Oops */
+							data[i].tile_wid = 8;
+							data[i].tile_hgt = 13;
+						}
+						/* Reset the tile info */
+						if (!data[i].tile_wid || !data[i].tile_hgt) {
+							data[i].tile_wid = data[i].font_wid;
+							data[i].tile_hgt = data[i].font_hgt;
+						}
+
+						ShowWindow(data[i].w, SW_SHOW);
+					} else {
+						ShowWindow(data[i].w, SW_HIDE);
+					}
+ 
+					/* Redraw later */
+					InvalidateRect(data[i].w, NULL, TRUE);
+				}
+
+				/* Focus on main window */
+				SetFocus(data[0].w);
+			}
 
 			break;
 		}
