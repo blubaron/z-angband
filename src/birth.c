@@ -1969,12 +1969,24 @@ void player_birth(void)
 	player_outfit();
 
 	/* Set the message window flag as default */
-	if (!window_flag[1])
+	if (ANGBAND_TERM_MAX > 1) if (!window_flag[1])
 		window_flag[1] |= PW_MESSAGE;
 
 	/* Set the inv/equip window flag as default */
-	if (!window_flag[2])
+	if (ANGBAND_TERM_MAX > 2) if (!window_flag[2])
 		window_flag[2] |= PW_INVEN;
+
+	/* Set the other default window flags */
+	if (ANGBAND_TERM_MAX > 3) if (!window_flag[3])
+		window_flag[3] |= PW_VISIBLE;
+	if (ANGBAND_TERM_MAX > 4) if (!window_flag[4])
+		window_flag[4] |= PW_SPELL;
+	if (ANGBAND_TERM_MAX > 5) if (!window_flag[5])
+		window_flag[5] |= PW_MONSTER | PW_OBJECT;
+	if (ANGBAND_TERM_MAX > 6) if (!window_flag[6])
+		window_flag[6] |= PW_OVERHEAD;
+	if (ANGBAND_TERM_MAX > 7) if (!window_flag[7])
+		window_flag[7] |= PW_PLAYER;
 
 	/* Extract current clone */
 	create_clone(FALSE);
