@@ -64,7 +64,7 @@ struct maxima
 	u16b h_max; /* Number of entries at end of "r_info[]" reserved for "heroes"  */
 	u16b v_max;	/* Max size for "v_info[]" */
 
-  u16b q_max;	/* Max size for quest array */
+	u16b q_max;	/* Max size for quest array */
 
 	u16b t_max;	/* Max size for field types array */
 	u16b fld_max;	/* Max size for field list */
@@ -78,7 +78,7 @@ struct maxima
 	u16b o_max;	/* Max size for "o_list[]" */
 	u16b m_max;	/* Max size for "m_list[]" */
 
-  u16b dun_max;	/* Max size for dungeon type array */
+	u16b dun_max;	/* Max size for dungeon type array */
 	u16b lmk_max;	/* Max size for landmark array */
 	u16b lvl_max;	/* Max size for defined level array */
 
@@ -115,17 +115,17 @@ typedef struct feature_type feature_type;
 
 struct feature_type
 {
-  //feature_type *next;
-  //u16b idx;
+	//feature_type *next;
+	//u16b idx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
 
-  u32b flags;	/* Properties of the feature */
-  u32b flags2;	/* Properties of the feature */
-  u16b base_feat;	/* index of the underlying feature */
+	u32b flags;	/* Properties of the feature */
+	u32b flags2;	/* Properties of the feature */
+	u16b base_feat;	/* index of the underlying feature */
 
-  byte d_attr;	/* Default feature attribute */
+	byte d_attr;	/* Default feature attribute */
 	char d_char;	/* Default feature character */
 
 	byte x_attr;	/* Desired feature attribute */
@@ -134,12 +134,12 @@ struct feature_type
 	byte priority;	/* Display priority on mini map */
 	byte dig;	/* How hard is it to dig through? or How locked or jammed is it? */
 
-  byte xd_attr;	/* Desired feature attribute when dimmed */
+	byte xd_attr;	/* Desired feature attribute when dimmed */
 	char xd_char;	/* Desired feature character when dimmed */
 	byte xl_attr;	/* Desired feature attribute when bright */
 	char xl_char;	/* Desired feature character when bright */
 
-  /*byte name_len;	/* length of name string */
+	/*byte name_len;	/* length of name string */
 	/*byte text_len;	/* length of feature description string */
 };
 
@@ -165,8 +165,8 @@ typedef struct object_kind object_kind;
 
 struct object_kind
 {
-  //object_kind *next;
-  //u16b idx;
+	//object_kind *next;
+	//u16b idx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -241,8 +241,8 @@ typedef struct artifact_type artifact_type;
 
 struct artifact_type
 {
-  //artifact_type *next;
-  //u16b idx;
+	//artifact_type *next;
+	//u16b idx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -284,8 +284,8 @@ typedef struct ego_item_type ego_item_type;
 
 struct ego_item_type
 {
-  //ego_item_type *next;
-  //u16b idx;
+	//ego_item_type *next;
+	//u16b idx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -356,8 +356,8 @@ typedef struct monster_race monster_race;
 
 struct monster_race
 {
-  //monster_race *next;
-  //u16b idx;
+	//monster_race *next;
+	//u16b idx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -435,6 +435,17 @@ struct monster_race
 	u16b r_see;	/* Number of monsters of this type visible */
 };
 
+typedef struct floor_note floor_note;
+
+struct floor_note
+{
+	u16b y;
+	u16b x;
+	u8b  color;
+	u8b  flags;
+	u16b notelen;
+	cptr note;
+};
 
 /*
  * Information about "vault generation"
@@ -449,16 +460,19 @@ struct vault_symbol
 	byte sym;	/* symbol that will be used */
 	//byte type;	/* type of id (feature, field, monster, object, monster group, or object tval) */
 	//u16b id;	/* id used with the symbol */
-  byte flags;
+	byte flags;
 	u16b feat;	/* feature used */
 	u16b feat_mod_flags;	/* feature used */
 	s16b r_idx;	/* monster race - if r_idx < 0 make hero from -r_idx */
 	s16b k_idx;	/* object kind - if k_idx < 0 make randart from -k_idx */
 	s16b ego;	  /* ego used or artifact idx - if ego < 0 make artifact from -ego */
+	/* # if ego > 0, if k_idx > 0, use k_idx as base if appropiate tval for ego
+	 *# if ego > 0, if k_idx < 0, make randart that includes ego
+	 *# if ego > 0, if k_idx = 0, pick random object for ego */
 	u16b trap;	/* trap/field used on the spot */
-  /* if r_idx, k_idx, or trap start with '*', then the number means out
-   * of depth rather than index
-   */
+	/* if r_idx, k_idx, or trap start with '*', then the number means out
+	 * of depth rather than index
+	 */
 };
 
 /*
@@ -469,8 +483,8 @@ typedef struct vault_type vault_type;
 
 struct vault_type
 {
-  //vault_type *next;
-  //u16b idx;
+	//vault_type *next;
+	//u16b vidx;
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -482,9 +496,11 @@ struct vault_type
 	byte hgt;	/* Vault height */
 	byte wid;	/* Vault width */
 
-  vault_symbol *pSymbols;
-  //vault_symbol symbols[8];
-  u16b vidx;
+	vault_symbol *pSymbols;
+	//floor_note *notes;
+	//u32b line;
+	//u32b message;
+	u16b vidx;
 };
 
 
@@ -1204,13 +1220,35 @@ union quest_data_type
 typedef struct quest_chain quest_chain;
 struct quest_chain
 {
-  byte stage_type[4];
-  byte current_stage;
-  byte chain_flags;
-  quest_data_type stage[4];
-  c_ptr stage_text[4];
-  c_ptr stage_success_text[4];
-  c_ptr stage_fail_text[4];
+	byte stage_type[4];
+	byte current_stage;
+	byte chain_flags;
+	quest_data_type stage[4];
+	c_ptr stage_text[4];
+	c_ptr stage_success_text[4];
+	c_ptr stage_fail_text[4];
+};
+typedef struct quest_tree_stage quest_tree_stage;
+struct quest_tree_stage
+{
+	byte stage;
+	byte level;
+	u16b stage_timeout;
+
+	byte stage_type;
+	byte stage_flags;
+	byte success_stage;
+	byte failure_stage;
+
+	byte success_reward;
+	byte success_item;
+	byte failure_reward;
+	byte failure_item;
+  
+	quest_data_type stage;
+	c_ptr stage_text;
+	c_ptr stage_success_text;
+	c_ptr stage_fail_text;
 };
 #endif
 
@@ -1788,31 +1826,31 @@ struct player_type
 	bool birth[OPT_BIRTH];
 	u32b squelch[(SQUELCHMAX/32)];
 
-  byte ob_count;
-  byte dc_count;
-  //byte qb_count;
-  //byte ql_count;
-  //struct quest_building_info *quest_buildings;
-  //struct quest_building_info *owned_buildings;
-  //struct quest_level_info *quest_levels;
-  //struct quest_level_info *death_chests;
+	byte ob_count;
+	byte dc_count;
+	//byte qb_count;
+	//byte ql_count;
+	//struct quest_building_info *quest_buildings;
+	//struct quest_building_info *owned_buildings;
+	//struct quest_level_info *quest_levels;
+	//struct quest_level_info *death_chests;
 
-  u32b bank_gold;
-  u32b bank_layaway_gold;
-  u32b bank_layaway_paid;
-  object_type *bank_layaway;
+	u32b bank_gold;
+	u32b bank_layaway_gold;
+	u32b bank_layaway_paid;
+	object_type *bank_layaway;
 };
 /*typedef struct quest_building_info {
-  byte questid;
-  byte flags;
-  s16b place;
-  s16b building;
+	byte questid;
+	byte flags;
+	s16b place;
+	s16b building;
 };
 typedef struct quest_level_info {
-  byte questid;
-  byte flags;
-  s16b place;
-  s16b level;
+	byte questid;
+	byte flags;
+	s16b place;
+	s16b level;
 };
 */
 
@@ -1951,50 +1989,50 @@ struct dun_type
 {
   byte didx; /* index of base dungeon type */
 
-	byte min_level;	/* Minimum level in the dungeon */
-	byte max_level;	/* Maximum dungeon level allowed */
+	byte min_level;         /* Minimum level in the dungeon */
+	byte max_level;         /* Maximum dungeon level allowed */
 
-	byte level_change_step;	/* Depths Levels changed for every dungeon level */
+	byte level_change_step; /* Depths Levels changed for every dungeon level */
 
-	obj_theme theme;	/* Dungeon object theme */
+	obj_theme theme;        /* Dungeon object theme */
 
-	u32b habitat;	/* Flags describing habitat */
+	u32b habitat;           /* Flags describing habitat */
 
-	s16b rating;	/* Level's current rating */
+	s16b rating;            /* Level's current rating */
 
-	s16b region;	/* Hack - Region for current level */
+	s16b region;            /* Hack - Region for current level */
 
-	u16b rooms;		/* Room types available */
+	u16b rooms;             /* Room types available */
 
-	byte recall_depth;	/* Recall depth */
+	byte recall_depth;      /* Recall depth */
 
-	bool good_item_flag;	/* True if "Artifact" on this level */
+	bool good_item_flag;    /* True if "Artifact" on this level */
 
-	u16b floor;		/* Floor terrain type */
-	u16b wall;      /* Wall terrain type */
-	u16b perm_wall; /* Permanent wall terrain type */
-	u16b rubble;    		/* Override terrain type */
+	u16b floor;             /* Floor terrain type */
+	u16b wall;              /* Wall terrain type */
+	u16b perm_wall;         /* Permanent wall terrain type */
+	u16b rubble;            /* Override terrain type */
 
-  u16b door_open;		  /* Override terrain type */
-	u16b door_closed;		/* Override terrain type */
-	u16b door_broken;		/* Override terrain type */
-	u16b door_secret;		/* Override terrain type */
+	u16b door_closed;       /* Override terrain type */
+	u16b door_open;         /* Override terrain type */
+	u16b door_broken;       /* Override terrain type */
+	u16b door_secret;       /* Override terrain type */
 
-  u16b stairs_up;	  	/* Override terrain type */
-  u16b stairs_down;		/* Override terrain type */
-	u16b pillar;    		/* Override terrain type */
-	u16b stairs_closed;	/* Override terrain type */
+	u16b stairs_up;         /* Override terrain type */
+	u16b stairs_down;       /* Override terrain type */
+	u16b pillar;            /* Override terrain type */
+	u16b stairs_closed;     /* Override terrain type */
 	
-	stream_gen_type vein[2];  /* For magma veins, etc. */
+	stream_gen_type vein[2]; /* For magma veins, etc. */
 	stream_gen_type river[2];
 	stream_gen_type lake;
 
 	byte freq_monsters;
 	byte freq_objects;
-    byte freq_doors;
-    byte freq_traps;
+	byte freq_doors;
+	byte freq_traps;
 	byte freq_rubble;
-    byte freq_treasure;  /* Buried treasure */
+	byte freq_treasure;     /* Buried treasure */
 	byte freq_stairs;
 	byte freq_arena;
 	byte freq_cavern;
@@ -2002,7 +2040,7 @@ struct dun_type
 
 	byte room_limit;
 
-	u32b flags;		/* Extra flags */
+	u32b flags;             /* Extra flags */
 };
 
 
@@ -2011,9 +2049,9 @@ typedef struct dun_gen_type dun_gen_type;
 
 struct dun_gen_type
 {
-  byte didx; /* index of base dungeon type */
+	byte didx; /* index of base dungeon type */
 
-  /* Theme information */
+	/* Theme information */
 	obj_theme theme;
 	u32b habitat;
 
@@ -2029,40 +2067,40 @@ struct dun_gen_type
 	byte pop;
 	byte height;
 
-	u16b rooms;		/* Room types available */
+	u16b rooms;             /* Room types available */
 
-	u16b floor;		/* Floor terrain type */
-	u16b wall;      /* Wall terrain type */
-	u16b perm_wall; /* Permanent wall terrain type */
-	u16b rubble;    		/* Override terrain type */
+	u16b floor;             /* Floor terrain type */
+	u16b wall;              /* Wall terrain type */
+	u16b perm_wall;         /* Permanent wall terrain type */
+	u16b rubble;            /* Override terrain type */
 	
-	u16b door_closed;		/* Override terrain type */
-  u16b door_open;		  /* Override terrain type */
-	u16b door_broken;		/* Override terrain type */
-	u16b door_secret;		/* Override terrain type */
+	u16b door_closed;       /* Override terrain type */
+	u16b door_open;         /* Override terrain type */
+	u16b door_broken;       /* Override terrain type */
+	u16b door_secret;       /* Override terrain type */
 
-  u16b stairs_up;	  	/* Override terrain type */
-  u16b stairs_down;		/* Override terrain type */
-	u16b pillar;    		/* Override terrain type */
-	u16b stairs_closed;	/* Override terrain type */
+	u16b stairs_up;         /* Override terrain type */
+	u16b stairs_down;       /* Override terrain type */
+	u16b pillar;            /* Override terrain type */
+	u16b stairs_closed;     /* Override terrain type */
 	
-	/*u16b wallsupport;  	/* Override terrain type */
-	/*u16b freq_small;		/* frequency of small levels */
+	/*u16b wallsupport;     /* Override terrain type */
+	/*u16b freq_small;      /* frequency of small levels */
 
-  /*u16b statue;	    	/* Override terrain type */
-	/*u16b fountain;	  	/* Override terrain type */
-	/*u16b window;	    	/* Override terrain type */
+	/*u16b statue;          /* Override terrain type */
+	/*u16b fountain;        /* Override terrain type */
+	/*u16b window;          /* Override terrain type */
 
-	stream_gen_type vein[2];  /* For magma veins, etc. */
+	stream_gen_type vein[2]; /* For magma veins, etc. */
 	stream_gen_type river[2];
 	stream_gen_type lake;
 
 	byte freq_monsters;
 	byte freq_objects;
-  byte freq_doors;
-  byte freq_traps;
+	byte freq_doors;
+	byte freq_traps;
 	byte freq_rubble;
-  byte freq_treasure;  /* Buried treasure */
+	byte freq_treasure;     /* Buried treasure */
 	byte freq_stairs;
 	byte freq_arena;
 	byte freq_cavern;
@@ -2070,15 +2108,15 @@ struct dun_gen_type
 
 	byte room_limit;
 
-	u32b flags;		/* Extra flags */
+	u32b flags;             /* Extra flags */
 
-  //u32b name;	/* Name (offset) */
-	//u32b text;	/* Text (offset) */
+	//u32b name;              /* Name (offset) */
+	//u32b text;              /* Text (offset) */
 
-  char *name;
-  char *text;
+	char *name;
+	char *text;
 
-  dun_gen_type *next; /* next dungeon type in the linked list */
+	dun_gen_type *next;     /* next dungeon type in the linked list */
 };
 
 
@@ -2089,33 +2127,33 @@ struct dun_gen_type
 typedef struct place_type place_type;
 struct place_type
 {
-	u32b seed;	/* Seed for RNG */
-	store_type *store;	/* The stores[numstores] */
+	u32b seed;              /* Seed for RNG */
+	store_type *store;      /* The stores[numstores] */
 
 	dun_type *dungeon;
 
-	byte type;	/* Type of place */
+	byte type;              /* Type of place */
 
 	byte numstores;
-	u16b quest_num;	/* Quest number if is special */
+	u16b quest_num;         /* Quest number if is special */
 
-	byte x;	/* Location mod 16 in wilderness */
+	byte x;                 /* Location mod 16 in wilderness */
 	byte y;
 
-	byte xsize;	/* Size in wilderness */
-	byte ysize;	/* Size in wilderness */
+	byte xsize;             /* Size in wilderness */
+	byte ysize;             /* Size in wilderness */
 
-	byte data;	/* pop for towns, generic for quests */
-	byte monst_type;	/* Type of population (monsters/people etc.) */
+	byte data;              /* pop for towns, generic for quests */
+	byte monst_type;        /* Type of population (monsters/people etc.) */
 
-	s16b region;	/* Region */
+	s16b region;            /* Region */
 
-	byte gates_x[MAX_GATES];	/* Position of the town gates */
+	byte gates_x[MAX_GATES]; /* Position of the town gates */
 	byte gates_y[MAX_GATES];
 	
-	byte seen;  /* Has the player ever been here? */
+	byte seen;              /* Has the player ever been here? */
 
-	char name[T_NAME_LEN];	/* Town name */
+	char name[T_NAME_LEN];  /* Town name */
 };
 
 
@@ -2250,8 +2288,8 @@ typedef struct monster_group_type monster_group_type;
 
 struct monster_group_type
 {
-  //monster_group_type *next;
-  //u16b idx;
+	//monster_group_type *next;
+	//u16b idx;
 
 	u16b flags;
 	char name[32];
@@ -2286,8 +2324,8 @@ typedef struct hero_type hero_type;
 
 struct hero_type
 {
-	s16b r_idx;		/* Monster race "base" */
-	byte offset;    /* Number of levels upgraded */
-	u32b seed; 		/* Seed used to generate the hero from the base type */
-	byte flags;     /* Killed?  Quest target?  */
+	s16b r_idx;  /* Monster race "base" */
+	byte offset; /* Number of levels upgraded */
+	u32b seed;   /* Seed used to generate the hero from the base type */
+	byte flags;  /* Killed?  Quest target?  */
 };
