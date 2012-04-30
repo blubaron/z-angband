@@ -1828,6 +1828,7 @@ struct player_type
 
 	byte ob_count;
 	byte dc_count;
+	u16b used_ankhs; /* the number of ankhs used with this character */
 	//byte qb_count;
 	//byte ql_count;
 	//struct quest_building_info *quest_buildings;

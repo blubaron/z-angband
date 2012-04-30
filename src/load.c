@@ -390,6 +390,7 @@ static void rd_item(object_type *o_ptr)
 	if (o_ptr->tval == TV_CONTAINER && sf_version >= 56)
 		rd_s16b(&o_ptr->contents_o_idx);
 
+
 	rd_byte((byte *)(&o_ptr->allocated));
 
 	rd_byte(&o_ptr->feeling);
@@ -1448,6 +1449,8 @@ static void rd_extra(void)
     rd_byte(&p_ptr->ob_count);
     /* Read the number of death chests */
     rd_byte(&p_ptr->dc_count);
+    /* Read the number of times ankhs have been used */
+    rd_u16b(&p_ptr->used_ankhs);
   } else {
     /* skip the bytes and mark to look for an appropriate place later */
     for (i = 0; i < 6; i++) rd_byte(&tmp8u);
@@ -1471,9 +1474,12 @@ static void rd_extra(void)
     /* Read the number of death chests */
     rd_byte(&tmp8u);
     p_ptr->dc_count = 0;
+    rd_byte(&tmp8u);
+    rd_byte(&tmp8u);
+    p_ptr->used_ankhs = 0;
   }
 	/* Future use */
-	for (i = 0; i < 12; i++) rd_byte(&tmp8u);
+	for (i = 0; i < 10; i++) rd_byte(&tmp8u);
 
 	/* Skip the flags */
 	strip_bytes(12);
