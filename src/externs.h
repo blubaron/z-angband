@@ -339,6 +339,7 @@ extern void move_player(int dir, int do_pickup);
 extern void run_step(int dir);
 
 /* cmd2.c */
+extern int coords_to_dir(int x, int y);
 extern void do_cmd_go_up(void);
 extern void do_cmd_go_down(void);
 extern void do_cmd_search(void);
@@ -353,6 +354,7 @@ extern void do_cmd_spike(void);
 extern void do_cmd_walk(int pickup);
 extern void do_cmd_stay(int pickup);
 extern void do_cmd_run(void);
+extern void do_cmd_pathfind(int x, int y);
 extern void do_cmd_rest(void);
 extern void do_cmd_fire(void);
 extern void do_cmd_fire_aux(int mult, object_type *o_ptr, const object_type *j_ptr);

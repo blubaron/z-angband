@@ -1600,6 +1600,10 @@ struct player_run
 	s16b cur_dir;	/* Direction we are running */
 	s16b old_dir;	/* Direction we came from */
 	int  mode;      /* Current running algorithm */
+
+	byte *path;
+	byte path_size;
+	byte path_index;
 };
 
 /*

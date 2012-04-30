@@ -684,21 +684,25 @@ static int count_chests(int *x, int *y, bool trapped)
 /*
  * Convert an adjacent location to a direction.
  */
-static int coords_to_dir(int x, int y)
-{
-	int d[3][3] =
-	{
-	{7, 4, 1},
-	{8, 5, 2},
-	{9, 6, 3}
-	};
-	int dy = y - p_ptr->py;
-	int dx = x - p_ptr->px;
+int coords_to_dir(int x, int y)
+ {
+	/* No movement required */
+	if ((y == p_ptr->py) && (x == p_ptr->px)) return (5);
+
+	/* South or North */
+	if (x == p_ptr->px) return ((y < p_ptr->py) ? 8 : 2);
+
+	/* East or West */
+	if (y == p_ptr->py) return ((x < p_ptr->px) ? 4 : 6);
+
+	/* South-east or South-west */
+	if (y < p_ptr->py) return ((x < p_ptr->px) ? 7 : 9);
+
+	/* North-east or North-west */
+	if (y > p_ptr->py) return ((x < p_ptr->px) ? 1 : 3);
 
 	/* Paranoia */
-	if (ABS(dx) > 1 || ABS(dy) > 1) return (0);
-
-	return d[dx + 1][dy + 1];
+	return (5);
 }
 
 
@@ -2302,6 +2306,34 @@ void do_cmd_run(void)
 	}
 }
 
+/*
+ * Start running with pathfinder.
+ *
+ * Note that running while confused is not allowed.
+ */
+int find_player_path(int x, int y);
+
+void do_cmd_pathfind(int x, int y)
+{
+	int dir;
+	/* Hack -- no running when confused */
+	if (query_timed(TIMED_CONFUSED))
+	{
+		msgf("You are too confused!");
+		return;
+	}
+ 
+	if (dir = find_player_path(x, y))
+	{
+		p_ptr->state.running = (p_ptr->cmd.arg ? p_ptr->cmd.arg : 1000);
+		/* Calculate torch radius */
+		p_ptr->update |= (PU_TORCH);
+		run_step(dir);
+	} else {
+		p_ptr->state.running = (p_ptr->cmd.arg ? p_ptr->cmd.arg : 1000);
+		run_step(coords_to_dir(x, y));
+	}
+}
 
 
 /*

@@ -106,59 +106,57 @@ static int see_interesting(int x, int y)
 	/* Check memorized grids */
 	if (pc_ptr->feat)
 	{
-		switch (c_ptr->feat)
-		{
-		case FEAT_DEEP_LAVA:
-			if (!res_fire_lvl()) break;
-			return (TRUE);
-		case FEAT_DEEP_ACID:
-			if (!res_acid_lvl()) break;
-			return (TRUE);
-		case FEAT_DEEP_SWAMP:
-			if (!res_pois_lvl()) break;
-			return (TRUE);
-
-		case FEAT_SHAL_SWAMP:
-			if (!res_pois_lvl()) break;
-			if (FLAG(p_ptr, TR_FEATHER)) break;
-			return (TRUE);
-
-		case FEAT_SHAL_ACID:
-			if (!res_acid_lvl()) break;
-			if (FLAG(p_ptr, TR_FEATHER)) break;
-			return (TRUE);
-
-		case FEAT_SHAL_LAVA:
-			if (!res_fire_lvl()) break;
-			if (FLAG(p_ptr, TR_FEATHER)) break;
-			return (TRUE);
-
-		/* Water */
-		case FEAT_DEEP_WATER:
-		case FEAT_OCEAN_WATER:
-			if (FLAG(p_ptr, TR_FEATHER)) break;
-			return (TRUE);
-
-		/* Open doors */
-		case FEAT_OPEN:
-		case FEAT_BROKEN:
-			if (find_ignore_doors) break;
-
-			return (TRUE);
-
-		/* Closed doors */
-		case FEAT_CLOSED:
-			return (TRUE);
-
-		/* Stairs */
-		case FEAT_LESS:
-		case FEAT_MORE:
-		case FEAT_QUEST_LESS:
-		case FEAT_QUEST_MORE:
-			if (find_ignore_stairs) break;
-
+		feature_type *feat;
+		feat = &(f_info[pc_ptr->feat]);
+		/* damaging terrain is interesting if the player does not have the 
+		 * resistance, but is not interesting if the terrain is shallow (not deep)
+		 * and the player has levitation.
+		 */
+		if (feat->flags & FF_DAMAGING) {
+			if (!(feat->flags & FF_DEEP) && FLAG(p_ptr, TR_FEATHER)) {
+				return (FALSE);
+			}
+			if ((feat->flags2 & FF_FIERY) && !res_fire_lvl()) {
+				return (TRUE);
+			}
+			if ((feat->flags2 & FF_ICY) && !res_cold_lvl()) {
+				return (TRUE);
+			}
+			if ((feat->flags2 & FF_ACID) && !res_acid_lvl()) {
+				 return (TRUE);
+			}
+			if ((feat->flags2 & FF_ELEC) && !res_elec_lvl()) {
+				return (TRUE);
+			}
+			if ((feat->flags2 & FF_POISON) && !res_pois_lvl()) {
+				return (TRUE);
+			}
+		}
+		/* non damaging liquid terrains are only interesting if the terrain
+		 * is deep and the player does not have levitation.
+		 */
+		if ((feat->flags & FF_LIQUID) && (feat->flags & FF_DEEP)) {
+			if (!FLAG(p_ptr, TR_FEATHER)) return (TRUE);
+		}
+		/* see if the terrain has a flag that is generally interesting */
+		if ((feat->flags & (FF_MASK_INTERESTING))
+			|| (feat->flags2 & (FF_MASK_INTERESTING2))) {
+			/* if so, check if we are ignoring certain types of the generally
+			 * interesting flags.
+			 */
+			if ((find_ignore_doors) 
+				&& !((feat->flags & (FF_MASK_INTERESTING)) & ~FF_CLOSEABLE)) {
+				/* we are ignoring open doors */
+				return (FALSE);
+			}
+			if ((find_ignore_stairs)
+				&& !((feat->flags & (FF_MASK_INTERESTING)) & ~(FF_EXIT_UP | FF_EXIT_DOWN))) {
+				/* we are ignoring stairs */
+				return (FALSE);
+			}
 			return (TRUE);
 		}
+
 	}
 
 	/* Boring */
@@ -166,11 +164,14 @@ static int see_interesting(int x, int y)
 }
 
 
-#define RUN_MODE_START    0  /* Beginning of run */
-#define RUN_MODE_OPEN     1  /* Running in a room or open area */
-#define RUN_MODE_CORRIDOR 2  /* Running in a corridor */
-#define RUN_MODE_WALL     3  /* Running along a wall */
-#define RUN_MODE_FINISH   4  /* End of run */
+#define RUN_MODE_START        0  /* Beginning of run */
+#define RUN_MODE_OPEN         1  /* Running in a room or open area */
+#define RUN_MODE_CORRIDOR     2  /* Running in a corridor */
+#define RUN_MODE_WALL         3  /* Running along a wall */
+#define RUN_MODE_FINISH       4  /* End of run */
+#define RUN_MODE_ROAD         5  /* Run along a wilderness road */
+#define RUN_MODE_WATER        6  /* Swim along a wilderness waterway */
+#define RUN_MODE_PATH         7  /* Follow a precomputed path */
 
 /*
  * There are exactly 36 interesting
@@ -566,6 +567,12 @@ static void run_choose_mode(void)
 	unsigned int i;
 	_u64b wall_dirs = 0;
 
+	/* if we have a path, use it */
+	if (p_ptr->run.path) {
+		p_ptr->run.mode = RUN_MODE_PATH;
+		return;
+	}
+
 	/* Check valid dirs */
 	for (i = 1; i < 10; i++)
 	{
@@ -600,6 +607,22 @@ static void run_choose_mode(void)
 			return;
 		}
 	}
+
+	//if (!p_ptr->depth) {
+		/* check if we are on a road, if so follow it */
+	//	int x, y;
+	//	x = ((u16b)p_ptr->wilderness_x / WILD_BLOCK_SIZE);
+	//	y = ((u16b)p_ptr->wilderness_y / WILD_BLOCK_SIZE);
+     
+	//	if (wild[y][x].done.info & WILD_INFO_ROAD|WILD_INFO_TRACK) {
+	//		p_ptr->run.mode = RUN_MODE_ROAD;
+	//		return;
+	//	} else
+	//	if (wild[y][x].done.info & WILD_INFO_WATER) {
+	//		p_ptr->run.mode = RUN_MODE_WATER;
+	//		return;
+	//	}
+	//}
 
 	/* Assume we're in the open */
 	p_ptr->run.mode = RUN_MODE_OPEN;
@@ -847,7 +870,243 @@ static void run_wall(void)
 	}
 }
 
+/****** Pathfinding code ******/
+/*    modified from angband   */
+#define MARK_DISTANCE(c,d) if ((c <= MAX_PF_LENGTH) && (c > d)) { c = d; try_again = TRUE;}
 
+int find_player_path(int x, int y)
+{
+	/* Maximum size around the player to consider in the pathfinder */
+	#define MAX_PF_RADIUS 50
+
+	/* Maximum distance to consider in the pathfinder */
+	#define MAX_PF_LENGTH 250
+
+
+	static int terrain[MAX_PF_RADIUS][MAX_PF_RADIUS];
+	static char pf_result[MAX_PF_LENGTH];
+
+	int ox, oy, ex, ey;
+	int oxl, oyl, exl, eyl;
+	static int dir_search[8] = {2,4,6,8,1,3,7,9};
+
+	int i, j, k, dir;
+	int cur_distance;
+	bool try_again;
+	cave_type *c_ptr;
+	feature_type *feat;
+
+	ox = MAX(p_ptr->px - MAX_PF_RADIUS / 2, p_ptr->min_wid);
+	oy = MAX(p_ptr->py - MAX_PF_RADIUS / 2, p_ptr->min_hgt);
+
+	ex = MIN(p_ptr->px + MAX_PF_RADIUS / 2 - 1, p_ptr->max_wid);
+	ey = MIN(p_ptr->py + MAX_PF_RADIUS / 2 - 1, p_ptr->max_hgt);
+
+	/* make sure the target is in our grid, regardless if the player can walk there */
+	if ((x < ox) || (x >= ex) || (y < oy) || (y >= ey))	{
+		bell("Target out of range.");
+		return 0;
+	}
+
+
+	for (j = oy; j < ey; j++) {
+		for (i = ox; i < ex; i++) {
+			feat  = &(f_info[parea(i, j)->feat]);
+			if ((parea(i, j)->feat == 0)
+				|| (feat->flags & FF_PWALK)
+				|| ((feat->flags & FF_PPASS) && (FLAG(p_ptr, TR_PASS_WALL)))) {
+				terrain[j - oy][i - ox] = MAX_PF_LENGTH;
+			} else {
+				terrain[j - oy][i - ox] = -1;
+			}
+		}
+	}
+
+	terrain[y - oy][x - ox] = MAX_PF_LENGTH;
+	terrain[p_ptr->py - oy][p_ptr->px - ox] = 1;
+
+	/* another algorithm to try to reduce the number of passes */
+	cur_distance = 2;
+	for (dir = 1; dir < 10; dir++) {
+		if (dir != 5) {
+			MARK_DISTANCE(terrain[p_ptr->py - oy + ddy[dir]][p_ptr->px - ox + ddx[dir]], cur_distance);
+		}
+	}
+
+	do {
+		try_again = FALSE;
+
+		for (k = 1; k < MAX_PF_RADIUS/2 - 1; k++) {
+			oxl = MAX(p_ptr->px - k, ox+1);
+			oyl = MAX(p_ptr->py - k, oy+1);
+			exl = MIN(p_ptr->px + k, ex-1);
+			eyl = MIN(p_ptr->py + k, ey-1);
+
+			j = oyl;
+			for (i = oxl; i <= exl; i++) {
+				cur_distance = terrain[j - oy][i - ox] + 1;
+
+				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
+					for (dir = 1; dir < 10; dir++) {
+						if (dir != 5) {
+							 MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+						}
+					}
+				}
+			}
+			j = eyl;
+			for (i = oxl; i <= exl; i++) {
+				cur_distance = terrain[j - oy][i - ox] + 1;
+
+				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
+					for (dir = 1; dir < 10; dir++) {
+						if (dir != 5) {
+							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+						}
+					}
+				}
+			}
+			i = oxl;
+			for (j = oyl; j <= eyl; j++) {
+				cur_distance = terrain[j - oy][i - ox] + 1;
+
+				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
+					for (dir = 1; dir < 10; dir++) {
+						if (dir != 5) {
+							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+						}
+					}
+				}
+			}
+			i = exl;
+			for (j = oyl; j <= eyl; j++) {
+				cur_distance = terrain[j - oy][i - ox] + 1;
+
+				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
+					for (dir = 1; dir < 10; dir++) {
+						if (dir != 5) {
+							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+						}
+					}
+				}
+			}
+			if (terrain[y - oy][x - ox] < 0) {
+				try_again = FALSE;
+				break;
+			}
+			if (terrain[y - oy][x - ox] < MAX_PF_LENGTH) {
+				try_again = FALSE;
+				break;
+			}
+		}
+	} while (try_again);
+
+	/* Failure */
+	if (terrain[y - oy][x - ox] == MAX_PF_LENGTH)
+	{
+		bell("Target space unreachable.");
+		return 0;
+	}
+
+	/* Success */
+	i = x;
+	j = y;
+
+	p_ptr->run.path_index = 0;
+
+	while ((i != p_ptr->px) || (j != p_ptr->py))
+	{
+		cur_distance = terrain[j - oy][i - ox] - 1;
+		for (k = 0; k < 8; k++)
+		{
+			dir = dir_search[k];
+			if (terrain[j - oy + ddy[dir]][i - ox + ddx[dir]] == cur_distance)
+				break;
+		}
+
+		/* Should never happend */
+		if (dir == 10)
+		{
+			bell("Wtf ?");
+			return 0;
+		}
+
+		else if (dir == 5)
+		{
+			bell("Heyyy !");
+			return 0;
+		}
+		else if (p_ptr->run.path_index >= MAX_PF_LENGTH)
+		{
+			bell("Path not found !");
+			return 0;
+		}
+
+		pf_result[p_ptr->run.path_index++] = '0' + (char)(10 - dir);
+		i += ddx[dir];
+		j += ddy[dir];
+	}
+
+	p_ptr->run.path = pf_result;
+	p_ptr->run.path_index--;
+
+	return pf_result[p_ptr->run.path_index] - '0';
+}
+
+static void run_path(bool starting)
+{
+	int px = p_ptr->px;
+	int py = p_ptr->py;
+
+	int dir = p_ptr->run.old_dir;
+	int dx;// = ddx[dir];
+	int dy;// = ddy[dir];
+
+	if (starting) {
+		p_ptr->run.path_index--;
+	}
+
+	if (!p_ptr->run.path) {
+		p_ptr->run.path_size = 0;
+		p_ptr->run.path_index = 0;
+		p_ptr->run.mode = RUN_MODE_FINISH;
+		return;
+	}
+
+	if (p_ptr->run.path_index < 0) {
+		FREE(p_ptr->run.path);
+		p_ptr->run.path = NULL;
+		p_ptr->run.path_size = 0;
+		p_ptr->run.path_index = 0;
+		p_ptr->run.mode = RUN_MODE_FINISH;
+		return;
+	}
+
+	if (check_interesting())
+	{
+		FREE(p_ptr->run.path);
+		p_ptr->run.path = NULL;
+		p_ptr->run.path_size = 0;
+		p_ptr->run.path_index = 0;
+		p_ptr->run.mode = RUN_MODE_FINISH;
+		return;
+	}
+	dir = p_ptr->run.path[p_ptr->run.path_index--] - '0';
+	dx = ddx[dir];
+	dy = ddy[dir];
+
+	p_ptr->run.cur_dir = dir;
+
+	if (see_wall(px + dx, py + dy))
+	{
+		FREE(p_ptr->run.path);
+		p_ptr->run.path = NULL;
+		p_ptr->run.path_size = 0;
+		p_ptr->run.path_index = 0;
+		p_ptr->run.mode = RUN_MODE_FINISH;
+		return;
+	}
+}
 
 /*
  * Take one step along a run path
@@ -903,6 +1162,18 @@ void run_step(int dir)
 			break;
 
 		case RUN_MODE_FINISH:
+			break;
+
+		case RUN_MODE_ROAD:
+			run_open();
+			break;
+		
+		case RUN_MODE_WATER:
+			run_open();
+			break;
+
+		case RUN_MODE_PATH:
+			run_path(starting);
 			break;
 
 		default:
