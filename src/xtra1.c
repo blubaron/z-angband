@@ -4049,6 +4049,10 @@ void update_stuff(void)
 		p_ptr->update &= ~(PU_MONSTERS);
 		update_monsters(FALSE);
 	}
+
+	if (p_ptr->update & (PU_OBJECTS)) {
+		p_ptr->update &= ~(PU_OBJECTS);
+	}
 }
 
 
