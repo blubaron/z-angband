@@ -422,8 +422,8 @@ T:41:0x9b:0x97	# 41   Other - Home
 T:42:0x99:0x89	# 42 Regular   Book Store
 T:43:0x89:0xd7	# 43   Other - Weaponmaster
 T:44:0x9b:0x8c	# 44   Other - Zymurgist 
-T:45:0x89:0xc5	# 45   Magesmith (weapon)
-T:46:0x89:0xc6	# 46   Magesmith (armour)
+T:45:0x89:0xc5	# 45   Magesmith, weapon
+T:46:0x89:0xc6	# 46   Magesmith, armour
 T:47:0x9b:0xaf	# 47   Other - Mutatalist
 T:48:0x9b:0xa2	# 48   Other - Map Maker
 T:49:0x9b:0x8f	# 49 Advanced   Weapon Smiths
@@ -539,7 +539,7 @@ T:156:0x9c:0x9a	# 156   Quest giver - Town hall
 ### Feature attr/char definitions ### f_info.txt
 
 # nothing
-F:0:0x7D:0x80
+F:0:0x80:0x80
 
 # open floor
 F:1:0x97:0x81
@@ -2142,6 +2142,7 @@ R:446:0x91:0x98
 
 # Catoblepas
 R:447:0x93:0x9B
+
 
 # Lesser wall monster
 R:448:0x96:0xcd
