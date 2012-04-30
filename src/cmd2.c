@@ -843,7 +843,7 @@ void do_cmd_open(void)
 	bool more = FALSE;
 
 	/* Option: Pick a direction */
-	if (easy_open)
+	if (easy_open && !p_ptr->cmd.dir)
 	{
 		int num_doors, num_chests;
 
@@ -1999,6 +1999,7 @@ void do_cmd_disarm(void)
  */
 void do_cmd_alter(void)
 {
+
 	int y, x, dir;
 	int action;
 
@@ -3251,3 +3252,47 @@ void do_cmd_throw(void)
 {
 	do_cmd_throw_aux(1);
 }
+
+void do_cmd_use_terrain(void)
+{
+	cave_type *c_ptr;
+	feature_type *feat;
+
+	/* Player grid */
+	c_ptr = area(p_ptr->px, p_ptr->py);
+	feat  = &(f_info[c_ptr->feat]);
+
+	if (is_visible_trap(c_ptr)) {
+		p_ptr->cmd.dir = 5;
+		do_cmd_disarm();
+	} else
+	//if (c_ptr->fld_idx) {
+	//if (feat->flags & FF_TRAP) {
+	//  /* see if there is a use action for this field */
+	//} else
+	if (feat->flags & FF_EXIT_UP) {
+		if (feat->flags & FF_EXIT_DOWN) {
+			/* if we can go up or down here, ask the player */
+			if (get_check("Do you want to go down?")) {
+				do_cmd_go_down();
+			} else
+			if (get_check("Do you want to go up?")) {
+				do_cmd_go_up();
+			}
+		} else {
+			do_cmd_go_up();
+		}
+	} else
+	if (feat->flags & FF_EXIT_DOWN) {
+		do_cmd_go_down();
+	} else
+	if (feat->flags & FF_CLOSED) {
+		p_ptr->cmd.dir = 5;
+		do_cmd_open();
+	} else
+	if (feat->flags & FF_CLOSEABLE) {
+		p_ptr->cmd.dir = 5;
+		do_cmd_close();
+	}
+}
+

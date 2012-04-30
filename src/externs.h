@@ -362,6 +362,7 @@ extern void do_cmd_throw(void);
 extern void do_cmd_throw_aux(int mult);
 extern bool do_cmd_open_aux(int x, int y);
 extern bool do_cmd_disarm_aux(cave_type *c_ptr, int dir);
+extern void do_cmd_use_terrain(void);
 
 /* cmd3.c */
 extern void do_cmd_inven(void);
