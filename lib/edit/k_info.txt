@@ -7067,17 +7067,20 @@ D:It can hold up to 160.0 stones of items
 N:702:& Ankh~
 G:&:U
 I:41:1:1000
-W:120:0:05:87000
+W:50:0:05:87000
 A:0/0
 F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:Anchors your soul to this plane. If you have one on you when you
 D: die, you will be returned to the nearest temple or cathedral.
 D: However, your items and gold will remain in the dungeon.
 
+# this ankh is what the player starts with. it is low value, to limit
+# how much the player can get if it is sold. The effect is the same as
+# the normal ankh.
 N:703:& Ankh~
 G:&:U
 I:41:2:1000
-W:120:0:05:100
+W:50:0:05:100
 A:0/0
 F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:Anchors your soul to this plane. If you have one on you when you
