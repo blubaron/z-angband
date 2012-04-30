@@ -559,8 +559,6 @@ static void prt_hp(void)
 
 #endif /* !VARIABLE_PLAYER_GRAPH */
 
-	put_fstr(COL_MAXHP, ROW_MAXHP, "Max HP " CLR_L_GREEN "%5d", p_ptr->mhp);
-
 	color = CLR_L_GREEN;
 
 	if (p_ptr->chp >= p_ptr->mhp)
@@ -579,7 +577,10 @@ static void prt_hp(void)
 		color_player = TERM_RED;
 	}
 
-	put_fstr(COL_CURHP, ROW_CURHP, "Cur HP %s%5d", color, p_ptr->chp);
+	put_fstr(COL_HP, ROW_HP, "HP %s%4d" CLR_WHITE "/" CLR_L_GREEN "%4d", color, p_ptr->chp, p_ptr->mhp);
+	//put_fstr(COL_MAXHP, ROW_MAXHP, "Max HP " CLR_L_GREEN "%5d", p_ptr->mhp);
+	//put_fstr(COL_CURHP, ROW_CURHP, "Cur HP %s%5d", color, p_ptr->chp);
+
 
 #ifndef VARIABLE_PLAYER_GRAPH
 
@@ -618,8 +619,6 @@ static void prt_sp(void)
 	/* Do not show mana unless it matters */
 	if (!mp_ptr->spell_book) return;
 
-	put_fstr(COL_MAXSP, ROW_MAXSP, "Max SP " CLR_L_GREEN "%5d", p_ptr->msp);
-
 	color = CLR_L_GREEN;
 
 	if (p_ptr->csp >= p_ptr->msp)
@@ -636,7 +635,9 @@ static void prt_sp(void)
 	}
 
 	/* Show mana */
-	put_fstr(COL_CURSP, ROW_CURSP, "Cur SP %s%5d", color, p_ptr->csp);
+	put_fstr(COL_SP, ROW_SP, "SP %s%4d" CLR_WHITE "/" CLR_L_GREEN "%4d", color, p_ptr->csp, p_ptr->msp);
+	//put_fstr(COL_CURSP, ROW_CURSP, "Cur SP %s%5d", color, p_ptr->csp);
+	//put_fstr(COL_MAXSP, ROW_MAXSP, "Max SP " CLR_L_GREEN "%5d", p_ptr->msp);
 }
 
 
@@ -1135,6 +1136,8 @@ static void prt_stun(void)
  */
 static void health_redraw(void)
 {
+	Term_erase(COL_TARGET_NAME, ROW_TARGET_NAME, 12);
+
 	/* Not tracking */
 	if (!p_ptr->health_who)
 	{
@@ -1147,6 +1150,7 @@ static void health_redraw(void)
 	{
 		/* Indicate that the monster health is "unknown" */
 		put_fstr(COL_INFO, ROW_INFO, "[----------]");
+		put_fstr(COL_TARGET_NAME, ROW_TARGET_NAME, "Unknown");
 	}
 
 	/* Tracking a hallucinatory monster */
@@ -1154,6 +1158,7 @@ static void health_redraw(void)
 	{
 		/* Indicate that the monster health is "unknown" */
 		put_fstr(COL_INFO, ROW_INFO, "[----------]");
+		put_fstr(COL_TARGET_NAME, ROW_TARGET_NAME, "Unknown");
 	}
 
 	/* Tracking a dead monster ??? */
@@ -1161,6 +1166,7 @@ static void health_redraw(void)
 	{
 		/* Indicate that the monster health is "unknown" */
 		put_fstr(COL_INFO, ROW_INFO, "[----------]");
+		//put_fstr(COL_TARGET_NAME, ROW_TARGET_NAME, r_info[m_list[p_ptr->health_who].r_idx].name);
 	}
 
 	/* Tracking a visible monster */
@@ -1208,6 +1214,9 @@ static void health_redraw(void)
 
 		/* Dump the current "health" (use '*' symbols) */
 		put_fstr(COL_INFO + 1, ROW_INFO, "%s%.*s", attr, len, "**********");
+
+		/* Dump the name of the monster */
+		put_fstr(COL_TARGET_NAME, ROW_TARGET_NAME, "%.*s", 12, mon_race_name(monst_race(m_list[p_ptr->health_who].r_idx)));
 	}
 }
 

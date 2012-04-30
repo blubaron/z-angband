@@ -1184,8 +1184,20 @@
 #define ROW_CURSP               19
 #define COL_CURSP               0	/* "Cur SP xxxxx" */
 
+#define ROW_HP                  16
+#define COL_HP                  0	/* "HP xxxx/xxxx" */
+
+#define ROW_SP                  17
+#define COL_SP                  0	/* "SP xxxx/xxxx" */
+
+#define ROW_BLANK               18
+#define COL_BLANK               0	/* "            " available */
+
+#define ROW_TARGET_NAME         19
+#define COL_TARGET_NAME         0	/* "xxxxxxxxxxxx" */
+
 #define ROW_INFO                20
-#define COL_INFO                0	/* "xxxxxxxxxxxx" */
+#define COL_INFO                0	/* "[xxxxxxxxxx]" */
 
 #define ROW_CUT                 21
 #define COL_CUT                 0	/* <cut> */
