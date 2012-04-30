@@ -1044,6 +1044,9 @@ static void process_world(void)
 			bool dawn = FALSE;
 			bool dusk = FALSE;
 
+			/* Redraw time on status bar */
+			p_ptr->redraw |= (PR_TIME);
+
 			/* Check for dawn */
 			dawn = (!(turn % TOWN_DAY));
 			dusk = (!dawn && !(turn % TOWN_HALF_DAY));
@@ -3257,7 +3260,7 @@ static void evolve_dungeon(void)
 	p_ptr->window |= (PW_MONSTER | PW_MESSAGE | PW_VISIBLE);
 
 	/* Redraw dungeon */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_EQUIPPY);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_EQUIPPY | PR_TIME);
 
 	/* Redraw map */
 	p_ptr->redraw |= (PR_MAP);

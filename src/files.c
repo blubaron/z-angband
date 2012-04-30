@@ -1844,6 +1844,7 @@ static void display_player_flag_aux(int col, int row,
  * Special display, part 1
  */
 static void display_player_flag_info(void)
+
 {
 	int row;
 	int col;
@@ -2734,7 +2735,7 @@ void do_cmd_character(void)
 	screen_load();
 
 	/* Redraw everything */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME);
 
 	handle_stuff();
 }
@@ -3218,6 +3219,7 @@ errr file_character(cptr name, bool full)
 #define RESIZE_SHOW_FILE	-2
 static cptr resize_name = NULL;
 static cptr resize_what = NULL;
+
 static int resize_line  = 0;
 static int resize_hgt   = 0;
 

@@ -2746,6 +2746,7 @@ enum
 #define SM_CLONED               0x00400000	/* XXX Cloned */
 #define SM_PET                  0x00800000	/* XXX Pet */
 #define SM_IMM_ACID             0x01000000
+
 #define SM_IMM_ELEC             0x02000000
 #define SM_IMM_FIRE             0x04000000
 #define SM_IMM_COLD             0x08000000
@@ -2833,7 +2834,7 @@ enum
 #define PR_STATE        0x00100000L	/* Display Extra (State) */
 #define PR_SPEED        0x00200000L	/* Display Extra (Speed) */
 #define PR_STUDY        0x00400000L	/* Display Extra (Study) */
-/* xxx */
+#define PR_TIME         0x00800000L	/* Display Extra (Time) */
 #define PR_EXTRA        0x01000000L	/* Display Extra Info */
 #define PR_BASIC        0x02000000L	/* Display Basic Info */
 #define PR_MAP          0x04000000L	/* Display Map */

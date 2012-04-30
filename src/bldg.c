@@ -2109,7 +2109,7 @@ void do_cmd_bldg(const field_type *f_ptr)
 	p_ptr->update |= (PU_MONSTERS);
 
 	/* Redraw entire screen */
-	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_EQUIPPY);
+	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_EQUIPPY | PR_TIME);
 
 	/* Redraw map */
 	p_ptr->redraw |= (PR_MAP);

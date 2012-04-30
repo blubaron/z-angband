@@ -46,7 +46,7 @@ void do_cmd_redraw(void)
 	p_ptr->update |= (PU_MONSTERS);
 
 	/* Redraw everything */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME);
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_SPELL | PW_PLAYER);
@@ -104,7 +104,7 @@ void resize_map(void)
 	p_ptr->update |= (PU_MONSTERS);
 
 	/* Redraw everything */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME);
 
 	/* Hack -- update */
 	handle_stuff();
