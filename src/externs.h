@@ -435,6 +435,7 @@ extern void do_cmd_zap_rod(void);
 extern void do_cmd_activate(void);
 extern void do_cmd_rerate(void);
 extern void ring_of_power(int dir);
+extern void do_cmd_use(void);
 
 /* cmd7.c */
 extern void do_cmd_list(void);

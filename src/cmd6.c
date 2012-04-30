@@ -1065,3 +1065,103 @@ void do_cmd_activate(void)
 	/* Activate the item */
 	do_cmd_activate_aux(o_ptr);
 }
+
+/*
+ * Hook to determine if an object is useable
+ */
+static bool item_tester_hook_useable(const object_type *o_ptr)
+{
+	switch (o_ptr->tval) {
+	case TV_FOOD:
+	case TV_POTION:
+	case TV_SCROLL:
+	case TV_STAFF:
+	case TV_WAND:
+	case TV_ROD:
+		return (TRUE);
+	}
+	return item_tester_hook_activate(o_ptr);
+}
+
+void do_cmd_use(void)
+{
+	object_type *o_ptr;
+	cptr q, s;
+	bool used = (FALSE);
+
+	/* Prepare the hook */
+	item_tester_hook = item_tester_hook_useable;
+
+	/* Get an item */
+	q = "Use which item? ";
+	s = "You have nothing to use.";
+
+	/* Containers that activate?  Maybe someday.  */
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+
+	/* Not a valid item */
+	if (!o_ptr) return;
+
+	/* Activate the item */
+	switch (o_ptr->tval) {
+	case TV_FOOD:
+		{
+			/* Eat the object */
+			do_cmd_eat_food_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_POTION:
+		{
+			/* Quaff the potion */
+			do_cmd_quaff_potion_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_SCROLL:
+		{
+			/* Check some conditions */
+			if (query_timed(TIMED_BLIND)) {
+				msgf("You can't see anything.");
+				return;
+			}
+			if (no_lite()) {
+				msgf("You have no light to read by.");
+				return;
+			}
+			if (query_timed(TIMED_CONFUSED)) {
+				msgf("You are too confused!");
+				return;
+			}
+			/* Read the scroll */
+			do_cmd_read_scroll_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_STAFF:
+		{
+			/* Use the staff */
+			do_cmd_use_staff_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_WAND:
+		{
+			/* Aim the wand */
+			do_cmd_aim_wand_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_ROD:
+		{
+			/* Zap the rod */
+			do_cmd_zap_rod_aux(o_ptr);
+			used = TRUE;
+		} break;
+	case TV_STATUE:
+		{
+			/* Activate the statue */
+			do_cmd_activate_aux(o_ptr);
+			used = TRUE;
+		} break;
+	}
+	if (!used && FLAG(o_ptr, TR_ACTIVATE)) {
+		do_cmd_activate_aux(o_ptr);
+	}
+}
+
