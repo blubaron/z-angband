@@ -416,9 +416,10 @@
 #define BUILD_BLACKSMITH		123
 #define BUILD_BANK				124
 #define BUILD_CASTLE2			125
+#define BUILD_EMPTY			126
 
 /* Maximum number of "building" types in a city */
-#define MAX_CITY_BUILD			126
+#define MAX_CITY_BUILD			127
 
 
 /*
