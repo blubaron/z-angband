@@ -72,7 +72,7 @@ void do_cmd_redraw(void)
 		Term_redraw();
 
 		/* Refresh */
-		Term_fresh();
+		/* term_freesh is in term_redraw Term_fresh(); */
 	}
 
 	/* Restore */
