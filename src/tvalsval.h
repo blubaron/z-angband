@@ -489,6 +489,7 @@
 #define SV_ROD_COLD_BALL                27
 #define SV_ROD_HAVOC                    28
 
+#define SV_ROD_ALCHEMY                  29
 
 /* The "sval" codes for TV_SCROLL */
 
@@ -545,6 +546,8 @@
 #define SV_SCROLL_CHAOS                 50
 #define SV_SCROLL_RUMOR                 51
 #define SV_SCROLL_ARTIFACT              52
+
+#define SV_SCROLL_ALCHEMY               53
 
 /* The "sval" codes for TV_POTION */
 #define SV_POTION_WATER                  0

@@ -896,15 +896,15 @@ void carry(int pickup)
 					//if ((i == 'A') || (i == 'a'))
 					//{
 						/* try to use alchemy on it */
-						/*if (has charged rod of alchemy )
+						/*if (has charged rod of alchemy ) SV_ROD_ALCHEMY TV_ROD
 						{
 							alchemy_aux(o_ptr); // need to split this fn from alchemy()
 						}
-						else if (has scroll of alchemy )
+						else if (has scroll of alchemy ) SV_SCROLL_ALCHEMY TV_SCROLL
 						{
 							alchemy_aux(o_ptr); // need to split this fn from alchemy()
 						}
-						else if (has spell of alchemy and mana)
+						else if (has spell of alchemy and mana) (sorcercy spell 25)
 						{
 							alchemy_aux(o_ptr); // need to split this fn from alchemy()
 						}
