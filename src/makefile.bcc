@@ -101,7 +101,7 @@ OBJ = \
 	mind.obj \
 	melee2.obj \
 	melee1.obj \
-	main-win.obj \
+	platform/win/main-win.obj \
 	maid-grf.obj \
 	notes.obj \
 	load.obj \
