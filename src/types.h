@@ -441,8 +441,8 @@ struct floor_note
 {
 	u16b y;
 	u16b x;
-	u8b  color;
-	u8b  flags;
+	byte color;
+	byte flags;
 	u16b notelen;
 	cptr note;
 };
