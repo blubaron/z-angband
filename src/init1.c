@@ -123,7 +123,7 @@ static cptr f_info_flags[] =
 	"LIGHTSUP",
 	"DARKENS",
 	"STONE",
-	"RUN1",
+	"GLOW",
 	"RUN2",
 	"FOUNTAIN",
 	"STATUE",
@@ -1480,7 +1480,7 @@ static errr grab_two_feat_flag(u32b *flags, u32b *flags2, cptr names[], cptr wha
 	int i;
 
 	/* Check flags */
-	for (i = 0; i < 56; i++)
+	for (i = 0; i < 64; i++)
 	{
 		if (streq(what, names[i]))
 		{
