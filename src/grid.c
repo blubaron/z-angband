@@ -2126,9 +2126,7 @@ bool generate_lake(int x0, int y0, int xsize, int ysize,
 			}
 
 			/* Light lava and trees */
-			if ((c_ptr->feat == FEAT_DEEP_LAVA) ||
-				(c_ptr->feat == FEAT_SHAL_LAVA) || (c_ptr->feat == FEAT_TREES))
-			{
+			if (f_info[c_ptr->feat].flags2 & FF_GLOW) {
 				c_ptr->info |= CAVE_GLOW;
 			}
 		}

@@ -1707,6 +1707,7 @@
 
 /* The sword of the Dawn */
 
+
 #define ART_DAWN                110
 
 /* Hafted */
@@ -2029,7 +2030,7 @@ enum
 	FF_LIGHTSUP     = 0x00400000, /* switches to base when attacked with light */
 	FF_DARKENS      = 0x00800000, /* switches to base when attacked with darkness */
 	FF_STONE        = 0x01000000, /* switches to base when attacked with stone to mud */
-	FF_RUN1         = 0x02000000, /* when starting to run, uses algorithm 2? (from FA) */
+	FF_GLOW         = 0x02000000, /* terrain lights itself */
 	FF_RUN2         = 0x04000000, /* when starting to run, uses algorithm 3? (from FA) */
 	FF_FOUNTAIN     = 0x08000000, /* if terrain is a fountain */
 	FF_STATUE       = 0x10000000, /* if terrain is a statue of some sort */
@@ -4490,6 +4491,7 @@ extern int PlayerUID;
 
 #define FTYPE_NOTHING	0
 #define FTYPE_TRAP		1
+
 #define FTYPE_DOOR		2
 #define FTYPE_BUILD		3
 #define FTYPE_FEAT		4
