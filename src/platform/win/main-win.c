@@ -5371,7 +5371,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			/* Prompt the user */
 			if (savefile[0] != 0) {
 				prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-				prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+				prtf(10, 23, "  [Or choose to 'load (L)ast' or 'return to (G)raveyard']");
 			} else {
 				prtf(10, 23, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
 			}
@@ -5425,7 +5425,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 						/* Prompt the user */
 						prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-						prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+						prtf(10, 23, "  [Or choose to 'load (L)ast' or 'return to (G)raveyard']");
 
 						/* Flush it */
 						Term_fresh();
