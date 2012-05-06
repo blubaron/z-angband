@@ -124,7 +124,7 @@ static cptr f_info_flags[] =
 	"DARKENS",
 	"STONE",
 	"GLOW",
-	"RUN2",
+	"LIGHT",
 	"FOUNTAIN",
 	"STATUE",
 	"SUPPORT",

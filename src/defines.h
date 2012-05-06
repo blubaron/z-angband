@@ -1708,6 +1708,7 @@
 /* The sword of the Dawn */
 
 
+
 #define ART_DAWN                110
 
 /* Hafted */
@@ -2031,7 +2032,7 @@ enum
 	FF_DARKENS      = 0x00800000, /* switches to base when attacked with darkness */
 	FF_STONE        = 0x01000000, /* switches to base when attacked with stone to mud */
 	FF_GLOW         = 0x02000000, /* terrain lights itself */
-	FF_RUN2         = 0x04000000, /* when starting to run, uses algorithm 3? (from FA) */
+	FF_LIGHT        = 0x04000000, /* terrain lights up surrounding terrain */
 	FF_FOUNTAIN     = 0x08000000, /* if terrain is a fountain */
 	FF_STATUE       = 0x10000000, /* if terrain is a statue of some sort */
 	FF_SUPPORT      = 0x20000000, /* if terrain is a wall support of some sort */
@@ -3170,6 +3171,7 @@ enum
 #define RF4_CONF            0x20000000	/* Confuse Player */
 #define RF4_SLOW            0x40000000	/* Slow Player */
 #define RF4_HOLD            0x80000000	/* Paralyze Player */
+
 
 /*
  * New monster race bit flags
