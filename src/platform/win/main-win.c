@@ -2096,7 +2096,6 @@ static errr Term_xtra_win(int n, int v)
 	return 1;
 }
 
-#if 0
 /*
  * Find the square a particular pixel is part of.
  */
@@ -2122,7 +2121,6 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 		}
 	}
 }
-#endif /* 0 */
 
 /*
  * Find the pixel at the top-left corner of a square.
@@ -2167,7 +2165,6 @@ static errr Term_curs_win(int x, int y)
 	HDC hdc;
 
 	int x1, y1;
-	int tile_wid, tile_hgt;
 	
 	/* Top left hand corner */
 	square_to_pixel(&x1, &y1, x, y);
