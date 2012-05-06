@@ -1074,7 +1074,6 @@ static void run_path(bool starting)
 	}
 
 	if (p_ptr->run.path_index < 0) {
-		FREE(p_ptr->run.path);
 		p_ptr->run.path = NULL;
 		p_ptr->run.path_size = 0;
 		p_ptr->run.path_index = 0;
@@ -1084,7 +1083,6 @@ static void run_path(bool starting)
 
 	if (check_interesting())
 	{
-		FREE(p_ptr->run.path);
 		p_ptr->run.path = NULL;
 		p_ptr->run.path_size = 0;
 		p_ptr->run.path_index = 0;
@@ -1099,7 +1097,6 @@ static void run_path(bool starting)
 
 	if (see_wall(px + dx, py + dy))
 	{
-		FREE(p_ptr->run.path);
 		p_ptr->run.path = NULL;
 		p_ptr->run.path_size = 0;
 		p_ptr->run.path_index = 0;
