@@ -3229,10 +3229,10 @@ static void check_for_save_file(LPSTR cmd_line)
 	Term_fresh();
 
 	/* Play game */
-	play_game(FALSE);
+	//play_game(FALSE);
 
 	/* Quit */
-	quit(NULL);
+	//quit(NULL);
 }
 
 
@@ -3279,11 +3279,13 @@ static void start_screensaver(void)
 	int i, j;
 #endif /* ALLOW_BORG */
 
-	/* Set the name for process_player_name() */
-	strnfmt(op_ptr->full_name, sizeof(op_ptr->full_name), "%s", saverfilename);
+	if (savefile[0] == 0) {
+		/* Set the name for process_player_name() */
+		strnfmt(op_ptr->full_name, sizeof(op_ptr->full_name), "%s", saverfilename);
 
-	/* Set 'savefile' to a valid name */
-	process_player_name(TRUE);
+		/* Set 'savefile' to a valid name */
+		process_player_name(TRUE);
+	}
 
 	/* Does the savefile already exist? */
 	file_exists = check_file(savefile);
@@ -3380,7 +3382,7 @@ static void start_screensaver(void)
 #endif /* ALLOW_BORG */
 
 	/* Play game */
-	play_game((bool)!file_exists);
+	//play_game((bool)!file_exists);
 }
 
 #endif /* USE_SAVER */
@@ -5339,17 +5341,6 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* We are now initialized */
 	initialized = TRUE;
 
-#ifdef USE_SAVER
-	if (screensaver)
-	{
-		/* Start the screensaver */
-		start_screensaver();
-
-		/* Paranoia */
-		quit(NULL);
-	}
-#endif /* USE_SAVER */
-
 	/* Did the user double click on a save file? */
 	check_for_save_file(lpCmdLine);
 	
@@ -5365,6 +5356,14 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	{
 		bool new_game = FALSE;
     
+#ifdef USE_SAVER
+		if (screensaver)
+		{
+			/* Start the screensaver */
+			start_screensaver();
+		}
+#endif /* USE_SAVER */
+
 		/* Let the player choose a savefile or start a new game */
 		if (!game_in_progress) {
 			//int choice = 0;
@@ -5410,6 +5409,9 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 					process_menus(IDM_FILE_OPEN);
 				} else
 				if ((key == 'l') || (key == 'L')) {
+					if (savefile[0] != 0) {
+						quit("Quiting because repeated play is not working yet.");
+					}
 					if (savefile[0] != 0) {
 						/* Load the last game */
 						game_in_progress = TRUE;
