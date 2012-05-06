@@ -2178,26 +2178,22 @@ static errr Term_curs_win(int x, int y)
 	
 	if (td->map_active)
 	{
-		tile_wid = td->map_tile_wid;
-		tile_hgt = td->map_tile_hgt;
-		
-		rc.right = rc.left + tile_wid;
+		rc.right = rc.left + td->map_tile_wid;
+		rc.bottom = rc.top + td->map_tile_hgt;
 	}
 	else
 	{
-		tile_wid = td->tile_wid;
-		tile_hgt = td->tile_hgt;
-		
 		if (is_bigtiled(x, y))
 		{
-			rc.right = rc.left + tile_wid * 2;
+			rc.right = rc.left + td->tile_wid * 2;
+			rc.bottom = rc.top + td->tile_hgt;
 		}
 		else
 		{
-			rc.right = rc.left + tile_wid;
+			rc.right = rc.left + td->tile_wid;
+			rc.bottom = rc.top + td->tile_hgt;
 		}
 	}
-	rc.bottom = rc.top + tile_hgt;
 
 	/* Cursor is done as a yellow "box" */
 	hdc = GetDC(td->w);
@@ -2442,9 +2438,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	hdcSrc = CreateCompatibleDC(hdc);
 	hbmSrcOld = SelectObject(hdcSrc, infGraph.hBitmap);
 
-	//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-	//		(arg_graphics == GRAPHICS_DAVID_GERVAIS))
-  if (infMask.hBitmap)
+	if (infMask.hBitmap)
 	{
 		hdcMask = CreateCompatibleDC(hdc);
 		SelectObject(hdcMask, infMask.hBitmap);
@@ -2468,10 +2462,8 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		x1 = col * w1;
 		y1 = row * h1;
 
-		//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-		//	(arg_graphics == GRAPHICS_DAVID_GERVAIS))
 		if (hdcMask)
-    {
+		{
 			x3 = (tcp[i] & 0x7F) * w1;
 			y3 = (tap[i] & 0x7F) * h1;
 
@@ -2533,9 +2525,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	SelectObject(hdcSrc, hbmSrcOld);
 	DeleteDC(hdcSrc);
 
-	//if ((arg_graphics == GRAPHICS_ADAM_BOLT) ||
-	//	(arg_graphics == GRAPHICS_DAVID_GERVAIS))
-  if (hdcMask)
+	if (hdcMask)
 	{
 		/* Release */
 		SelectObject(hdcMask, hbmSrcOld);
@@ -2742,7 +2732,7 @@ static void init_windows(void)
 
 	MENUITEMINFO mii;
 	HMENU hm;
-  graphics_mode *mode;
+	graphics_mode *mode;
 
 	/* Main window */
 	td = &data[0];
@@ -2906,14 +2896,14 @@ static void init_windows(void)
 	mii.cbSize = sizeof(MENUITEMINFO);
 	mii.fMask = MIIM_ID | MIIM_TYPE;
 	mii.fType = MFT_STRING;
-  mode = graphics_modes;
+	mode = graphics_modes;
 	while (mode) {
-    if (mode->grafID != GRAPHICS_NONE) {
-		  mii.wID = mode->grafID + IDM_OPTIONS_GRAPHICS_NONE;
-		  mii.dwTypeData = mode->menuname;
-		  mii.cch = strlen(mode->menuname);
-		  InsertMenuItem(hm,IDM_OPTIONS_BIGTILE, FALSE, &mii);
-    }
+		if (mode->grafID != GRAPHICS_NONE) {
+			mii.wID = mode->grafID + IDM_OPTIONS_GRAPHICS_NONE;
+			mii.dwTypeData = mode->menuname;
+			mii.cch = strlen(mode->menuname);
+			InsertMenuItem(hm,IDM_OPTIONS_BIGTILE, FALSE, &mii);
+		}
 		mode = mode->pNext;
 	}
 	//mii.cbSize = sizeof(MENUITEMINFO);
@@ -2959,7 +2949,7 @@ static void setup_menus(void)
 	int i;
 
 	HMENU hm = GetMenu(data[0].w);
-  graphics_mode *mode;
+	graphics_mode *mode;
 
 #ifdef USE_SAVER
 	main_menu = hm;
@@ -3093,10 +3083,10 @@ static void setup_menus(void)
 
 	/* Menu "Options", disable all */
 	mode = graphics_modes;
-  while (mode) {
+	while (mode) {
 		EnableMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE,
 					   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-    mode = mode->pNext;
+		mode = mode->pNext;
 	} 
 	/*EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
@@ -3131,10 +3121,10 @@ static void setup_menus(void)
 
 	/* Menu "Options", update all */
 	mode = graphics_modes;
-  while (mode) {
-  	CheckMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE,
+	while (mode) {
+		CheckMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE,
 	                (arg_graphics == mode->grafID ? MF_CHECKED : MF_UNCHECKED));
-    mode = mode->pNext;
+		mode = mode->pNext;
 	} 
 	/*CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
 	              (arg_graphics == GRAPHICS_NONE ? MF_CHECKED : MF_UNCHECKED));
@@ -3166,13 +3156,13 @@ static void setup_menus(void)
 #ifdef USE_GRAPHICS
 	if (initialized && p_ptr->cmd.inkey_flag)
 	{
-	  mode = graphics_modes;
-    while (mode) {
-      if ((mode->grafID == 0) || (mode->file && mode->file[0])) {
-		    EnableMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
-      }
-      mode = mode->pNext;
-	  } 
+		mode = graphics_modes;
+		while (mode) {
+			if ((mode->grafID == 0) || (mode->file && mode->file[0])) {
+				EnableMenuItem(hm, mode->grafID + IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
+			}
+			mode = mode->pNext;
+		} 
 		/*EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD, MF_ENABLED);
 		EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM, MF_ENABLED);
@@ -3723,8 +3713,8 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 		case IDM_WINDOW_OPT: {
-      Term_keypress('=');
-      Term_keypress('m');
+			Term_keypress('=');
+			Term_keypress('m');
 
 			break;
 		}
@@ -3810,6 +3800,7 @@ static void process_menus(WORD wCmd)
 
 			break;
 		}
+
 
 		case IDM_TILE_08X08:
 		{
@@ -3898,208 +3889,6 @@ static void process_menus(WORD wCmd)
 
 			break;
 		}
-#if (0)
-    /*case IDM_OPTIONS_GRAPHICS_NONE:
-    case IDM_OPTIONS_GRAPHICS_OLD:
-    case IDM_OPTIONS_GRAPHICS_ADAM:
-    case IDM_OPTIONS_GRAPHICS_DAVID:
-    case IDM_OPTIONS_GRAPHICS_DAVID_6:
-    case IDM_OPTIONS_GRAPHICS_DAVID_7:
-    case IDM_OPTIONS_GRAPHICS_DAVID_8:
-		{
-			/* Paranoia *//*
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" *//*
-	    switch (wCmd)
-	    {
-        case IDM_OPTIONS_GRAPHICS_NONE: arg_graphics = GRAPHICS_NONE; break;
-        case IDM_OPTIONS_GRAPHICS_OLD: arg_graphics = GRAPHICS_ORIGINAL; break
-        case IDM_OPTIONS_GRAPHICS_ADAM: arg_graphics = GRAPHICS_ADAM_BOLT; break;
-        case IDM_OPTIONS_GRAPHICS_DAVID: arg_graphics = GRAPHICS_DAVID_GERVAIS; break;
-        case IDM_OPTIONS_GRAPHICS_DAVID_6: arg_graphics = 6; break;
-        case IDM_OPTIONS_GRAPHICS_DAVID_7: arg_graphics = 7; break;
-        case IDM_OPTIONS_GRAPHICS_DAVID_8: arg_graphics = 8; break;
-      }
-			if (arg_graphics != use_graphics)
-			{
-				/* React to changes *//*
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw *//*
-				Term_key_push(KTRL('R'));
-			}
-      break;
-    }*/
-    case IDM_OPTIONS_GRAPHICS_NONE:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != GRAPHICS_NONE)
-			{
-				arg_graphics = GRAPHICS_NONE;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-
-		case IDM_OPTIONS_GRAPHICS_OLD:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != GRAPHICS_ORIGINAL)
-			{
-				arg_graphics = GRAPHICS_ORIGINAL;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-
-		case IDM_OPTIONS_GRAPHICS_ADAM:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != GRAPHICS_ADAM_BOLT)
-			{
-				arg_graphics = GRAPHICS_ADAM_BOLT;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-
-		case IDM_OPTIONS_GRAPHICS_DAVID:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != GRAPHICS_DAVID_GERVAIS)
-			{
-				arg_graphics = GRAPHICS_DAVID_GERVAIS;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-		case IDM_OPTIONS_GRAPHICS_DAVID_6:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != 6)
-			{
-				arg_graphics = 6;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-		case IDM_OPTIONS_GRAPHICS_DAVID_7:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != 7)
-			{
-				arg_graphics = 7;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-		case IDM_OPTIONS_GRAPHICS_DAVID_8:
-		{
-			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
-				plog("You may not do that right now.");
-				break;
-			}
-
-			/* Toggle "arg_graphics" */
-			if (arg_graphics != 8)
-			{
-				arg_graphics = 8;
-
-				/* React to changes */
-				Term_xtra_win_react();
-
-				/* Hack -- Force redraw */
-				Term_key_push(KTRL('R'));
-			}
-
-			break;
-		}
-#endif
 		case IDM_OPTIONS_BIGTILE:
 		{
 			/* Paranoia */
@@ -4252,7 +4041,7 @@ static void process_menus(WORD wCmd)
 		}
 		default: {
 			if ((wCmd >= IDM_OPTIONS_GRAPHICS_NONE) && (wCmd <= IDM_OPTIONS_GRAPHICS_NONE+graphics_mode_high_id)) {
-        graphics_mode *mode;
+				graphics_mode *mode;
 				int selected_mode = 0;
 				int desired_mode = wCmd - IDM_OPTIONS_GRAPHICS_NONE;
 
@@ -4262,14 +4051,14 @@ static void process_menus(WORD wCmd)
 					break;
 				}
 
-        mode = graphics_modes;
-        while (mode) {
+				mode = graphics_modes;
+				while (mode) {
 					if (mode->grafID == desired_mode) {
 						selected_mode = desired_mode;
 						break;
 					}
-          mode = mode->pNext;
-        }
+					mode = mode->pNext;
+				}
 
 				/* Toggle "arg_graphics" */
 				if (arg_graphics != selected_mode) {
@@ -5501,7 +5290,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		plog_fmt("Graphics list load failed");
 	}
 
-  /* Prepare the windows */
+	/* Prepare the windows */
 	init_windows();
 
 	/* Activate hooks */
@@ -5543,27 +5332,27 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* Save player movement hook */
 	set_callback((callback_type) win_player_move, CALL_PLAYER_MOVE, NULL);
 
-  /* This section to play repeated games without exiting first was
-   * modified from Sil */
+	/* This section to play repeated games without exiting first was
+	 * modified from Sil */
 	while (1)
-  {
+	{
 		bool new_game = FALSE;
     
 		/* Let the player choose a savefile or start a new game */
-    if (!game_in_progress) {
+		if (!game_in_progress) {
 			//int choice = 0;
 			//int highlight = 1;
-      char key;
+			char key;
 
 			//if (p_ptr->state.is_dead) highlight = 4;
-	    /* Prompt the user */
-      if (savefile[0] != 0) {
-  	    prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-        prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
-      } else {
-  	    prtf(10, 23, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-      }
-	    Term_fresh();
+			/* Prompt the user */
+			if (savefile[0] != 0) {
+				prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+				prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+			} else {
+				prtf(10, 23, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+			}
+			Term_fresh();
 
 
 			/* Process Events until "new" or "open" is selected */
@@ -5571,121 +5360,121 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			{
 				//OPENFILENAME ofn;
 
-        /* process any windows messages */
-	      while (PeekMessage(&msg, NULL, 0, 0,PM_REMOVE)) {
-		      TranslateMessage(&msg);
-		      DispatchMessage(&msg);
-	      }
-        /* see if there is a key press on the queue */
-        Term_inkey(&key, FALSE,TRUE);
-        if ((key == 'n') || (key == 'N')) {
+				/* process any windows messages */
+				while (PeekMessage(&msg, NULL, 0, 0,PM_REMOVE)) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+				/* see if there is a key press on the queue */
+				Term_inkey(&key, FALSE,TRUE);
+				if ((key == 'n') || (key == 'N')) {
 					/* New game */
-          if (savefile[0] != 0) {
-            quit("Quiting because repeated play is not working yet.");
-          }
-          savefile[0] = 0;
-          process_menus(IDM_FILE_NEW);
-        } else
-        if ((key == 'o') || (key == 'O')) {
+					if (savefile[0] != 0) {
+						quit("Quiting because repeated play is not working yet.");
+					}
+					savefile[0] = 0;
+					process_menus(IDM_FILE_NEW);
+				} else
+				if ((key == 'o') || (key == 'O')) {
 					/* Load a save game */
-          if (savefile[0] != 0) {
-            quit("Quiting because repeated play is not working yet.");
-          }
-          process_menus(IDM_FILE_OPEN);
-        } else
-        if ((key == 'l') || (key == 'L')) {
-          if (savefile[0] != 0) {
-					  /* Load the last game */
-					  game_in_progress = TRUE;
-					  new_game = FALSE;
-          }
-        } else
-        if ((key == 'g') || (key == 'G')) {
-          if (savefile[0] != 0) {
-					  /* show the graveyard */
-            tomb_menu(FALSE);
+					if (savefile[0] != 0) {
+						quit("Quiting because repeated play is not working yet.");
+					}
+					process_menus(IDM_FILE_OPEN);
+				} else
+				if ((key == 'l') || (key == 'L')) {
+					if (savefile[0] != 0) {
+						/* Load the last game */
+						game_in_progress = TRUE;
+						new_game = FALSE;
+					}
+				} else
+				if ((key == 'g') || (key == 'G')) {
+					if (savefile[0] != 0) {
+						/* show the graveyard */
+						tomb_menu(FALSE);
 
-            /* Show the initial screen again */
-            display_introduction();
+						/* Show the initial screen again */
+						display_introduction();
 
-	          /* Prompt the user */
-	          prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-	          prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
+						/* Prompt the user */
+						prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+						prtf(10, 23, "[Or choose to 'load (L)ast' or ' return to (G)raveyard']");
 
-            /* Flush it */
-	          Term_fresh();
-          }
-        } else
-        /*if ((key == 't') || (key == 'T')) {
+						/* Flush it */
+						Term_fresh();
+					}
+				} else
+				/*if ((key == 't') || (key == 'T')) {
 					/* Start the tutorial */ /*
 					game_in_progress = TRUE;
 					new_game = FALSE;
-        } else*/
-        if ((key == 'x') || (key == 'X')) {
+				} else*/
+				if ((key == 'x') || (key == 'X')) {
 					/* Quit */
 					quit(NULL);
-        }
+				}
 			}
 		}
 
 		/* Handle pending events (most notably update) and flush input */
 		Term_flush();
 
-    if (savefile[0] != 0) {
-      new_game = FALSE;
-    } else {
-      new_game = TRUE;
-    }
+		if (savefile[0] != 0) {
+			new_game = FALSE;
+		} else {
+			new_game = TRUE;
+		}
 		/*
 		 * Play a game -- "new_game" is set by "new", "open" or the open document
-		 * even handler as appropriate
+		 * event handler as appropriate
 		 */
 		play_game(new_game);
 
 		// game no longer in progress
 		game_in_progress = FALSE;
 
-	/* Free the messages */
-	messages_free();
+		/* Free the messages */
+		messages_free();
 
-	/* Free the "quarks" */
-	//quarks_free();
+		/* Free the "quarks" */
+		//quarks_free();
 
-  //cleanup_angband();
+		//cleanup_angband();
 
-    // clear the region used for big tiles
-    Term_bigregion(-1, -1, -1);
-	  /* Hack - redraw everything + recalc bigtile regions */
-	  angband_term[0]->resize_hook();
+		// clear the region used for big tiles
+		Term_bigregion(-1, -1, -1);
+		/* Hack - redraw everything + recalc bigtile regions */
+		angband_term[0]->resize_hook();
     
-    // reset some globals that start at 0
-	  character_loaded = FALSE;
+		// reset some globals that start at 0
+		character_loaded = FALSE;
 
 		// rerun the first initialization routine
 		//init_stuff();
 		
 		// do some more between-games initialization
 		//re_init_some_things();
-  /* Initialize the "quark" package */
+	/* Initialize the "quark" package */
 	//(void)quarks_init();
 
 	/* Initialize the "message" package */
 	(void)messages_init();
 
 	/* Show the initial screen again */
-  display_introduction();
+	display_introduction();
 
 	/* Flush it */
 	Term_fresh();
-  //init_angband();
+	//init_angband();
 
-  /* reinitialize arrays that use quarks */
+	/* reinitialize arrays that use quarks */
 	//note("[Initializing arrays... (wilderness)]");
 	//if (init_w_info()) quit("Cannot initialize wilderness");
 
 	}
 
-  /* Paranoia */
+	/* Paranoia */
 	quit(NULL);
 
 	/* Paranoia */
