@@ -323,6 +323,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 		{
 			use_transparency = TRUE;
 
+
 			*xsize = 16;
 			*ysize = 16;
 
@@ -2701,19 +2702,8 @@ static const byte priority_table[][2] =
 static byte priority(byte feat)
 {
 	int i = 0;
-
-	/* Scan the table */
-	while (priority_table[i][1])
-	{
-		/* Does the feature match? */
-		if (priority_table[i][0] == feat)
-		{
-			return (priority_table[i][1]);
-		}
-
-		/* Next entry */
-		i++;
-	}
+	if (f_info[feat].priority)
+		return f_info[feat].priority;
 
 	/* Default - assume floor */
 	return (5);
