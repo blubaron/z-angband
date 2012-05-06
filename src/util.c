@@ -2267,10 +2267,255 @@ char inkey(void)
 	p_ptr->cmd.inkey_flag = FALSE;
 	p_ptr->cmd.inkey_scan = FALSE;
 
+	/* check for and translate a mouse press */
+	if (ch & 0x80) {
+		int x,y;
+		char b;
+
+		/* this was a mouse press, get the press (and ignore it) */
+		Term_getmousepress(&b,&x,&y);
+		if ((ch& 0x0F) == 2) {
+			ch = ESCAPE;
+		} else
+		{
+			ch = '\n';
+		}
+	}
+
 	/* Return the keypress */
 	return (ch);
 }
 
+/* an inkey that does not translate mouse presses */
+char inkey_m(void)
+{
+	int v;
+	char kk;
+	char ch = 0;
+	bool done = FALSE;
+	term *old = Term;
+
+	/* Hack -- Use the "inkey_next" pointer */
+	if (inkey_next && *inkey_next && !p_ptr->cmd.inkey_xtra)
+	{
+		/* Get next character, and advance */
+		ch = *inkey_next++;
+
+		/* Cancel the various "global parameters" */
+		p_ptr->cmd.inkey_base = FALSE;
+		p_ptr->cmd.inkey_xtra = FALSE;
+		p_ptr->cmd.inkey_flag = FALSE;
+		p_ptr->cmd.inkey_scan = FALSE;
+
+		/* Accept result */
+		return (ch);
+	}
+
+	/* Forget pointer */
+	inkey_next = NULL;
+
+
+#ifdef ALLOW_BORG
+
+	/* Mega-Hack -- Use the special hook */
+	if (inkey_hack && ((ch = (*inkey_hack) (p_ptr->cmd.inkey_xtra)) != 0))
+	{
+		/* Cancel the various "global parameters" */
+		p_ptr->cmd.inkey_base = FALSE;
+		p_ptr->cmd.inkey_xtra = FALSE;
+		p_ptr->cmd.inkey_flag = FALSE;
+		p_ptr->cmd.inkey_scan = FALSE;
+
+		/* Accept result */
+		return (ch);
+	}
+
+#endif /* ALLOW_BORG */
+
+	/* Hack -- handle delayed "flush()" */
+	if (p_ptr->cmd.inkey_xtra)
+	{
+		/* End "macro action" */
+		parse_macro = FALSE;
+
+		/* End "macro trigger" */
+		parse_under = FALSE;
+
+		/* Forget old keypresses */
+		Term_flush();
+	}
+
+
+	/* Access cursor state */
+	(void)Term_get_cursor(&v);
+
+	/* Show the cursor if waiting, except sometimes in "command" mode */
+	if (!p_ptr->cmd.inkey_scan &&
+		(!p_ptr->cmd.inkey_flag || hilite_player || character_icky))
+	{
+		/* Show the cursor */
+		(void)Term_set_cursor(1);
+	}
+
+
+	/* Hack -- Activate main screen */
+	Term_activate(angband_term[0]);
+
+	/* Get a key */
+	while (!ch)
+	{
+		/* Hack -- Handle "inkey_scan" */
+		if (!p_ptr->cmd.inkey_base && p_ptr->cmd.inkey_scan &&
+			(0 != Term_inkey(&kk, FALSE, FALSE)))
+		{
+			break;
+		}
+
+
+		/* Hack -- Flush output once when no key ready */
+		if (!done && (0 != Term_inkey(&kk, FALSE, FALSE)))
+		{
+			/* Hack -- activate proper term */
+			Term_activate(old);
+
+			/* Flush output */
+			Term_fresh();
+
+			/* Hack -- activate main screen */
+			Term_activate(angband_term[0]);
+
+			/* Mega-Hack -- reset saved flag */
+			character_saved = FALSE;
+
+			/* Mega-Hack -- reset signal counter */
+			signal_count = 0;
+
+			/* Only once */
+			done = TRUE;
+		}
+
+
+		/* Hack -- Handle "inkey_base" */
+		if (p_ptr->cmd.inkey_base)
+		{
+			int w = 0;
+
+			/* Wait forever */
+			if (!p_ptr->cmd.inkey_scan)
+			{
+				/* Wait for (and remove) a pending key */
+				if (0 == Term_inkey(&ch, TRUE, TRUE))
+				{
+					/* Done */
+					break;
+				}
+
+				/* Oops */
+				break;
+			}
+
+			/* Wait */
+			while (TRUE)
+			{
+				/* Check for (and remove) a pending key */
+				if (0 == Term_inkey(&ch, FALSE, TRUE))
+				{
+					/* Done */
+					break;
+				}
+
+				/* No key ready */
+				else
+				{
+					/* Increase "wait" */
+					w += 10;
+
+					/* Excessive delay */
+					if (w >= 100) break;
+
+					/* Delay */
+					Term_xtra(TERM_XTRA_DELAY, w);
+				}
+			}
+
+			/* Done */
+			break;
+		}
+
+
+		/* Get a key (see above) */
+		ch = inkey_aux();
+
+
+		/* Handle "control-right-bracket" */
+		if (ch == 29)
+		{
+			/* Strip this key */
+			ch = 0;
+
+			/* Continue */
+			continue;
+		}
+
+
+		/* Treat back-quote as escape */
+		if (ch == '`') ch = ESCAPE;
+
+
+		/* End "macro trigger" */
+		if (parse_under && (ch <= 32))
+		{
+			/* Strip this key */
+			ch = 0;
+
+			/* End "macro trigger" */
+			parse_under = FALSE;
+		}
+
+
+		/* Handle "control-caret" */
+		if (ch == 30)
+		{
+			/* Strip this key */
+			ch = 0;
+		}
+
+		/* Handle "control-underscore" */
+		else if (ch == 31)
+		{
+			/* Strip this key */
+			ch = 0;
+
+			/* Begin "macro trigger" */
+			parse_under = TRUE;
+		}
+
+		/* Inside "macro trigger" */
+		else if (parse_under)
+		{
+			/* Strip this key */
+			ch = 0;
+		}
+	}
+
+
+	/* Hack -- restore the term */
+	Term_activate(old);
+
+
+	/* Restore the cursor */
+	(void)Term_set_cursor(v);
+
+
+	/* Cancel the various "global parameters" */
+	p_ptr->cmd.inkey_base = FALSE;
+	p_ptr->cmd.inkey_xtra = FALSE;
+	p_ptr->cmd.inkey_flag = FALSE;
+	p_ptr->cmd.inkey_scan = FALSE;
+
+ 	/* Return the keypress */
+ 	return (ch);
+ }
 
 
 /*
@@ -3147,7 +3392,7 @@ void set_message_type(char *buf, uint max, cptr fmt, va_list *vp)
 	/* Unused parameter */
 	(void)fmt;
 
-    /* Get the argument - and set the message type */
+	/* Get the argument - and set the message type */
 	current_message_type = va_arg(*vp, int);
 
 	/* Get the string to format with. */
@@ -3342,7 +3587,7 @@ void request_command(int shopping)
 			p_ptr->cmd.inkey_flag = TRUE;
 
 			/* Get a command */
-			cmd = inkey();
+			cmd = inkey_m();
 		}
 
 		/* Clear top line */

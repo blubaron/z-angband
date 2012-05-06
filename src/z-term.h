@@ -194,6 +194,14 @@ struct term
 	u16b key_xtra;
 	u16b key_size;
 
+	char *mouse_queue;
+	u16b *mouse_x_queue;
+	u16b *mouse_y_queue;
+
+	byte mouse_head;
+	byte mouse_tail;
+	byte mouse_size;
+
 	byte wid;
 	byte hgt;
 
@@ -301,8 +309,10 @@ extern errr Term_what(int x, int y, byte *a, char *c);
 
 extern void Term_flush(void);
 extern errr Term_keypress(int k);
+extern errr Term_mousepress(int button, int mods, int x, int y);
 extern errr Term_key_push(int k);
 extern errr Term_inkey(char *ch, bool wait, bool take);
+extern errr Term_getmousepress(char *button, int *x, int *y);
 
 extern void Term_save(void);
 extern void Term_load(void);

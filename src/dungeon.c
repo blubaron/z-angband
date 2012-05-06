@@ -2260,7 +2260,152 @@ static bool enter_borg_mode(void)
 
 #endif /* ALLOW_BORG */
 
+static void process_click(char press, int xpos, int ypos)
+{
+	char button = press & 0x7;
+	bool shift = press & 16;
+	bool ctrl = press & 32;
+	bool alt = press & 64;
+	bool meta = press & 8;
+	int x,y;
 
+	y = ypos-ROW_MAP + p_ptr->panel_y1;
+	x = xpos-COL_MAP + p_ptr->panel_x1;
+
+	/* Check for a valid location */
+	//if (!in_bounds_fully(y, x)) return;
+	if ((x == p_ptr->px) && (y == p_ptr->py)) {
+		if (shift) {
+			/* shift-click - cast magic / open inventory */
+			if (button == 1) {
+				/* Cast a spell  - from proces_command*/
+				if (FLAG(p_ptr, TR_NO_MAGIC))
+				{
+					cptr which_power = "magic";
+					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+						which_power = "psionic powers";
+					else if (mp_ptr->spell_book == TV_LIFE_BOOK)
+						which_power = "prayer";
+
+					msgf("An anti-magic shell disrupts your %s!", which_power);
+
+					p_ptr->state.energy_use = 0;
+				}
+				else
+				{
+					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+						do_cmd_mindcraft();
+					else
+						do_cmd_cast();
+				}
+
+			} else
+			if (button == 2) {
+				do_cmd_inven();
+			}
+		} else
+		if (ctrl) {
+			/* ctrl-click - use feature / use inventory item */
+			if (button == 1) {
+				do_cmd_use_terrain();
+			} else
+			if (button == 2) {
+				do_cmd_use();
+			}
+		} else
+		if (alt) {
+			/* alt-click - Search  or show char screen */
+			if (button == 1) {
+ 				do_cmd_search();
+			} else
+			if (button == 2) {
+				Term_keypress('C');
+			}
+		} else
+		{
+			/* just-click - wait and try pickup, or show player context menu */
+			if (button == 1) {
+ 				do_cmd_stay(TRUE);
+			} else
+			if (button == 2) {
+ 				do_cmd_rest();
+			}
+		}
+	} else
+	if (button == 1) {
+#if (0)
+		if (p_ptr->timed[TMD_CONFUSED]) {
+			cmd_insert(CMD_WALK);
+		} else
+#endif
+		{
+			if (shift) {
+				/* shift-click - run */
+				p_ptr->cmd.dir = coords_to_dir(x, y);
+				do_cmd_run();
+			} else
+			if (ctrl) {
+				/* control-click - alter */
+				p_ptr->cmd.dir = coords_to_dir(x, y);
+				do_cmd_alter();
+			} else
+			if (alt) {
+				/* alt-click - look */
+				//cmd_insert(CMD_RUN);
+				//cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(y,x));
+			} else
+			{
+				/* if the click was adjacent to the player, walk in that direction */
+				if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
+						&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1)) {
+					p_ptr->cmd.dir = coords_to_dir(x, y);
+					do_cmd_walk(always_pickup);
+				} else {
+					/* if not, pathfind to that spot */
+					do_cmd_pathfind(x,y);
+				}
+			}
+		}
+//#endif
+	} else
+	if (button == 2) {
+#if (0)
+		int m_idx = cave->m_idx[y][x];
+		if (m_idx && target_able(m_idx)) {
+			monster_type *m_ptr = cave_monster(cave, m_idx);
+			/* Set up target information */
+			monster_race_track(m_ptr->r_idx);
+			health_track(p_ptr, m_ptr);
+			//health_track(p_ptr, m_idx);
+			target_set_monster(m_idx);
+		} else {
+			target_set_location(y,x);
+		}
+		if (e.mouse.mods & KC_MOD_SHIFT) {
+			/* shift-click - cast spell at target */
+		} else
+		if (e.mouse.mods & KC_MOD_CONTROL) {
+			/* control-click - fire at target */
+		} else
+		if (e.mouse.mods & KC_MOD_ALT) {
+			/* alt-click - throw at target */
+			/* maybe look with projectile path? */
+		} else
+		{
+			//msg("Target set.");
+			/* see if the click was adjacent to the player */
+			if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
+				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1)) {
+				context_menu_cave(cave,y,x,1,e.mouse.x, e.mouse.y);
+			} else {
+				context_menu_cave(cave,y,x,0,e.mouse.x, e.mouse.y);
+			}
+		}
+#endif
+	}
+
+}
+ 
 
 /*
  * Parse and execute the current command
@@ -2809,6 +2954,7 @@ static void process_command(void)
 		{
 			/* Take notes */
 			do_cmd_note();
+
 			break;
 		}
 
@@ -3099,8 +3245,19 @@ static void process_player(void)
 			/* Get a command (normal) */
 			request_command(FALSE);
 
-			/* Process the command */
-			process_command();
+			if (p_ptr->cmd.cmd & 0x80) {
+				/* the command is a mouse command */
+				int x, y;
+				char button;
+				/* make sure we have the right mouse press, and clear until we do */
+				while ((Term_getmousepress(&button, &x, &y)==0) && (button != p_ptr->cmd.cmd));
+				if (button == p_ptr->cmd.cmd) {
+					process_click(button, x ,y);
+				}
+			} else {
+				/* Process the command */
+				process_command();
+			}
 		}
 
 

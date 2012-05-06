@@ -1005,6 +1005,7 @@ extern void flush(void);
 extern void text_to_ascii(char *buf, cptr str);
 extern void ascii_to_text(char *buf, cptr str);
 extern char inkey(void);
+extern char inkey_m(void);
 extern s16b quark_add(cptr str);
 extern s16b quark_fmt(cptr str, ...);
 extern void quark_remove(s16b *i);

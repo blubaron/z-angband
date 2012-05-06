@@ -869,7 +869,18 @@ void carry(int pickup)
 					/* Get an acceptable answer */
 					while (TRUE)
 					{
-						i = inkey();
+						i = inkey_m();
+						if (i & 0x80) {
+							int x,y;
+							char b;
+							/* this was a mouse press, get the press and translate it */
+							Term_getmousepress(&b,&x,&y);
+							if ((i & 0x0F) == 1) {
+								i = 'y';
+								break;
+							}
+							/* other presses are equivalent to no */
+ 						}
 						if (quick_messages) break;
 						if (i == ESCAPE) break;
 						if (strchr("YyNnKk", i)) break;
@@ -1001,7 +1012,18 @@ void carry(int pickup)
 			/* Get an acceptable answer */
 			while (TRUE)
 			{
-				i = inkey();
+				i = inkey_m();
+				if (i & 0x80) {
+					int x,y;
+					char b;
+					/* this was a mouse press, get the press and translate it */
+					Term_getmousepress(&b,&x,&y);
+					if ((i & 0x0F) == 1) {
+						i = 'y';
+						break;
+					}
+					/* other presses are equivalent to no */
+ 				}
 				if (quick_messages) break;
 				if (i == ESCAPE) break;
 				if (strchr("YyNnKk", i)) break;

@@ -4191,6 +4191,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			if (screensaver_active)
 			{
 				stop_screensaver();
+				screensaver_active = FALSE;
 				return 0;
 			}
 #endif /* USE_SAVER */
@@ -4236,21 +4237,47 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			return 0;
 		}
 
-#ifdef USE_SAVER
 
 		case WM_MBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		{
+#ifdef USE_SAVER
 			if (screensaver_active)
 			{
 				stop_screensaver();
+				screensaver_active = FALSE;
 				return 0;
+			} else {
+#endif /* USE_SAVER */
+				char button, mods;
+				int xPos, yPos;
+
+				/* Get the text grid */
+				pixel_to_square(&xPos, &yPos,GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam));
+
+				if (uMsg == WM_LBUTTONDOWN)
+					button = 1;
+				else if (uMsg == WM_RBUTTONDOWN)
+					button = 2;
+				else
+					button = 3;
+
+				/* Extract the modifiers */
+				mods = 0;
+				if (GetKeyState(VK_CONTROL) & 0x8000) mods |= 2;
+				if (GetKeyState(VK_SHIFT)   & 0x8000) mods |= 1;
+				if (GetKeyState(VK_MENU)    & 0x8000) mods |= 4;
+
+				Term_mousepress(button, mods, xPos, yPos);
+#ifdef USE_SAVER
 			}
+#endif /* USE_SAVER */
 
 			break;
 		}
 
+#ifdef USE_SAVER
 		case WM_MOUSEMOVE:
 		{
 			if (!screensaver_active) break;

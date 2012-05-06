@@ -1900,6 +1900,7 @@ void Term_flush(void)
 
 	/* Forget all keypresses */
 	Term->key_head = Term->key_tail = 0;
+	Term->mouse_head = Term->mouse_tail = 0;
 }
 
 
@@ -1930,6 +1931,54 @@ errr Term_keypress(int k)
 	return (1);
 }
 
+/*
+ * Add a mouse button press to the "queue"
+ */
+errr Term_mousepress(int m, int mods, int x, int y)
+{
+	if (m > 7) m = m % 8;
+
+	/* mark that this is a mouse press */
+	m |=  128;
+
+	if (mods & 1) {
+		/* shift is down */
+		m |= 16;
+	}
+	if (mods & 2) {
+		/* control is down */
+		m |= 32;
+	}
+	if (mods & 4) {
+		/* alt is down */
+		m |= 64;
+	}
+	if (mods & 8) {
+		/* meta is down, remove this possibility
+		 * if more than 8 mouse buttons are needed */
+		m |= 8;
+	}
+	/* Store the char, advance the queue */
+	Term->key_queue[Term->key_head++] = m;
+
+	/* Circular queue, handle wrap */
+	if (Term->key_head == Term->key_size) Term->key_head = 0;
+
+	/* Store the char, advance the queue */
+	Term->mouse_x_queue[Term->mouse_head] = x;
+	Term->mouse_y_queue[Term->mouse_head] = y;
+	Term->mouse_queue[Term->mouse_head++] = m;
+
+	/* Circular queue, handle wrap */
+	if (Term->mouse_head == Term->mouse_size) Term->mouse_head = 0;
+
+	/* if overflow, return the error */
+	if (Term->key_head == Term->key_tail) return (1);
+	if (Term->mouse_head == Term->mouse_tail) return (2);
+
+	/* Success */
+	return (0);
+}
 
 /*
  * Add a keypress to the FRONT of the "queue"
@@ -2018,6 +2067,31 @@ errr Term_inkey(char *ch, bool wait, bool take)
 	return (0);
 }
 
+/*
+ * Check if a mouse press was read from the key queue, get the
+ * mouse press information.
+ */
+errr Term_getmousepress(char *button, int *x, int *y)
+{
+	/* Assume no key */
+	(*button) = 0;
+
+	/* Do not Wait */
+	/* No keys are ready */
+	if (Term->mouse_head == Term->mouse_tail)
+		return (1);
+
+	/* Extract the next keypress */
+	(*button) = Term->mouse_queue[Term->mouse_tail];
+	(*x) = Term->mouse_x_queue[Term->mouse_tail];
+	(*y) = Term->mouse_y_queue[Term->mouse_tail];
+
+	/* If requested, advance the queue, wrap around if necessary */
+	if ((++Term->mouse_tail == Term->mouse_size)) Term->mouse_tail = 0;
+
+	/* Success */
+	return (0);
+}
 
 
 /*** Extra routines ***/
@@ -2276,6 +2350,9 @@ errr term_nuke(term *t)
 
 	/* Free the input queue */
 	KILL(t->key_queue);
+	KILL(t->mouse_queue);
+	KILL(t->mouse_x_queue);
+	KILL(t->mouse_y_queue);
 
 	/* Success */
 	return (0);
@@ -2304,6 +2381,17 @@ errr term_init(term *t, int w, int h, int k)
 
 	/* Allocate the input queue */
 	C_MAKE(t->key_queue, t->key_size, char);
+
+	/* Prepare the mouse input queue */
+	t->mouse_head = t->mouse_tail = 0;
+
+	/* Determine the mouse input queue size */
+	t->mouse_size = 8;
+
+	/* Allocate the mouse input queue */
+	C_MAKE(t->mouse_queue, t->mouse_size, char);
+	C_MAKE(t->mouse_x_queue, t->mouse_size, u16b);
+	C_MAKE(t->mouse_y_queue, t->mouse_size, u16b);
 
 
 	/* Save the size */
