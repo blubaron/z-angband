@@ -2487,34 +2487,34 @@ void build_cmd_grave (void)
  */
 void building_bank_info(void)
 {
-  int row = 4;
+	int row = 4;
 
-  if (p_ptr->bank_layaway) {
-  	int wid, hgt;
-  	char o_name[256];
+	if (p_ptr->bank_layaway) {
+		int wid, hgt;
+		char o_name[256];
    	
-    Term_get_size(&wid, &hgt);
+		Term_get_size(&wid, &hgt);
  	  
-    object_desc(o_name, p_ptr->bank_layaway, TRUE, 3, 256);
-    if (wid < 300) {
-      o_name[wid-44] = '\0';
-    }
+		object_desc(o_name, p_ptr->bank_layaway, TRUE, 3, 256);
+		if (wid < 300) {
+			o_name[wid-44] = '\0';
+		}
 
 		put_fstr(2, row, "On layaway: %s for %dgp, paid %dgp.", o_name, p_ptr->bank_layaway_gold, p_ptr->bank_layaway_paid);
-    row += 2;
+		row += 2;
 	}
-  if (p_ptr->bank_gold > 0) {
+	if (p_ptr->bank_gold > 0) {
 		put_fstr(2, row, "On deposit: %8dgp", p_ptr->bank_gold);
-    row += 2;
+		row += 2;
 	}
-  if (get_loan_amount()) {
-	  store_type * st_ptr = get_current_store();
-	  store_type * st_ptr2 = get_loaner();
-    if (st_ptr == st_ptr2) {
-		  put_fstr(2, row, CLR_YELLOW "On loan:    %8dgp", get_loan_amount());
-    } else {
-		  put_fstr(2, row, CLR_RED "On loan:    %8dgp", get_loan_amount());
-    }
+	if (get_loan_amount()) {
+		store_type * st_ptr = get_current_store();
+		store_type * st_ptr2 = get_loaner();
+		if (st_ptr == st_ptr2) {
+			put_fstr(2, row, CLR_YELLOW "On loan:    %8dgp", get_loan_amount());
+		} else {
+			put_fstr(2, row, CLR_RED "On loan:    %8dgp", get_loan_amount());
+		}
 	}
 }
 /*
@@ -2523,27 +2523,27 @@ void building_bank_info(void)
 void build_cmd_bank_deposit(void)
 {
 	store_type * st_ptr = get_current_store();
-  u32b amt;
+	u32b amt;
 
 	if (p_ptr->au > 0) {
-    amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au);
-    if (amt > p_ptr->au) {
-      amt = p_ptr->au;
-    }
-    if (amt > 0)  {
-      p_ptr->au -= amt;
-      p_ptr->bank_gold += amt;
-  		msgf ("You have deposited %d gold.", amt);
-	  	message_flush();
-    }
-  } else {
-  	if (p_ptr->bank_gold > 0) {
-	  	msgf ("You do not have any money to deposit.");
-    } else {
-	  	msgf ("You do not have any money to deposit. Please do not waste our time.");
-    }
+		amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au);
+		if (amt > p_ptr->au) {
+			amt = p_ptr->au;
+		}
+		if (amt > 0)  {
+			p_ptr->au -= amt;
+			p_ptr->bank_gold += amt;
+			msgf ("You have deposited %d gold.", amt);
+			message_flush();
+		}
+	} else {
+		if (p_ptr->bank_gold > 0) {
+			msgf ("You do not have any money to deposit.");
+		} else {
+			msgf ("You do not have any money to deposit. Please do not waste our time.");
+		}
 		message_flush();
-  }
+	}
 }
 
 /*
@@ -2552,23 +2552,23 @@ void build_cmd_bank_deposit(void)
 void build_cmd_bank_withdraw(void)
 {
 	store_type * st_ptr = get_current_store();
-  u32b amt;
+	u32b amt;
 
 	if (p_ptr->bank_gold > 0) {
-    amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold);
-    if (amt > p_ptr->bank_gold) {
-      amt = p_ptr->bank_gold;
-    }
-    if (amt > 0)  {
-      p_ptr->bank_gold -= amt;
-      p_ptr->au += amt;
-  		msgf ("You have withdrawn %d gold.", amt);
-	  	message_flush();
-    }
-  } else {
+		amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold);
+		if (amt > p_ptr->bank_gold) {
+			amt = p_ptr->bank_gold;
+		}
+		if (amt > 0)  {
+			p_ptr->bank_gold -= amt;
+			p_ptr->au += amt;
+			msgf ("You have withdrawn %d gold.", amt);
+			message_flush();
+		}
+	} else {
 		msgf ("You do not have any money deposited with us.");
 		message_flush();
-  }
+	}
 }
 
 /*
@@ -2577,73 +2577,72 @@ void build_cmd_bank_withdraw(void)
 void build_cmd_item_layaway(void)
 {
 	store_type * st_ptr = get_current_store();
-  u32b amt;
-  int item_new;
+	u32b amt;
+	int item_new;
 
 	if (p_ptr->bank_layaway_gold > 0) {
-    if (p_ptr->au > 0) {
-      amt = get_quantity_big("How much would you like to put towards the item?", p_ptr->au);
-      if (amt > p_ptr->au) {
-        amt = p_ptr->au;
-      }
-      if (amt > p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid) {
-        amt = p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid;
-      }
-      if (amt > 0)  {
-        p_ptr->au -= amt;
-        p_ptr->bank_layaway_paid += amt;
+		if (p_ptr->au > 0) {
+			amt = get_quantity_big("How much would you like to put towards the item?", p_ptr->au);
+			if (amt > p_ptr->au) {
+				amt = p_ptr->au;
+			}
+			if (amt > p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid) {
+				amt = p_ptr->bank_layaway_gold - p_ptr->bank_layaway_paid;
+			}
+			if (amt > 0)  {
+				p_ptr->au -= amt;
+				p_ptr->bank_layaway_paid += amt;
 
-		    /* Make a sound */
-		    sound(SOUND_BUY);
+				/* Make a sound */
+				sound(SOUND_BUY);
 
-        if (p_ptr->bank_layaway_paid >= p_ptr->bank_layaway_gold) {
-          p_ptr->au += p_ptr->bank_layaway_paid - p_ptr->bank_layaway_gold;
-          p_ptr->bank_layaway_gold = 0;
-          p_ptr->bank_layaway_paid = 0;
+				if (p_ptr->bank_layaway_paid >= p_ptr->bank_layaway_gold) {
+					p_ptr->au += p_ptr->bank_layaway_paid - p_ptr->bank_layaway_gold;
+					p_ptr->bank_layaway_gold = 0;
+					p_ptr->bank_layaway_paid = 0;
 
-			    /* Hack -- buying an item makes you aware of it */
-			    object_aware(p_ptr->bank_layaway);
-			    object_mental(p_ptr->bank_layaway);
-			    p_ptr->bank_layaway->info &= ~(OB_STOREB);
+					/* Hack -- buying an item makes you aware of it */
+					object_aware(p_ptr->bank_layaway);
+					object_mental(p_ptr->bank_layaway);
+					p_ptr->bank_layaway->info &= ~(OB_STOREB);
 
-         	/* see if there is room in pack */
-	        if (inven_carry_okay(p_ptr->bank_layaway)) {
-            object_type *j_ptr;
-			      /* Give it to the player */
-			      j_ptr = inven_carry(p_ptr->bank_layaway);
+					/* see if there is room in pack */
+					if (inven_carry_okay(p_ptr->bank_layaway)) {
+						object_type *j_ptr;
+						/* Give it to the player */
+						j_ptr = inven_carry(p_ptr->bank_layaway);
 
-			      /* Paranoia */
-			      if (!j_ptr)
-			      {
-				      msgf("Too many allocated objects!");
-				      return;
-			      }
+						/* Paranoia */
+						if (!j_ptr) {
+							msgf("Too many allocated objects!");
+							return;
+						}
 
-			      /* Get slot */
-			      item_new = get_item_position(p_ptr->inventory, j_ptr);
+						/* Get slot */
+						item_new = get_item_position(p_ptr->inventory, j_ptr);
 
-			      /* Describe the final result */
-  		      msgf ("You have paid off the item. You here it is.");
-			      msgf("You have %v (%c).", OBJECT_FMT(j_ptr, TRUE, 3), I2A(item_new));
+						/* Describe the final result */
+						msgf ("You have paid off the item. You here it is.");
+						msgf("You have %v (%c).", OBJECT_FMT(j_ptr, TRUE, 3), I2A(item_new));
 
-			      /* Handle stuff */
-			      handle_stuff();
-          } else {
-            //drop_near(
-  		      msgf ("You have paid off the item. You can pick it up outside.");
-          }
-          //object_wipe(p_ptr->bank_layaway);
-        } else {
-  		    msgf ("You have paid %d gold towards %s.", amt, "unknown");
-        }
-      }
-    } else {
-		  msgf ("You do not have any gold.");
-    }
-  } else {
+						/* Handle stuff */
+						handle_stuff();
+					} else {
+						//drop_near(
+						msgf ("You have paid off the item. You can pick it up outside.");
+					}
+					//object_wipe(p_ptr->bank_layaway);
+				} else {
+					msgf ("You have paid %d gold towards %s.", amt, "unknown");
+				}
+			}
+		} else {
+			msgf ("You do not have any gold.");
+		}
+	} else {
 		msgf ("You do not have an item on layaway.");
-  }
-  message_flush();
+	}
+	message_flush();
 }
 
 /*
