@@ -448,6 +448,7 @@
 #define ST_HALF_INVEN		0x08	/* One page of inventory */
 #define ST_GREED			0x10	/* Double prices */
 #define ST_ULTRA_GREED		0x20	/* Quadruple prices */
+#define ST_MAKE_MORE		0x40	/* when selling 2 out of a stack of 3 or more, add some more to store inventory */
 
 
 
@@ -1706,6 +1707,7 @@
 #define ART_AVAVIR              109
 
 /* The sword of the Dawn */
+
 
 
 

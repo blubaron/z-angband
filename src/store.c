@@ -1927,6 +1927,14 @@ static bool store_sell(void)
 				q_ptr->ac = 0;
 			}
 
+			/* see if the store can make more of the item */
+			if ((amt == 2) && (o_ptr->number > 2) && object_known_p(o_ptr)
+					&& (o_ptr->discount == 0)) {
+				if (info_flags & ST_MAKE_MORE) {
+					q_ptr->number += 1 + (50/o_ptr->weight);
+				}
+			}
+
 			/* Take the item from the player, describe the result */
 			item_increase(o_ptr, -amt);
 
