@@ -2627,13 +2627,18 @@ void build_cmd_item_layaway(void)
 
 						/* Handle stuff */
 						handle_stuff();
+
+						/* cleanup the object */
+						object_wipe(p_ptr->bank_layaway);
+						p_ptr->bank_layaway = NULL;
 					} else {
-						//drop_near(
-						msgf ("You have paid off the item. You can pick it up outside.");
+						p_ptr->bank_layaway_gold = 50;
+						msgf ("You have paid off the item, but you cannot carry anymore items.");
+						msgf ("You can pay %d gold to pick it up later.", p_ptr->bank_layaway_gold);
 					}
-					//object_wipe(p_ptr->bank_layaway);
 				} else {
-					msgf ("You have paid %d gold towards %s.", amt, "unknown");
+					msgf ("You have paid %d gold towards %v.", amt, 
+						OBJECT_FMT(p_ptr->bank_layaway, TRUE, 3));
 				}
 			}
 		} else {
