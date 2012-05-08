@@ -96,6 +96,10 @@
 #define IDM_OPTIONS_SAVER           430
 #define IDM_OPTIONS_MAP             440
 #define IDM_OPTIONS_SCREENSHOT      441
+#define IDM_OPTIONS_TILE_INC_WID    442
+#define IDM_OPTIONS_TILE_DEC_WID    443
+#define IDM_OPTIONS_TILE_INC_HGT    444
+#define IDM_OPTIONS_TILE_DEC_HGT    445
 
 #define IDM_OPTIONS_SOUND           446
 
@@ -112,6 +116,8 @@
 #define IDM_OPTIONS_TILE_8x8        457
 #define IDM_OPTIONS_TILE_16x8       458
 #define IDM_OPTIONS_TILE_16x16      459
+#define IDM_OPTIONS_TILE_3x2        460
+#define IDM_OPTIONS_TILE_4x3        461
 
 #define IDM_TILE_FONT 		190
 #define IDM_TILE_08X08		191

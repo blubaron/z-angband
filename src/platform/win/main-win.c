@@ -2103,21 +2103,26 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 {
 	term_data *td = (term_data*)(Term->data);
 	
-	if (td->map_active)
-	{
+	if (td->map_active) {
 		(*x) = (ox - td->size_ow1) / td->map_tile_wid;
 		(*y) = (oy - td->size_oh1) / td->map_tile_hgt;
-	}
-	else
-	{
+	} else {
 		(*x) = (ox - td->size_ow1) / td->tile_wid;
 		(*y) = (oy - td->size_oh1) / td->tile_hgt;
 	
-		if ((use_bigtile) && ((*y) >= Term->scr->big_y1)
-			&& ((*y) <= Term->scr->big_y2)
-			&& ((*x) >= Term->scr->big_x1))
+		if ((tile_height_mult > 1)
+				&& ((*y) > Term->scr->big_y1)
+				&& ((*y) <= Term->scr->big_y2)
+				&& ((*x) >= Term->scr->big_x1))
 		{
-			(*x) -= ((*x) - Term->scr->big_x1 + 1) / 2;
+			(*y) = (((*y) - Term->scr->big_y1) / tile_height_mult) + Term->scr->big_y1;
+		}
+		if ((tile_width_mult > 1)
+				&& ((*y) >= Term->scr->big_y1)
+				&& ((*y) <= Term->scr->big_y2)
+				&& ((*x) > Term->scr->big_x1))
+		{
+			(*x) = (((*x) - Term->scr->big_x1) / tile_width_mult) + Term->scr->big_x1;
 		}
 	}
 }
@@ -2129,25 +2134,31 @@ static void square_to_pixel(int *x, int *y, int ox, int oy)
 {
 	term_data *td = (term_data*)(Term->data);
 	
-	if (td->map_active)
-	{
+	if (td->map_active) {
 		(*x) = ox * td->map_tile_wid + td->size_ow1;
 		(*y) = oy * td->map_tile_hgt + td->size_oh1;
-	}
-	else
-	{
-		(*y) = oy * td->tile_hgt + td->size_oh1;
-	
-		if ((use_bigtile) && (oy >= Term->scr->big_y1)
+	} else {
+		if ((tile_width_mult > 1)
+				&& (oy >= Term->scr->big_y1)
 				&& (oy <= Term->scr->big_y2)
 				&& (ox > Term->scr->big_x1))
 		{
-			(*x) = ox * td->tile_wid * 2 + td->size_ow1 -
-					Term->scr->big_x1 * td->tile_wid;
-		}
-		else
-		{
+			(*x) = Term->scr->big_x1 * td->tile_wid + td->size_ow1;
+			(*x) += (ox-Term->scr->big_x1) * td->tile_wid * tile_width_mult;
+		} else {
 			(*x) = ox * td->tile_wid + td->size_ow1;
+		}
+		if ((tile_height_mult > 1)
+				&& (oy > Term->scr->big_y1)
+				&& (oy <= Term->scr->big_y2)
+				&& (ox >= Term->scr->big_x1))
+		{
+	 		(*y) = Term->scr->big_y1 * td->tile_hgt + td->size_oh1;
+			(*y) += (oy-Term->scr->big_y1) * td->tile_hgt * tile_height_mult;
+			// (*y) = (Term->scr->big_y1 + (oy-Term->scr->big_y1) * tile_height_mult);
+			// (*y) = (*y) * td->tile_hgt + td->size_oh1;
+		} else {
+			(*y) = oy * td->tile_hgt + td->size_oh1;
 		}
 	}
 }
@@ -2177,16 +2188,11 @@ static errr Term_curs_win(int x, int y)
 	{
 		rc.right = rc.left + td->map_tile_wid;
 		rc.bottom = rc.top + td->map_tile_hgt;
-	}
-	else
-	{
-		if (is_bigtiled(x, y))
-		{
-			rc.right = rc.left + td->tile_wid * 2;
-			rc.bottom = rc.top + td->tile_hgt;
-		}
-		else
-		{
+	} else {
+		if (is_bigtiled(x, y)) {
+			rc.right = rc.left + td->tile_wid * tile_width_mult;
+			rc.bottom = rc.top + td->tile_hgt * tile_height_mult;
+		} else {
 			rc.right = rc.left + td->tile_wid;
 			rc.bottom = rc.top + td->tile_hgt;
 		}
@@ -2253,17 +2259,9 @@ static errr Term_wipe_win(int x, int y, int n)
 	HDC hdc;
 	RECT rc;
 	
-	int x1, y1, x2, y2;
-	
-	/*** Find the dimensions ***/
-	square_to_pixel(&x1, &y1, x, y);
-	square_to_pixel(&x2, &y2, x + n, y);
-	
-	/* Rectangle to erase in client coords */
-	rc.left = x1;
-	rc.right = x2;
-	rc.top = y1;
-	rc.bottom = y1 + td->tile_hgt;
+	/* Find the dimensions of the rectangle to erase in client coords */
+	square_to_pixel(&(rc.left), &(rc.top), x, y);
+	square_to_pixel(&(rc.right), &(rc.bottom), x + n, y+1);
 
 	hdc = GetDC(td->w);
 	SetBkColor(hdc, RGB(0, 0, 0));
@@ -2304,15 +2302,12 @@ static errr Term_text_win(int cx, int cy, int n, byte a, cptr s)
 	SetBkColor(hdc, RGB(0, 0, 0));
 
 	/* Foreground color */
-	if (colors16)
-	{
+	if (colors16) {
 		SetTextColor(hdc, PALETTEINDEX(win_pal[a]));
-	}
-	else if (paletted)
-	{
+	} else
+	if (paletted) {
 		SetTextColor(hdc, win_clr[a&0x0F]);
-	}
-	else
+	} else
 	{
 		SetTextColor(hdc, win_clr[a]);
 	}
@@ -2330,10 +2325,8 @@ static errr Term_text_win(int cx, int cy, int n, byte a, cptr s)
 	rc.bottom = rc.top + td->font_hgt;
 
 	/* Dump each character */
-	for (i = 0; i < n; i++)
-	{
-		if (is_bigtiled(cx + i, cy))
-		{
+	for (i = 0; i < n; i++) {
+		if (is_bigtiled(cx + i, cy)) {
 			rc.left = x + ((td->tile_wid - td->font_wid) / 2);
 			rc.right = rc.left + td->font_wid;
 			
@@ -2342,10 +2335,8 @@ static errr Term_text_win(int cx, int cy, int n, byte a, cptr s)
 						s+i, 1, NULL);
 
 			/* Advance */
-			x += td->tile_wid * 2;
-		}
-		else
-		{
+			x += td->tile_wid * tile_width_mult;
+		} else {
 			rc.left = x + ((td->tile_wid - td->font_wid) / 2);
 			rc.right = rc.left + td->font_wid;
 			
@@ -2387,7 +2378,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 
 	int i;
 	int x1, y1, w1, h1;
-	int x2, y2, w2, h2, tw2;
+	int x2, y2, w2, h2, tw2, th2;
 	int x3, y3;
 
 	HDC hdcMask;
@@ -2396,8 +2387,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	HBITMAP hbmSrcOld;
 
 	/* Paranoia */
-	if (!use_graphics)
-	{
+	if (!use_graphics) {
 		/* Erase the grids */
 		return (Term_wipe_win(x, y, n));
 	}
@@ -2407,22 +2397,23 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	h1 = infGraph.CellHeight;
 
 	/* Size of window cell */
-	if (td->map_active)
-	{
+	if (td->map_active) {
 		w2 = td->map_tile_wid;
 		h2 = td->map_tile_hgt;
 		tw2 = w2;
-	}
-	else
-	{
+		th2 = h2;
+	} else {
 		w2 = td->tile_wid;
 		h2 = td->tile_hgt;
 
 		/* big tile mode */
-		if (use_bigtile)
-			tw2 = 2 * w2;
-		else
-			tw2 = w2;
+		if (is_bigtiled(x,y)) {
+			tw2 = tile_width_mult  * w2;
+			th2 = tile_height_mult * h2;
+		} else {
+ 			tw2 = w2;
+			th2 = h2;
+		}
 	}
 
 	/* Starting point */
@@ -2435,19 +2426,15 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	hdcSrc = CreateCompatibleDC(hdc);
 	hbmSrcOld = SelectObject(hdcSrc, infGraph.hBitmap);
 
-	if (infMask.hBitmap)
-	{
+	if (infMask.hBitmap) {
 		hdcMask = CreateCompatibleDC(hdc);
 		SelectObject(hdcMask, infMask.hBitmap);
-	}
-	else
-	{
+	} else {
 		hdcMask = NULL;
 	}
 
 	/* Draw attr/char pairs */
-	for (i = 0; i < n; i++, x2 += w2)
-	{
+	for (i = 0; i < n; i++, x2 += tw2) {
 		byte a = ap[i];
 		char c = cp[i];
 
@@ -2459,61 +2446,53 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		x1 = col * w1;
 		y1 = row * h1;
 
-		if (hdcMask)
-		{
+		if (hdcMask) {
 			x3 = (tcp[i] & 0x7F) * w1;
 			y3 = (tap[i] & 0x7F) * h1;
 
 			/* Perfect size */
-			if ((w1 == tw2) && (h1 == h2))
-			{
+			if ((w1 == tw2) && (h1 == th2)) {
  				/* Copy the terrain picture from the bitmap to the window */
-				BitBlt(hdc, x2, y2, tw2, h2, hdcSrc, x3, y3, SRCCOPY);
+				BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, SRCCOPY);
  
  				/* Mask out the tile */
-				BitBlt(hdc, x2, y2, tw2, h2, hdcMask, x1, y1, SRCAND);
+				BitBlt(hdc, x2, y2, tw2, th2, hdcMask, x1, y1, SRCAND);
  
  				/* Draw the tile */
-				BitBlt(hdc, x2, y2, tw2, h2, hdcSrc, x1, y1, SRCPAINT);
-			}
+				BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x1, y1, SRCPAINT);
+			} else
 
 			/* Need to stretch */
-			else
 			{
 				/* Set the correct mode for stretching the tiles */
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
 				/* Copy the terrain picture from the bitmap to the window */
-				StretchBlt(hdc, x2, y2, tw2, h2, hdcSrc, x3, y3, w1, h1, SRCCOPY);
+				StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x3, y3, w1, h1, SRCCOPY);
 
 				/* Only draw if terrain and overlay are different */
-				if ((x1 != x3) || (y1 != y3))
-				{
+				if ((x1 != x3) || (y1 != y3)) {
 					/* Mask out the tile */
-					StretchBlt(hdc, x2, y2, tw2, h2, hdcMask, x1, y1, w1, h1, SRCAND);
+					StretchBlt(hdc, x2, y2, tw2, th2, hdcMask, x1, y1, w1, h1, SRCAND);
 
 					/* Draw the tile */
-					StretchBlt(hdc, x2, y2, tw2, h2, hdcSrc, x1, y1, w1, h1, SRCPAINT);
+					StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x1, y1, w1, h1, SRCPAINT);
 				}
 			}
-		}
-		else
-		{
+		} else {
 			/* Perfect size */
-			if ((w1 == tw2) && (h1 == h2))
-			{
+			if ((w1 == tw2) && (h1 == th2)) {
 				/* Copy the picture from the bitmap to the window */
-				BitBlt(hdc, x2, y2, tw2, h2, hdcSrc, x1, y1, SRCCOPY);
-			}
+				BitBlt(hdc, x2, y2, tw2, th2, hdcSrc, x1, y1, SRCCOPY);
+			} else
 
 			/* Need to stretch */
-			else
 			{
 				/* Set the correct mode for stretching the tiles */
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
 				/* Copy the picture from the bitmap to the window */
-				StretchBlt(hdc, x2, y2, tw2, h2, hdcSrc, x1, y1, w1, h1, SRCCOPY);
+				StretchBlt(hdc, x2, y2, tw2, th2, hdcSrc, x1, y1, w1, h1, SRCCOPY);
 			}
 		}
 	}
@@ -3123,23 +3102,9 @@ static void setup_menus(void)
 	                (arg_graphics == mode->grafID ? MF_CHECKED : MF_UNCHECKED));
 		mode = mode->pNext;
 	} 
-	/*CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
-	              (arg_graphics == GRAPHICS_NONE ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD,
-	              (arg_graphics == GRAPHICS_ORIGINAL ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM,
-	              (arg_graphics == GRAPHICS_ADAM_BOLT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID,
-	              (arg_graphics == GRAPHICS_DAVID_GERVAIS ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6,
-	              (arg_graphics == 6 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
-	              (arg_graphics == 7 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
-	              (arg_graphics == 8 ? MF_CHECKED : MF_UNCHECKED));*/
 
 	CheckMenuItem(hm, IDM_OPTIONS_BIGTILE,
-	              (use_bigtile ? MF_CHECKED : MF_UNCHECKED));
+	              (((tile_width_mult > 1) || (tile_height_mult > 1)) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_SOUND,
 	              (arg_sound ? MF_CHECKED : MF_UNCHECKED));
 #ifdef USE_SAVER
@@ -3224,12 +3189,6 @@ static void check_for_save_file(LPSTR cmd_line)
 	game_in_progress = TRUE;
 
 	Term_fresh();
-
-	/* Play game */
-	//play_game(FALSE);
-
-	/* Quit */
-	//quit(NULL);
 }
 
 
@@ -3377,9 +3336,6 @@ static void start_screensaver(void)
 	screensaver_inkey_hack_buffer[j++] = KTRL('Z'); /* Enter borgmode */
 	screensaver_inkey_hack_buffer[j++] = 'z'; /* Run Borg */
 #endif /* ALLOW_BORG */
-
-	/* Play game */
-	//play_game((bool)!file_exists);
 }
 
 #endif /* USE_SAVER */
@@ -3888,7 +3844,38 @@ static void process_menus(WORD wCmd)
 
 			break;
 		}
-		case IDM_OPTIONS_BIGTILE:
+
+		case IDM_OPTIONS_GRAPHICS_NICE: {
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
+				plog("You may not do that right now.");
+				break;
+			}
+
+			/* Toggle "arg_graphics_nice" */
+			use_bigtile = !use_bigtile;
+
+			/* Hack - redraw everything + recalc bigtile regions */
+			angband_term[0]->resize_hook();
+			
+			break;
+		}
+
+		case IDM_OPTIONS_TILE_1x1:
+		case IDM_OPTIONS_TILE_2x1:
+		case IDM_OPTIONS_TILE_2x2:
+		case IDM_OPTIONS_TILE_3x1:
+		case IDM_OPTIONS_TILE_3x2:
+		case IDM_OPTIONS_TILE_3x3:
+		case IDM_OPTIONS_TILE_4x2:
+		case IDM_OPTIONS_TILE_4x3:
+		case IDM_OPTIONS_TILE_4x4:
+		case IDM_OPTIONS_TILE_6x3:
+		case IDM_OPTIONS_TILE_6x6:
+		case IDM_OPTIONS_TILE_8x4:
+		case IDM_OPTIONS_TILE_8x8:
+		case IDM_OPTIONS_TILE_16x8:
+		case IDM_OPTIONS_TILE_16x16:
 		{
 			/* Paranoia */
 			if (!p_ptr->cmd.inkey_flag || !initialized)
@@ -3896,13 +3883,108 @@ static void process_menus(WORD wCmd)
 				plog("You may not do that right now.");
 				break;
 			}
+			switch (wCmd)
+			{
+			case IDM_OPTIONS_TILE_1x1:
+			{
+				tile_width_mult = 1;
+				tile_height_mult = 1;
+				break;
+			}
+			case IDM_OPTIONS_TILE_2x1:
+			{
+				tile_width_mult = 2;
+				tile_height_mult = 1;
+				break;
+			}
+			case IDM_OPTIONS_TILE_2x2:
+			{
+				tile_width_mult = 2;
+				tile_height_mult = 2;
+				break;
+			}
+			case IDM_OPTIONS_TILE_3x1:
+			{
+				tile_width_mult = 3;
+				tile_height_mult = 1;
+				break;
+			}
+			case IDM_OPTIONS_TILE_3x2:
+			{
+				tile_width_mult = 3;
+				tile_height_mult = 2;
+				break;
+			}
+			case IDM_OPTIONS_TILE_3x3:
+			{
+				tile_width_mult = 3;
+				tile_height_mult = 3;
+				break;
+			}
+			case IDM_OPTIONS_TILE_4x2:
+			{
+				tile_width_mult = 4;
+				tile_height_mult = 2;
+				break;
+			}
+			case IDM_OPTIONS_TILE_4x3:
+			{
+				tile_width_mult = 4;
+				tile_height_mult = 3;
+				break;
+			}
+			case IDM_OPTIONS_TILE_4x4:
+			{
+				tile_width_mult = 4;
+				tile_height_mult = 4;
+				break;
+			}
+			case IDM_OPTIONS_TILE_6x3:
+			{
+				tile_width_mult = 6;
+				tile_height_mult = 3;
+				break;
+			}
+			case IDM_OPTIONS_TILE_6x6:
+			{
+				tile_width_mult = 6;
+				tile_height_mult = 6;
+				break;
+			}
+			case IDM_OPTIONS_TILE_8x4:
+			{
+				tile_width_mult = 8;
+				tile_height_mult = 4;
+				break;
+			}
+			case IDM_OPTIONS_TILE_8x8:
+			{
+				tile_width_mult = 8;
+				tile_height_mult = 8;
+				break;
+			}
+			case IDM_OPTIONS_TILE_16x8:
+			{
+				tile_width_mult = 16;
+				tile_height_mult = 8;
+				break;
+			}
+			case IDM_OPTIONS_TILE_16x16:
+			{
+				tile_width_mult = 16;
+				tile_height_mult = 16;
+				break;
+			}
+			}
 
-			/* Toggle "use_bigtile" */
-			toggle_bigtile();
-	
+			/* Clear screen */
+			Term_xtra_win_clear();
+
+			/* Hack - redraw everything + recalc bigtile regions */
+			angband_term[0]->resize_hook();
+
 			break;
 		}
-
 
 		case IDM_OPTIONS_SOUND:
 		{
@@ -4242,8 +4324,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 		case WM_LBUTTONDOWN:
 		{
 #ifdef USE_SAVER
-			if (screensaver_active)
-			{
+			if (screensaver_active) {
 				stop_screensaver();
 				screensaver_active = FALSE;
 				return 0;
@@ -5349,13 +5430,11 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 	/* This section to play repeated games without exiting first was
 	 * modified from Sil */
-	while (1)
-	{
+	while (1) {
 		bool new_game = FALSE;
     
 #ifdef USE_SAVER
-		if (screensaver)
-		{
+		if (screensaver) {
 			/* Start the screensaver */
 			start_screensaver();
 		}

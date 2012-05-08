@@ -236,10 +236,9 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 	use_graphics = GRAPHICS_NONE;
 	use_transparency = FALSE;
 
-  current_graphics_mode = get_graphics_mode(graphics);
-  if (current_graphics_mode && current_graphics_mode->file) {
+	current_graphics_mode = get_graphics_mode(graphics);
+	if (current_graphics_mode && current_graphics_mode->file) {
 		/* Try the file */
-		//path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/%s",current_graphics_mode->file);
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",current_graphics_mode->file));
 
 		/* Use the file if it exists */
@@ -255,7 +254,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 
 		/* Did we change the graphics? */
 		return (old_graphics != use_graphics);
-  } else {
+	} else {
 		/* Try the "8x8.bmp" file */
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/8x8.png");
 
@@ -268,97 +267,8 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 			*xsize = 8;
 			*ysize = 8;
 		}
-  }
-#if (0)
-	if (graf_width && graf_height)
-	{
-    /* WARNING - this assumes that graphics is correct, may not be if
-    GRAPHICS_ANY is used? */
-
-    strnfmt(filename+1024-128,128,"graf/%s",graf_name);
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, filename+1024-128);
-    // may or may not work, has not been tested
-		//path_make(filename, ANGBAND_DIR_XTRA_GRAF, graf_name);
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
-		{
-			use_transparency = TRUE;
-
-			*xsize = graf_width;
-			*ysize = graf_height;
-		}
-	  use_graphics = graphics;
-
-    /* Did we change the graphics? */
-		return (old_graphics != use_graphics);
-	}
-	if ((graphics == GRAPHICS_ANY) || (graphics == GRAPHICS_DAVID_GERVAIS))
-	{
-		/* Try the "32x32.bmp" file */
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/32x32.bmp");
-
-		/* Use the "32x32.bmp" file if it exists */
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
-		{
-			use_transparency = TRUE;
-
-			*xsize = 32;
-			*ysize = 32;
-		}
-
-		use_graphics = GRAPHICS_DAVID_GERVAIS;
-
-		/* Did we change the graphics? */
-		return (old_graphics != use_graphics);
 	}
 
-	/* We failed, or we want 16x16 graphics */
-	if ((graphics == GRAPHICS_ANY) || (graphics == GRAPHICS_ADAM_BOLT) ||
-		 (graphics == GRAPHICS_HALF_3D))
-	{
-		/* Try the "16x16.bmp" file */
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/16x16.bmp");
-
-		/* Use the "16x16.bmp" file if it exists */
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
-		{
-			use_transparency = TRUE;
-
-
-			*xsize = 16;
-			*ysize = 16;
-
-			/* Use graphics */
-			if (graphics == GRAPHICS_HALF_3D)
-			{
-				use_graphics = GRAPHICS_HALF_3D;
-			}
-			else
-			{
-				use_graphics = GRAPHICS_ADAM_BOLT;
-			}
-
-			/* Did we change the graphics? */
-			return (old_graphics != use_graphics);
-		}
-	}
-
-	/* We failed, or we want 8x8 graphics */
-	if ((graphics == GRAPHICS_ANY) || (graphics == GRAPHICS_ORIGINAL))
-	{
-		/* Try the "8x8.bmp" file */
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/8x8.bmp");
-
-		/* Use the "8x8.bmp" file if it exists */
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
-		{
-			/* Use graphics */
-			use_graphics = GRAPHICS_ORIGINAL;
-
-			*xsize = 8;
-			*ysize = 8;
-		}
-	}
-#endif
 	/* Did we change the graphics? */
 	return (old_graphics != use_graphics);
 }
@@ -368,7 +278,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
  */
 bool is_bigtiled(int x, int y)
 {
-	if ((use_bigtile)
+	if (((tile_width_mult > 1) || (tile_height_mult > 1))
 		&& (y >= Term->scr->big_y1)
 		&& (y <= Term->scr->big_y2)
 		&& (x >= Term->scr->big_x1))
@@ -381,20 +291,18 @@ bool is_bigtiled(int x, int y)
 
 void toggle_bigtile(void)
 {
-	if (use_bigtile)
+	if ((tile_width_mult > 1) || (tile_height_mult > 1))
 	{
 		/* Hack - disable bigtile mode */
 		Term_bigregion(-1, -1, -1);
 
-		use_bigtile = FALSE;
-    tile_width_mult = 1;
-    tile_height_mult = 1;
+		tile_width_mult = 1;
+		tile_height_mult = 1;
 	}
 	else
 	{
-		use_bigtile = TRUE;
-    tile_width_mult = 2;
-    tile_height_mult = 1;
+		tile_width_mult = 2;
+		tile_height_mult = 1;
 	}
 
 	/* Hack - redraw everything + recalc bigtile regions */
@@ -1235,7 +1143,7 @@ void do_cmd_view_map(void)
 	int cy, cx;
 	int wid, hgt;
   
-  int tw/*,th*/;
+	int tw, th;
 
 	void (*hook) (void);
 
@@ -1257,12 +1165,13 @@ void do_cmd_view_map(void)
 	/* Clear the screen */
 	Term_clear();
 
-  /* store the tile multipliers */
-  tw = use_bigtile;
-  use_bigtile = 0;
+	/* store the tile multipliers */
+	tw = tile_width_mult;
+	th = tile_height_mult;
+	tile_width_mult = 1;
+	tile_height_mult = 1;
 
-	if (p_ptr->depth)
-	{
+	if (p_ptr->depth) {
 		/* In the dungeon - All we have to do is display the map */
 
 		/* Get size */
@@ -1287,9 +1196,7 @@ void do_cmd_view_map(void)
 
 		/* Get any key */
 		(void)inkey();
-	}
-	else
-	{
+	} else {
 		/* Offset from player */
 		int x, y;
 
@@ -1307,8 +1214,7 @@ void do_cmd_view_map(void)
 
 		/* In the wilderness - Display the map + move it around */
 
-		while (TRUE)
-		{
+		while (TRUE) {
 			/* Reset offset of map */
 			cx = x;
 			cy = y;
@@ -1335,34 +1241,29 @@ void do_cmd_view_map(void)
 			c = inkey();
 
 			/* Allow a redraw */
-			if (c == KTRL('R'))
-			{
+			if (c == KTRL('R')) {
 				/* Do the redraw */
 				do_cmd_redraw();
 
 				continue;
 			}
 
-			if ((c == '~') || (c == '|')) // Added by Brett
-			{
-    		/* Check artifacts, uniques, objects, quests etc. */
-		    do_cmd_knowledge();
-        continue;
-			}
-      else
+			if ((c == '~') || (c == '|')) { // Added by Brett
+				/* Check artifacts, uniques, objects, quests etc. */
+				do_cmd_knowledge();
+				continue;
+			} else
 			/* Accept '*' or a direction -- MT */
-			if ((c == '*') || (c == 't') || (c == 'h') || (c == 'q'))
-      { 
-        // key is checked here, to trap the key press, so it does not
-        // leave the map when not on a town
-			  /* On a town?  -- MT */
-			  if (w_ptr->place)
-			  {
-          /* Check if this is an info command */
-				  if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
-				  /* Display info for this town -- MT */
-				  //single_town_info(w_ptr->place);
-			  }
+			if ((c == '*') || (c == 't') || (c == 'h') || (c == 'q')) { 
+				// key is checked here, to trap the key press, so it does not
+				// leave the map when not on a town
+				/* On a town?  -- MT */
+				if (w_ptr->place) {
+					/* Check if this is an info command */
+					if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
+					/* Display info for this town -- MT */
+					//single_town_info(w_ptr->place);
+				}
 				continue;
 			}
 
@@ -1394,8 +1295,9 @@ void do_cmd_view_map(void)
 		}
 	}
 
-  /* restore the tile multipliers */
-  use_bigtile = tw;
+	/* restore the tile multipliers */
+	tile_width_mult = tw;
+	tile_height_mult = th;
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = hook;
@@ -1551,6 +1453,7 @@ static void variable_player_graph(byte *a, char *c)
 							*a = TERM_L_WHITE;
 						else
 							*a = TERM_WHITE;
+
 						*c = 253;
 						break;
 					}
@@ -2825,8 +2728,7 @@ void display_map(int *cx, int *cy)
 
 
 	/* Hack - disable bigtile mode */
-	if (use_bigtile)
-	{
+	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
 		Term_bigregion(-1, -1, -1);
 	}
 
@@ -3075,9 +2977,7 @@ void display_map(int *cx, int *cy)
 				}
 			}
 		}
-	}
-	else
-	{
+	} else {
 		yrat = p_ptr->max_hgt - p_ptr->min_hgt;
 		xrat = p_ptr->max_wid - p_ptr->min_wid;
 
@@ -3718,8 +3618,7 @@ void display_law_map(int *cx, int *cy)
 
 
 	/* Hack - disable bigtile mode */
-	if (use_bigtile)
-	{
+	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
 		Term_bigregion(-1, -1, -1);
 	}
 
@@ -4081,6 +3980,7 @@ void do_cmd_view_law_map(void)
 	int px = p_ptr->px;
 
 	int cy, cx;
+	itn tw, th;
 
 	void (*hook) (void);
 
@@ -4101,6 +4001,12 @@ void do_cmd_view_law_map(void)
 
 	/* Clear the screen */
 	Term_clear();
+
+	/* store the tile multipliers */
+	tw = tile_width_mult;
+	th = tile_height_mult;
+	tile_width_mult = 1;
+	tile_height_mult = 1;
 
 	{
 		/* Offset from player */
@@ -4183,6 +4089,10 @@ void do_cmd_view_law_map(void)
 			}
 		}
 	}
+
+	/* restore the tile multipliers */
+	tile_width_mult = tw;
+	tile_height_mult = th;
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = hook;
