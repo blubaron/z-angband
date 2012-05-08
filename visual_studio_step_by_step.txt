@@ -11,29 +11,33 @@ Using the directx 9 PNG file loader:
     subdirectory.
 
  4. In the project settings, in the C/C++ tab, in the additional include
-    directories ilne, add: src, src/platform/win.
+    directories line, add: "src, src/platform/win".
 
- 5. In the project settings, also in the Link tab, remove any directory names
+ 5. In the project settings, in the Link tab, in the object/modules
+    line, add: "src\lua\tolua.lib d3d9.lib d3dx9.lib winmm.lib ".
+
+ 6. In the project settings, also in the Link tab, remove any directory names
     (usually Debug\ or Release\) from in front of the executable name. Doing
     this will put the executeable in the project directory so you do not have
     to move it every time the project is compiled.
 
- 6. Add all of the files that end in ".c" or ".h" in the src directory to the
-    project files.  This can be done by right-clicking on the project in
-    visual studio and choosing "Add Files to Project" from the context menu
-    or by going to "Project" -> "Add to Project" -> "Files" from the menu bar.
+ 7. Add all of the files that end in ".c" or ".h" in the src directory to the
+    project files, except run_old.c.  This can be done by right-clicking on
+    the project in visual studio and choosing "Add Files to Project" from the
+    context menu or by going to "Project" -> "Add to Project" -> "Files" from
+    the menu bar.
 
- 7. Add all of the files that end in ".c" or ".h" in the src\platform\win
+ 8. Add all of the files that end in ".c" or ".h" in the src\platform\win
     directory to the project, as well as zplus.rc.
 
- 8. Save the project, then compile the project. There will be a lot of
+ 9. Save the project, then compile the project. There will be a lot of
     warnings, but there should not be any errors. The warnings can be ignored.
 
- 9. If there are no errors, enjoy playing z+angband. There should not be any
+10. If there are no errors, enjoy playing z+angband. There should not be any
     errors and the executable should be built. If there are any errors, and
     you do not know how to fix them, you can ask on the Variant forum at
     http://angband.oook.cz. Please make sure to mention that you are using my
     personal version, rather than the official version of z+Angband.
 
-10. To submit bug fixes, changes, etc please open pull requests on the Github
+11. To submit bug fixes, changes, etc please open pull requests on the Github
     site.
