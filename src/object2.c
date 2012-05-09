@@ -4357,9 +4357,7 @@ void place_object(int x, int y, bool good, bool great, int delta_level)
 	c_ptr = area(x, y);
 
 	/* Do not generate items on "nasty" terrain */
-	if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-		(c_ptr->feat == FEAT_SHAL_WATER) || (c_ptr->feat == FEAT_SHAL_ACID))
-	{
+	if (f_info[c_ptr->feat].flags & FF_ICKY) {
 		return;
 	}
 
