@@ -1702,7 +1702,7 @@ N:114:Rare Potion Store
 G:6:B
 W:100:3:0
 I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
-D:4:60:90:0:0:100:0:104
+D:4:60:90:0:0:100:0:40
 L:SBINIT:place_sb(rand_range(110, 125), rand_range(5, 25) * 10)
 L:PENTER:do_cmd_store(field)
 L:STORE2:result = item_tester_hook_tval(object, TV_POTION)
@@ -1802,7 +1802,7 @@ N:124:Rare Magic Store
 G:5:R
 W:100:3:0
 I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
-D:5:60:90:0:0:100:0:104
+D:5:60:90:0:0:100:0:40
 L:SBINIT:place_sb(rand_range(120, 125), rand_range(10, 30) * 10)
 L:PENTER:do_cmd_store(field)
 L:STORE2:result = item_tester_hook_recharge(object)
@@ -1842,7 +1842,7 @@ N:128:High Temple
 G:4:G
 W:100:3:0
 I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
-D:3:50:75:33:33:34:0:81
+D:3:50:75:33:33:34:0:17
 L:SBINIT:place_sb(rand_range(110, 125), rand_range(5, 25) * 10)
 L:PENTER:do_cmd_store(field)
 L:STORE1:result = item_tester_hook_recharge(object)
