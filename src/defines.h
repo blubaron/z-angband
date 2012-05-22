@@ -1320,7 +1320,6 @@ enum
 
 #define FF_MASK_INTERESTING FF_QUEST | FF_TRAP | FF_CLOSED | FF_CLOSEABLE | \
                             FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | \
-
                             FF_EXIT_UP | FF_EXIT_DOWN | FF_PATTERN | FF_BROKEN |\
                             FF_DIG_CUSTOM | FF_DIG_FOOD // | FF_INTERESTING
 #define FF_MASK_INTERESTING2 FF_FOUNTAIN | FF_STATUE | FF_TEXT
