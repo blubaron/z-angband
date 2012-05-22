@@ -265,8 +265,11 @@ static int see_interesting(int x, int y)
  *   What moves to remove from consideration if both the
  *   checks listed pass.
  */
-//typedef long long _u64b;
+#ifdef WIN32
 typedef unsigned _int64 _u64b;
+#else
+typedef long long _u64b;
+#endif
 
 static const struct
 {
