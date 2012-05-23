@@ -1658,6 +1658,10 @@ static void react_mousepress(XButtonEvent *ev)
 	/* The co-ordinates are only used in Angband format. */
 	pixel_to_square(&x, &y, ev->x, ev->y);
 	
+	/* switch buttons 2 and 3 to match other platforms (for 3 button mice) */
+	if (ev->button == 3) ev->button = 2;
+	else if (ev->button == 2) ev->button = 3;
+
 	Term_mousepress(ev->button, mods, x, y);
 }
 
