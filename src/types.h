@@ -139,8 +139,8 @@ struct feature_type
 	byte xl_attr;	/* Desired feature attribute when bright */
 	char xl_char;	/* Desired feature character when bright */
 
-	/*byte name_len;	/* length of name string */
-	/*byte text_len;	/* length of feature description string */
+	/*byte name_len;*/	/* length of name string */
+	/*byte text_len;*/	/* length of feature description string */
 };
 
 
@@ -1677,6 +1677,7 @@ struct player_type
 
 	u16b exp_frac;	/* Cur exp frac (times 2^16) */
 
+
 	s32b max_exp;	/* Max experience */
 	s32b exp;	/* Cur experience */
 
@@ -2089,12 +2090,12 @@ struct dun_gen_type
 	u16b pillar;            /* Override terrain type */
 	u16b stairs_closed;     /* Override terrain type */
 	
-	/*u16b wallsupport;     /* Override terrain type */
-	/*u16b freq_small;      /* frequency of small levels */
+	/*u16b wallsupport;*/     /* Override terrain type */
+	/*u16b freq_small;*/      /* frequency of small levels */
 
-	/*u16b statue;          /* Override terrain type */
-	/*u16b fountain;        /* Override terrain type */
-	/*u16b window;          /* Override terrain type */
+	/*u16b statue;*/          /* Override terrain type */
+	/*u16b fountain;*/        /* Override terrain type */
+	/*u16b window;*/          /* Override terrain type */
 
 	stream_gen_type vein[2]; /* For magma veins, etc. */
 	stream_gen_type river[2];
@@ -2115,8 +2116,8 @@ struct dun_gen_type
 
 	u32b flags;             /* Extra flags */
 
-	//u32b name;              /* Name (offset) */
-	//u32b text;              /* Text (offset) */
+	/*u32b name; */             /* Name (offset) */
+	/*u32b text; */             /* Text (offset) */
 
 	char *name;
 	char *text;

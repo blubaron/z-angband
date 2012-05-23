@@ -1237,14 +1237,14 @@
 /*
  * Feature flags
  */
-/*#define FF_BLOCK		0x01	/* Blocks movement + los */
-/*#define FF_BLOCK_LOS	0x02	/* Half-blocks los */
-/*#define FF_USE_TRANS	0x04	/* Use transparency light effects */
-/*#define FF_ICKY			0x08	/* Terrain can not have objects */
-/*#define FF_PERM			0x10	/* Permanent terrain */
-/*#define FF_OBJECT		0x20	/* Terrain is described like an object */
-/*#define FF_PATTERN		0x40	/* The pattern */
-/*#define FF_MARK			0x80	/* Remember tile if seen */
+/*#define FF_BLOCK		0x01	*//* Blocks movement + los */
+/*#define FF_BLOCK_LOS	0x02	*//* Half-blocks los */
+/*#define FF_USE_TRANS	0x04	*//* Use transparency light effects */
+/*#define FF_ICKY			0x08	*//* Terrain can not have objects */
+/*#define FF_PERM			0x10	*//* Permanent terrain */
+/*#define FF_OBJECT		0x20	*//* Terrain is described like an object */
+/*#define FF_PATTERN		0x40	*//* The pattern */
+/*#define FF_MARK			0x80	*//* Remember tile if seen */
 /* from angband 3.2.0*/
 enum
 {
