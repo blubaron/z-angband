@@ -8,6 +8,7 @@ subdir = ./src/
 ## ##### Zangband Files to compile #####
 ##
 
+CFLAGS += -Isrc -Isrc/platform -Isrc/platform/win
 
 ##
 ## The Zangband source files
@@ -17,22 +18,27 @@ NORMOBJS := $(addprefix src/,\
 	variable.o tables.o util.o cave.o \
 	object1.o object2.o monster1.o monster2.o \
 	xtra1.o xtra2.o spells1.o spells2.o \
-	melee1.o melee2.o save.o files.o fields.o\
-	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o \
+	melee1.o melee2.o save.o files.o fields.o \
+	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o cmd7.o \
         store.o birth.o load.o ui.o hero.o\
 	wizard1.o wizard2.o grid.o streams.o rooms.o \
 	generate.o dungeon.o init1.o init2.o \
 	effects.o quest1.o quest2.o racial.o run.o script.o \
 	artifact.o mutation.o flavor.o spells3.o \
-	mspells1.o mspells2.o scores.o mind.o grafmode.o wild4.o \
+	mspells1.o mspells2.o scores.o mind.o wild4.o \
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o)
 
-ANGOBJS := $(NORMOBJS) $(addprefix src/,\
-	platform/maid-x11.o\
-	platform/main-cap.o platform/main-gcu.o platform/main-x11.o platform/main-xaw.o platform/main-xpj.o\
-	platform/main-lsl.o platform/main-vcs.o platform/main-gtk.o platform/win/main-win.o platform/main.o \
-	platform/maid-grf.o platform/main-dos.o platform/main-ibm.o platform/main-emx.o \
-	platform/main-ami.o platform/main-tnb.o)
+ANGOBJS := $(addprefix src/, maid-grf.o grafmode.o) \
+	$(addprefix src/platform/, maid-x11.o main-x11.o \
+	main-cap.o main-gcu.o main-xaw.o main-xpj.o \
+	main-lsl.o main-vcs.o main-gtk.o main.o \
+	main-dos.o main-ibm.o main-emx.o \
+	main-ami.o main-tnb.o)
+
+WINOBJS := $(addprefix src/platform/win,\
+	main-win.o readdib.o)
+	#readdx9.o win-layout.o)
+
 
 ##
 ## The wrapper auto-generated files
@@ -56,7 +62,7 @@ ZUTILOBJS := $(addprefix src/,\
 ##
 ## Normal list of object files.
 ##
-objs-y += $(ANGOBJS) $(LUAWOBJS) $(ZUTILOBJS)
+objs-y += $(ZUTILOBJS) $(LUAWOBJS) $(NORMOBJS) $(ANGOBJS)
 
 ##
 ## Extra object files depending on the ports
@@ -64,15 +70,15 @@ objs-y += $(ANGOBJS) $(LUAWOBJS) $(ZUTILOBJS)
 
 objs-$(amiga) += src/sound-ami.o
 
-objs-$(cygwin) += src/angband.res src/readdib.o
+objs-$(cygwin) += src/platform/win/zplus.res $(WINOBJS)
 ifeq ($(cygwin),y)
-src/angband.res : src/angband.rc
+src/platform/win/zplus.res : src/platform/win/zplus.rc
 	windres $< -O coff -o $@
 endif
 
-objs-$(lcc) += src/angband.res src/readdib.o
+objs-$(lcc) += src/platform/win/zplus.res $(WINOBJS)
 ifeq ($(lcc),y)
-src/angband.res : src/angband.rc
+src/platform/win/zplus.res : src/platform/win/zplus.rc
 	$(LCC_PATH)\bin\lrc.exe -I$(LCC_PATH)\include $^
 endif
 
@@ -124,19 +130,22 @@ INCS := $(addprefix src/,\
 ## Generic dependancy information
 ##
 
-$(ANGOBJS): $(INCS) .default_path
+$(NORMOBJS): $(INCS) .default_path
 $(ZUTILOBJS): $(HDRS)
 $(LUAWOBJS): $(INCS)
+$(ANGOBJS): $(INCS) .default_path
+$(WINOBJS): $(INCS) .default_path
 
 
 ##
 ## Extra dependancies
 ##
 
-GRAF_PORTS = $(addprefix src/,\
-		platform/main-ami.o platform/maid-grf.o platform/maid-x11.o \
-		platform/main-gtk.o platform/main-tnb.o platform/win/main-win.o platform/main-x11.o \
-		platform/main-xaw.o platform/main-xpj.o)
+GRAF_PORTS = src/maid-grf.o $(addprefix src/platform/,\
+		main-ami.o maid-x11.o main-x11.o \
+		main-gtk.o main-tnb.o win/main-win.o \
+		main-xaw.o main-xpj.o)
+$(GRAFPORTS): src/maid-grf.h src/angband.h src/platform/maid-x11.h
 
 src/cmd6.o: src/script.h
 src/init1.c: src/init.h
@@ -146,10 +155,6 @@ src/grid.o: src/grid.h src/generate.h
 src/rooms.o: src/grid.h src/generate.h src/rooms.h
 src/streams.o: src/grid.h src/generate.h
 src/fields.o: src/grid.h src/script.h
-$(GRAFPORTS): src/maid-grf.h
-src/platform/main-x11.o: src/platform/maid-x11.h
-src/platform/main-xaw.o: src/platform/maid-x11.h
-src/platform/main-xpj.o: src/platform/maid-x11.h
 src/script.o: src/script.h
 src/quest1.o: src/wild.h src/grid.h
 src/quest2.o: src/wild.h src/grid.h
@@ -192,12 +197,14 @@ distclean-files += autoconf.h
 srcdirlist += src
 notsrcfiles += src/compress.c src/autoconf.h
 
-srcfiles += src/*.c src/*.h src/angband.rc src/angband.ico \
-		 src/angband.xpm src/zangband.icns src/makefile* src/l-*.pkg \
+srcfiles += src/*.c src/*.h src/platform/*.c src/platform/*.h\
+		 src/platform/win/*.c src/platform/win/*.h \
+		 src/platform/win/zplus.rc src/platform/win/zplus.ico \
+		 src/platform/angband.xpm src/platform/zangband.icns src/makefile* src/l-*.pkg \
 		 src/autoconf.h.in
 
 # scan other source directories
-dirs := lua tk
+dirs := lua platform/tk
 include $(scandir)
 
 $(LUAWSRCS): %.c: %.pkg src/lua/tolua $(TOLUALUAOBJS)
