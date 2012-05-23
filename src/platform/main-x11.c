@@ -1639,6 +1639,27 @@ static void react_keypress(XKeyEvent *ev)
 	}
 }
 
+/*
+ * Process a keypress event
+ *
+ * Also appears in "main-xaw.c".
+ */
+static void react_mousepress(XButtonEvent *ev)
+{
+	int mods, x, y;
+
+	/* Extract four "modifier flags" */
+	mods = 0;
+	if (ev->state & ControlMask) mods |= 2;
+	if (ev->state & ShiftMask) mods |= 1;
+	if (ev->state & Mod1Mask) mods |= 4;
+	if (ev->state & Mod2Mask) mods |= 8;
+
+	/* The co-ordinates are only used in Angband format. */
+	pixel_to_square(&x, &y, ev->x, ev->y);
+	
+	Term_mousepress(ev->button, mods, x, y);
+}
 
 /*
  * Convert co-ordinates from starting corner/opposite corner to minimum/maximum.
@@ -2062,6 +2083,23 @@ static errr CheckEvent(bool wait)
 	/* Switch on the Type */
 	switch (xev->type)
 	{
+		case ButtonRelease:
+		{
+			/* Nothing */
+			break;
+		}
+		case ButtonPress:
+		{
+			if (xev->type == ButtonPress) {
+				/* Hack -- use "old" term */
+				Term_activate(&old_td->t);
+
+				/* Process the key */
+				react_mousepress(&(xev->xbutton));
+			}
+			break;
+		}
+#if 0
 		case ButtonPress:
 		case ButtonRelease:
 		{
@@ -2086,7 +2124,7 @@ static errr CheckEvent(bool wait)
 
 			break;
 		}
-
+#endif
 		case MotionNotify:
 		{
 			/* Where is the mouse */
