@@ -1983,7 +1983,13 @@ static void coord_trans(int *x, int *y, int xoffset, int yoffset, int transno)
 	*y += yoffset;
 }
 
-
+/*
+ * a test for water monsters
+ */
+static bool aquatic_monster_test (int r_idx)
+{
+	return FLAG(&r_info[r_idx], RF_SILLY);
+}
 /*
  * Hack -- fill in "vault" rooms
  */
@@ -2087,19 +2093,19 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 				case '+':
 				{
 					/* Closed doors (locked) */
-		      //make_lockjam_door(x, y, FEAT_CLOSED, randint1(10) + p_ptr->depth / 10, FALSE);
+					//make_lockjam_door(x, y, FEAT_CLOSED, randint1(10) + p_ptr->depth / 10, FALSE);
 					set_feat_grid(c_ptr, FEAT_CLOSED);
 					break;
 				}
 
-        case '\'':
+				case '\'':
 				{
 					/* Open doors */
 					set_feat_grid(c_ptr, FEAT_OPEN);
 					break;
 				}
 
-        case '|':
+				case '|':
 				{
 					/* Pillar */
 					set_feat_grid(c_ptr, FEAT_PILLAR);
@@ -2113,10 +2119,50 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					break;
 				}
 
-        case '^':
+				case '^':
 				{
 					/* Trap */
 					place_trap(x, y);
+					break;
+				}
+
+				case ';':
+				{
+					/* Tree */
+					set_feat_grid(c_ptr, FEAT_TREES);
+					break;
+				}
+
+				case '-':
+				case '~':
+				{
+					/* water (river1 type) */
+					//if (one_in_(dun->river[0].rarity) {
+					//	set_feat_grid(c_ptr, dun->river[0].deep);
+					//} else {
+					//	set_feat_grid(c_ptr, dun->river[0].shal);
+					//}
+					if (one_in_(3)) {
+						set_feat_grid(c_ptr, dun->feat_deep_liquid);
+					} else {
+						set_feat_grid(c_ptr, dun->feat_shal_liquid);
+					}
+					break;
+				}
+
+				case '@':
+				{
+					/* water (lake type) */
+					//if (onein(dun->river[0].rarity) {
+					//	set_feat_grid(c_ptr, dun->lake.deep);
+					//} else {
+					//	set_feat_grid(c_ptr, dun->lake.shal);
+					//}
+					if (one_in_(3)) {
+						set_feat_grid(c_ptr, dun->feat_deep_liquid);
+					} else {
+						set_feat_grid(c_ptr, dun->feat_shal_liquid);
+					}
 					break;
 				}
 
@@ -2162,9 +2208,13 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 					break;
 				}
 				case 'A':
-          { /*object is placed on here */
+				{ /*object is placed on here */
 					set_feat_grid(c_ptr, FEAT_PATTERN_OLD);
 					break;
+				}
+				default:
+				{
+					/* test against the vault's custom symbols */
 				}
 			}
 		}
@@ -2301,8 +2351,64 @@ static void build_vault(int xval, int yval, int xmax, int ymax, cptr data,
 				{
 					/* Object */
 					place_object(x, y, TRUE, FALSE, 10);
-				}
 					break;
+				}
+
+				case 'x':
+				{
+					/* Make an chest (if possible) */
+					object_type *o_ptr;
+					int k_idx = 0;
+					int min_level, base;
+
+					/* Prepare allocation table */
+					init_match_hook(TV_CHEST, 0);
+					get_obj_num_prep(kind_is_match);
+
+					/* Pick a random object */
+					base = base_level() + randint1(10);
+					min_level = base_level() + randint1(10) / 2;
+					do {
+						k_idx = get_obj_num(base, min_level);
+
+						/* Paranoia - try less hard to get something */
+						if (min_level < 1) break;
+							min_level /= 2;
+					} while (!k_idx);
+
+					if (k_idx) {
+#if 0
+						/* Prepare the object */
+						o_ptr = object_prep(k_idx);
+	          
+						/* Lock and trap it */
+						//(void)put_object(o_ptr, x, y);
+
+						/* Put it on the ground */
+						(void)put_object(o_ptr, x, y);
+#endif
+					}
+					break;
+				}
+
+				case '-':
+				{
+					/* Meaner water hide monster */
+					if (f_info[cave_p(x, y)->feat].flags & FF_LIQUID) {
+						/* Apply the monster restriction */
+						get_mon_num_prep(aquatic_monster_test);
+						(void)place_monster(x, y, TRUE, TRUE, 9);
+						/* Remove the monster restriction */
+						get_mon_num_prep(NULL);
+					} else {
+						(void)place_monster(x, y, TRUE, TRUE, 9);
+					}
+					break;
+				}
+				default:
+				{
+					/* test against the vault's custom symbols */
+				}
 			}
 		}
 	}
