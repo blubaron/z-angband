@@ -2173,7 +2173,7 @@ enum
 #define PU_MONSTERS     0x01000000L	/* Update monsters */
 #define PU_DISTANCE     0x02000000L	/* Update distances */
 #define PU_OBJECTS      0x04000000L	/* Update floor objects */
- /* xxx */
+/* xxx */
 #define PU_FLOW         0x10000000L	/* Update flow */
 /* xxx (many) */
 

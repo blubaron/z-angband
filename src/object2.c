@@ -5418,7 +5418,6 @@ static bool reorder_pack_comp(const object_type *o1_ptr,
 	if ((o1_ptr->tval == REALM1_BOOK) &&
 		(o2_ptr->tval != REALM1_BOOK)) return (TRUE);
 	if ((o2_ptr->tval == REALM1_BOOK) &&
-
 		(o1_ptr->tval != REALM1_BOOK)) return (FALSE);
 
 

@@ -1677,7 +1677,6 @@ struct player_type
 
 	u16b exp_frac;	/* Cur exp frac (times 2^16) */
 
-
 	s32b max_exp;	/* Max experience */
 	s32b exp;	/* Cur experience */
 
@@ -1831,8 +1830,8 @@ struct player_type
 	bool birth[OPT_BIRTH];
 	u32b squelch[(SQUELCHMAX/32)];
 
-	byte ob_count;
-	byte dc_count;
+	byte ob_count; /* the number of owned buildings */
+	byte dc_count; /* the number of outstanding death chests */
 	u16b used_ankhs; /* the number of ankhs used with this character */
 	//byte qb_count;
 	//byte ql_count;

@@ -18,11 +18,11 @@
 void do_cmd_go_up(void)
 {
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	/* Player grid */
 	c_ptr = area(p_ptr->px, p_ptr->py);
-  feat  = &(f_info[c_ptr->feat]);
+	feat  = &(f_info[c_ptr->feat]);
 
 	//if (c_ptr->feat == FEAT_LESS || c_ptr->feat == FEAT_QUEST_LESS)
 	if (feat->flags & FF_EXIT_UP)
@@ -64,11 +64,11 @@ void do_cmd_go_up(void)
 void do_cmd_go_down(void)
 {
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	/* Player grid */
 	c_ptr = area(p_ptr->px, p_ptr->py);
-  feat  = &(f_info[c_ptr->feat]);
+	feat  = &(f_info[c_ptr->feat]);
 
 	//if (c_ptr->feat != FEAT_MORE && c_ptr->feat != FEAT_QUEST_MORE)
 	if (feat->flags & FF_EXIT_DOWN)
@@ -167,29 +167,29 @@ void do_cmd_search(void)
  */
 void do_cmd_toggle_search(void)
 {
-  static clock_t last_toggle;
+	static clock_t last_toggle;
 
 	/* Increase the search mode */
 	if ((p_ptr->state.searching < SEARCH_MODE_MAX)
-      && (clock() < last_toggle + (2*CLOCKS_PER_SEC))) {
+			&& (clock() < last_toggle + (2*CLOCKS_PER_SEC))) {
 		/* Clear the searching flag */
 		p_ptr->state.searching++;
-  } else
+	} else
 
 	/* Stop searching */
 	if (p_ptr->state.searching) {
 		/* Clear the searching flag */
 		p_ptr->state.searching = SEARCH_MODE_NONE;
-  } else
+	} else
 
 	/* Start searching */
 	{
 		/* Set the searching flag */
 		p_ptr->state.searching = SEARCH_MODE_SEARCH;
 	}
-  last_toggle = clock();
+	last_toggle = clock();
 
-  /* Recalculate bonuses */
+	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
 
 	/* Redraw the state */
@@ -325,16 +325,16 @@ static void chest_death(int x, int y, object_type *o_ptr)
 	/* Determine the "value" of the items */
 	//level = ABS(o_ptr->pval); // = randint1(get_object_level(o_ptr))
 	/* From Vanilla value = o_ptr->origin_depth - 10 + 2 * o_ptr->sval;*/
-  /* combined */
-  /*level = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + get_object_level(o_ptr))/2;*/
-  /* another combined with some shallower depth items at deeper depths */
-  level = get_object_level(o_ptr);
-  number = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + level)/2;
-  if (number > level) {
-    level = rand_range(level/2, number);
-  } else {
-    level = rand_range(number/2, level);
-  }
+	/* combined */
+	/*level = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + get_object_level(o_ptr))/2;*/
+	/* another combined with some shallower depth items at deeper depths */
+	level = get_object_level(o_ptr);
+	number = ((o_ptr->mem.depth - 10 + 2 * o_ptr->sval) + level)/2;
+	if (number > level) {
+		level = rand_range(level/2, number);
+	} else {
+		level = rand_range(number/2, level);
+	}
 	if (level < 1)
 		level = 1; 
 
@@ -539,8 +539,8 @@ static bool do_cmd_open_chest(int x, int y, object_type *o_ptr)
 static bool is_open(int feat)
 {
 	//return (feat == FEAT_OPEN);
-  feature_type *feat_ptr = &(f_info[feat]);
-  return ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & (FF_CLOSED|FF_HIDDEN)));
+	feature_type *feat_ptr = &(f_info[feat]);
+	return ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & (FF_CLOSED|FF_HIDDEN)));
 }
 
 
@@ -550,8 +550,8 @@ static bool is_open(int feat)
 static bool is_closed(int feat)
 {
 	//return (feat == FEAT_CLOSED);
-  feature_type *feat_ptr = &(f_info[feat]);
-  return ((feat_ptr->flags & FF_DOOR) && (feat_ptr->flags & FF_CLOSED));
+	feature_type *feat_ptr = &(f_info[feat]);
+	return ((feat_ptr->flags & FF_DOOR) && (feat_ptr->flags & FF_CLOSED));
 }
 
 
@@ -685,7 +685,7 @@ static int count_chests(int *x, int *y, bool trapped)
  * Convert an adjacent location to a direction.
  */
 int coords_to_dir(int x, int y)
- {
+{
 	/* No movement required */
 	if ((y == p_ptr->py) && (x == p_ptr->px)) return (5);
 
@@ -720,7 +720,7 @@ bool do_cmd_open_aux(int x, int y)
 	int i;
 
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	field_type *f_ptr;
 
@@ -729,7 +729,7 @@ bool do_cmd_open_aux(int x, int y)
 
 	/* Get requested grid */
 	c_ptr = area(x, y);
-  feat = &(f_info[c_ptr->feat]);
+	feat = &(f_info[c_ptr->feat]);
 
 	/* Must be a closed door */
 	//if (c_ptr->feat != FEAT_CLOSED)
@@ -748,13 +748,13 @@ bool do_cmd_open_aux(int x, int y)
 		return (FALSE);
 	}
 
-  /* if a door, check if it is locked or jammed */
-  if (feat->flags & FF_DOOR) {
-	  /* Get fields */
-	  f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
-  } else {
-    f_ptr = NULL;
-  }
+	/* if a door, check if it is locked or jammed */
+	if (feat->flags & FF_DOOR) {
+		/* Get fields */
+		f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
+	} else {
+		f_ptr = NULL;
+	}
 
 	/* If the door is locked / jammed */
 	if (f_ptr)
@@ -770,19 +770,19 @@ bool do_cmd_open_aux(int x, int y)
 
 		/* Success? */
 		if (!field_script_single(f_ptr, FIELD_ACT_INTERACT,
-									"i", LUA_VAR_NAMED(i, "power")))
+				"i", LUA_VAR_NAMED(i, "power")))
 			 //,LUA_RETURN(did_open_door), LUA_RETURN(did_bash_door)))
 		{
-      if (c_ptr->feat == FEAT_OPEN) {
-        if (feat->base_feat) {
-		      cave_set_feat(x, y, feat->base_feat);
-        } else {
-          cave_set_feat(x, y, the_feat(FEAT_OPEN));
-        }
-      } else
-      if (c_ptr->feat == FEAT_BROKEN) {
-        cave_set_feat(x, y, the_feat(FEAT_BROKEN));
-      }
+			if (c_ptr->feat == FEAT_OPEN) {
+				if (feat->base_feat) {
+					cave_set_feat(x, y, feat->base_feat);
+				} else {
+					cave_set_feat(x, y, the_feat(FEAT_OPEN));
+				}
+			} else
+			if (c_ptr->feat == FEAT_BROKEN) {
+				cave_set_feat(x, y, the_feat(FEAT_BROKEN));
+			}
 			/* Sound */
 			sound(SOUND_OPENDOOR);
 
@@ -806,11 +806,11 @@ bool do_cmd_open_aux(int x, int y)
 	{
 		/* Open the door */
 		//cave_set_feat(x, y, FEAT_OPEN);
-    if (feat->base_feat) {
-		  cave_set_feat(x, y, the_feat(feat->base_feat));
-    } else {
-      cave_set_feat(x, y, the_feat(FEAT_OPEN));
-    }
+		if (feat->base_feat) {
+			cave_set_feat(x, y, the_feat(feat->base_feat));
+		} else {
+			cave_set_feat(x, y, the_feat(FEAT_OPEN));
+		}
 
 		/* Sound */
 		sound(SOUND_OPENDOOR);
@@ -838,7 +838,7 @@ void do_cmd_open(void)
 	object_type *o_ptr;
 
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	bool more = FALSE;
 
@@ -885,7 +885,7 @@ void do_cmd_open(void)
 
 		/* Get requested grid */
 		c_ptr = area(x, y);
-    feat = &(f_info[c_ptr->feat]);
+		feat = &(f_info[c_ptr->feat]);
 
 		/* Check for chest */
 		o_ptr = chest_check(x, y);
@@ -942,7 +942,7 @@ void do_cmd_open(void)
 static bool do_cmd_close_aux(int x, int y)
 {
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	bool more = FALSE;
 
@@ -961,7 +961,7 @@ static bool do_cmd_close_aux(int x, int y)
 
 	/* Get grid and contents */
 	c_ptr = area(x, y);
-  feat = &(f_info[c_ptr->feat]);
+	feat = &(f_info[c_ptr->feat]);
 
 	/* Broken door */
 	//if (c_ptr->feat == FEAT_BROKEN)
@@ -976,11 +976,11 @@ static bool do_cmd_close_aux(int x, int y)
 	{
 		/* Close the door */
 		//cave_set_feat(x, y, FEAT_CLOSED);
-    if (feat->base_feat) {
-		  cave_set_feat(x, y, the_feat(feat->base_feat));
-    } else {
-      cave_set_feat(x, y, the_feat(FEAT_CLOSED));
-    }
+		if (feat->base_feat) {
+			cave_set_feat(x, y, the_feat(feat->base_feat));
+		} else {
+			cave_set_feat(x, y, the_feat(FEAT_CLOSED));
+		}
 
 		/* Sound */
 		sound(SOUND_SHUTDOOR);
@@ -1004,7 +1004,7 @@ void do_cmd_close(void)
 	int y, x, dir;
 
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	bool more = FALSE;
 
@@ -1050,13 +1050,13 @@ void do_cmd_close(void)
 
 		/* Get grid and contents */
 		c_ptr = area(x, y);
-    feat = &(f_info[c_ptr->feat]);
+		feat = &(f_info[c_ptr->feat]);
 
 		/* Require open/broken door */
 		//if ((c_ptr->feat != FEAT_OPEN) && (c_ptr->feat != FEAT_BROKEN))
-    //if (!(feat->flags & FF_DOOR) || (feat->flags & FF_CLOSED))
-    if (!(feat->flags & FF_CLOSEABLE) || (feat->flags & FF_BROKEN))
-    {
+		//if (!(feat->flags & FF_DOOR) || (feat->flags & FF_CLOSED))
+		if (!(feat->flags & FF_CLOSEABLE) || (feat->flags & FF_BROKEN))
+		{
 			/* Message */
 			msgf("You see nothing there to close.");
 		}
@@ -1127,7 +1127,7 @@ static bool do_cmd_tunnel_aux_org(int x, int y)
 	int dig = p_ptr->skills[SKILL_DIG];
 
 	field_type *f_ptr = field_script_find(c_ptr,
-										FIELD_ACT_INTERACT_TEST, ":i", LUA_RETURN(action));
+			FIELD_ACT_INTERACT_TEST, ":i", LUA_RETURN(action));
 
 	/* Take a turn */
 	p_ptr->state.energy_use = 100;
@@ -1403,17 +1403,17 @@ static bool do_cmd_tunnel_aux_org(int x, int y)
 static bool do_cmd_tunnel_aux(int x, int y)
 {
 	bool more = FALSE;
-  bool okay;
-  feature_type *feat;
+	bool okay;
+	feature_type *feat;
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
 
 	int action;
-  int base;
+	int base;
 	int dig = p_ptr->skills[SKILL_DIG];
 
 	field_type *f_ptr = field_script_find(c_ptr,
-										FIELD_ACT_INTERACT_TEST, ":i", LUA_RETURN(action));
+			FIELD_ACT_INTERACT_TEST, ":i", LUA_RETURN(action));
 
 	/* Take a turn */
 	p_ptr->state.energy_use = 100;
@@ -1434,7 +1434,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	if (f_ptr && (action == ACT_TUNNEL))
 	{
 		if (!field_script_single(f_ptr, FIELD_ACT_INTERACT,
-									"i", LUA_VAR_NAMED(dig, "power")))
+				"i", LUA_VAR_NAMED(dig, "power")))
 		{
 			/* Finished tunneling */
 			return (FALSE);
@@ -1444,12 +1444,12 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		return (TRUE);
 	}
 
-  feat  = &(f_info[c_ptr->feat]);
-  if (feat->base_feat == 0) {
-    base = the_floor();
-  } else {
-    base = feat->base_feat;
-  }
+	feat  = &(f_info[c_ptr->feat]);
+	if (feat->base_feat) {
+		base = feat->base_feat;
+	} else {
+		base = the_floor();
+	}
 
 	/* Must be a wall/door/etc */
 	if (feat->flags & (FF_PWALK|FF_MWALK))
@@ -1461,7 +1461,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		return (FALSE);
 	}
 
-  /* Titanium */
+	/* Titanium */
 	if (feat->flags & FF_PERM)
 	{
 		msgf("This seems to be permanent rock.");
@@ -1474,7 +1474,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		return (FALSE);
 	}
 
-  okay = (dig > feat->dig + randint0(40*feat->dig));
+	okay = (dig > feat->dig + randint0(40*feat->dig));
 
 	/* Secret doors */
 	if (feat->flags & (FF_HIDDEN | FF_DOOR | FF_OVERLAY))
@@ -1482,8 +1482,8 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		/* Tunnel */
 		if (okay)
 		{
-	    /* Remove the feature */
-	    cave_set_feat(x, y, the_floor());
+			/* Remove the feature */
+			cave_set_feat(x, y, the_floor());
 
 			msgf("You have finished the tunnel.");
 		}
@@ -1505,8 +1505,8 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		/* Chop Down */
 		if (okay)
 		{
-	    /* Remove the feature */
-	    cave_set_feat(x, y, base);
+			/* Remove the feature */
+			cave_set_feat(x, y, base);
 
 			msgf("You have cleared away the %s.", f_name + feat->name);
 
@@ -1532,8 +1532,8 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		/* Tunnel */
 		if (okay)
 		{
-	    /* Remove the feature */
-	    cave_set_feat(x, y, base);
+			/* Remove the feature */
+			cave_set_feat(x, y, base);
 
 			msgf("You have finished the tunnel.");
 
@@ -1547,27 +1547,26 @@ static bool do_cmd_tunnel_aux(int x, int y)
 			/* We may continue tunelling */
 			msgf("You tunnel into the %s.", f_name + feat->name);
 			more = TRUE;
-	    if (feat->flags & FF_HIDDEN)
-	    {
-		    /* Occasional Search XXX XXX */
-		    if (one_in_(4)) search();
-	    }
+			if (feat->flags & FF_HIDDEN)
+			{
+				/* Occasional Search XXX XXX */
+				if (one_in_(4)) search();
+			}
 		}
 	}
 
 	/* Quartz / Magma */
 	if (okay)
 	{
-    okay = FALSE;
-    if (feat->flags & FF_DIG_GOLD)
-    {
+		okay = FALSE;
+		if (feat->flags & FF_DIG_GOLD) {
 			/* Place some gold */
 			place_gold(x, y);
-      okay = TRUE;
+			okay = TRUE;
 		}
 
-    if (feat->flags & FF_DIG_OBJ)
-    {
+		if (feat->flags & FF_DIG_OBJ)
+		{
 			/* Message */
 			//msgf("You have removed the rubble.");
 
@@ -1587,28 +1586,28 @@ static bool do_cmd_tunnel_aux(int x, int y)
 				if (player_can_see_grid(pc_ptr) && (!quiet_squelch || (
 					!SQUELCH(o_list[c_ptr->o_idx].k_idx) || FLAG(&o_list[c_ptr->o_idx], TR_SQUELCH))))
 				{
-          okay = TRUE;
+					okay = TRUE;
 				}
 			}
 		}
-    if (feat->flags & FF_DIG_FOOD)
-    {
+		if (feat->flags & FF_DIG_FOOD)
+		{
 			/* Place some food */
 			place_gold(x, y);
-      okay = TRUE;
+			okay = TRUE;
 		}
-    if (feat->flags & FF_DIG_CUSTOM)
-    {
+		if (feat->flags & FF_DIG_CUSTOM)
+		{
 			/* lookup this feat, get the object this places and place it */
 			place_gold(x, y);
-      okay = TRUE;
+			okay = TRUE;
 		}
-    if (okay)
-    {
+		if (okay)
+		{
 			/* Message */
 			msgf("You have found something!");
 		}
-  }
+	}
 
 	make_noise(4);
 
@@ -1632,7 +1631,7 @@ void do_cmd_tunnel(void)
 	int y, x, dir;
 
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	bool more = FALSE;
 
@@ -1672,7 +1671,7 @@ void do_cmd_tunnel(void)
 
 		/* Get grid */
 		c_ptr = area(x, y);
-    feat  = &(f_info[c_ptr->feat]);
+		feat  = &(f_info[c_ptr->feat]);
 
 		/* No tunnelling through doors */
 		//if (c_ptr->feat == FEAT_CLOSED)
@@ -1999,12 +1998,11 @@ void do_cmd_disarm(void)
  */
 void do_cmd_alter(void)
 {
-
 	int y, x, dir;
 	int action;
 
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	bool more = FALSE;
 
@@ -2041,7 +2039,7 @@ void do_cmd_alter(void)
 
 		/* Get grid */
 		c_ptr = area(x, y);
-    feat = &(f_info[c_ptr->feat]);
+		feat = &(f_info[c_ptr->feat]);
 
 		/* Take a turn */
 		p_ptr->state.energy_use = 100;
@@ -2050,15 +2048,15 @@ void do_cmd_alter(void)
 		if (c_ptr->m_idx)
 		{
 			/* Attack */
-      if (p_ptr->state.searching == SEARCH_MODE_SWING) {
-        py_attack_swing(x,y);
-      } else {
-  			py_attack(x, y);
-      }
+			if (p_ptr->state.searching == SEARCH_MODE_SWING) {
+				py_attack_swing(x,y);
+			} else {
+				py_attack(x, y);
+			}
 		}
 		else if (field_script_find(c_ptr,
-									FIELD_ACT_INTERACT_TEST,
-									":i", LUA_RETURN(action)))
+			                   FIELD_ACT_INTERACT_TEST,
+			                   ":i", LUA_RETURN(action)))
 		{
 			switch (action)
 			{
@@ -2162,7 +2160,7 @@ void do_cmd_spike(void)
 
 	object_type *o_ptr;
 	cave_type *c_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	/* Get a "repeated" direction */
 	if (get_rep_dir(&dir))
@@ -2183,7 +2181,7 @@ void do_cmd_spike(void)
 
 		/* Get grid and contents */
 		c_ptr = area(x, y);
-    feat = &(f_info[c_ptr->feat]);
+		feat = &(f_info[c_ptr->feat]);
 
 		/* Require closed door */
 		//if (c_ptr->feat != FEAT_CLOSED)
@@ -2307,6 +2305,8 @@ void do_cmd_run(void)
 	}
 }
 
+
+
 /*
  * Start running with pathfinder.
  *
@@ -2335,6 +2335,7 @@ void do_cmd_pathfind(int x, int y)
 		run_step(coords_to_dir(x, y));
 	}
 }
+
 
 
 /*
@@ -2399,9 +2400,9 @@ void do_cmd_rest(void)
 
 		/* Ask for duration */
 		if (!get_string(out_val, 5,
-        				"Rest (0-9999, '*' for HP/SP, '&' as needed): "))
-        {
-        	return;
+        			"Rest (0-9999, '*' for HP/SP, '&' as needed): "))
+		{
+			return;
 		}
 
 		/* Rest until done */

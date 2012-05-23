@@ -1844,7 +1844,6 @@ static void display_player_flag_aux(int col, int row,
  * Special display, part 1
  */
 static void display_player_flag_info(void)
-
 {
 	int row;
 	int col;
@@ -3219,7 +3218,6 @@ errr file_character(cptr name, bool full)
 #define RESIZE_SHOW_FILE	-2
 static cptr resize_name = NULL;
 static cptr resize_what = NULL;
-
 static int resize_line  = 0;
 static int resize_hgt   = 0;
 

@@ -2260,6 +2260,7 @@ static bool enter_borg_mode(void)
 
 #endif /* ALLOW_BORG */
 
+
 static void process_click(char press, int xpos, int ypos)
 {
 	char button = press & 0x7;
@@ -2954,7 +2955,6 @@ static void process_command(void)
 		{
 			/* Take notes */
 			do_cmd_note();
-
 			break;
 		}
 
