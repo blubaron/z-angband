@@ -4180,7 +4180,7 @@ object_type *make_object(int level, int delta_level, obj_theme *theme)
  * Put an object on the ground.
  * We assume the grid is in bounds.
  */
-static bool put_object(object_type *o_ptr, int x, int y)
+bool put_object(object_type *o_ptr, int x, int y)
 {
 	/* Acquire grid */
 	cave_type *c_ptr = area(x, y);
@@ -5418,6 +5418,7 @@ static bool reorder_pack_comp(const object_type *o1_ptr,
 	if ((o1_ptr->tval == REALM1_BOOK) &&
 		(o2_ptr->tval != REALM1_BOOK)) return (TRUE);
 	if ((o2_ptr->tval == REALM1_BOOK) &&
+
 		(o1_ptr->tval != REALM1_BOOK)) return (FALSE);
 
 

@@ -670,6 +670,7 @@ extern void init_match_hook(byte tval, byte sval);
 extern byte kind_is_match(int k_idx);
 extern void init_match_theme(obj_theme theme);
 extern byte kind_is_theme(int k_idx);
+extern bool put_object(object_type *o_ptr, int x, int y);
 extern object_type *make_object(int level, int delta_level, obj_theme *theme);
 extern bool place_specific_object(int x, int y, int level, int k_idx, bool force);
 extern void place_object(int x, int y, bool good, bool great, int delta_level);
