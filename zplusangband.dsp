@@ -160,6 +160,10 @@ SOURCE=.\src\flavor.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\game.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\generate.c
 # End Source File
 # Begin Source File
@@ -425,6 +429,10 @@ SOURCE=.\src\defines.h
 # Begin Source File
 
 SOURCE=.\src\externs.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\game.h
 # End Source File
 # Begin Source File
 

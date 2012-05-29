@@ -109,6 +109,7 @@ OBJ = \
 	init1.obj \
 	grid.obj \
 	generate.obj \
+	game.obj \
 	flavor.obj \
 	files.obj \
 	fields.obj \
