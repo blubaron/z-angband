@@ -974,7 +974,7 @@ static void prt_state(void)
 	/* Nothing interesting */
 	else
 	{
-		put_fstr(COL_STATE, Term->hgt - 1, "      ");
+		put_fstr(COL_STATE, Term->hgt - 1, "       ");
 	}
 }
 
