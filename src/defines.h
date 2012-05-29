@@ -2218,7 +2218,7 @@ enum
 #define PR_BASIC        0x02000000L	/* Display Basic Info */
 #define PR_MAP          0x04000000L	/* Display Map */
 #define PR_WIPE         0x08000000L	/* Hack -- Total Redraw */
-/* xxx */
+#define PR_BUTTONS      0x10000000L	/* Redraw buttons */
 /* xxx */
 /* xxx */
 /* xxx */

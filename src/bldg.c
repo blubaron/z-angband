@@ -14,6 +14,7 @@
 
 #include "angband.h"
 #include "wild.h"
+#include "button.h"
 
 
 /* Hack - force exit from building */
@@ -366,7 +367,7 @@ void display_build(const field_type *f_ptr)
 	/* Display building-specific information */
 	(void) field_script_const(f_ptr, FIELD_ACT_BUILD_ACT1, "i", LUA_VAR(factor));
 
-	prtf(0, 23, " ESC) Exit building");
+	prtf(0, 23, " $UESC) Exit building$Y%c$V",ESCAPE);
 
 	/* Show your gold */
 	building_prt_gold();
@@ -938,20 +939,20 @@ bool home_rest(void)
 
 		return (FALSE);
 	}
-  if (tick < (day_len>>1)) /*day_len/2*/
-  {
-	  /* Rest until sunset */
-    turn += (day_len>>1)-tick;
-	  /* Save the number of turns skipped; they don't "count" */
-	  turn_offset += (day_len>>1)-tick;
-  }
-  else
-  {
-    /* Rest all night */
-	  turn += day_len-tick;
-	  /* Save the number of turns skipped; they don't "count" */
-	  turn_offset += day_len-tick;
-  }
+	if (tick < (day_len>>1)) /*day_len/2*/
+	{
+		/* Rest until sunset */
+		turn += (day_len>>1)-tick;
+		/* Save the number of turns skipped; they don't "count" */
+		turn_offset += (day_len>>1)-tick;
+	}
+	else
+	{
+		/* Rest all night */
+		turn += day_len-tick;
+		/* Save the number of turns skipped; they don't "count" */
+		turn_offset += day_len-tick;
+	}
 	p_ptr->chp = p_ptr->mhp;
 
 	/*
@@ -1378,7 +1379,7 @@ bool compare_weapons(void)
 	bool result = TRUE;;
 
 	/* Clear the screen */
-    clear_region(0, 6, 18);
+	clear_region(0, 6, 18);
 
 	/* Point to wielded weapon */
 	o_ptr = &p_ptr->equipment[EQUIP_WIELD];
@@ -1816,10 +1817,10 @@ bool building_magetower(int factor, bool display)
 		/* Haven't been here before? */
 		if (!build_ptr->data)
 		{
-			put_fstr(35, 18, CLR_YELLOW " R) Record aura (%dgp)", factor * 5);
+			put_fstr(35, 18, CLR_YELLOW " $UR) Record aura (%dgp)$V", factor * 5);
 		}
 
-		put_fstr(35, 19, CLR_YELLOW " T) Teleport");
+		put_fstr(35, 19, CLR_YELLOW " $UT) Teleport$V");
 
 		for (i = 0; i < max_link; i++)
 		{
@@ -1847,8 +1848,8 @@ bool building_magetower(int factor, bool display)
 		}
 
 		/* Build the prompt */
-		strnfmt(out_val, 160, "(Towns %c-%c, ESC to exit)",
-					  I2A(0), I2A(max_link - 1));
+		strnfmt(out_val, 160, "(Towns %c-%c, %UESC to exit$Y%c$V)",
+					  I2A(0), I2A(max_link - 1), ESCAPE);
 
 		while (TRUE)
 		{
@@ -2035,6 +2036,9 @@ void do_cmd_bldg(const field_type *f_ptr)
 	/* Forget the view */
 	forget_view();
 
+	/* backup any buttons that are on screen */
+	button_backup_all();
+
 	/* Hack -- Increase "icky" depth */
 	screen_save();
 
@@ -2088,6 +2092,9 @@ void do_cmd_bldg(const field_type *f_ptr)
 
 	/* Hack -- Character is no longer in "icky" mode */
 	screen_load();
+
+	/* restore buttons from the previous screen */
+	button_restore();
 
 	/* Hack -- Cancel automatic command */
 	p_ptr->cmd.new = 0;
@@ -2655,106 +2662,106 @@ void build_cmd_item_layaway(void)
  */
 void building_buy_info(void)
 {
-  int row = 3;
-  int numcolumns = 1;
-  int numrows = 16;
-  int numbuildings = 0, i;
-  int j, r, c1, c2, price;
-  /* get the number of buildings that we can build this into */
-  for (i = 0; i < MAX_CITY_BUILD; i++) {
-    if (wild_build[i].base_field
-        && (wild_build[i].base_field == wild_build[i].field)) {
-      numbuildings++;
-    }
-  }
-  if (numbuildings == 0) {
-	  put_fstr( 0, row, CLR_YELLOW " No buildings are currently for sale. In Bank: %dgp", p_ptr->bank_gold);
-    return;
-  }
-  numcolumns = (numbuildings / numrows) + 1;
-  if (numcolumns > 3) {
-    //numrows -= 1;
-    numbuildings = 3 * numrows;
-    numcolumns = 3;
-	  put_fstr(20, 2, CLR_YELLOW "Too many buildings available, showing first %d buildings.", numbuildings);
-    //row += 1;
-  }
-  if (numcolumns == 3) {
-  	put_fstr( 0, row, " Building");
-	  put_fstr(20, row, "Price");
-  	put_fstr(27, row, " Building");
-	  put_fstr(46, row, "Price");
-  	put_fstr(54, row, " Building");
-	  put_fstr(74, row, "Price");
-  } else
-  if (numcolumns == 2) {
-  	put_fstr( 0, row, " Building");
-	  put_fstr(34, row, "Price");
-  	put_fstr(40, row, " Building");
-	  put_fstr(74, row, "Price");
-  } else
-  {
-  	put_fstr( 0, row, " Building");
-	  put_fstr(34, row, "Price");
-  }
-  row += 1;
-  j = 0;
-  for (i = 0; (i < MAX_CITY_BUILD) && (j < numbuildings); i++) {
-    if (wild_build[i].base_field
-        && (wild_build[i].base_field == wild_build[i].field)) {
-      if (numcolumns == 3) {
-        if (j >= 2*numrows) {
-          c1 = 54;
-          c2 = 72;
-        } else
-        if (j >= numrows) {
-          c1 = 27;
-          c2 = 44;
-        } else
-        {
-          c1 = 0;
-          c2 = 18;
-        }
-      } else {
-        if (j >= numrows) {
-          c1 = 40;
-          c2 = 72;
-        } else
-        {
-          c1 = 0;
-          c2 = 32;
-        }
-      }
-      r = row+(j%numrows);
-      price = (wild_build[i].rarity+3) * 100000;
-      //TODO adjust home price if no home in place if ((i==BUILD_HOME) && (pl_ptr))
-  	  put_fstr(c1, r, t_info[wild_build[i].field].name);
-      if (price > p_ptr->au + p_ptr->bank_gold) {
-  	    put_fstr(c2, r, CLR_SLATE "%7d", price);
-      } else {
-  	    put_fstr(c2, r, "%7d", price);
-      }
-      j++;
-    }
-  }
-  row += numrows;
-  if (row > 19) {
- 	  put_fstr( 0, row, "You may: ");
-  }
-  put_fstr(58, row, CLR_SLATE "In banks: %9dau", p_ptr->bank_gold);
-  row++;
-  put_fstr(10, row, CLR_YELLOW "Buildings cannont be purchased yet.");
+	int row = 3;
+	int numcolumns = 1;
+	int numrows = 16;
+	int numbuildings = 0, i;
+	int j, r, c1, c2, price;
+	/* get the number of buildings that we can build this into */
+	for (i = 0; i < MAX_CITY_BUILD; i++) {
+		if (wild_build[i].base_field
+				&& (wild_build[i].base_field == wild_build[i].field)) {
+			numbuildings++;
+		}
+	}
+	if (numbuildings == 0) {
+		put_fstr( 0, row, CLR_YELLOW " No buildings are currently for sale. In Bank: %dgp", p_ptr->bank_gold);
+		return;
+	}
+	numcolumns = (numbuildings / numrows) + 1;
+	if (numcolumns > 3) {
+		//numrows -= 1;
+		numbuildings = 3 * numrows;
+		numcolumns = 3;
+		put_fstr(20, 2, CLR_YELLOW "Too many buildings available, showing first %d buildings.", numbuildings);
+		//row += 1;
+	}
+	if (numcolumns == 3) {
+		put_fstr( 0, row, " Building");
+		put_fstr(20, row, "Price");
+		put_fstr(27, row, " Building");
+		put_fstr(46, row, "Price");
+		put_fstr(54, row, " Building");
+		put_fstr(74, row, "Price");
+	} else
+	if (numcolumns == 2) {
+		put_fstr( 0, row, " Building");
+		put_fstr(34, row, "Price");
+		put_fstr(40, row, " Building");
+		put_fstr(74, row, "Price");
+	} else
+	{
+		put_fstr( 0, row, " Building");
+		put_fstr(34, row, "Price");
+	}
+	row += 1;
+	j = 0;
+	for (i = 0; (i < MAX_CITY_BUILD) && (j < numbuildings); i++) {
+		if (wild_build[i].base_field
+				&& (wild_build[i].base_field == wild_build[i].field)) {
+			if (numcolumns == 3) {
+				if (j >= 2*numrows) {
+					c1 = 54;
+					c2 = 72;
+				} else
+				if (j >= numrows) {
+					c1 = 27;
+					c2 = 44;
+				} else
+				{
+					c1 = 0;
+					c2 = 18;
+				}
+			} else {
+				if (j >= numrows) {
+					c1 = 40;
+					c2 = 72;
+				} else
+				{
+					c1 = 0;
+					c2 = 32;
+				}
+			}
+			r = row+(j%numrows);
+			price = (wild_build[i].rarity+3) * 100000;
+			//TODO adjust home price if no home in place if ((i==BUILD_HOME) && (pl_ptr))
+			put_fstr(c1, r, t_info[wild_build[i].field].name);
+			if (price > p_ptr->au + p_ptr->bank_gold) {
+				put_fstr(c2, r, CLR_SLATE "%7d", price);
+			} else {
+				put_fstr(c2, r, "%7d", price);
+			}
+			j++;
+		}
+	}
+	row += numrows;
+	if (row > 19) {
+		put_fstr( 0, row, "You may: ");
+	}
+	put_fstr(58, row, CLR_SLATE "In banks: %9dau", p_ptr->bank_gold);
+	row++;
+	put_fstr(10, row, CLR_YELLOW "Buildings cannont be purchased yet.");
 }
 /*
  * show a menu to change an abondoned building into an owned building of some type
  */
 void building_upgrade_info(void)
 {
-  int row = 4;
-  //for (i = 0; i < FTBUILD_MAX; i++) {
-  //}
+	int row = 4;
+	//for (i = 0; i < FTBUILD_MAX; i++) {
+	//}
 	put_fstr(row, 0, CLR_YELLOW " Deposited: %dgp", p_ptr->bank_gold);
-  row += 2;
+	row += 2;
 }
 
 /*

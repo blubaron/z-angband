@@ -14,6 +14,7 @@
 #include "script.h"
 
 #include "init.h"
+#include "button.h"
 
 #ifdef CHECK_MODIFICATION_TIME
 #ifndef RISCOS
@@ -1237,6 +1238,8 @@ static errr init_other(void)
 	/* Initialize the "message" package */
 	(void)messages_init();
 
+	/*** Prepare mouse buttons ***/
+	(void)button_init();
 
 	/*** Prepare region list ***/
 	C_MAKE(rg_list, z_info->rg_max, region_type);
@@ -1622,7 +1625,7 @@ void display_introduction()
 
 	char buf[1024];
 
-  /*** Verify the "news" file ***/
+	/*** Verify the "news" file ***/
 
 	/* Build the filename */
 	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
@@ -1731,7 +1734,7 @@ void init_angband(void)
 
 	char buf[1024];
 
-  display_introduction();
+	display_introduction();
 
 	/* Flush it */
 	Term_fresh();
@@ -1973,6 +1976,9 @@ void cleanup_angband(void)
 	}
 #endif /* 0 */
 
+	/* Free the buttons */
+	button_free();
+
 	/* Free the messages */
 	messages_free();
 
@@ -1988,16 +1994,16 @@ void cleanup_angband(void)
 	free_info(&f_head);
 	free_info(&z_head);
 
-  /* free stuff from init_w_info */
+	/* free stuff from init_w_info */
 	FREE(wild_choice_tree);
 	FREE(wild_gen_data);
-  /* free stuff from init_t_info */
-  FREE(t_info);
-  FREE(fld_list);
-  /* free stuff from init_mg_info */
-  FREE(mg_info);
-  /* free stuff from init_dun_info */
-  /* still using hardcoded dungeons */
+	/* free stuff from init_t_info */
+	FREE(t_info);
+	FREE(fld_list);
+	/* free stuff from init_mg_info */
+	FREE(mg_info);
+	/* free stuff from init_dun_info */
+	/* still using hardcoded dungeons */
 	if (dun_name)
 		FREE(dun_name);
 
@@ -2074,13 +2080,16 @@ void re_init_some_things(void)
 	}
 #endif
 
-  /* Free the messages */
+	/* Free the buttons */
+	button_kill_all();
+
+	/* Free the messages */
 	messages_free();
 	/* Initialize the "message" package */
 	(void)messages_init();
 
   #if (0)
-  /* reinitialize arrays that use quarks */
+	/* reinitialize arrays that use quarks */
 	//note("[Initializing arrays... (wilderness)]");
 	//if (init_w_info()) quit("Cannot initialize wilderness");
 	// Reset the autoinscriptions
@@ -2092,7 +2101,7 @@ void re_init_some_things(void)
 	/* Free the "quarks" */
 	quarks_free();
 
-  /* Free the macros */
+	/* Free the macros */
 	for (i = 0; i < macro__num; ++i)
 	{
 		string_free(macro__pat[i]);
@@ -2138,10 +2147,10 @@ void re_init_some_things(void)
 	/* Initialize the "message" package */
 	(void)messages_init();
 #endif
-  character_loaded = FALSE;
+	character_loaded = FALSE;
 
-  // display the introduction message again
-  display_introduction();
+	// display the introduction message again
+	display_introduction();
 
 
 	/* Flush it */
@@ -2157,12 +2166,12 @@ void re_init_some_things(void)
 	FREE(temp_g);
 	C_MAKE(temp_g, TEMP_MAX, u16b);
 
-    /* has_lite patch causes both temp_g and temp_x/y to be used
-    in targetting mode: can't use the same memory any more. */
+	/* has_lite patch causes both temp_g and temp_x/y to be used
+	 * in targetting mode: can't use the same memory any more. */
 	FREE(temp_y);
 	FREE(temp_x);
-    C_MAKE(temp_y, TEMP_MAX, byte);
-    C_MAKE(temp_x, TEMP_MAX, byte);
+	C_MAKE(temp_y, TEMP_MAX, byte);
+	C_MAKE(temp_x, TEMP_MAX, byte);
 
 	/*** Prepare dungeon arrays ***/
 

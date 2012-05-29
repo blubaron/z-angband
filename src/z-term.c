@@ -11,7 +11,7 @@
 /* Purpose: a generic, efficient, terminal window package -BEN- */
 #include "z-virt.h"
 #include "z-term.h"
-
+#include "button.h"
 /*
  * This file provides a generic, efficient, terminal window package,
  * which can be used not only on standard terminal environments such
@@ -1512,7 +1512,7 @@ void Term_draw(int x, int y, byte a, char c)
 void Term_addch(byte a, char c)
 {
 	int w = Term->wid;
-  int x,y;
+	int x,y;
 	/* Handle "unusable" cursor */
 	if (Term->scr->cu) return;
 
@@ -1520,12 +1520,12 @@ void Term_addch(byte a, char c)
 	if (!c) return;
 
 	/* Notice bigtile region changes */
-  // Note this can adjust the cursor point so save and restore afterwards
-  x = Term->scr->cx;
-  y = Term->scr->cy;
+	/* Note this can adjust the cursor point so save and restore afterward s*/
+	x = Term->scr->cx;
+	y = Term->scr->cy;
 	Term_bigtile_expand(Term->scr->cx, Term->scr->cy);
-  Term->scr->cx = x;
-  Term->scr->cy = y;
+	Term->scr->cx = x;
+	Term->scr->cy = y;
 	
 	/* Queue the given character for display */
 	Term_queue_char(Term->scr->cx, Term->scr->cy, a, c, 0, 0);
@@ -1561,7 +1561,7 @@ void Term_putch(int x, int y, byte a, char c)
  */
 void Term_big_putch(int x, int y, byte a, char c)
 {
-  int hor, vert;
+	int hor, vert;
 
 	/* Avoid warning */
 	(void)c;
@@ -1936,6 +1936,22 @@ errr Term_keypress(int k)
  */
 errr Term_mousepress(int m, int mods, int x, int y)
 {
+	keycode_t key;
+	key = button_get_key(x,y);
+	if (key) {
+		/* a button was pressed */
+		if (key & 0x80) {
+			/* a button that changes the mouse press was presses
+			 * ignore it here */
+			return (0);
+		} else {
+			return Term_keypress(key);
+		}
+	}
+	if (mouse_press) {
+		m = mouse_press;
+		mouse_press = 0;
+	}
 	if (m > 7) m = m % 8;
 
 	/* mark that this is a mouse press */

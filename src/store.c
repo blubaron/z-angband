@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 
 #define MAX_COMMENT_1	6
@@ -734,8 +735,8 @@ static object_type *store_carry(object_type *o_ptr)
 	o_ptr->kn_flags[2] = o_ptr->flags[2];
 	o_ptr->kn_flags[3] = o_ptr->flags[3];
 
-    /* Erase the inscription */
-    quark_remove(&o_ptr->inscription);
+	/* Erase the inscription */
+	quark_remove(&o_ptr->inscription);
 
 	/* Erase the "feeling" */
 	o_ptr->feeling = FEEL_NONE;
@@ -850,12 +851,12 @@ static void store_create(void)
 
 	/* Hack -- consider up to fifty items */
 	for (tries = 0; tries < 50; tries++)
-    {
-        /* Assume no flags */
-        flags = OC_NORMAL;
+	{
+		/* Assume no flags */
+		flags = OC_NORMAL;
 
-        /* Assume no bonus */
-        delta = 0;
+		/* Assume no bonus */
+		delta = 0;
 
 		/* Get level to use */
 		level = rand_range(f_ptr->data[1], f_ptr->data[2]);
@@ -867,29 +868,29 @@ static void store_create(void)
 		if (!kind) continue;
 
 		/* Create a new object of the chosen kind */
-        q_ptr = object_prep(kind);
+		q_ptr = object_prep(kind);
 
 		/* Create object based on restrictions */
 		if (restricted & ST_REST_GREAT)
-        {
-            /* Apply "great" magic */
-            delta = 30;
-            flags = OC_FORCE_GOOD;
+		{
+			/* Apply "great" magic */
+			delta = 30;
+			flags = OC_FORCE_GOOD;
 		}
 		else if (restricted & ST_REST_GOOD)
-        {
-            /* Apply "good" magic */
-            delta = 15;
-        }
+		{
+			/* Apply "good" magic */
+			delta = 15;
+		}
 
-        /* Occasionally generate unusually good items */
-        while (one_in_(30))
-        {
-            delta += rand_range(5, 15);
-        }
+		/* Occasionally generate unusually good items */
+		while (one_in_(30))
+		{
+			delta += rand_range(5, 15);
+		}
 
-        /* Apply some magic */
-        apply_magic(q_ptr, level, delta, flags);
+		/* Apply some magic */
+		apply_magic(q_ptr, level, delta, flags);
 
 		/* Mega-Hack -- no chests in stores */
 		if (q_ptr->tval == TV_CHEST) continue;
@@ -959,13 +960,13 @@ static void display_entry(int pos)
 
 	/* Hack -- fake monochrome */
 	if (!use_color)
-    {
-    	a = TERM_WHITE;
-    	c = ' ';
-    }
+	{
+		a = TERM_WHITE;
+		c = ' ';
+	}
 
-    if (object_aware_p(o_ptr))
-        Term_draw(3, i + 6, a, c);
+	if (object_aware_p(o_ptr))
+		Term_draw(3, i + 6, a, c);
 
 	/* Describe an item in the home */
 	if (st_ptr->type == BUILD_STORE_HOME)
@@ -1572,8 +1573,8 @@ static void store_purchase(void)
 				o_ptr->ac = 0;
 			}
 
-            /* Erase the inscription */
-            quark_remove(&j_ptr->inscription);
+			/* Erase the inscription */
+			quark_remove(&j_ptr->inscription);
 
 			/* Store object memory */
 			if (j_ptr->mem.type == OM_NONE)
@@ -1821,13 +1822,14 @@ static bool store_sell(void)
 
 	if (o_ptr->tval == TV_ROD)
 	{
+
 		q_ptr->pval = o_ptr->pval * amt / o_ptr->number;
 	}
 
 	/* Remove any inscription, feeling for stores */
 	if (!(st_ptr->type == BUILD_STORE_HOME))
-    {
-        quark_remove(&q_ptr->inscription);
+	{
+		quark_remove(&q_ptr->inscription);
 		q_ptr->feeling = FEEL_NONE;
 	}
 
@@ -2050,29 +2052,29 @@ static void store_examine(void)
  */
 static void store_home(void)
 {
-  int i;
+	int i;
 	place_type *pl_ptr;
 
-  if (st_ptr->type == BUILD_STORE_HOME) {
-    p_ptr->home_place_num = p_ptr->place_num;
-    p_ptr->home_store_num = 0;
-    // find which building we are in to store the info
-    pl_ptr = &place[p_ptr->place_num];
-	  for (i = 0; i < pl_ptr->numstores; i++)
-	  {
-      if (&(pl_ptr->store[i]) == st_ptr)
-      {
-        p_ptr->home_store_num = i;
-        msgf("You decide to live here.");
-        break;
-      }
-	  }
-  }
-  if (0 == p_ptr->home_store_num)
-  {
-    msgf("You decide to be homeless for a while.");
-  }
-  return;
+	if (st_ptr->type == BUILD_STORE_HOME) {
+		p_ptr->home_place_num = p_ptr->place_num;
+		p_ptr->home_store_num = 0;
+		// find which building we are in to store the info
+		pl_ptr = &place[p_ptr->place_num];
+		for (i = 0; i < pl_ptr->numstores; i++)
+		{
+			if (&(pl_ptr->store[i]) == st_ptr)
+			{
+				p_ptr->home_store_num = i;
+				msgf("You decide to live here.");
+				break;
+			}
+		}
+	}
+	if (0 == p_ptr->home_store_num)
+	{
+		msgf("You decide to be homeless for a while.");
+	}
+	return;
 }
 
 /*
@@ -2091,15 +2093,15 @@ static void store_layaway(void)
 
 	char out_val[160];
 
-  if (st_ptr->type == BUILD_STORE_HOME) {
-  	/* Empty? */
-    if (st_ptr->stock) {
-		  msgf("You already own all of these items.");
-    } else {
-		  msgf("Your home is empty.");
-    }
+	if (st_ptr->type == BUILD_STORE_HOME) {
+		/* Empty? */
+		if (st_ptr->stock) {
+			msgf("You already own all of these items.");
+		} else {
+			msgf("Your home is empty.");
+		}
 		return;
-  }
+	}
 	/* Empty? */
 	if (!st_ptr->stock) {
 		msgf("I am currently out of stock.");
@@ -2209,8 +2211,8 @@ static void store_layaway(void)
 				o_ptr->ac = 0;
 			}
 
-      /* Erase the inscription */
-      quark_remove(&j_ptr->inscription);
+			/* Erase the inscription */
+			quark_remove(&j_ptr->inscription);
 
 			/* Store object memory */
 			if (j_ptr->mem.type == OM_NONE)
@@ -2219,16 +2221,16 @@ static void store_layaway(void)
 			/* Erase the "feeling" */
 			j_ptr->feeling = FEEL_NONE;
 
-      /* move the item to the lay away spot */
-      p_ptr->bank_layaway_gold = price;
-      p_ptr->bank_layaway_paid = 0;
-      if (p_ptr->bank_layaway) {
-  	    object_copy(o_ptr, p_ptr->bank_layaway);
-      } else {
-  	    p_ptr->bank_layaway = object_dup(o_ptr);
-      }
+			/* move the item to the lay away spot */
+			p_ptr->bank_layaway_gold = price;
+			p_ptr->bank_layaway_paid = 0;
+			if (p_ptr->bank_layaway) {
+				object_copy(o_ptr, p_ptr->bank_layaway);
+			} else {
+				p_ptr->bank_layaway = object_dup(o_ptr);
+			}
 
-      /* show the results */
+			/* show the results */
 			msgf("You can pay for %v at any bank.", OBJECT_FMT(j_ptr, TRUE, 3));
 
 			/* Handle stuff */
@@ -2645,21 +2647,21 @@ static void store_process_command(void)
 		case 'R':
 		{
 			/* Rest Home */
-      if (st_ptr->type == BUILD_STORE_HOME)
-      {
-			  home_rest();
-      }
+			if (st_ptr->type == BUILD_STORE_HOME)
+			{
+				home_rest();
+			}
 			break;
 		}
 		case 'E':
 		{
 			/* Eat something */
-      if (st_ptr->type == BUILD_STORE_HOME)
-      {
-        do_cmd_eat_food();
-  			//(void)set_food(PY_FOOD_MAX - 1);
-			  //home_eat_food();
-      }
+			if (st_ptr->type == BUILD_STORE_HOME)
+			{
+				do_cmd_eat_food();
+				//(void)set_food(PY_FOOD_MAX - 1);
+				//home_eat_food();
+			}
 			break;
 		}
 		default:
@@ -2893,6 +2895,8 @@ void do_cmd_store(const field_type *f1_ptr)
 	/* Forget the view */
 	forget_view();
 
+	/* backup any buttons that are on screen */
+	button_backup_all();
 
 	/* Hack -- Character is in "icky" mode */
 	screen_save();
@@ -3001,34 +3005,34 @@ void do_cmd_store(const field_type *f1_ptr)
 
 
 		/* Basic commands */
-		prtf(0, 22, " ESC) Exit from Building.");
+		prtf(0, 22, " $UESC) Exit from Building.$Y%c$V", ESCAPE);
 
 		/* Browse if necessary */
 		if (get_list_length(st_ptr->stock) > 12)
 		{
-			prtf(0, 23, " SPACE) Next page of stock");
+			prtf(0, 23, " $USPACE) Next page of stock$Y $V");
 		}
 
 		/* Home commands */
 		if (st_ptr->type == BUILD_STORE_HOME)
 		{
-			prtf(31, 22, " g) Get an item.");
-			prtf(31, 23, " d) Drop an item.");
-	  	prtf(56, 23, " H) Set your main Home.");
-	  	prtf(31, 24, " E) Eat something.");
-	  	prtf(56, 24, " R) Rest for a time.");
+			prtf(31, 22, " $Ug) Get an item.$V");
+			prtf(31, 23, " $Ud) Drop an item.$V");
+			prtf(56, 23, " $UH) Set your main Home.$V");
+			prtf(31, 24, " $UE) Eat something.$V");
+			prtf(56, 24, " $UR) Rest for a time.$V");
 		}
 
 		/* Shop commands XXX XXX XXX */
 		else
 		{
-			prtf(31, 22, " p) Purchase an item.");
-			prtf(31, 23, " s) Sell an item.");
-			prtf(56, 23, " L) Put an item on layaway.");
+			prtf(31, 22, " $Up) Purchase an item.$V");
+			prtf(31, 23, " $Us) Sell an item.$V");
+			prtf(56, 23, " $UL) Put an item on layaway.$V");
 		}
 
 		/* Add in the eXamine option */
-		prtf(56, 22, " x) eXamine an item.");
+		prtf(56, 22, " $Ux) eXamine an item.$V");
 
 		/* Prompt */
 		prtf(0, 21, "You may: ");
@@ -3062,12 +3066,14 @@ void do_cmd_store(const field_type *f1_ptr)
 		}
 	}
 
-
 	/* Free turn XXX XXX XXX */
 	p_ptr->state.energy_use = 0;
 
 	/* Hack -- Character is no longer in "icky" mode */
 	screen_load();
+
+	/*restore buttons from the previous screen */
+	button_restore();
 
 	/* Hack -- Cancel automatic command */
 	p_ptr->cmd.new = 0;
@@ -3173,18 +3179,18 @@ bool send_home (void)
 		}
 	}
 
-  /* check if the main home has space */
-  if (which < 0 && p_ptr->home_place_num)
-  {
-	  if (get_list_length(place[p_ptr->home_place_num].store[p_ptr->home_store_num].stock)
-      < place[p_ptr->home_place_num].store[p_ptr->home_store_num].max_stock)
-	  {
-		  which = p_ptr->home_store_num;
-		  pl_ptr = &place[p_ptr->home_place_num];
-	  }
-  }
+	/* check if the main home has space */
+	if (which < 0 && p_ptr->home_place_num)
+	{
+		if (get_list_length(place[p_ptr->home_place_num].store[p_ptr->home_store_num].stock)
+				< place[p_ptr->home_place_num].store[p_ptr->home_store_num].max_stock)
+		{
+			which = p_ptr->home_store_num;
+			pl_ptr = &place[p_ptr->home_place_num];
+		}
+	}
 
-  /* Look for other towns, if they exist */
+	/* Look for other towns, if they exist */
 	if (which < 0 && !vanilla_town)
 	{
 		/* Search towns in order of distance from the player / the player's place. */

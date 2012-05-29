@@ -77,6 +77,7 @@
 
 #include "grafmode.h"
 #include "win-menu.h"
+#include "button.h"
 
 #ifdef WINDOWS
 
@@ -272,6 +273,7 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
 
 
 /*
+
  * Extra "term" data
  *
  * Note the use of "font_want" for the names of the font file requested by
@@ -4986,6 +4988,7 @@ static void hook_quit(cptr str)
 
 #ifdef HAS_CLEANUP
 	cleanup_angband();
+
 #endif /* HAS_CLEANUP */
 
 	exit(0);
@@ -5347,6 +5350,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* Save player movement hook */
 	set_callback((callback_type) win_player_move, CALL_PLAYER_MOVE, NULL);
 
+	/* If we are using port specific hooks, set them here */
 	/* This section to play repeated games without exiting first was
 	 * modified from Sil */
 	while (1)
@@ -5370,10 +5374,10 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			//if (p_ptr->state.is_dead) highlight = 4;
 			/* Prompt the user */
 			if (savefile[0] != 0) {
-				prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-				prtf(10, 23, "  [Or choose to 'load (L)ast' or 'return to (G)raveyard']");
+				prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+				prtf(10, 23, "  [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
 			} else {
-				prtf(10, 23, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
+				prtf(10, 23, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
 			}
 			Term_fresh();
 
@@ -5424,8 +5428,8 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 						display_introduction();
 
 						/* Prompt the user */
-						prtf(10, 22, "[Choose '(N)ew', '(O)pen', or 'e(X)it' from the 'File' menu]");
-						prtf(10, 23, "  [Or choose to 'load (L)ast' or 'return to (G)raveyard']");
+						prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+						prtf(10, 23, "  [Or choose to $U'load (L)ast$Yl$V' or $U'return to (G)raveyard'$Yg$V]");
 
 						/* Flush it */
 						Term_fresh();
@@ -5442,6 +5446,8 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 				}
 			}
 		}
+
+		button_kill_all();
 
 		/* Handle pending events (most notably update) and flush input */
 		Term_flush();
