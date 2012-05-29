@@ -610,5 +610,9 @@ errr init_vcs(int argc,char **argv)
 	return 0;
 }
 
+void close_vcs(void)
+{
+}
+
 #endif /* USE_VCS */
 

@@ -86,6 +86,28 @@ static const module_type modules[] =
 #endif /* USE_VCS */
 };
 
+static int init_sound_dummy(int argc, char *argv[], unsigned char *new_game) {
+	/* prevent compiler warning*/
+	(void) argc;(void) argv;(void) new_game;
+	return 0;
+}
+static void close_sound_dummy(void) {
+	return 0;
+}
+
+/*
+ * List of sound modules in the order they should be tried.
+ */
+static const struct module_type sound_modules[] =
+{
+#ifdef SOUND_SDL
+	{ "sdl", {"SDL_mixer sound module", NULL}, init_sound_sdl, close_sound_sdl },
+#endif /* SOUND_SDL */
+
+	{ "none", {"No sound", NULL}, init_sound_dummy, close_sound_dummy },
+};
+
+
 /*
  * A hook for "quit()".
  *
@@ -99,13 +121,22 @@ static void quit_hook(cptr s)
 	(void)s;
 
 	/* Scan windows */
-	for (j = ANGBAND_TERM_MAX - 1; j >= 0; j--)
-	{
+	for (j = ANGBAND_TERM_MAX - 1; j >= 0; j--) {
 		/* Unused */
 		if (!angband_term[j]) continue;
 
 		/* Nuke it */
 		term_nuke(angband_term[j]);
+	}
+	sound_modules[0].close();
+	if (ANGBAND_SYS) {
+		for (j = 0; j < (int)NUM_ELEMENTS(modules); j++) {
+			if (streq(ANGBAND_SYS, modules[j].name)) {
+				/* Try to use port */
+				modules[j].close();
+				break;
+			}
+		}
 	}
 }
 
@@ -354,8 +385,35 @@ static void game_usage(void)
 #else /* FIXED_PATHS */
 	puts("  -d<def>  Define a 'lib' dir sub-path");
 #endif /* FIXED_PATHS */
-
+#if 0
 	/* Print the name and help for each available module */
+	puts("  -s<sys>  Use sound module <sys>, where <sys> can be:");
+	for (i = 0; i < (int)N_ELEMENTS(sound_modules); i++) {
+		if (i) {
+			printf("     %s   %s\n", sound_modules[i].name,
+			       sound_modules[i].help);
+		} else {
+			/* The first line is special */
+			printf("     %s   %s(default)\n", sound_modules[i].name,
+			       sound_modules[i].help);
+		}
+	}
+#endif
+#if 0
+	puts("  -m<sys>  Use module <sys>, where <sys> can be:");
+	/* Print the name and help for each available module */
+	for (i = 0; i < (int)N_ELEMENTS(modules); i++) {
+		if (i) {
+			printf("     %s   %s\n",
+			       modules[i].name, modules[i].help);
+		} else {
+			/* The first line is special */
+			printf("     %s   %s (default)\n",
+			       modules[i].name, modules[i].help);
+		}
+	}
+#endif
+
 	for (i = 0; i < (int)NUM_ELEMENTS(modules); i++)
 	{
 		/* Spacer */
@@ -586,6 +644,15 @@ int main(int argc, char *argv[])
 
 	/* Make sure we have a display! */
 	if (!done) quit("Unable to prepare any 'display module'!");
+
+	/* Try the modules in the order specified by sound_modules[] */
+	/*for (i = 0; i < (int)N_ELEMENTS(sound_modules); i++)
+		if (!soundstr || streq(soundstr, sound_modules[i].name))
+			if (0 == sound_modules[i].init(argc, argv, NULL))
+				break;*/
+	/* initialize the first sound module (until there is a global variable
+	 * to store a pointer to the name, or a pointer to the sound module)*/
+	sound_modules[0].init(argc, argv, (unsigned char *)&new_game);
 
 	/* Gtk and Tk initialise earlier */
 	if (!(streq(ANGBAND_SYS, "gtk") || streq(ANGBAND_SYS, "tnb")))

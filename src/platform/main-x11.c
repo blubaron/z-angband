@@ -2841,7 +2841,6 @@ errr init_x11(int argc, char *argv[])
 		plog_fmt("Ignoring option: %s", argv[i]);
 	}
 
-
 	/* Init the Metadpy if possible */
 	if (Metadpy_init_name(dpy_name)) return (-1);
 	
@@ -3021,4 +3020,7 @@ errr init_x11(int argc, char *argv[])
 	return (0);
 }
 
+void close_x11(void)
+{
+}
 #endif /* USE_X11 */

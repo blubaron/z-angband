@@ -2917,4 +2917,9 @@ errr init_gtk(int argc, char **argv, unsigned char *new_game)
 	return (0);
 }
 
+/* close the XPJ port */
+void close_gtk(void)
+{
+}
+
 #endif /* USE_GTK */

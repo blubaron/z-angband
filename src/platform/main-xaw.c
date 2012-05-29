@@ -1954,4 +1954,9 @@ errr init_xaw(int argc, char *argv[])
 	return (0);
 }
 
+/* close the XAW port */
+void close_xaw(void)
+{
+}
+
 #endif /* USE_XAW */

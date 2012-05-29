@@ -3589,4 +3589,9 @@ errr init_xpj(int argc, char *argv[])
 	return (0);
 }
 
+/* close the XPJ port */
+void close_xpj(void)
+{
+}
+
 #endif /* USE_XPJ */

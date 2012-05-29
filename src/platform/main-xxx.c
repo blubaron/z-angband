@@ -670,6 +670,11 @@ errr init_xxx(void)
 	return (0);
 }
 
+/* termination function */
+void close_xxx(void)
+{
+}
+
 
 #ifdef INTERNAL_MAIN
 

@@ -128,76 +128,91 @@ typedef const char *cptr;
 
 #ifdef USE_XAW
 extern errr init_xaw(int argc, char **argv);
+extern void close_xaw(void);
 extern cptr help_xaw[];
 #endif
 
 #ifdef USE_X11
 extern errr init_x11(int argc, char **argv);
+extern void close_x11(void);
 extern cptr help_x11[];
 #endif
 
 #ifdef USE_XPJ
 extern errr init_xpj(int argc, char **argv);
+extern void close_xpj(void);
 extern cptr help_xpj[];
 #endif
 
 #ifdef USE_GCU
 extern errr init_gcu(void);
+extern void close_gcu(void);
 extern cptr help_gcu[];
 #endif
 
 #ifdef USE_CAP
 extern errr init_cap(void);
+extern void close_cap(void);
 extern cptr help_cap[];
 #endif
 
 #ifdef USE_DOS
 extern errr init_dos(void);
+extern void close_dos(void);
 extern cptr help_dos[];
 #endif
 
 #ifdef USE_IBM
 extern errr init_ibm(void);
+extern void close_ibm(void);
 extern cptr help_ibm[];
 #endif
 
 #ifdef USE_EMX
 extern errr init_emx(void);
+extern void close_emx(void);
 extern cptr help_emx[];
 #endif
 
 #ifdef USE_SLA
 extern errr init_sla(void);
+extern void close_sla(void);
 extern cptr help_sla[];
 #endif
 
 #ifdef USE_AMI
 extern errr init_ami(void);
+extern void close_ami(void);
 extern cptr help_ami[];
 #endif
 
 #ifdef USE_VME
 extern errr init_vme(void);
+extern void close_vme(void);
 extern cptr help_vme[];
 #endif
 
 #ifdef USE_LSL
 extern errr init_lsl(void);
+extern void close_lsl(void);
 extern cptr help_lsl[];
 #endif
 
 #ifdef USE_GTK
 extern errr init_gtk(int argc, char **argv, unsigned char *new_game);
+extern void close_gtk(void);
 extern cptr help_gtk[];
 #endif
 
 #ifdef USE_VCS
 extern errr init_vcs(int argc, char **argv);
+extern void close_vcs(void);
 extern cptr help_vcs[];
 #endif
 
 #ifdef USE_TNB
 extern errr init_tnb(int argc, cptr *argv);
+extern void close_tnb(void);
 extern cptr help_tnb[];
 #endif
 
@@ -211,6 +226,7 @@ struct module_type
 	cptr name;
 	cptr *help;
 	errr (*init) (int argc, char **argv, unsigned char *new_game);
+	void (*close)(void);
 };
 
 
@@ -219,7 +235,7 @@ struct module_type
  *
  * This expands 'INIT_MODULE(port)' to be:
  *
- * { "port", help_port, init_port }   (Without the type-cast. )
+ * { "port", help_port, init_port, close_port }   (Without the type-cast. )
  *
  * When adding new ports make sure you use the correct parameter
  * types to init_"port_name"().  If you need to add a new one,
@@ -227,6 +243,6 @@ struct module_type
  * parameters due to the way C passes them on the stack.)
  */
 #define INIT_MODULE(P) \
-		{ #P, help_##P, (errr (*)(int, char **, unsigned char *)) init_##P }
+		{ #P, help_##P, (errr (*)(int, char **, unsigned char *)) init_##P, (void (*)(void)) close_##P }
 
 #endif /* INCLUDED_H_SYSTEM_H */
