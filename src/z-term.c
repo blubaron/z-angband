@@ -1936,16 +1936,18 @@ errr Term_keypress(int k)
  */
 errr Term_mousepress(int m, int mods, int x, int y)
 {
-	keycode_t key;
-	key = button_get_key(x,y);
-	if (key) {
-		/* a button was pressed */
-		if (key & 0x80) {
-			/* a button that changes the mouse press was presses
-			 * ignore it here */
-			return (0);
-		} else {
-			return Term_keypress(key);
+	if ((m == 1) && (mods == 0)) {
+		keycode_t key;
+		key = button_get_key(x,y);
+		if (key) {
+			/* a button was pressed */
+			if (key & 0x80) {
+				/* a button that changes the mouse press was presses
+				 * ignore it here */
+				return (0);
+			} else {
+				return Term_keypress(key);
+			}
 		}
 	}
 	if (mouse_press) {
