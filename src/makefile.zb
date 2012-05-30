@@ -20,7 +20,7 @@ NORMOBJS := $(addprefix src/,\
 	xtra1.o xtra2.o spells1.o spells2.o \
 	melee1.o melee2.o save.o files.o fields.o \
 	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o cmd7.o \
-        store.o birth.o load.o ui.o hero.o\
+        store.o birth.o load.o ui.o hero.o button.c\
 	wizard1.o wizard2.o grid.o streams.o rooms.o \
 	generate.o dungeon.o game.o init1.o init2.o \
 	effects.o quest1.o quest2.o racial.o run.o script.o \
@@ -36,8 +36,8 @@ ANGOBJS := $(addprefix src/, maid-grf.o grafmode.o) \
 	main-ami.o main-tnb.o)
 
 WINOBJS := $(addprefix src/platform/win,\
-	main-win.o readdib.o)
-	#readdx9.o win-layout.o)
+	main-win.o readdib.o \
+	readdx9.o win-layout.o)
 
 
 ##
@@ -170,6 +170,7 @@ src/z-util.o: src/z-util.h
 src/z-virt.o: src/z-virt.h src/z-util.h
 src/wild4.o: src/wild.h src/grid.h
 src/grafmode.o: src/grafmode.h
+src/button.o: src/button.h
 
 ##
 ## Build wrappers

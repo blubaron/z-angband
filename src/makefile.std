@@ -98,7 +98,7 @@ ANGOBJS := $(LUAWOBJS) \
 	artifact.o mutation.o flavor.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o platform/maid-x11.o\
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o\
-	grafmode.o wild4.o\
+	grafmode.o wild4.o button.o\
 	platform/main-cap.o platform/main-gcu.o platform/main-x11.o platform/main-xaw.o platform/main-xpj.o\
 	platform/main-lsl.o platform/main-vcs.o platform/main-gtk.o platform/win/main-win.o platform/main.o \
 	maid-grf.o platform/main-dos.o platform/main-ibm.o platform/main-emx.o \

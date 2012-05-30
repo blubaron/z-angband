@@ -123,6 +123,7 @@ OBJ = \
 	cmd2.obj \
 	cmd1.obj \
 	cave.obj \
+	button.obj \
 	bldg.obj \
 	birth.obj \
 	avatar.obj \

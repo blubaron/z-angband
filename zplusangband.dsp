@@ -108,6 +108,10 @@ SOURCE=.\src\bldg.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\button.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\cave.c
 # End Source File
 # Begin Source File
@@ -421,6 +425,10 @@ SOURCE=.\src\angband.h
 # Begin Source File
 
 SOURCE=.\src\autoconf.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\button.h
 # End Source File
 # Begin Source File
 
