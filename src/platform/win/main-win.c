@@ -273,7 +273,6 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
 
 
 /*
-
  * Extra "term" data
  *
  * Note the use of "font_want" for the names of the font file requested by
@@ -284,6 +283,7 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
  * as attempting to represent the name of a font.
  */
 #include "win-term.h"
+
 
 /*
  * An array of term_data's
@@ -897,13 +897,13 @@ static void save_prefs(void)
 	strnfmt(buf, 128, "%d", arg_graphics);
 	WritePrivateProfileString("Angband", "Graphics", buf, ini_file);
 	
-  /* Save the tile width */
+	/* Save the tile width */
 	strnfmt(buf, 128, "%d", tile_width_mult);
-  WritePrivateProfileString("Angband", "TileWidth", buf, ini_file);
+	WritePrivateProfileString("Angband", "TileWidth", buf, ini_file);
 
-  /* Save the tile height */
+	/* Save the tile height */
 	strnfmt(buf, 128, "%d", tile_height_mult);
-  WritePrivateProfileString("Angband", "TileHeight", buf, ini_file);
+	WritePrivateProfileString("Angband", "TileHeight", buf, ini_file);
 
 	/* Save the "use_bigtile" flag */
 	strnfmt(buf, 128, "%d", use_bigtile ? 1 : 0);
@@ -981,12 +981,12 @@ static void load_prefs(void)
 
 	/* Extract the "arg_graphics" flag */
 	GetPrivateProfileString("Angband", "Graphics", "0", buf, 1024, ini_file);
-  if (strlen(buf) == 1) {
-	  arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
-  }
-  arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+	if (strlen(buf) == 1) {
+		arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
+	}
+	arg_graphics = GetPrivateProfileInt("Angband", "Graphics", GRAPHICS_NONE, ini_file);
 	
-  /* Extract the tile width */
+	/* Extract the tile width */
 	tile_width_mult = GetPrivateProfileInt("Angband", "TileWidth", 1, ini_file);
 
 	/* Extract the tile height */
@@ -1287,75 +1287,32 @@ static bool init_graphics(void)
 		cptr name;
 		cptr mask = NULL;
 
-    current_graphics_mode = get_graphics_mode(arg_graphics);
-    if (current_graphics_mode) {
+		current_graphics_mode = get_graphics_mode(arg_graphics);
+		if (current_graphics_mode) {
 			wid = current_graphics_mode->cell_width;
 			hgt = current_graphics_mode->cell_height;
 			name = current_graphics_mode->file;
 			use_transparency = TRUE;
-    } else {
+		} else {
 			wid = 8;
 			hgt = 8;
 			name = "8x8.png";
 			use_transparency = TRUE;
-    }
-#if (0)
-		if (graf_width && graf_height)
-		{
-			wid = graf_width;
-			hgt = graf_height;
-
-			name = graf_name;
-      if (strlen(graf_mask) > 1) {
-        mask = graf_mask;
-  			//use_transparency = FALSE;
-      }// else {
-  			use_transparency = TRUE;
-      //}
-    }
-		else if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-		{
-			wid = 32;
-			hgt = 32;
-
-			name = "32x32.bmp";
-			mask = "mask32.bmp";
-
-			use_transparency = TRUE;
 		}
-		else if (arg_graphics == GRAPHICS_ADAM_BOLT)
-		{
-			wid = 16;
-			hgt = 16;
 
-			name = "16X16.BMP";
-			mask = "mask.bmp";
-
-			use_transparency = TRUE;
-		}
-		else
-		{
-			wid = 8;
-			hgt = 8;
-
-			name = "8X8.png";
-		}
-#endif
 		/* Access the bitmap file */
 		path_make(buf, ANGBAND_DIR_XTRA_GRAF, name);
 
 		/* Load the bitmap or quit */
 		//if (!ReadDIB(data[0].w, buf, &infGraph))
 		//if (!ReadDIB_DX9(data[0].w, buf, &infGraph))
-    if (mask) 
-    {
-		  if (!ReadDIB_DX9(data[0].w, buf, &infGraph))
-		  {
-			  plog_fmt("Cannot read bitmap file '%s'", name);
-			  return (FALSE);
-		  }
+		if (mask) {
+			if (!ReadDIB_DX9(data[0].w, buf, &infGraph)) {
+				plog_fmt("Cannot read bitmap file '%s'", name);
+				return (FALSE);
+			}
 			
-      /* Access the mask file */
+			/* Access the mask file */
 			path_build(buf, sizeof(buf), ANGBAND_DIR_XTRA_GRAF, mask);
 
 			/* Load the bitmap or quit */
@@ -1364,15 +1321,12 @@ static bool init_graphics(void)
 				plog_fmt("Cannot read bitmap file '%s'", buf);
 				return (FALSE);
 			}
-    }
-    else
-    {
-		  if (!ReadDIB2_DX9(data[0].w, buf, &infGraph, &infMask))
-		  {
-			  plog_fmt("Cannot read bitmap file '%s'", name);
-			  return (FALSE);
-		  }
-    }
+		} else {
+			if (!ReadDIB2_DX9(data[0].w, buf, &infGraph, &infMask)) {
+				plog_fmt("Cannot read bitmap file '%s'", name);
+				return (FALSE);
+			}
+		}
 
 		/* Save the new sizes */
 		infGraph.CellWidth = wid;
@@ -3226,12 +3180,6 @@ static void check_for_save_file(LPSTR cmd_line)
 	game_in_progress = TRUE;
 
 	Term_fresh();
-
-	/* Play game */
-	//play_game(FALSE);
-
-	/* Quit */
-	//quit(NULL);
 }
 
 
@@ -3379,9 +3327,6 @@ static void start_screensaver(void)
 	screensaver_inkey_hack_buffer[j++] = KTRL('Z'); /* Enter borgmode */
 	screensaver_inkey_hack_buffer[j++] = 'z'; /* Run Borg */
 #endif /* ALLOW_BORG */
-
-	/* Play game */
-	//play_game((bool)!file_exists);
 }
 
 #endif /* USE_SAVER */
@@ -3396,8 +3341,7 @@ static void display_help(cptr filename)
 
 	path_make(tmp, ANGBAND_DIR_XTRA_HELP, filename);
 
-	if (check_file(tmp))
-	{
+	if (check_file(tmp)) {
 #ifdef HTML_HELP
 
 		HtmlHelp(data[0].w, tmp, HH_DISPLAY_TOPIC, 0);
@@ -3411,11 +3355,10 @@ static void display_help(cptr filename)
 
 #endif /* HTML_HELP */
 
-	}
-	else
-	{
+	} else {
 		plog_fmt("Cannot find help file: %s", tmp);
 		plog("Use the online help files instead.");
+		Term_Keypress('?');
 	}
 }
 
@@ -3437,20 +3380,14 @@ static void process_menus(WORD wCmd)
 		/* New game */
 		case IDM_FILE_NEW:
 		{
-			if (!initialized)
-			{
+			if (!initialized) {
 				plog("You cannot do that yet...");
-			}
-			else if (game_in_progress)
-			{
+			} else
+			if (game_in_progress) {
 				plog("You can't start a new game while you're still playing!");
-			}
-			else
+			} else
 			{
 				game_in_progress = TRUE;
-				//Term_flush();
-				//play_game(TRUE);
-				//quit(NULL);
 			}
 			break;
 		}
@@ -3458,15 +3395,12 @@ static void process_menus(WORD wCmd)
 		/* Open game */
 		case IDM_FILE_OPEN:
 		{
-			if (!initialized)
-			{
+			if (!initialized) {
 				plog("You cannot do that yet...");
-			}
-			else if (game_in_progress)
-			{
+			} else
+			if (game_in_progress) {
 				plog("You can't open a new game while you're still playing!");
-			}
-			else
+			} else
 			{
 				memset(&ofn, 0, sizeof(ofn));
 				ofn.lStructSize = sizeof(ofn);
@@ -3478,14 +3412,10 @@ static void process_menus(WORD wCmd)
 				ofn.lpstrInitialDir = ANGBAND_DIR_SAVE;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-				if (GetOpenFileName(&ofn))
-				{
+				if (GetOpenFileName(&ofn)) {
 					/* Load 'savefile' */
 					validate_file(savefile);
 					game_in_progress = TRUE;
-					//Term_flush();
-					//play_game(FALSE);
-					//quit(NULL);
 				}
 			}
 			break;
@@ -3495,7 +3425,7 @@ static void process_menus(WORD wCmd)
 		case IDM_FILE_SAVE:
 		{
 			if (game_in_progress && character_generated &&
-			    p_ptr->cmd.inkey_flag)
+					p_ptr->cmd.inkey_flag)
 			{
 				/* Hack -- Forget messages */
 				msg_flag = FALSE;
@@ -3506,9 +3436,7 @@ static void process_menus(WORD wCmd)
 #else /* ZANGBAND */
 				do_cmd_save_game();
 #endif /* ZANGBAND */
-			}
-			else
-			{
+			} else {
 				/* Paranoia */
 				plog("You may not do that right now.");
 			}
@@ -3518,8 +3446,7 @@ static void process_menus(WORD wCmd)
 		/* Show scores */
 		case IDM_FILE_SCORE:
 		{
-			if (!initialized)
-			{
+			if (!initialized) {
 				plog("You may not do that right now.");
 				break;
 			}
@@ -3533,11 +3460,9 @@ static void process_menus(WORD wCmd)
 		/* Exit */
 		case IDM_FILE_EXIT:
 		{
-			if (game_in_progress && character_generated)
-			{
+			if (game_in_progress && character_generated) {
 				/* Paranoia */
-				if (!p_ptr->cmd.inkey_flag)
-				{
+				if (!p_ptr->cmd.inkey_flag) {
 					plog("You may not do that right now.");
 					break;
 				}
@@ -3578,14 +3503,11 @@ static void process_menus(WORD wCmd)
 
 			td = &data[i];
 
-			if (!td->visible)
-			{
+			if (!td->visible) {
 				td->visible = TRUE;
 				ShowWindow(td->w, SW_SHOW);
 				term_data_redraw(td);
-			}
-			else
-			{
+			} else {
 				td->visible = FALSE;
 				ShowWindow(td->w, SW_HIDE);
 			}
@@ -3722,7 +3644,8 @@ static void process_menus(WORD wCmd)
 		case IDM_WINDOW_RESET: {
 			if (MessageBox(NULL,
 				  "This will reset the size and layout of the angband windows\n based on your screen size. Do you want to continue?",
-				  "z+Angband", MB_YESNO|MB_ICONWARNING) == IDYES) {
+				  "z+Angband", MB_YESNO|MB_ICONWARNING) == IDYES)
+			{
 				term *old = Term;
 				int i;
 				RECT rc;
@@ -3893,8 +3816,7 @@ static void process_menus(WORD wCmd)
 		case IDM_OPTIONS_BIGTILE:
 		{
 			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
 				plog("You may not do that right now.");
 				break;
 			}
@@ -3909,8 +3831,7 @@ static void process_menus(WORD wCmd)
 		case IDM_OPTIONS_SOUND:
 		{
 			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
 				plog("You may not do that right now.");
 				break;
 			}
@@ -3931,8 +3852,7 @@ static void process_menus(WORD wCmd)
 
 		case IDM_OPTIONS_SAVER:
 		{
-			if (hwndSaver)
-			{
+			if (hwndSaver) {
 				DestroyWindow(hwndSaver);
 				hwndSaver = NULL;
 				screensaver_active = FALSE;
@@ -3940,12 +3860,10 @@ static void process_menus(WORD wCmd)
 				/* Switch main menu back on */
 				SetMenu(data[0].w, main_menu);
 
-				for (i = MAX_TERM_DATA - 1; i >= 0; --i)
-				{
+				for (i = MAX_TERM_DATA - 1; i >= 0; --i) {
 					td = &data[i];
 
-					if (td->visible)
-					{
+					if (td->visible) {
 						/* Turn the Windows back to normal */
 						SetWindowLong(td->w, GWL_STYLE, td->dwStyle);
 
@@ -3956,9 +3874,7 @@ static void process_menus(WORD wCmd)
 				}
 
 				ShowCursor(TRUE);
-			}
-			else
-			{
+			} else {
 				/* Create a screen saver window */
 				hwndSaver = CreateWindowEx(WS_EX_TOPMOST, "WindowsScreenSaverClass",
 				                           "Angband Screensaver",
@@ -3967,14 +3883,11 @@ static void process_menus(WORD wCmd)
 				                           GetSystemMetrics(SM_CYSCREEN),
 				                           NULL, NULL, hInstance, NULL);
 
-				if (hwndSaver)
-				{
-					for (i = MAX_TERM_DATA - 1; i >= 0; --i)
-					{
+				if (hwndSaver) {
+					for (i = MAX_TERM_DATA - 1; i >= 0; --i) {
 						td = &data[i];
 
-						if (td->visible)
-						{
+						if (td->visible) {
 							/* Switch off border and titlebar */
 							SetWindowLong(td->w, GWL_STYLE, WS_VISIBLE);
 
@@ -3990,9 +3903,7 @@ static void process_menus(WORD wCmd)
 					ShowCursor(FALSE);
 
 					screensaver_active = TRUE;
-				}
-				else
-				{
+				} else {
 					plog("Failed to create saver window");
 				}
 			}
@@ -4019,8 +3930,7 @@ static void process_menus(WORD wCmd)
 		case IDM_OPTIONS_MAP:
 		{
 			/* Paranoia */
-			if (!p_ptr->cmd.inkey_flag || !initialized)
-			{
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
 				plog("You may not do that right now.");
 				break;
 			}
@@ -4092,14 +4002,11 @@ static void handle_wm_paint(HWND hWnd)
 
 	BeginPaint(hWnd, &ps);
 
-	if (td->map_active)
-	{
+	if (td->map_active) {
 		/* Redraw the map */
 		/* ToDo: Only redraw the necessary parts */
 		windows_map_aux();
-	}
-	else
-	{
+	} else {
 		/* Get the area that should be updated (rounding up/down) */
 		/* ToDo: Take the window borders into account */
 		x1 = (ps.rcPaint.left / td->tile_wid) - 1;
@@ -4189,8 +4096,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			bool ma = FALSE;
 
 #ifdef USE_SAVER
-			if (screensaver_active)
-			{
+			if (screensaver_active) {
 				stop_screensaver();
 				screensaver_active = FALSE;
 				return 0;
@@ -4203,8 +4109,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
 
 			/* Handle "special" keys */
-			if (special_key[(byte)(wParam)])
-			{
+			if (special_key[(byte)(wParam)]) {
 				/* Begin the macro trigger */
 				Term_keypress(31);
 
@@ -4244,8 +4149,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 		case WM_LBUTTONDOWN:
 		{
 #ifdef USE_SAVER
-			if (screensaver_active)
-			{
+			if (screensaver_active) {
 				stop_screensaver();
 				screensaver_active = FALSE;
 				return 0;
@@ -4283,16 +4187,14 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 		{
 			if (!screensaver_active) break;
 
-			if (iMouse)
-			{
+			if (iMouse) {
 				dx = LOWORD(lParam) - xMouse;
 				dy = HIWORD(lParam) - yMouse;
 
 				if (dx < 0) dx = -dx;
 				if (dy < 0) dy = -dy;
 
-				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS))
-				{
+				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS)) {
 					stop_screensaver();
 				}
 			}
@@ -4314,10 +4216,8 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 
 		case WM_CLOSE:
 		{
-			if (game_in_progress && character_generated)
-			{
-				if (!p_ptr->cmd.inkey_flag)
-				{
+			if (game_in_progress && character_generated) {
+				if (!p_ptr->cmd.inkey_flag) {
 					plog("You may not do that right now.");
 					return 0;
 				}
@@ -4364,8 +4264,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				case SIZE_MINIMIZED:
 				{
 					/* Hide sub-windows */
-					for (i = 1; i < MAX_TERM_DATA; i++)
-					{
+					for (i = 1; i < MAX_TERM_DATA; i++) {
 						if (data[i].visible) ShowWindow(data[i].w, SW_HIDE);
 					}
 					return 0;
@@ -4382,8 +4281,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 					int rows = (HIWORD(lParam) - td->size_oh1) / td->tile_hgt;
 
 					/* New size */
-					if ((td->cols != cols) || (td->rows != rows))
-					{
+					if ((td->cols != cols) || (td->rows != rows)) {
 						/* Save the new size */
 						td->cols = cols;
 						td->rows = rows;
@@ -4401,8 +4299,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 					td->size_hack = TRUE;
 
 					/* Show sub-windows */
-					for (i = 1; i < MAX_TERM_DATA; i++)
-					{
+					for (i = 1; i < MAX_TERM_DATA; i++) {
 						if (data[i].visible) ShowWindow(data[i].w, SW_SHOW);
 					}
 
@@ -4442,11 +4339,9 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 
 		case WM_ACTIVATE:
 		{
-			if (wParam && !HIWORD(lParam))
-			{
+			if (wParam && !HIWORD(lParam)) {
 				/* Do something to sub-windows */
-				for (i = 1; i < MAX_TERM_DATA; i++)
-				{
+				for (i = 1; i < MAX_TERM_DATA; i++) {
 					SetWindowPos(data[i].w, hWnd, 0, 0, 0, 0,
 					             SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 				}
@@ -4566,8 +4461,7 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 			rows = (HIWORD(lParam) - td->size_oh1) / td->tile_hgt;
 
 			/* New size */
-			if ((td->cols != cols) || (td->rows != rows))
-			{
+			if ((td->cols != cols) || (td->rows != rows)) {
 				/* Save old term */
 				term *old_term = Term;
 
@@ -4612,8 +4506,7 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 			bool ma = FALSE;
 
 #ifdef USE_SAVER
-			if (screensaver_active)
-			{
+			if (screensaver_active) {
 				stop_screensaver();
 				return 0;
 			}
@@ -4625,8 +4518,7 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 			if (GetKeyState(VK_MENU)    & 0x8000) ma = TRUE;
 
 			/* Handle "special" keys */
-			if (special_key[(byte)(wParam)])
-			{
+			if (special_key[(byte)(wParam)]) {
 				/* Begin the macro trigger */
 				Term_keypress(31);
 
@@ -4666,8 +4558,7 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		{
-			if (screensaver_active)
-			{
+			if (screensaver_active) {
 				stop_screensaver();
 				return 0;
 			}
@@ -4679,16 +4570,14 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 		{
 			if (!screensaver_active) break;
 
-			if (iMouse)
-			{
+			if (iMouse) {
 				dx = LOWORD(lParam) - xMouse;
 				dy = HIWORD(lParam) - yMouse;
 
 				if (dx < 0) dx = -dx;
 				if (dy < 0) dy = -dy;
 
-				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS))
-				{
+				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS)) {
 					stop_screensaver();
 				}
 			}
@@ -4728,10 +4617,8 @@ static LRESULT FAR PASCAL AngbandListProc(HWND hWnd, UINT uMsg,
 			if (wParam == HTCLOSE) wParam = HTSYSMENU;
 #endif /* HTCLOSE */
 
-			if (wParam == HTSYSMENU)
-			{
-				if (td->visible)
-				{
+			if (wParam == HTSYSMENU) {
+				if (td->visible) {
 					td->visible = FALSE;
 					ShowWindow(td->w, SW_HIDE);
 				}
@@ -4794,16 +4681,14 @@ LRESULT FAR PASCAL AngbandSaverProc(HWND hWnd, UINT uMsg,
 
 		case WM_MOUSEMOVE:
 		{
-			if (iMouse)
-			{
+			if (iMouse) {
 				dx = LOWORD(lParam) - xMouse;
 				dy = HIWORD(lParam) - yMouse;
 
 				if (dx < 0) dx = -dx;
 				if (dy < 0) dy = -dy;
 
-				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS))
-				{
+				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS)) {
 					stop_screensaver();
 				}
 			}
@@ -4845,8 +4730,7 @@ LRESULT FAR PASCAL AngbandSaverProc(HWND hWnd, UINT uMsg,
 static void hack_plog(cptr str)
 {
 	/* Give a warning */
-	if (str)
-	{
+	if (str) {
 		MessageBox(NULL, str, "Warning",
 		           MB_ICONEXCLAMATION | MB_OK);
 	}
@@ -4859,8 +4743,7 @@ static void hack_plog(cptr str)
 static void hack_quit(cptr str)
 {
 	/* Give a warning */
-	if (str)
-	{
+	if (str) {
 		MessageBox(NULL, str, "Error",
 		           MB_ICONEXCLAMATION | MB_OK | MB_ICONSTOP);
 	}
@@ -4894,8 +4777,7 @@ static void hook_plog(cptr str)
 #endif /* USE_SAVER */
 
 	/* Warning */
-	if (str)
-	{
+	if (str) {
 		MessageBox(data[0].w, str, "Warning",
 		           MB_ICONEXCLAMATION | MB_OK);
 	}
@@ -4920,8 +4802,7 @@ static void hook_quit(cptr str)
 #endif /* USE_SAVER */
 	{
 		/* Give a warning */
-		if (str)
-		{
+		if (str) {
 			MessageBox(data[0].w, str, "Error",
 			           MB_ICONEXCLAMATION | MB_OK | MB_ICONSTOP);
 		}
@@ -4933,8 +4814,7 @@ static void hook_quit(cptr str)
 	/*** Could use 'Term_nuke_win()' XXX XXX XXX */
 
 	/* Destroy all windows */
-	for (i = MAX_TERM_DATA - 1; i >= 0; --i)
-	{
+	for (i = MAX_TERM_DATA - 1; i >= 0; --i) {
 		term_force_font(&data[i], NULL);
 		if (data[i].font_want) string_free(data[i].font_want);
 		if (data[i].w) DestroyWindow(data[i].w);
@@ -4953,10 +4833,8 @@ static void hook_quit(cptr str)
 
 #ifdef USE_SOUND
 	/* Free the sound names */
-	for (i = 0; i < SOUND_MAX; i++)
-	{
-		for (j = 0; j < SAMPLE_MAX; j++)
-		{
+	for (i = 0; i < SOUND_MAX; i++) {
+		for (j = 0; j < SAMPLE_MAX; j++) {
 			if (!sound_file[i][j]) break;
 
 			string_free(sound_file[i][j]);
@@ -4988,7 +4866,6 @@ static void hook_quit(cptr str)
 
 #ifdef HAS_CLEANUP
 	cleanup_angband();
-
 #endif /* HAS_CLEANUP */
 
 	exit(0);
@@ -5027,8 +4904,7 @@ static void init_stuff(void)
 #ifdef USE_SAVER
 
 	/* Try to get the path to the Angband folder */
-	if (screensaver)
-	{
+	if (screensaver) {
 		/* Extract the filename of the savefile for the screensaver */
 		GetPrivateProfileString("Angband", "SaverFile", "", saverfilename, sizeof(saverfilename), path);
 
@@ -5046,10 +4922,8 @@ static void init_stuff(void)
 	i = strlen(path);
 
 	/* Get the path */
-	for (; i > 0; i--)
-	{
-		if (path[i] == '\\')
-		{
+	for (; i > 0; i--) {
+		if (path[i] == '\\') {
 			/* End of path */
 			break;
 		}
@@ -5165,8 +5039,7 @@ bool broken_ascii(void)
 	OSVERSIONINFO Dozeversion;
  	Dozeversion.dwOSVersionInfoSize = sizeof(Dozeversion);
 
-	if (GetVersionEx(&Dozeversion))
-	{
+	if (GetVersionEx(&Dozeversion)) {
 		/* Win XP is b0rken */
 		if ((Dozeversion.dwPlatformId >= VER_PLATFORM_WIN32_NT) &&
 			(Dozeversion.dwMajorVersion >= 5))
@@ -5195,8 +5068,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	(void)nCmdShow;
 
 #ifdef USE_SAVER
-	if (lpCmdLine && ((*lpCmdLine == '-') || (*lpCmdLine == '/')))
-	{
+	if (lpCmdLine && ((*lpCmdLine == '-') || (*lpCmdLine == '/'))) {
 		lpCmdLine++;
 
 		switch (*lpCmdLine)
@@ -5211,8 +5083,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 				if (!screensaverSemaphore) exit(0);
 
-				if (GetLastError() == ERROR_ALREADY_EXISTS)
-				{
+				if (GetLastError() == ERROR_ALREADY_EXISTS) {
 					CloseHandle(screensaverSemaphore);
 					exit(0);
 				}
@@ -5239,8 +5110,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 #endif /* USE_SAVER */
 
 	/* Initialize */
-	if (hPrevInst == NULL)
-	{
+	if (hPrevInst == NULL) {
 		wc.style         = CS_CLASSDC;
 		wc.lpfnWndProc   = AngbandWndProc;
 		wc.cbClsExtra    = 0;
@@ -5286,8 +5156,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	init_stuff();
 
 	/* Initialize the keypress analyzer */
-	for (i = 0; special_key_list[i]; i++)
-	{
+	for (i = 0; special_key_list[i]; i++) {
 		special_key[special_key_list[i]] = TRUE;
 	}
 
@@ -5298,8 +5167,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	ReleaseDC(NULL, hdc);
 
 	/* Initialize the colors */
-	for (i = 0; i < 256; i++)
-	{
+	for (i = 0; i < 256; i++) {
 		byte rv, gv, bv;
 
 		/* Extract desired values */
@@ -5330,8 +5198,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* Set the system suffix */
 	ANGBAND_SYS = "win";
 	
-	if (broken_ascii())
-	{
+	if (broken_ascii()) {
 		ANGBAND_SYS = "w2k";
 	}
 
@@ -5353,13 +5220,11 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	/* If we are using port specific hooks, set them here */
 	/* This section to play repeated games without exiting first was
 	 * modified from Sil */
-	while (1)
-	{
+	while (1) {
 		bool new_game = FALSE;
     
 #ifdef USE_SAVER
-		if (screensaver)
-		{
+		if (screensaver) {
 			/* Start the screensaver */
 			start_screensaver();
 		}
@@ -5383,8 +5248,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 
 			/* Process Events until "new" or "open" is selected */
-			while (!game_in_progress)
-			{
+			while (!game_in_progress) {
 				//OPENFILENAME ofn;
 
 				/* process any windows messages */
@@ -5487,23 +5351,22 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		
 		// do some more between-games initialization
 		//re_init_some_things();
-	/* Initialize the "quark" package */
-	//(void)quarks_init();
+		/* Initialize the "quark" package */
+		//(void)quarks_init();
 
-	/* Initialize the "message" package */
-	(void)messages_init();
+		/* Initialize the "message" package */
+		(void)messages_init();
 
-	/* Show the initial screen again */
-	display_introduction();
+		/* Show the initial screen again */
+		display_introduction();
 
-	/* Flush it */
-	Term_fresh();
-	//init_angband();
+		/* Flush it */
+		Term_fresh();
+		//init_angband();
 
-	/* reinitialize arrays that use quarks */
-	//note("[Initializing arrays... (wilderness)]");
-	//if (init_w_info()) quit("Cannot initialize wilderness");
-
+		/* reinitialize arrays that use quarks */
+		//note("[Initializing arrays... (wilderness)]");
+		//if (init_w_info()) quit("Cannot initialize wilderness");
 	}
 
 	/* Paranoia */
