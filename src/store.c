@@ -2568,6 +2568,17 @@ static void store_process_command(void)
 	}
 
 	/* Parse the command */
+	if (p_ptr->cmd.cmd & 0x80) {
+		/* the command is a mouse press */
+		/* pop the mouse press */
+		char button;
+		int x,y;
+		Term_getmousepress(&button, &x, &y);
+		if ((button & 0x7f) == 2) {
+			/* leave the store */
+			leave_store = TRUE;
+		}
+	} else
 	switch (p_ptr->cmd.cmd)
 	{
 		case '\r':
