@@ -1458,6 +1458,28 @@ static infoclr *clr[256];
  */
 static byte color_table[256][4];
 
+#ifdef USE_GRAPHICS
+typedef struct XTilesheet XTilesheet;
+struct XTilesheet
+{
+	XImage *color;
+	XImage *mask;
+	byte CellWidth;
+	byte CellHeight;
+	int ImageWidth;
+	int ImageHeight;
+};
+extern bool ReadTiles(char* filename, XTilesheet *tiles);
+extern bool FreeTiles(XTilesheet *tiles);
+
+static XTilesheet tiles; /* tiles loaded from disk */
+static XTilesheet viewtiles; /* tiles that are displayed on screen */
+static XTilesheet maptiles; /* tiles same size as font */
+
+#endif /* USE_GRAPHICS */
+
+extern bool SaveWindow(infowin *win, char*filename);
+
 /*
  * Forward declare
  */

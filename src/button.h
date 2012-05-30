@@ -10,7 +10,7 @@ typedef struct _button_mouse_2d button_mouse;
 /**
  * Mouse button structure
  */
-typedef struct _button_mouse_2d
+struct _button_mouse_2d
 {
 	struct _button_mouse_2d *next;
 	char* label;                 /*!< Label on the button */
@@ -22,7 +22,7 @@ typedef struct _button_mouse_2d
 	byte mods;                   /*!< modifiers sent with the press */
 	//byte id;
 	//byte list;                 /*!< button list to switch to on press */
-} button_mouse;
+};
 
 
 /** Function prototype for the UI to provide to create native buttons */
@@ -52,7 +52,7 @@ int button_add_1d(const char *label, keycode_t keypress); /* 1d button */
 int button_kill(keycode_t keypress);
 
 void button_kill_all(void);
-void button_init();
+void button_init(void);
 void button_free(void);
 
 void button_hook(button_add_2d_f add, button_add_1d_f add_1d,

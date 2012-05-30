@@ -234,21 +234,21 @@ struct term
 
 	/* draw a cave grid */
 	errr (*cave_hook) (int x, int y, int n, 
-		const cave_type **grid, const int cx, const int cy);
+		const void **grid, const int cx, const int cy); /* grid is actually cave_type** */
 
 	/* override the map display */
 	void (*view_map_hook)(term *t);
 
 	/* ui override hooks */
-	bool (*get_aim_dir_hook)(int *dp)
+	bool (*get_aim_dir_hook)(int *dp);
 	bool (*get_check_hook)(cptr prompt, ...);
 	bool (*get_string_hook)(char *buf, int len, cptr str, ...);
 	bool (*get_com_hook)(cptr prompt, char *command);
 	s32b (*get_quantity_big_hook)(cptr prompt, s32b max);
 	s16b (*get_quantity_hook)(cptr prompt, s16b max);
-	object_type *(*get_item_hook)(cptr pmt, cptr str, int mode);
-	void (*store_hook)(const field_type *f1_ptr);
-	void (*bldg_hook)(const field_type *f_ptr);
+	void *(*get_item_hook)(cptr pmt, cptr str, int mode); /* return value is actually object_type */
+	void (*store_hook)(const void *f1_ptr); /* f1 is actually a pointer to feild_type */
+	void (*bldg_hook)(const void *f_ptr); /* f is actually a pointer to feild_type */
 	void (*character_hook)(void);
 	void (*destroy_hook)(void);
 	void (*inven_hook)(void);
