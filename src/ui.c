@@ -1042,7 +1042,6 @@ void put_cstr(int col, int row, cptr str, bool clear)
 	/* Default to white */
 	byte a = TERM_WHITE;
 	byte da = a;
-	static button_mouse *button;
 	int x = col;
 
 	/* Clear line, position cursor */
@@ -1095,10 +1094,7 @@ void put_cstr(int col, int row, cptr str, bool clear)
 			/* Start a button area */
 			else if (*c == 'U')
 			{
-				if (button) {
-					/* this button was not finished, so delete it TODO */
-				}
-				button = button_add_start(row, x,*(c+1));
+				(void)button_add_start(row, x,*(c+1));
 				c++;
 
 				continue;
@@ -1107,10 +1103,7 @@ void put_cstr(int col, int row, cptr str, bool clear)
 			/* End a button area */
 			else if (*c == 'V')
 			{
-				if (button) {
-					button_add_end(button,NULL ,0, row, x);
-					button = NULL;
-				}
+				(void)button_add_end(NULL ,0, row, x);
 				c++;
 
 				continue;
@@ -1119,9 +1112,7 @@ void put_cstr(int col, int row, cptr str, bool clear)
 			/* Set the keypress of the current button area */
 			else if (*c == 'Y')
 			{
-				if (button) {
-					button->key = *(c+1);
-				}
+				(void)button_last_key(*(c+1));
 				c+=2;
 
 				continue;
@@ -1135,7 +1126,7 @@ void put_cstr(int col, int row, cptr str, bool clear)
 				while (*pc && !isspace(*(pc++))) {
 					len++;
 				}
-				button_add_2d(row,x,row,x+len,NULL,*(c+1));
+				(void)button_add_2d(row,x,row,x+len,NULL,*(c+1));
 				c++;
 
 				continue;
@@ -1144,7 +1135,7 @@ void put_cstr(int col, int row, cptr str, bool clear)
 			/* add a one character button */
 			else if (*c == 'X')
 			{
-				button_add_2d(row,x,row,x,NULL,*(c+1));
+				(void)button_add_2d(row,x,row,x,NULL,*(c+1));
 				c++;
 
 				continue;

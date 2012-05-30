@@ -28,12 +28,31 @@
 #define MAX_MOUSE_LABEL 10
 
 
-/*** Types ***/
-
 /**
  * Maximum number of mouse buttons
  */
 #define MAX_MOUSE_BUTTONS  20
+
+
+/*** Types ***/
+typedef struct _button_mouse_2d button_mouse;
+
+/**
+ * Mouse button structure
+ */
+struct _button_mouse_2d
+{
+	struct _button_mouse_2d *next;
+	char* label;                 /*!< Label on the button */
+	int left;                    /*!< Column containing the left edge of the button */
+	int right;                   /*!< Column containing the right edge of the button */
+	int top;                     /*!< Row containing the left edge of the button */
+	int bottom;                  /*!< Row containing the right edge of the button */
+	keycode_t key;               /*!< Keypress corresponding to the button */
+	byte mods;                   /*!< modifiers sent with the press */
+	//byte id;
+	//byte list;                 /*!< button list to switch to on press */
+};
 
 typedef struct _button_mouse_1d
 {
@@ -46,8 +65,7 @@ typedef struct _button_mouse_1d
 typedef struct _button_backup
 {
 	struct _button_backup *next; /* the button set that will be restored after this one */
-	button_mouse *buttons;       /* the list of buttons */
-	button_mouse *buttons_end;   /* the end of the list of buttons */
+	button_mouse *buttons;       /* the list (stack) of buttons */
 	button_mouse_1d *buttons_1d; /* the list of 1d buttons */
 	int num;                     /* the number of buttons in the list */
 	int num_1d;                  /* the number of 1d buttons in the list */
@@ -56,8 +74,7 @@ typedef struct _button_backup
 
 /*** Variables ***/
 
-static button_mouse *button_list_root;
-static button_mouse *button_list_end;
+static button_mouse *button_stack;
 static button_mouse_1d *button_1d_list;
 static button_backup *button_backups;
 
@@ -140,26 +157,33 @@ int button_add_1d(const char *label, char keypress)
 	return button_add_1d_text(label, keypress);
 }
 
-button_mouse* button_add_start(int top, int left, keycode_t keypress)
+int button_add_start(int top, int left, keycode_t keypress)
 {
 	button_mouse* button = RNEW(button_mouse);
-
+	if (!button) {
+		return -1;
+	}
 	button->label = NULL;
 	button->left = left;
 	button->right = left+1;
 	button->top = top;
 	button->bottom = top;
-	button->next = 0;
 	button->mods = 0;
 	button->key = keypress;
 
-	return button;
+	button->next = button_stack;
+	button_stack = button;
+	button_num++;
+	return 0;
 }
 
-int button_add_end(button_mouse* button,
-                   const char *label, keycode_t keypress,
+int button_add_end(const char *label, keycode_t keypress,
                    int bottom, int right)
 {
+	button_mouse* button = button_stack;
+	if (!button) {
+		return -1;
+	}
 	if (bottom) button->bottom = bottom;
 	if (!right && label) {
 		right = strlen(label);
@@ -177,16 +201,13 @@ int button_add_end(button_mouse* button,
 	if (button_add_2d_hook) {
 		int res = (*button_add_2d_hook) (button);
 		if (res) { // if res != 0
+			if (res == 1) {
+				/* pop the button off of the stack, but don't free it */
+				button_stack = button->next;
+			}
 			return res;
 		}
 	}
-	if (!button_list_root)
-		button_list_root = button;
-	if (button_list_end)
-		button_list_end->next = button;
-	button_list_end = button;
-	button->next = 0;
-	button_num++;
 
 	/* Redraw */
 	p_ptr->redraw |= (PR_BUTTONS);
@@ -197,17 +218,28 @@ int button_add_end(button_mouse* button,
 int button_add_2d(int top, int left, int bottom, int right,
                const char *label, keycode_t keypress)
 {
-	button_mouse *bttn = button_add_start(top, left, 0);
-	if (bttn) {
-		return button_add_end(bttn, label, keypress, bottom, right);
+	int res;
+	res = button_add_start(top, left, 0);
+	if (res < 0) {
+		return res;
 	}
-	return -1;
+	res = button_add_end(label, keypress, bottom, right);
+	return res;
+}
+int button_last_key(keycode_t newkey)
+{
+	button_mouse* button = button_stack;
+	if (!button) {
+		return -1;
+	}
+	button->key = newkey;
+	return 0;
 }
 
 /*
  * Make a backup of the current buttons
  */
-bool button_backup_all(void)
+bool button_backup_all(bool kill_all)
 {
 	button_backup *newbackup;
 
@@ -216,11 +248,9 @@ bool button_backup_all(void)
 		return FALSE;
 	}
 	/* copy the 2d buttons */
-	newbackup->buttons = button_list_root;
-	newbackup->buttons_end = button_list_end;
+	newbackup->buttons = button_stack;
 	newbackup->num = button_num;
-	button_list_root = NULL;
-	button_list_end = NULL;
+	button_stack = NULL;
 
 	/* copy the 1d buttons */
 	if (button_num == 0) {
@@ -245,6 +275,10 @@ bool button_backup_all(void)
 	newbackup->next = button_backups;
 	button_backups = newbackup;
 
+	if (kill_all) {
+		button_kill_all();
+	}
+
 	/* Redraw */
 	p_ptr->redraw |= (PR_BUTTONS);
 
@@ -266,8 +300,7 @@ void button_restore(void)
 		button_backup *next;
 
 		/* restore the 2d buttons */
-		button_list_root = button_backups->buttons;
-		button_list_end = button_backups->buttons_end;
+		button_stack = button_backups->buttons;
 		button_num = button_backups->num;
 
 		/* restore the 1d buttons */
@@ -309,7 +342,7 @@ int button_kill_text(char keypress)
 {
 	int i, j, length;
 
-	button_mouse *testee = button_list_root, *next;
+	button_mouse *testee = button_stack, *next;
 	button_mouse *prev = NULL;
 	/* Find the 2d button */
 	while (testee) {
@@ -319,11 +352,8 @@ int button_kill_text(char keypress)
 			if (prev) {
 				prev->next = next;
 			}
-			if (button_list_root == testee) {
-				button_list_root = next;
-			}
-			if (button_list_end == testee) {
-				button_list_end = prev;
+			if (button_stack == testee) {
+				button_stack = next;
 			}
 			/* free the memory */
 			if (testee->label)
@@ -396,32 +426,28 @@ int button_kill(char keypress)
  */
 void button_kill_all(void)
 {
-	int i;
+	int i,res;
 
-	button_mouse *bttn = button_list_root, *bnext;
-	while (bttn) {
-		bnext = bttn->next;
-		if (button_kill_hook) {
-			(void)(*button_kill_hook) (bttn->key);
-		} else {
-			if (bttn->label) {
-				(void)string_free(bttn->label);
-			}
-			FREE(bttn);
-		}
-		bttn = bnext;
-	}
-	button_list_root = NULL;
-	button_list_end = NULL;
-	button_num = 0;
-
+	button_mouse *bttn = button_stack, *bnext;
 	/* Paranoia */
 	if (!button_kill_hook) return;
 
 	/* One by one */
 	if (button_kill_hook) {
+		while (bttn) {
+			bnext = bttn->next;
+			res = (*button_kill_hook) (bttn->key);
+			if (res==0) {
+				if (bttn->label) {
+					(void)string_free(bttn->label);
+				}
+				FREE(bttn);
+			}
+			bttn = bnext;
+		}
+
 		for (i = button_num - 1; i >= 0; i--) {
-			int res = (*button_kill_hook) (button_1d_list[i].key);
+			res = (*button_kill_hook) (button_1d_list[i].key);
 			if (res==0) {
 				button_1d_list[i].label[0] = '\0';
 				button_1d_list[i].left = 0;
@@ -430,6 +456,15 @@ void button_kill_all(void)
 			}
 		}
 	} else {
+		while (bttn) {
+			bnext = bttn->next;
+			if (bttn->label) {
+				(void)string_free(bttn->label);
+			}
+			FREE(bttn);
+			bttn = bnext;
+		}
+
 		for (i = 0; i < button_1d_num; i--) {
 			button_1d_list[i].label[0] = '\0';
 			button_1d_list[i].left = 0;
@@ -437,6 +472,8 @@ void button_kill_all(void)
 			button_1d_list[i].key = 0;
 		}
 	}
+	button_stack = NULL;
+	button_num = 0;
 	button_1d_length = 0;
 	button_1d_num = 0;
 }
@@ -450,6 +487,7 @@ void button_init(void)
 	/* Prepare mouse button arrays */
 	button_1d_list = C_ZNEW(MAX_MOUSE_BUTTONS, button_mouse_1d);
 	button_backups = NULL;
+	button_stack = NULL;
 
 	/* initialize the global numbers */
 	button_1d_start_x = 0;
@@ -465,6 +503,7 @@ void button_init(void)
 	button_add_1d_hook = NULL;
 	button_kill_hook = NULL;
 	button_print_hook = NULL;
+	button_get_hook = NULL;
 }
 
 void button_hook(button_add_2d_f add, button_add_1d_f add_1d,
@@ -497,7 +536,6 @@ void button_free(void)
 				bttn = bnext;
 			}
 			button_backups->buttons = NULL;
-			button_backups->buttons_end = NULL;
 		}
 		if (button_backups->buttons_1d) {
 			FREE(button_backups->buttons_1d);
@@ -506,8 +544,8 @@ void button_free(void)
 		button_backups = next;
 	}
 	button_backups = NULL;
-	if (button_list_root) {
-		button_mouse *bttn = button_list_root, *bnext;
+	if (button_stack) {
+		button_mouse *bttn = button_stack, *bnext;
 		while (bttn) {
 			bnext = bttn->next;
 			if (bttn->label)
@@ -515,8 +553,7 @@ void button_free(void)
 			FREE(bttn);
 			bttn = bnext;
 		}
-		button_list_root = NULL;
-		button_list_end = NULL;
+		button_stack = NULL;
 	}
 	if (button_1d_list) {
 		FREE(button_1d_list);
@@ -540,7 +577,7 @@ char button_get_key(int x, int y)
 	int i;
 
 	/* first check 2d buttons */
-	button_mouse *bttn = button_list_root;
+	button_mouse *bttn = button_stack;
 	while (bttn) {
 		if ((y >= bttn->top) && (y <= bttn->bottom)
 				&& (x >= bttn->left) && (x <= bttn->right)) {
@@ -592,7 +629,7 @@ size_t button_print(int row, int col)
 		put_fstr(col + button_1d_list[j].left, row, CLR_SLATE "%s", button_1d_list[j].label);
 
 	/* print 2d buttons */
-	bttn = button_list_root;
+	bttn = button_stack;
 	while (bttn) {
 		if (bttn->label && bttn->label[0]) {
 			put_cstr(bttn->left, bttn->top, bttn->label, FALSE);

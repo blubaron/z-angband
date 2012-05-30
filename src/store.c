@@ -2907,7 +2907,7 @@ void do_cmd_store(const field_type *f1_ptr)
 	forget_view();
 
 	/* backup any buttons that are on screen */
-	button_backup_all();
+	button_backup_all(TRUE);
 
 	/* Hack -- Character is in "icky" mode */
 	screen_save();

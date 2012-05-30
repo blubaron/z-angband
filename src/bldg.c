@@ -2037,7 +2037,7 @@ void do_cmd_bldg(const field_type *f_ptr)
 	forget_view();
 
 	/* backup any buttons that are on screen */
-	button_backup_all();
+	button_backup_all(TRUE);
 
 	/* Hack -- Increase "icky" depth */
 	screen_save();

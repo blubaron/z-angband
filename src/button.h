@@ -4,29 +4,11 @@
 #define BUTTON_H
 
 typedef char keycode_t;
-
-typedef struct _button_mouse_2d button_mouse;
-
-/**
- * Mouse button structure
- */
-struct _button_mouse_2d
-{
-	struct _button_mouse_2d *next;
-	char* label;                 /*!< Label on the button */
-	int left;                    /*!< Column containing the left edge of the button */
-	int right;                   /*!< Column containing the right edge of the button */
-	int top;                     /*!< Row containing the left edge of the button */
-	int bottom;                  /*!< Row containing the right edge of the button */
-	keycode_t key;               /*!< Keypress corresponding to the button */
-	byte mods;                   /*!< modifiers sent with the press */
-	//byte id;
-	//byte list;                 /*!< button list to switch to on press */
-};
-
+//typedef struct _button_mouse_2d;
 
 /** Function prototype for the UI to provide to create native buttons */
-typedef int (*button_add_2d_f)(button_mouse* button);
+//typedef int (*button_add_2d_f)(button_mouse* button);
+typedef int (*button_add_2d_f)(struct _button_mouse_2d*);
 typedef int (*button_add_1d_f)(const char *, keycode_t);
 
 /** Function prototype for the UI to provide to remove native buttons */
@@ -38,14 +20,21 @@ typedef size_t (*button_print_f)(int row_1d, int col_1d);
 /** Function prototype for the UI to provide to test native buttons */
 typedef int (*button_get_f)(int x, int y);
 
-button_mouse* button_add_start(int top, int left, keycode_t keypress);
-int button_add_end(button_mouse* button,
-                   const char *label, keycode_t keypress,
+/* the return values for the above hook functions are essentially:
+ * <0 - an error occurred, skip default behavior
+ * 0  - the function succeeded but continue with default behavior
+ * >0 - the function succeded, skip the default behavior
+ */
+
+
+int button_add_start(int top, int left, keycode_t keypress);
+int button_add_end(const char *label, keycode_t keypress,
                    int bottom, int right);
 int button_add_2d(int top, int left, int bottom, int right,
                   const char *label, keycode_t keypress);
+int button_last_key(keycode_t newkey);
 
-bool button_backup_all(void);
+bool button_backup_all(bool kill_all);
 void button_restore(void);
 
 int button_add_1d(const char *label, keycode_t keypress); /* 1d button */
