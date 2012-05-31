@@ -246,6 +246,7 @@ struct term
 	bool (*get_com_hook)(cptr prompt, char *command);
 	s32b (*get_quantity_big_hook)(cptr prompt, s32b max);
 	s16b (*get_quantity_hook)(cptr prompt, s16b max);
+	u32b (*get_number_hook)(cptr prompt, u32b initial);
 	void *(*get_item_hook)(cptr pmt, cptr str, int mode); /* return value is actually object_type */
 	void (*store_hook)(const void *f1_ptr); /* f1 is actually a pointer to feild_type */
 	void (*bldg_hook)(const void *f_ptr); /* f is actually a pointer to feild_type */
