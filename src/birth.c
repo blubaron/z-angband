@@ -1395,6 +1395,8 @@ static bool player_birth_aux_3(void)
 
 	s32b last_round;
 
+	/* Store any previous buttons */
+	button_backup_all(TRUE);
 
 	/*** Autoroll ***/
 
@@ -1519,7 +1521,7 @@ static bool player_birth_aux_3(void)
 			put_fstr(col + 13, 10, "Round:");
 
 			/* Indicate the state */
-			put_fstr(col + 13, 12, "(Hit ESC to stop)");
+			put_fstr(col + 13, 12, "$U(Hit ESC to stop)$Y%c$V",ESCAPE);
 
 			best_score = -1;
 			for (i = 0; i < A_MAX; i++) {
@@ -1634,15 +1636,22 @@ static bool player_birth_aux_3(void)
 			/* Fully rested */
 			p_ptr->csp = p_ptr->msp;
 
+			/* Store any previous buttons */
+			button_backup_all(TRUE);
+
 			/* Display the player */
 			display_player(mode);
 
 			/* Prepare a prompt (must squeeze everything in) */
-			prtf(2, 23, "['r' to reroll%s, 'n' for next screen, or Enter to accept]",
-				previous ? ", 'p' for prev": "");
+			prtf(2, 22, "[Press $U'?' for help$Y?$V, $U'=' for options$Y=$V]");
+			prtf(2, 23, "[$U'r' to reroll$Yr$V%s, $U'n' for next screen$Yn$V, or $UEnter to accept$Y\n$V]",
+				previous ? ", $U'p' for prev$Yp$V": "");
 
 			/* Prompt and get a command */
 			ch = inkey();
+
+			/* restore any previous buttons */
+			button_restore();
 
 			/* Quit */
 			if (ch == KTRL('X')) quit(NULL);
@@ -1663,8 +1672,12 @@ static bool player_birth_aux_3(void)
 			}
 
 			/* Increase mode */
-			if (ch == 'n') {
+			if ((ch == 'n') || (ch == '2') || (ch == '6')) {
 				mode = (mode + 1) % DISPLAY_PLAYER_MAX;
+			} else
+			/* Decrease mode */
+			if ((ch == '8') || (ch == '4')) {
+				mode = (mode + DISPLAY_PLAYER_MAX - 1) % DISPLAY_PLAYER_MAX;
 			}
 
 			/* Help */
@@ -1691,6 +1704,9 @@ static bool player_birth_aux_3(void)
 		/* Note that a previous roll exists */
 		previous = TRUE;
 	}
+
+	/* restore any previous buttons */
+	button_restore();
 
 	/* Clear prompt */
 	clear_from(23);
@@ -1865,15 +1881,21 @@ static bool player_birth_aux(void)
 	/* Initialize the virtues */
 	get_virtues();
 
+	/* Store any previous buttons */
+	button_backup_all(TRUE);
+
 	/* Display the player */
 	display_player(DISPLAY_PLAYER_STANDARD);
 
 	/* Prompt for it */
 	prtf(10, 23,
-		"['Ctrl-X' to suicide, 'Del' to start over, or Enter to continue]");
+		"[$U'Ctrl-X' to suicide$Y%c$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]", KTRL('X'), KTRL('H'));
 
 	/* Get a key */
 	ch = inkey();
+
+	/* restore any previous buttons */
+	button_restore();
 
 	/* Quit */
 	if (ch == KTRL('X')) quit(NULL);
