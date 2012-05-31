@@ -67,6 +67,7 @@ OBJ = \
 	z-term.obj \
 	z-rand.obj \
 	z-form.obj \
+	z-file.obj \
 	xtra2.obj \
 	xtra1.obj \
 	wizard2.obj \
@@ -76,6 +77,8 @@ OBJ = \
 	wild3.obj \
 	variable.obj \
 	hero.obj \
+	ui-inkey.obj \
+	userid.obj \
 	util.obj \
 	tables.obj \
 	streams.obj \
@@ -83,6 +86,7 @@ OBJ = \
 	spells3.obj \
 	spells2.obj \
 	spells1.obj \
+	signals.obj \
 	scores.obj \
 	save.obj \
 	rooms.obj \
@@ -90,6 +94,7 @@ OBJ = \
 	racial.obj \
 	quest1.obj \
 	quest2.obj \
+	quark.obj \
 	object2.obj \
 	object1.obj \
 	obj_kind.obj \
@@ -99,6 +104,7 @@ OBJ = \
 	monster2.obj \
 	monster1.obj \
 	mind.obj \
+	message.obj \
 	melee2.obj \
 	melee1.obj \
 	platform/win/main-win.obj \

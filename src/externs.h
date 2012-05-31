@@ -976,67 +976,13 @@ extern bool check_mortgage(void);
 
 
 /* util.c */
-extern void safe_setuid_drop(void);
-extern void safe_setuid_grab(void);
-extern void init_setuid(void);
-extern void signals_ignore_tstp(void);
-extern void signals_handle_tstp(void);
-extern void signals_init(void);
-extern bool assert_helper(cptr expr, cptr file, int line, bool result);
-extern errr path_parse(char *buf, int max, cptr file);
-extern void path_build(char *buf, int max, cptr path, cptr file);
-extern FILE *my_fopen(cptr file, cptr mode);
-extern FILE *my_fopen_temp(char *buf, int max);
-extern errr my_fgets(FILE *fff, char *buf, huge n);
-extern errr my_raw_fgets(FILE *fff, char *buf, huge n);
-extern void my_fclose(FILE *fff);
-extern errr fd_kill(cptr file);
-extern errr fd_move(cptr file, cptr what);
-extern int fd_make(cptr file, int mode);
-extern int fd_open(cptr file, int flags);
-extern errr fd_lock(int fd, int what);
-extern errr fd_seek(int fd, huge n);
-extern errr fd_read(int fd, char *buf, huge n);
-extern errr fd_write(int fd, cptr buf, huge n);
-extern errr fd_close(int fd);
-extern int count_bits(u32b x);
-extern sint macro_find_exact(cptr pat);
-extern void macro_add(cptr pat, cptr act);
-extern void flush(void);
-extern void text_to_ascii(char *buf, cptr str);
-extern void ascii_to_text(char *buf, cptr str);
-extern char inkey(void);
-extern char inkey_m(void);
-extern s16b quark_add(cptr str);
-extern s16b quark_fmt(cptr str, ...);
-extern void quark_remove(s16b *i);
-extern void quark_dup(s16b i);
-extern cptr quark_str(s16b i);
-extern errr quarks_init(void);
-extern errr quarks_free(void);
-extern byte get_msg_type_color(byte a);
-extern s16b message_num(void);
-extern cptr message_str(s16b age);
-extern u16b message_type(s16b age);
-extern byte message_color(s16b age);
-extern errr message_color_define(u16b type, byte color);
-extern void message_add(cptr str, u16b type);
-extern errr messages_init(void);
-extern void messages_free(void);
-extern void set_message_type(char *buf, uint max, cptr fmt, va_list *vp);
-extern void msgf(cptr fmt, ...);
-extern void msg_effect(u16b type, s16b extra);
-extern void message_flush(void);
-extern bool is_a_vowel(int ch);
-extern void request_command(int shopping);
-extern void repeat_push(int what);
-extern bool repeat_pull(int *what);
-extern void repeat_clear(void);
-extern void repeat_check(void);
-
-#ifdef PRIVATE_USER_PATH
-extern void create_user_dirs(void);
-#endif /* PRIVATE_USER_PATH */
+#include "util.h"
+#include "userid.h"
+#include "signals.h"
+#include "z-file.h"
+#include "ui-inkey.h"
+#include "quark.h"
+#include "message.h"
 
 /* xtra1.c */
 extern s16b modify_stat_value(int value, int amount);
@@ -1371,41 +1317,7 @@ extern void display_law_map(int *cx, int *cy);
 extern void do_cmd_view_law_map(void);
 
 /* ui.c */
-extern void center_string(char *buf, uint max, cptr fmt, va_list *vp);
-extern void binary_fmt(char *buf, uint max, cptr fmt, va_list *vp);
-extern void fmt_clean(char *buf);
-extern int get_player_choice(cptr *choices, int num, int col, int wid,
-                             cptr helpfile, void (*hook) (cptr));
-extern int get_player_sort_choice(cptr *choices, int num, int col, int wid,
-                                  cptr helpfile, void (*hook) (cptr));
-extern bool display_menu(menu_type *options, int select, bool scroll,
-						 int (*disp)(int), cptr prompt);
-extern void bell(cptr reason);
-extern void sound(int num);
-extern int color_char_to_attr(char c);
-extern char attr_to_color_char(byte c);
-extern void screen_save(void);
-extern void screen_load(void);
-extern int fmt_offset(cptr str1, cptr str2);
-extern void put_cstr(int col, int row, cptr str, bool clear);
-extern void put_fstr(int col, int row, cptr str, ...);
-extern void prtf(int col, int row, cptr str, ...);
-extern void roff(cptr str, ...);
-extern void wrap_froff(FILE *fff, char *buf, int margin, int rowmax);
-extern void froff(FILE *fff, cptr str, ...);
-extern void clear_from(int row);
-extern void clear_msg(void);
-extern void clear_row(int row);
-extern void clear_region(int x, int y1, int y2);
-extern bool askfor_aux(char *buf, int len);
-extern bool get_string(char *buf, int len, cptr str, ...);
-extern bool get_check(cptr prompt, ...);
-extern bool get_check_ext(bool def, bool esc, cptr prompt, ...);
-extern bool get_com(cptr prompt, char *command);
-extern s16b get_quantity(cptr prompt, s16b max);
-extern s32b get_quantity_big(cptr prompt, s32b max);
-extern void pause_line(int row);
-extern int get_keymap_dir(char ch);
+#include "ui.h"
 
 
 /* borg.c */
@@ -1419,23 +1331,4 @@ extern bool player_res(u32b flag);
  * Hack -- conditional (or "bizarre") externs
  */
 
-#ifdef SET_UID
-# ifndef HAS_USLEEP
-/* util.c */
-extern int usleep(huge usecs);
-# endif	/* HAS_USLEEP */
-extern void user_name(char *buf, int id);
-#endif /* SET_UID */
-
-#if defined(MAC_MPW) || defined(MACH_O_CARBON)
-/* main-mac.c, or its derivatives */
-extern u32b _fcreator;
-extern u32b _ftype;
-# if defined(MAC_MPW) && defined(CARBON)
-extern void convert_pathname(char *path);
-# endif
-# if defined(MACH_O_CARBON)
-extern void fsetfileinfo(cptr path, u32b fcreator, u32b ftype);
-# endif
-#endif
 

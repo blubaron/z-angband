@@ -244,6 +244,10 @@ SOURCE=.\src\melee2.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\message.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\mind.c
 # End Source File
 # Begin Source File
@@ -281,6 +285,10 @@ SOURCE=.\src\object1.c
 # Begin Source File
 
 SOURCE=.\src\object2.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\quark.c
 # End Source File
 # Begin Source File
 
@@ -324,6 +332,10 @@ SOURCE=.\src\script.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\signals.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\spells1.c
 # End Source File
 # Begin Source File
@@ -349,6 +361,15 @@ SOURCE=.\src\tables.c
 # Begin Source File
 
 SOURCE=.\src\ui.c
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui-inkey.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\userid.c
 # End Source File
 # Begin Source File
 
@@ -393,6 +414,10 @@ SOURCE=.\src\xtra1.c
 # Begin Source File
 
 SOURCE=.\src\xtra2.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\z-file.c
 # End Source File
 # Begin Source File
 
@@ -488,6 +513,10 @@ SOURCE=".\src\maid-grf.h"
 # End Source File
 # Begin Source File
 
+SOURCE=".\src\message.h"
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\options.h
 # End Source File
 # Begin Source File
@@ -496,11 +525,19 @@ SOURCE=.\src\platform\win\readdib.h
 # End Source File
 # Begin Source File
 
+SOURCE=".\src\quark.h"
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\rooms.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\script.h
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\signals.h"
 # End Source File
 # Begin Source File
 
@@ -513,6 +550,22 @@ SOURCE=.\src\tvalsval.h
 # Begin Source File
 
 SOURCE=.\src\types.h
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\ui.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\ui-inkey.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\userid.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\util.h"
 # End Source File
 # Begin Source File
 
@@ -533,6 +586,10 @@ SOURCE=".\src\platform\win\win-term.h"
 # Begin Source File
 
 SOURCE=".\src\z-config.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\z-file.h"
 # End Source File
 # Begin Source File
 
