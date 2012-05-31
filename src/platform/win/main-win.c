@@ -273,6 +273,7 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
 
 
 /*
+
  * Extra "term" data
  *
  * Note the use of "font_want" for the names of the font file requested by
@@ -3358,7 +3359,7 @@ static void display_help(cptr filename)
 	} else {
 		plog_fmt("Cannot find help file: %s", tmp);
 		plog("Use the online help files instead.");
-		Term_Keypress('?');
+		Term_keypress('?');
 	}
 }
 

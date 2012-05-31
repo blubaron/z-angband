@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 /*
  * How often the autoroller will update the display and pause

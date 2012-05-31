@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "script.h"
 #include "grafmode.h"
+#include "button.h"
 
 
 /*
@@ -1845,6 +1846,7 @@ static void display_player_flag_aux(int col, int row,
  */
 static void display_player_flag_info(void)
 
+
 {
 	int row;
 	int col;
@@ -2834,6 +2836,7 @@ errr file_character(cptr name, bool full)
 
 		/* End the row */
 		froff(fff, "%s\n", buf);
+
 	}
 
 	froff(fff, "\n\n  [Miscellaneous information]\n");

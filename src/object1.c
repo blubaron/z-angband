@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "script.h"
 #include "grafmode.h"
+#include "button.h"
 
 /* Hack: For use in get_item & subroutines.  */
 s16b curr_container = 0;
