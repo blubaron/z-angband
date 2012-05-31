@@ -95,6 +95,8 @@
 
 /* The "sval" codes for TV_FIGURINE */
 #define SV_FIGURINE_NORMAL		0
+#define SV_FIGURINE_TAMED		1
+#define SV_FIGURINE_NECRO		2
 
 /* The "sval" codes for TV_STATUE */
 #define SV_WOODEN_STATUE		0

@@ -2605,7 +2605,7 @@ static void throw_item_effect(object_type *i_ptr, bool hit_body, bool hit_wall,
 		{
 			msgf("The Figurine writhes and then shatters.");
 		}
-		else if (!use_upkeep)
+		else if (!use_upkeep && (i_ptr->sval == SV_FIGURINE_NORMAL))
 		{
 			m_ptr->unsummon = 500;  /* 500 duration for all figurine summons */
 		}
