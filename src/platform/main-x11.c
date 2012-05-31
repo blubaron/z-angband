@@ -1675,7 +1675,7 @@ static void react_mousepress(XButtonEvent *ev)
 	if (ev->state & ControlMask) mods |= 2;
 	if (ev->state & ShiftMask) mods |= 1;
 	if (ev->state & Mod1Mask) mods |= 4;
-	if (ev->state & Mod2Mask) mods |= 8;
+	//if (ev->state & Mod2Mask) mods |= 8;
 
 	/* The co-ordinates are only used in Angband format. */
 	pixel_to_square(&x, &y, ev->x, ev->y);
