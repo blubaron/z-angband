@@ -1735,17 +1735,6 @@ static bool player_rebirth(void)
 	if (!rebirth_ptr->can_rebirth)
 		return FALSE;
 	
-	/* Only query if we're not in competition mode */
-	if (!competition_mode) {
-		/* if short-circuits so we don't need the nesting here, but
-		 * it makes things clearer. */
-		if (!get_check("Rebirth?"))
-			return FALSE;
-	}
-	
-	/* We are doing a rebirth! */
-	rebirth = TRUE;
-	
 	/* Sex */
 	p_ptr->rp.psex = rebirth_ptr->rp.psex;
 	sp_ptr = &sex_info[p_ptr->rp.psex];
@@ -1754,27 +1743,14 @@ static bool player_rebirth(void)
 	p_ptr->rp.prace = rebirth_ptr->rp.prace;
 	rp_ptr = &race_info[p_ptr->rp.prace];
 
-	/* Give beastman a mutation at character birth */
-	if (p_ptr->rp.prace == RACE_BEASTMAN) {
-		p_ptr->change |= (PC_MUTATE);
-	}
-
 	/* Class */
 	p_ptr->rp.pclass = rebirth_ptr->rp.pclass;
 	cp_ptr = &class_info[p_ptr->rp.pclass];
 	mp_ptr = &magic_info[p_ptr->rp.pclass];
 
-	/* Starting spell slots */
-	for (i = 0; i < SPELL_LAYERS; i++) {
-		p_ptr->spell_slots[i] = magic_info[p_ptr->rp.pclass].max_spells[i];
-	}
-
 	/* Realms */
 	p_ptr->spell.realm[0] = rebirth_ptr->realm[0];
 	p_ptr->spell.realm[1] = rebirth_ptr->realm[1];
-
-	/* Initialize player quests */
-	init_player_quests();
 
 	/* Level one */
 	p_ptr->max_lev = p_ptr->lev = 1;
@@ -1787,11 +1763,6 @@ static bool player_rebirth(void)
 
 	/* Initial hitpoints */
 	p_ptr->mhp = p_ptr->rp.hitdie;
-
-	/* player_hp[] */
-	for (i = 0; i < PY_MAX_LEVEL; i++) {
-		p_ptr->player_hp[i] = rebirth_ptr->player_hp[i];
-	}
 
 	/* Age, weight, height */
 	p_ptr->rp.age = rebirth_ptr->rp.age;
@@ -1829,6 +1800,48 @@ static bool player_rebirth(void)
 
 	/* Fully rested */
 	p_ptr->csp = p_ptr->msp;
+
+	/* Only query if we're not in competition mode */
+	if (!competition_mode) {
+		/* if short-circuits so we don't need the nesting here, but
+		 * it makes things clearer. */
+		/* Display the player */
+		display_player(DISPLAY_PLAYER_STANDARD);
+
+		/* check for rebirth */
+		if (!get_check("Rebirth? ")) {
+			/* clear the info we set for the player display */
+			player_wipe();
+
+			return FALSE;
+		}
+	}
+	
+	/* We are doing a rebirth! */
+	rebirth = TRUE;
+
+	/* Give beastman a mutation at character birth */
+	if (p_ptr->rp.prace == RACE_BEASTMAN) {
+		p_ptr->change |= (PC_MUTATE);
+	}
+
+	/* Starting spell slots */
+	for (i = 0; i < SPELL_LAYERS; i++) {
+		p_ptr->spell_slots[i] = magic_info[p_ptr->rp.pclass].max_spells[i];
+	}
+	
+	/* player_hp[] */
+	for (i = 0; i < PY_MAX_LEVEL; i++) {
+		p_ptr->player_hp[i] = rebirth_ptr->player_hp[i];
+	}
+
+	/* Need to set these */
+	p_ptr->muta1 = 0;
+	p_ptr->muta2 = 0;
+	p_ptr->muta3 = 0;
+
+	/* Initialize player quests */
+	init_player_quests();
 
 	/* Done */
 	return (TRUE);
