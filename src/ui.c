@@ -1912,6 +1912,46 @@ s16b get_quantity(cptr prompt, s16b max)
 }
 
 /*
+ * Request a "number" from the user
+ */
+u32b get_number(cptr prompt, u32b initial)
+{
+	u32b amt;
+
+	char tmp[80];
+
+	char buf[80];
+
+	/* Build a prompt if needed */
+	if (!prompt)
+	{
+		/* Build a prompt */
+		strnfmt(tmp, 80, "Enter a number: ");
+
+		/* Use that prompt */
+		prompt = tmp;
+	}
+
+
+	/* Default to zero */
+	amt = initial;
+
+	/* Build the default */
+	strnfmt(buf, 80, "%d", amt);
+
+	/* Ask for a quantity */
+	if (!get_string(buf, 20, prompt)) return (0);
+
+	/* Extract a number */
+	amt = (u32b) atol(buf);
+
+	if (amt) repeat_push(amt);
+
+	/* Return the result */
+	return (amt);
+}
+
+/*
  * Pause for user response XXX XXX XXX
  */
 void pause_line(int row)

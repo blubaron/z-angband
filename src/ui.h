@@ -38,6 +38,7 @@ extern bool get_check_ext(bool def, bool esc, cptr prompt, ...);
 extern bool get_com(cptr prompt, char *command);
 extern s16b get_quantity(cptr prompt, s16b max);
 extern s32b get_quantity_big(cptr prompt, s32b max);
+extern u32b get_number(cptr prompt, u32b initial);
 extern void pause_line(int row);
 extern int get_keymap_dir(char ch);
 
