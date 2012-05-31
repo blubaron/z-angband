@@ -1845,8 +1845,6 @@ static void display_player_flag_aux(int col, int row,
  * Special display, part 1
  */
 static void display_player_flag_info(void)
-
-
 {
 	int row;
 	int col;
@@ -2836,7 +2834,6 @@ errr file_character(cptr name, bool full)
 
 		/* End the row */
 		froff(fff, "%s\n", buf);
-
 	}
 
 	froff(fff, "\n\n  [Miscellaneous information]\n");

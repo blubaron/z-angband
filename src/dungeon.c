@@ -3475,8 +3475,6 @@ bool dungeon_init_level(void)
 }
 bool dungeon_play_frame(void)
 {
-	cave_type *c_ptr;
-
 	/* Hack -- Compact the monster list occasionally */
 	if (m_cnt + 32 > z_info->m_max) compact_monsters(64);
 

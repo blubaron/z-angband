@@ -913,7 +913,6 @@ int find_player_path(int x, int y)
 	int i, j, k, dir;
 	int cur_distance;
 	bool try_again;
-	cave_type *c_ptr;
 	feature_type *feat;
 
 	ox = MAX(p_ptr->px - MAX_PF_RADIUS / 2, p_ptr->min_wid);
