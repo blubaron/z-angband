@@ -952,7 +952,7 @@ static void display_entry(int pos)
 	i = (pos % 12);
 
 	/* Label it, clear the line --(-- */
-	prtf(0, i + 6, "%c) ", I2A(i));
+	prtf(0, i + 6, "$U%c) ", I2A(i));
 
 	/* Show_store_graph perm on. */
 	a = object_attr(o_ptr);
@@ -986,7 +986,9 @@ static void display_entry(int pos)
 		{
 			/* Only show the weight of an individual item */
 			int wgt = o_ptr->weight;
-			put_fstr(wid - 12, i + 6, "%3d.%d lb", wgt / 10, wgt % 10);
+			put_fstr(wid - 12, i + 6, "%3d.%d lb$V", wgt / 10, wgt % 10);
+		} else {
+			put_fstr(maxwid, i + 6, "$V");
 		}
 	}
 
@@ -1019,7 +1021,7 @@ static void display_entry(int pos)
 		}
 
 		/* Actually draw the price */
-		put_fstr(wid - 12, i + 6, "%s%9ld  ", (x <= p_ptr->au ? CLR_WHITE : CLR_L_DARK), (long)x);
+		put_fstr(wid - 12, i + 6, "%s%9ld$V  ", (x <= p_ptr->au ? CLR_WHITE : CLR_L_DARK), (long)x);
 	}
 }
 
@@ -1054,14 +1056,51 @@ static void display_inventory(void)
 	if (stocknum > 12)
 	{
 		/* Show "more" reminder (after the last item) */
-		prtf(3, k + 6, "-more-");
+		prtf(3, k + 6, "$U-more-$Y $V");
 
 		/* Indicate the "current page" */
 		put_fstr(20, 5, "(Page %d)", p_ptr->state.store_top / 12 + 1);
 	}
 }
 
+static void display_store_options(store_type *st_ptr)
+{
+	/* Clear */
+	clear_from(21);
 
+	/* print basic store options */
+	prtf(0, 22, " $UESC) Exit from Building.$Y%c$V", ESCAPE);
+
+	/* Browse if necessary */
+	if (get_list_length(st_ptr->stock) > 12)
+	{
+		prtf(0, 23, " $USPACE) Next page of stock$Y $V");
+	}
+
+	/* Home commands */
+	if (st_ptr->type == BUILD_STORE_HOME)
+	{
+		prtf(31, 22, " $Ug) Get an item.$V");
+		prtf(31, 23, " $Ud) Drop an item.$V");
+		prtf(56, 23, " $UH) Set your main Home.$V");
+		prtf(31, 24, " $UE) Eat something.$V");
+		prtf(56, 24, " $UR) Rest for a time.$V");
+	}
+
+	/* Shop commands XXX XXX XXX */
+	else
+	{
+		prtf(31, 22, " $Up) Purchase an item.$V");
+		prtf(31, 23, " $Us) Sell an item.$V");
+		prtf(56, 23, " $UL) Put an item on layaway.$V");
+	}
+
+	/* Add in the eXamine option */
+	prtf(56, 22, " $Ux) eXamine an item.$V");
+
+	/* Prompt */
+	prtf(0, 21, "You may: ");
+}
 /*
  * Displays players gold					-RAK-
  */
@@ -1084,6 +1123,7 @@ static void display_store(void)
 
 	/* Clear screen */
 	Term_clear();
+	button_kill_all();
 
 	/* The "Home" is special */
 	if (st_ptr->type == BUILD_STORE_HOME)
@@ -1133,37 +1173,12 @@ static void display_store(void)
 	display_inventory();
 
 	/* Basic commands */
-	prtf(0, 22, " ESC) Exit from Building.");
+	display_store_options(st_ptr);
 
-	/* Browse if necessary */
-	if (get_list_length(st_ptr->stock) > 12)
-	{
-		prtf(0, 23, " SPACE) Next page of stock");
+	/* test commands */
+	if (st_ptr->type != BUILD_STORE_HOME) {
+  		prtf(56, 23, " L) Buy an item on Lay away.");
 	}
-
-	/* Home commands */
-	if (st_ptr->type == BUILD_STORE_HOME)
-	{
-		prtf(31, 22, " g) Get an item.");
-		prtf(31, 23, " d) Drop an item.");
-	  prtf(56, 23, " H) Set your main Home.");
-	  prtf(31, 24, " E) Eat something.");
-	  prtf(56, 24, " R) Rest for a time.");
-	}
-
-	/* Shop commands XXX XXX XXX */
-	else
-	{
-		prtf(31, 22, " p) Purchase an item.");
-		prtf(31, 23, " s) Sell an item.");
-  	prtf(56, 23, " L) Buy an item on Lay away.");
-	}
-
-	/* Add in the eXamine option */
-	prtf(56, 22, " x) eXamine an item.");
-
-	/* Prompt */
-	prtf(0, 21, "You may: ");
 
 	/* Refresh */
 	Term_fresh();
@@ -1656,7 +1671,8 @@ static void store_purchase(void)
 			}
 
 			/* Redraw everything */
-			display_inventory();
+			//display_inventory();
+			display_store();
 		}
 	}
 
@@ -1711,7 +1727,8 @@ static void store_purchase(void)
 			}
 
 			/* Redraw everything */
-			display_inventory();
+			//display_inventory();
+			display_store();
 
 			chg_virtue(V_SACRIFICE, 1);
 		}
@@ -1953,7 +1970,8 @@ static bool store_sell(void)
 			if (item_pos >= 0)
 			{
 				p_ptr->state.store_top = (item_pos / 12) * 12;
-				display_inventory();
+				//display_inventory();
+				display_store();
 			}
 		}
 	}
@@ -1993,7 +2011,8 @@ static bool store_sell(void)
 		if (item_pos >= 0)
 		{
 			p_ptr->state.store_top = (item_pos / 12) * 12;
-			display_inventory();
+			//display_inventory();
+			display_store();
 		}
 	}
 
@@ -2290,7 +2309,8 @@ static void store_layaway(void)
 			}
 
 			/* Redraw everything */
-			display_inventory();
+			//display_inventory();
+			display_store();
 		}
 	}
 
@@ -2605,7 +2625,8 @@ static void store_process_command(void)
 			{
 				p_ptr->state.store_top += 12;
 				if (p_ptr->state.store_top >= stocknum) p_ptr->state.store_top = 0;
-				display_inventory();
+				//display_inventory();
+				display_store();
 			}
 			break;
 		}
@@ -2942,9 +2963,6 @@ void do_cmd_store(const field_type *f1_ptr)
 		/* Hack -- Check the charisma */
 		tmp_chr = p_ptr->stat[A_CHR].use;
 
-		/* Clear */
-		clear_from(21);
-
 		/* Update store inventory information */
 		if (st_ptr->type == BUILD_STORE_HOME)
 		{
@@ -3015,39 +3033,6 @@ void do_cmd_store(const field_type *f1_ptr)
 		item_tester_hook = NULL;
 
 
-		/* Basic commands */
-		prtf(0, 22, " $UESC) Exit from Building.$Y%c$V", ESCAPE);
-
-		/* Browse if necessary */
-		if (get_list_length(st_ptr->stock) > 12)
-		{
-			prtf(0, 23, " $USPACE) Next page of stock$Y $V");
-		}
-
-		/* Home commands */
-		if (st_ptr->type == BUILD_STORE_HOME)
-		{
-			prtf(31, 22, " $Ug) Get an item.$V");
-			prtf(31, 23, " $Ud) Drop an item.$V");
-			prtf(56, 23, " $UH) Set your main Home.$V");
-			prtf(31, 24, " $UE) Eat something.$V");
-			prtf(56, 24, " $UR) Rest for a time.$V");
-		}
-
-		/* Shop commands XXX XXX XXX */
-		else
-		{
-			prtf(31, 22, " $Up) Purchase an item.$V");
-			prtf(31, 23, " $Us) Sell an item.$V");
-			prtf(56, 23, " $UL) Put an item on layaway.$V");
-		}
-
-		/* Add in the eXamine option */
-		prtf(56, 22, " $Ux) eXamine an item.$V");
-
-		/* Prompt */
-		prtf(0, 21, "You may: ");
-
 		/* Get a command */
 		request_command(TRUE);
 
@@ -3073,7 +3058,8 @@ void do_cmd_store(const field_type *f1_ptr)
 		/* Hack -- Redisplay store prices if charisma changes */
 		if (tmp_chr != p_ptr->stat[A_CHR].use)
 		{
-			display_inventory();
+			//display_inventory();
+			display_store();
 		}
 	}
 
