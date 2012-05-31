@@ -1844,6 +1844,7 @@ static void display_player_flag_aux(int col, int row,
  * Special display, part 1
  */
 static void display_player_flag_info(void)
+
 {
 	int row;
 	int col;
@@ -2676,15 +2677,21 @@ void do_cmd_character(void)
 	/* Forever */
 	while (1)
 	{
+		/* backup any current mouse buttons */
+		button_backup_all(TRUE);
+
 		/* Display the player */
 		display_player(mode);
 
 		/* Prompt */
 		put_fstr(2, 23,
-					"['c' to change name, 'f' to file, 'p' for previous, 'n' for next, or ESC]");
+					"[$U'c' to change name$Yc$V, $U'f' to file$Yf$V, $U'p' for previous$Yp$V, $U'n' for next$Yn$V, or $UESC$Y%c$V]", ESCAPE);
 
 		/* Query */
 		c = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		/* Exit */
 		if (c == ESCAPE) break;
@@ -2709,15 +2716,21 @@ void do_cmd_character(void)
 		}
 
 		/* Decrease mode */
-		else if (c == 'p')
+		else if ((c == 'p') || (c == '8') || (c == '4'))
 		{
 			mode = (mode + DISPLAY_PLAYER_MAX - 1) % DISPLAY_PLAYER_MAX;
 		}
 
 		/* Increase mode */
-		else if (c == 'n')
+		else if ((c == 'n') || (c == '2') || (c == '6'))
 		{
 			mode = (mode + 1) % DISPLAY_PLAYER_MAX;
+		}
+
+		/* Ignore left clicks */
+		else if (c == '\n')
+		{
+			c = c;
 		}
 
 		/* Oops */

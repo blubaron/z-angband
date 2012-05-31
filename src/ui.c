@@ -126,6 +126,7 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 		hgt = Term->hgt - TABLE_ROW - 1;
 
 		/* Redraw the list */
+		button_backup_all(FALSE);
 		for (i = 0; ((i + top < num) && (i <= hgt)); i++)
 		{
 			if (i + top < 26)
@@ -145,15 +146,18 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 			if (i == (cur - top))
 			{
 				/* Highlight the current selection */
-				put_fstr(col, i + TABLE_ROW, CLR_L_BLUE "%s", buf);
+				put_fstr(col, i + TABLE_ROW, CLR_L_BLUE "$U%s$V", buf);
 			}
 			else
 			{
-				put_fstr(col, i + TABLE_ROW, buf);
+				put_fstr(col, i + TABLE_ROW, "$U%s$V", buf);
 			}
 		}
 
-		if (done) return (cur);
+		if (done) {
+			button_restore();
+			return (cur);
+		}
 
 		/* Display auxiliary information if any is available. */
 		if (hook) hook(choices[cur]);
@@ -162,6 +166,8 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 		Term_gotoxy(col, TABLE_ROW + cur - top);
 
 		c = inkey();
+
+		button_restore();
 
 		if (c == KTRL('X'))
 		{

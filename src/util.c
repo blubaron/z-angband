@@ -2272,10 +2272,22 @@ char inkey(void)
 		int x,y;
 		char b;
 
-		/* this was a mouse press, get the press (and ignore it) */
+		/* this was a mouse press, get the press (and translate it) */
 		Term_getmousepress(&b,&x,&y);
-		if ((ch& 0x0F) == 2) {
+		if ((ch& 0x07) == 2) {
 			ch = ESCAPE;
+		} else
+		if ((ch& 0x07) == 4) {
+			ch = '8';
+		} else
+		if ((ch& 0x07) == 5) {
+			ch = '2';
+		} else
+		if ((ch& 0x07) == 6) {
+			ch = '4';
+		} else
+		if ((ch& 0x07) == 7) {
+			ch = '6';
 		} else
 		{
 			ch = '\n';
@@ -3758,6 +3770,7 @@ void request_command(int shopping)
 
 				/* Command "m" -> "purchase" (get) */
 			case 'm': p_ptr->cmd.cmd = 'g';
+
 				break;
 
 				/* Command "s" -> "sell" (drop) */

@@ -2303,7 +2303,7 @@ void show_list(s16b o_list_ptr, bool store)
 		prtf(col ? col - 2 : col, j + 1, "");
 
 		/* Clear the line with the (possibly indented) index */
-		put_fstr(col, j + 1, "%c)", I2A(out_index[j]));
+		put_fstr(col, j + 1, "$U%c)", I2A(out_index[j]));
 
 		/* Display graphics for object, if desired */
 		a = object_attr(o_ptr);
@@ -2320,7 +2320,7 @@ void show_list(s16b o_list_ptr, bool store)
 		Term_draw(col + 3, j + 1, a, c);
 
 		/* Display the entry itself */
-		put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s",
+		put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 				 out_color[j], out_desc[j]);
 
 		/* Display the weight if needed */
@@ -2464,7 +2464,7 @@ void show_equip(bool store)
 		prtf(col ? col - 2 : col, j + 1, "");
 
 		/* Clear the line with the (possibly indented) index */
-		put_fstr(col, j + 1,"%c)", I2A(i));
+		put_fstr(col, j + 1,"$U%c)", I2A(i));
 
 		/* Show_equip_graph perm. on. */
 		a = object_attr(o_ptr);
@@ -2498,7 +2498,7 @@ void show_equip(bool store)
 		else
 		{
 			/* Display the entry itself */
-			put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s",
+			put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 					 out_color[j], out_desc[j]);
 		}
 
@@ -2903,10 +2903,10 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Inven:");
 
 			/* Append */
-			if (equip) strnfcat(out_val, 160, &len, " / for Equip,");
+			if (equip) strnfcat(out_val, 160, &len, " $U/ for Equip$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			break;
 		}
@@ -2923,13 +2923,13 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Contents:");
 
 			/* Append */
-			if (equip) strnfcat(out_val, 160, &len, " / for Inven,");
+			if (equip) strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			/* Append */
-			if (full_container) strnfcat(out_val, 160, &len, " * for container,");
+			if (full_container) strnfcat(out_val, 160, &len, " $U* for container$V,");
 
 			break;
 		}
@@ -2962,10 +2962,10 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Equip:");
 
 			/* Append */
-			if (inven) strnfcat(out_val, 160, &len, " / for Inven,");
+			if (inven) strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			break;
 		}
@@ -2988,11 +2988,11 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 				/* Append */
 				if (inven)
 				{
-					strnfcat(out_val, 160, &len, " / for Inven,");
+					strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 				}
 				else if (equip)
 				{
-					strnfcat(out_val, 160, &len, " / for Equip,");
+					strnfcat(out_val, 160, &len, " $U/ for Equip$V,");
 				}
 			}
 			else
@@ -3416,6 +3416,9 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 		/* Activate the correct term info */
 		toggle = toggle_windows(toggle, command_wrk);
 
+		/* backup existing buttons */
+		button_backup_all(TRUE);
+
 		/* Display the prompt */
 		show_item_prompt(allow_inven, allow_equip, allow_floor, store, pmt,
 						 full_container, command_wrk);
@@ -3756,6 +3759,8 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				break;
 			}
 		}
+		/* restore previous buttons */
+		button_restore();
 	}
 
 	/* Fix the screen */
