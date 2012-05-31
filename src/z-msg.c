@@ -4,7 +4,7 @@
 
 
 #include "angband.h"
-#include "message.h"
+#include "z-msg.h"
 
 
 /*

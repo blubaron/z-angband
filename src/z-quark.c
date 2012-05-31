@@ -4,7 +4,7 @@
 
 
 #include "angband.h"
-#include "quark.h"
+#include "z-quark.h"
 
 /*
  * The "quark" package

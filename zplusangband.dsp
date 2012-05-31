@@ -244,10 +244,6 @@ SOURCE=.\src\melee2.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\message.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\mind.c
 # End Source File
 # Begin Source File
@@ -285,10 +281,6 @@ SOURCE=.\src\object1.c
 # Begin Source File
 
 SOURCE=.\src\object2.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\quark.c
 # End Source File
 # Begin Source File
 
@@ -425,6 +417,14 @@ SOURCE=".\src\z-form.c"
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\z-msg.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\z-quark.c
+# End Source File
+# Begin Source File
+
 SOURCE=".\src\z-rand.c"
 # End Source File
 # Begin Source File
@@ -513,19 +513,11 @@ SOURCE=".\src\maid-grf.h"
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\message.h"
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\options.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\platform\win\readdib.h
-# End Source File
-# Begin Source File
-
-SOURCE=".\src\quark.h"
 # End Source File
 # Begin Source File
 
@@ -594,6 +586,14 @@ SOURCE=".\src\z-file.h"
 # Begin Source File
 
 SOURCE=".\src\z-form.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\z-msg.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\z-quark.h"
 # End Source File
 # Begin Source File
 

@@ -1,10 +1,10 @@
-/* File: message.h */
+/* File: z-msg.h */
 
 /* Purpose: extern declarations (variables and functions) */
-#ifndef INCLUDED_MESSAGE_H
-#define INCLUDED_MESSAGE_H
+#ifndef INCLUDED_Z_MSG_H
+#define INCLUDED_Z_MSG_H
 
-/* message.c */
+/* z-msg.c */
 extern byte get_msg_type_color(byte a);
 extern s16b message_num(void);
 extern cptr message_str(s16b age);
@@ -19,5 +19,5 @@ extern void msgf(cptr fmt, ...);
 extern void msg_effect(u16b type, s16b extra);
 extern void message_flush(void);
 
-#endif /* INCLUDED_MESSAGE_H */
+#endif /* INCLUDED_Z_MSG_H */
 

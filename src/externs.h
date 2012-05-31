@@ -981,8 +981,8 @@ extern bool check_mortgage(void);
 #include "signals.h"
 #include "z-file.h"
 #include "ui-inkey.h"
-#include "quark.h"
-#include "message.h"
+#include "z-quark.h"
+#include "z-msg.h"
 
 /* xtra1.c */
 extern s16b modify_stat_value(int value, int amount);
