@@ -248,12 +248,68 @@ bool button_backup_all(bool kill_all)
 		return FALSE;
 	}
 	/* copy the 2d buttons */
-	newbackup->buttons = button_stack;
-	newbackup->num = button_num;
-	button_stack = NULL;
+	if (kill_all) {
+		newbackup->buttons = button_stack;
+		newbackup->num = button_num;
+		button_stack = NULL;
+		button_num = 0;
+	} else {
+		/* copy the buttons to new memory */
+		button_mouse *dest, *src, *end;
+		newbackup->buttons = NULL;
+		newbackup->num = 0;
+		end = NULL;
+		src = button_stack;
+		while (src) {
+			dest = RNEW(button_mouse);
+			if (!dest) {
+				FREE(newbackup);
+				return FALSE;
+			}
+
+			(void)C_COPY(dest, src, 1, button_mouse);
+			if (src->label) {
+				dest->label = string_make(src->label);
+			}
+			if (!(newbackup->buttons)) {
+				newbackup->buttons = dest;
+			}
+			if (end) {
+				end->next = dest;
+			}
+			end = dest;
+			newbackup->num++;
+			dest->next = NULL;
+			src = src->next;
+		}
+#if 0
+		int i;
+		button_mouse *button;
+		newbackup->buttons = C_RNEW(button_num, button_mouse);
+		if (!(newbackup->buttons)) {
+			FREE(newbackup);
+			return FALSE;
+		}
+		button = button_stack;
+		for (i=0; i<button_num; i++) {
+			if (button) {
+				/* Straight memory copy */
+				(void)C_COPY(&(newbackup->buttons[i]), button, 1, button_mouse);
+				if (button->label) {
+					newbackup->buttons[i].label = string_make(button->label);
+				}
+				button = button->next;
+			}
+			if (button) {
+				newbackup->buttons[i].next = &(newbackup->buttons[i+1]);
+			}
+		}
+		newbackup->num = button_num;
+#endif
+	}
 
 	/* copy the 1d buttons */
-	if (button_num == 0) {
+	if (button_1d_num == 0) {
 		newbackup->buttons_1d = NULL;
 		newbackup->num_1d = 0;
 		newbackup->length_1d = 0;
@@ -261,6 +317,15 @@ bool button_backup_all(bool kill_all)
 		newbackup->buttons_1d = C_RNEW(button_1d_num, button_mouse_1d);
 		if (!(newbackup->buttons_1d)) {
 			/* free the 2d buttons TODO */
+			if (newbackup->buttons && !kill_all) {
+				int i;
+				for (i=0; i<newbackup->num; i++) {
+					if (newbackup->buttons[i].label) {
+						string_free(newbackup->buttons[i].label);
+					}
+				}
+				FREE(newbackup->buttons);
+			}
 			FREE(newbackup);
 			return FALSE;
 		}
@@ -275,7 +340,7 @@ bool button_backup_all(bool kill_all)
 	newbackup->next = button_backups;
 	button_backups = newbackup;
 
-	if (kill_all) {
+	if (kill_all && (button_num || button_1d_num)) {
 		button_kill_all();
 	}
 
