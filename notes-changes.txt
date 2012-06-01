@@ -453,6 +453,25 @@ enum
     Added a pathfinding run mode.
     *Started adding additional run modes to follow roads and waterways
 
+    *Added mouse buttons in most screens. the buttons are "on top" of text in 
+      the screen, always on top of the list of possible keys, and they send the
+      keypress.
+     *need to add more buttons, esp for options, knowledge screens, map
+     *need to add main screen buttons - character, inventory/equip, study, map,
+      search mode, target current target/show monster list.
+
+    *Got the X11 console working again. *need to readd graphics/png support.
+
+    Allow mouse wheel to scroll some menus, ie it can change the character
+      screen. added to X11 and Windows.
+
+    Gave some stores a service to make more of ammo the player already has.
+      for instance, if in a fletcher, and sell two ammo out of a stack, 20
+      appear in the store? (so need to have at least 3 in inventory) so far
+      just arcane/unique flether. *potions and scrolls too?
+
+    Allow for smaller levels and slower breeders in clearout quests.
+
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the
       default text character, instead of the icon character, because the 
