@@ -170,6 +170,12 @@
 #include <windows.h>
 #include <windowsx.h>
 
+
+#ifndef WM_MOUSEWHEEL
+// copied from winuser.h
+#define WM_MOUSEWHEEL                   0x020A
+#endif
+
 #ifdef USE_SOUND
 
 /*
@@ -273,7 +279,6 @@ unsigned _cdecl _dos_getfileattr(const char *, unsigned *);
 
 
 /*
-
  * Extra "term" data
  *
  * Note the use of "font_want" for the names of the font file requested by
@@ -4182,6 +4187,40 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 
 			break;
 		}
+
+  case WM_MOUSEWHEEL:
+    {
+#ifdef USE_SAVER
+			if (screensaver_active) {
+				stop_screensaver();
+				screensaver_active = FALSE;
+				return 0;
+			} else {
+#endif /* USE_SAVER */
+				char button, mods;
+				int xPos, yPos;
+				short n = (short) HIWORD(wParam);
+
+				/* Get the text grid */
+				pixel_to_square(&xPos, &yPos,GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam));
+
+				if (n > 0) {
+					button = 4;
+				} else if (n < 0) {
+					button = 5;
+				}
+
+				/* Extract the modifiers */
+				mods = 0;
+				if (GetKeyState(VK_CONTROL) & 0x8000) mods |= 2;
+				if (GetKeyState(VK_SHIFT)   & 0x8000) mods |= 1;
+				if (GetKeyState(VK_MENU)    & 0x8000) mods |= 4;
+
+				Term_mousepress(button, mods, xPos, yPos);
+#ifdef USE_SAVER
+			}
+#endif /* USE_SAVER */
+    } break;
 
 #ifdef USE_SAVER
 		case WM_MOUSEMOVE:
