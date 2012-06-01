@@ -1110,14 +1110,14 @@ static errr init_dun_info(void)
 	/* General buffer */
 	char buf[1024];
 
-  int i;
-  int max  = z_info->dun_max-1;
-  for (i = 0 ;i < max; ++i) {
-    dungeons[i].next = &(dungeons[i+1]);
-  }
-  dungeons[max].next = NULL;
-  return (0);
-  /* still using hardcoded dungeons */
+	int i;
+	/*int max  = z_info->dun_max-1;
+	for (i = 0 ;i < max; ++i) {
+		dungeons[i].next = &(dungeons[i+1]);
+	}
+	dungeons[max].next = NULL;
+	return (0);*/
+	/* still using hardcoded dungeons */
 #if (0)
 	/* Init the header */
 	init_header(&dun_head, z_info->dun_max, sizeof(dun_gen_type));
@@ -1136,7 +1136,7 @@ static errr init_dun_info(void)
 //#if (0)
 
 	/* Later must add in python support. */
-	C_MAKE(dungeons_n, z_info->dun_max, dun_gen_type);
+	//C_MAKE(dungeons_n, z_info->dun_max, dun_gen_type);
 
 
 	/*** Load the ascii template file ***/
@@ -1985,15 +1985,6 @@ void cleanup_angband(void)
 	/* Free the "quarks" */
 	quarks_free();
 
-	/* Free the info, name, and text arrays */
-	free_info(&v_head);
-	free_info(&r_head);
-	free_info(&e_head);
-	free_info(&a_head);
-	free_info(&k_head);
-	free_info(&f_head);
-	free_info(&z_head);
-
 	/* free stuff from init_w_info */
 	FREE(wild_choice_tree);
 	FREE(wild_gen_data);
@@ -2003,15 +1994,16 @@ void cleanup_angband(void)
 	/* free stuff from init_mg_info */
 	FREE(mg_info);
 	/* free stuff from init_dun_info */
-	/* still using hardcoded dungeons */
-	if (dun_name)
-		FREE(dun_name);
+	clear_dun_info();
 
-	if (dun_text)
-		FREE(dun_text);
-
- 	if (dungeons_n)
-		FREE(dungeons_n);
+	/* Free the info, name, and text arrays */
+	free_info(&v_head);
+	free_info(&r_head);
+	free_info(&e_head);
+	free_info(&a_head);
+	free_info(&k_head);
+	free_info(&f_head);
+	free_info(&z_head);
 
 	/* Free the interface callbacks */
 	free_term_callbacks();

@@ -492,6 +492,8 @@ extern void wipe_all_heroes(void);
 extern errr init_w_info_txt(FILE *fp, char *buf);
 extern errr init_t_info_txt(FILE *fp, char *buf);
 extern errr init_mg_info_txt(FILE *fp, char *buf);
+extern errr init_dun_info_txt(FILE *fp, char *buf);
+extern void clear_dun_info(void);
 s32b monster_auto_experience(monster_race *r_ptr, bool verbose);
 
 /* init2.c */
@@ -1202,8 +1204,8 @@ extern int max_dun_level_reached(void);
 extern cptr building_name(byte build_type);
 extern void building_char(byte build_type, byte *a, char *c);
 extern cptr dungeon_type_name(u32b dun);
-extern dun_gen_type dungeons[];
-//extern dun_gen_type *dungeons;
+//extern dun_gen_type dungeons[];
+extern dun_gen_type *dungeons;
 extern void draw_quest_stair(place_type *pl_ptr);
 extern void refresh_quest_stair(place_type *pl_ptr);
 
