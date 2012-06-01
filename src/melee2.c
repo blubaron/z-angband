@@ -3084,9 +3084,18 @@ static void process_monster(int m_idx)
 			}
 		}
 
+		/* Hack -- multiply slower on clear quests */
+		if (current_quest
+			&& (current_quest->type == QUEST_TYPE_FIXED_CLEAROUT)) {
+			/*|| (current_quest->type == QUEST_TYPE_FIXED_DEN))) {
+			 * but not clear den quests, because player should be
+			 * prepared for breeder type? */
+			k += 1;
+		}
 		/* Hack -- multiply slower in crowded areas */
 		if ((k < 4) && (!k || one_in_(k * MON_MULT_ADJ)))
 		{
+
 			/* Try to multiply */
 			if (multiply_monster
 				(m_idx, FALSE, is_friendly(m_ptr), is_pet(m_ptr)))
