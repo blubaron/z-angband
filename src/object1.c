@@ -2491,7 +2491,7 @@ void show_equip(bool store)
 			put_fstr(col + 5, j + 1, "%-14s: ", mention_use(i));
 
 			/* Display the entry itself */
-			put_fstr(col + 21, j + 1, "%s" CLR_SET_DEFAULT "%s",
+			put_fstr(col + 21, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 					 out_color[j], out_desc[j]);
 		}
 
@@ -3007,7 +3007,7 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 	}
 
 	/* Show the prompt */
-	prtf(0, 0, "(%s ESC) %s", out_val, pmt);
+	prtf(0, 0, "(%s $UESC$Y%c$V) %s", out_val, ESCAPE, pmt);
 }
 
 /*
@@ -3427,6 +3427,9 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 		/* Get a key */
 		which = inkey();
 
+		/* restore previous buttons */
+		button_restore();
+
 		/* Parse it */
 		switch (which)
 		{
@@ -3760,8 +3763,6 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				break;
 			}
 		}
-		/* restore previous buttons */
-		button_restore();
 	}
 
 	/* Fix the screen */
