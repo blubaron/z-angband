@@ -494,8 +494,6 @@ void button_kill_all(void)
 	int i,res;
 
 	button_mouse *bttn = button_stack, *bnext;
-	/* Paranoia */
-	if (!button_kill_hook) return;
 
 	/* One by one */
 	if (button_kill_hook) {
