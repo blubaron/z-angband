@@ -5113,7 +5113,7 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
-						&floor, &wall, &perm_wall, &rubble))
+				&floor, &wall, &perm_wall, &rubble))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
