@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "maid-grf.h"
 #include "grafmode.h"
+#include "button.h"
 
 #ifdef SUPPORT_GAMMA
 
@@ -824,23 +825,23 @@ static void display_banner(wild_done_type *w_ptr)
 			if (home_in_town)
 			{
 				/* Town with home and castle */
-				banner = "Move around, press * for town, h for home, q for quests or any key to exit.";
+				banner = "Move around,$U press * for town$Yt$V,$U h for home$Yh$V,$U q for quests$Yq$V or $Uany key to exit$Y $V.";
 			}
 			/* Town with no home */
 			else if (pl_ptr->type != PL_TOWN_MINI)
 			{
 				/* Town with castle and no home */
-				banner = "Move around, press * for town, q for quests or any key to exit.";
+				banner = "Move around, $Upress * for town$Yt$V, $Uq for quests$Yq$V or $Uany key to exit$Y $V.";
 //						"Hit *, |, ~ for info, Move around, or hit any other key to continue.");
 			}
 			/* Inn */
 			else
 			{
-				banner = "Move around, press * for town, or any key to exit.";
+				banner = "Move around,$U press * for town$Yt$V, or $Uany key to exit$Y $V.";
 			}
 
 			/* Display lower banner */
-			put_fstr(1 + (wid - strlen(banner)) / 2, hgt - 1, banner);
+			put_fstr(1 + (wid - len_cstr(banner)) / 2, hgt - 1, banner);
 		}
 		/* So it is in the wilderness */
 		else
@@ -849,7 +850,7 @@ static void display_banner(wild_done_type *w_ptr)
 			//put_fstr(wid / 2 - 23, hgt - 1,
 					//"Move around or hit any other key to continue.");
 			put_fstr(wid / 2 - 30, hgt - 1,
-					"Move around, ~ for info, or hit any other key to continue.");
+					"Move around,$U ~ for info$Y~$V, or $Uhit any other key to continue$Y $V.");
 
 			/* It is a wilderness dungeon */
 			if (pl_ptr->type == PL_DUNGEON)
@@ -891,7 +892,7 @@ static void display_banner(wild_done_type *w_ptr)
 
 			/* Display wilderness place name */
 			if (pl_ptr->type != PL_FARM)
-				put_fstr((wid - strlen(banner)) / 2, 0, banner);
+				put_fstr((wid - len_cstr(banner)) / 2, 0, banner);
 		}
 	}
 	else
@@ -900,7 +901,7 @@ static void display_banner(wild_done_type *w_ptr)
 		//put_fstr(wid / 2 - 23, hgt - 1,
 				//"Move around or hit any other key to continue.");
 		put_fstr(wid / 2 - 30, hgt - 1,
-					"Move around, ~ for info, or hit any other key to continue.");
+					"Move around,$U ~ for info$Y~$V, or $Uhit any other key to continue$Y $V.");
 	}
 }
 
@@ -1172,6 +1173,9 @@ void do_cmd_view_map(void)
   tw = use_bigtile;
   use_bigtile = 0;
 
+	/* store the previous buttons */
+	button_backup_all(TRUE);
+
 	if (p_ptr->depth)
 	{
 		/* In the dungeon - All we have to do is display the map */
@@ -1191,7 +1195,7 @@ void do_cmd_view_map(void)
 		display_map(&cx, &cy);
 
 		/* Wait for it */
-		put_fstr((wid - COL_MAP) / 2, hgt - 1, "Hit any key to continue");
+		put_fstr((wid - COL_MAP) / 2, hgt - 1, "$UHit any key to continue$Y $V");
 
 		/* Hilite the player */
 		Term_gotoxy(cx, cy);
@@ -1228,6 +1232,9 @@ void do_cmd_view_map(void)
 			map_cx = cx;
 			map_cy = cy;
 
+			/* remove the buttons from the previous draw */
+			button_kill_all();
+
 			display_map(&cx, &cy);
 
 			/* Get wilderness square */
@@ -1243,7 +1250,97 @@ void do_cmd_view_map(void)
 			Term_fresh();
 
 			/* Get a response */
-			c = inkey();
+			c = inkey_m();
+
+			if (c & 0x80) {
+				/* this was a mouse press move the cursor */
+				char mb;
+				char mods;
+				int mx, my;
+				Term_getmousepress(&mb, &mx, &my);
+				mods = mb & 0x78;
+				mb = mb & 7;
+				if (mb == 2) {
+					/* exit the menu */
+					break;
+				} else
+				if (mb == 3) {
+					/* show the knowledge menu */
+			    do_cmd_knowledge();
+					continue;
+				} else
+				if (mb == 1) {
+					if ((mx == cx) && (mx == cx)) {
+						/* get info on a repeat click */
+						if (w_ptr->place) {
+							if (mods & 32) {
+								/* Display home info for this town */
+								(void)do_cmd_view_map_aux('h', w_ptr->place);
+							} else
+							if (mods & 16) {
+								/* Display quest info for this town */
+								(void)do_cmd_view_map_aux('q', w_ptr->place);
+							} else
+							{
+								/* Display info for this town -- MT */
+								(void)do_cmd_view_map_aux('t', w_ptr->place);
+							}
+						}
+					}
+					/* calculate the new offset */
+					x += mx - cx;
+					y += my - cy;
+				} else
+				if (mb == 4) {
+					/* move the cursor up */
+					y -= 1;
+					if (mods & 32) {
+						y -= 9;
+					}
+				} else
+				if (mb == 5) {
+					/* move the cursor down */
+					y += 1;
+					if (mods & 32) {
+						y += 9;
+					}
+				} else
+				if (mb == 6) {
+					/* move the cursor left */
+					x -= 1;
+					if (mods & 32) {
+						x -= 9;
+					}
+				} else
+				if (mb == 7) {
+					/* move the cursor right */
+					x += 1;
+					if (mods & 32) {
+						x += 9;
+					}
+				} else
+				{
+					/* do nothing */
+				}
+				/* Bounds checking */
+				if (x + px / WILD_BLOCK_SIZE < 0)
+				{
+					x = -px / WILD_BLOCK_SIZE;
+				}
+				if (y + py / WILD_BLOCK_SIZE < 0)
+				{
+					y = -py / WILD_BLOCK_SIZE;
+				}
+				if (x + px / WILD_BLOCK_SIZE > max_wild - 2)
+				{
+					x = max_wild - px / WILD_BLOCK_SIZE - 2;
+				}
+				if (y + py / WILD_BLOCK_SIZE > max_wild - 2)
+				{
+					y = max_wild - py / WILD_BLOCK_SIZE - 2;
+				}
+				continue;
+			}
 
 			/* Allow a redraw */
 			if (c == KTRL('R'))
@@ -1313,6 +1410,9 @@ void do_cmd_view_map(void)
 
 	/* The size may have changed during the scores display */
 	angband_term[0]->resize_hook();
+
+	/* restore any previous mouse buttons */
+	button_restore();
 
 	/* Hack - Flush it */
 	Term_fresh();
