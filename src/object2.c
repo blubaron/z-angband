@@ -4530,9 +4530,8 @@ void drop_near(object_type *j_ptr, int chance, int x, int y)
 			if (!cave_nice_grid(c_ptr)) continue;
 
 			/* Not on "nasty" terrains */
-			if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-				(c_ptr->feat == FEAT_SHAL_ACID) ||
-				(c_ptr->feat == FEAT_SHAL_WATER)) continue;
+			if (f_info[c_ptr->feat].flags & FF_LIQUID)
+				continue;
 
 			/* Check to see if fields dissallow placement */
 			if (fields_have_flags(c_ptr, FIELD_INFO_NO_OBJCT))
@@ -4636,13 +4635,15 @@ void drop_near(object_type *j_ptr, int chance, int x, int y)
 		if (!cave_nice_grid(c_ptr)) continue;
 
 		/* Not on "nasty" terrains */
-		if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-			(c_ptr->feat == FEAT_SHAL_ACID) ||
-			(c_ptr->feat == FEAT_SHAL_WATER)) continue;
+		if (f_info[c_ptr->feat].flags & FF_LIQUID)
+			continue;
 
 		/* Okay */
 		flag = TRUE;
 	}
+
+	/* the object gets to the ground */
+	p_ptr->update |= (PU_OBJECTS);
 
 	/* Grid */
 	c_ptr = area(bx, by);
