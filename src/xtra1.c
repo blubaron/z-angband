@@ -3400,6 +3400,7 @@ static void calc_bonuses(void)
 	{
 		SET_FLAG(p_ptr, TR_SH_COLD);
 	}
+
 	if (query_timed(TIMED_SH_FEAR))
 	{
 		SET_FLAG(p_ptr, TR_SH_FEAR);
@@ -4051,17 +4052,20 @@ void update_stuff(void)
 	{
 		p_ptr->update &= ~(PU_DISTANCE);
 		p_ptr->update &= ~(PU_MONSTERS);
+		p_ptr->update &= ~(PU_OBJECTS);
 		update_monsters(TRUE);
 	}
 
 	if (p_ptr->update & (PU_MONSTERS))
 	{
 		p_ptr->update &= ~(PU_MONSTERS);
+		p_ptr->update &= ~(PU_OBJECTS);
 		update_monsters(FALSE);
 	}
 
 	if (p_ptr->update & (PU_OBJECTS)) {
 		p_ptr->update &= ~(PU_OBJECTS);
+		update_monsters(FALSE);
 	}
 }
 
