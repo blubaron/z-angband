@@ -3477,6 +3477,10 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	/* Save the number of "real" lines */
 	size = next;
 
+	/* backup previous menu buttons, so they do not 
+	 * interfere here */
+	button_backup_all(TRUE);
+
 	/* Display the file */
 	while (TRUE)
 	{
@@ -3632,7 +3636,91 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		else
 		{
 			/* Get a keypress */
-			k = inkey();
+			k = inkey_m();
+		}
+
+		if (k & 0x80) {
+			/* translate a mouse press */
+			char mb, mods;
+			int mx, my;
+			Term_getmousepress(&mb, &mx, &my);
+			mods = mb & 0x78;
+			mb = mb & 0x07;
+			k = 0;
+			if (mb == 2) {
+				/* go to the last screen */
+				if (mods & 32) {
+					k = ESCAPE;
+				}
+				break;
+			} else
+			if (mb == 1) {
+				/* if a menu, select the option, otherwise do nothing */
+				if (menu && (my > 2) && (my < hgt-2)) {
+					/* move the file pointer to the beginning of the file */
+					/* TODO: this is not portable */
+					fpos_t pos = ftell(fff);
+					fseek(fff, SEEK_SET, 0);
+
+					next = 0;
+					/* Goto the selected line */
+					while (next < line + my-2) {
+						/* Get a line */
+						if (my_raw_fgets(fff, buf, 1024)) break;
+
+						/* Skip tags/links */
+						if (prefix(buf, "***** ")) continue;
+
+						/* Count the lines */
+						next++;
+					}
+					next = 0;
+					/* get the desired line */
+					while (next == 0) {
+						/* Get a line */
+						if (my_raw_fgets(fff, buf, 1024)) break;
+
+						/* Skip tags/links */
+						if (prefix(buf, "***** ")) continue;
+
+						/* Count the lines */
+						next++;
+					}
+					/* see if the line is a menu item */
+					if (buf[0]) {
+						for (i = 0; i < 62; i++) {
+							if (strstr(buf, hook[i])) {
+								char *c = strchr(buf, '(');
+								k = *(c+1);
+								break;
+							}
+						}
+					}
+
+					fseek(fff, SEEK_SET, pos);
+				//k = ESCAPE;
+				}
+			} else
+			if (mb == 4) {
+				/* scroll up */
+				if (mods & 32) {
+					line -= (hgt - 4) / 2;
+				} else
+				{
+					line -= 1;
+				}
+				if (line < 0) line = 0;
+			} else
+			if (mb == 5) {
+				/* scroll down */
+				if (mods & 32) {
+					line += (hgt - 4) / 2;
+				} else
+				{
+					line += 1;
+				}
+			}
+			/* otherwise do nothing */
 		}
 
 		/* Correct hgt after a resize */
@@ -3832,6 +3920,9 @@ bool show_file(cptr name, cptr what, int line, int mode)
 
 	/* Restore the screen */
 	screen_load();
+
+	/* restore any previous menu buttons */
+	button_restore();
 
 	/* Close the file */
 	my_fclose(fff);
