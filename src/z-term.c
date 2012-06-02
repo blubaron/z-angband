@@ -659,6 +659,77 @@ void Term_queue_line(int x, int y, int n, byte *a, char *c, byte *ta, char *tc)
 	}
 }
 
+/*
+ * Mentally draw a string of attr/chars at a given location
+ *
+ * Assumes given location and values are valid.
+ *
+ * This function is designed to be fast, with no consistancy checking.
+ * It is used to update the map in the game.
+ */
+void Term_queue_str(int x, int y, int n, byte a, char *s, byte ta, char tc)
+{
+	term_win *scrn = Term->scr;
+
+	int x1 = -1;
+	int x2 = -1;
+
+	byte *scr_aa = &scrn->a[y][x];
+	char *scr_cc = &scrn->c[y][x];
+
+	byte *scr_taa = &scrn->ta[y][x];
+	char *scr_tcc = &scrn->tc[y][x];
+	
+	/*
+	 * Hack - don't worry about bigtile stuff here,
+	 * since this routine isn't used by the menues. 
+	 */
+
+	while (n--)
+	{
+		/* Hack -- Ignore non-changes */
+		if ((*scr_aa == a) && (*scr_cc == *s) &&
+			(*scr_taa == ta) && (*scr_tcc == tc))
+		{
+			x++;
+			s++;
+			scr_aa++;
+			scr_cc++;
+			scr_taa++;
+			scr_tcc++;
+			continue;
+		}
+
+		/* Save the "literal" information */
+		*scr_taa++ = ta;
+		*scr_tcc++ = tc;
+
+		/* Save the "literal" information */
+		*scr_aa++ = a;
+		*scr_cc++ = *s++;
+
+		/* Track minimum changed column */
+		if (x1 < 0) x1 = x;
+
+		/* Track maximum changed column */
+		x2 = x;
+
+		x++;
+	}
+
+	/* Expand the "change area" as needed */
+	if (x1 >= 0)
+	{
+		/* Check for new min/max row info */
+		if (y < Term->y1) Term->y1 = y;
+		if (y > Term->y2) Term->y2 = y;
+
+		/* Check for new min/max col info in this row */
+		if (x1 < Term->x1[y]) Term->x1[y] = x1;
+		if (x2 > Term->x2[y]) Term->x2[y] = x2;
+	}
+}
+
 
 /*** Refresh routines ***/
 
@@ -1607,6 +1678,56 @@ void Term_big_putch(int x, int y, byte a, char c)
 				//Term_putch(x, y + vert, TERM_WHITE, ' ');
 		}
 	}
+}
+void Term_addstr(int n, byte a, char *s)
+{
+	int w = Term->wid;
+	int x,y;
+
+	/* Handle "unusable" cursor */
+	if (Term->scr->cu) return;
+
+	/* Paranoia -- no illegal chars */
+	if (!s) return;
+
+	/* Notice bigtile region changes */
+	/* Note this can adjust the cursor point so save and restore afterward s*/
+	x = Term->scr->cx;
+	y = Term->scr->cy;
+	Term_bigtile_expand(Term->scr->cx, Term->scr->cy);
+	Term->scr->cx = x;
+	Term->scr->cy = y;
+	
+	/* Obtain maximal length */
+	if (n < 0) n = strlen(s);
+
+	/* React to reaching the edge of the screen */
+	if (Term->scr->cx + n >= w)
+		n = w - Term->scr->cx;
+
+	/* Queue the given character for display */
+	Term_queue_str(Term->scr->cx, Term->scr->cy, n, a, s, 0, 0);
+
+	/* Advance the cursor */
+	Term->scr->cx += n;
+
+	/* Success */
+	if (Term->scr->cx < w) return;
+
+	/* Note "Useless" cursor */
+	Term->scr->cu = 1;
+
+	/* Note "Useless" cursor */
+	return;
+}
+
+void Term_putstr(int x, int y, int n, byte a, char *s)
+{
+	/* Move first */
+	Term_gotoxy(x, y);
+	
+	/* Then add the char */
+	Term_addstr(n, a, s);
 }
 
 /*

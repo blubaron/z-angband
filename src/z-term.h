@@ -314,8 +314,10 @@ extern void Term_xtra(int n, int v);
 
 extern void Term_queue_char(int x, int y, byte a, char c, byte ta, char tc);
 
-extern void Term_queue_line(int x, int y, int n, byte *a, char *c, byte *ta,
+extern void Term_queue_line(int x, int y, int n, byte *a, char *s, byte *ta,
 							char *tc);
+extern void Term_queue_str(int x, int y, int n, byte a, char *s, byte ta,
+							char tc);
 
 extern void Term_fresh(void);
 extern errr Term_set_cursor(int v);
@@ -323,6 +325,8 @@ extern void Term_gotoxy(int x, int y);
 extern void Term_draw(int x, int y, byte a, char c);
 extern void Term_addch(byte a, char c);
 extern void Term_putch(int x, int y, byte a, char c);
+extern void Term_addstr(int n, byte a, char *s);
+extern void Term_putstr(int x, int y, int n, byte a, char *s);
 extern void Term_erase(int x, int y, int n);
 extern void Term_clear(void);
 extern void Term_redraw(void);
