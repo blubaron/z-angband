@@ -3245,7 +3245,7 @@ static object_type *recall_object_choice(int *command_wrk)
  * This version of get_item() includes the modifications due to the
  * easy_floor flag.  This flag changes how items on the floor are treated.
  */
-object_type *get_item(cptr pmt, cptr str, int mode)
+object_type *get_item(cptr pmt, cptr str, int mode, int start)
 {
 	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
 
@@ -3365,27 +3365,38 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 		item_tester_hook = NULL;
 
 		/* Done */
-		return (FALSE);
+		return NULL;
 	}
 
 	/* Analyze choices */
+
+	/* use a given mode if we can */
+	if (allow_inven && (start == USE_INVEN)) {
+		command_wrk = (USE_INVEN);
+	} else
+	if (allow_equip && (start == USE_EQUIP)) {
+		command_wrk = (USE_EQUIP);
+	} else
+	if (allow_floor && (start == USE_FLOOR)) {
+		command_wrk = (USE_FLOOR);
+	} else
 
 	/* Use inventory if allowed */
 	if (allow_inven)
 	{
 		command_wrk = (USE_INVEN);
-	}
+	} else
 
 	/* Use equipment if allowed */
-	else if (allow_equip)
+	if (allow_equip)
 	{
-		command_wrk |= (USE_EQUIP);
-	}
+		command_wrk = (USE_EQUIP);
+	} else
 
 	/* Use floor if allowed */
-	else if (allow_floor)
+	if (allow_floor)
 	{
-		command_wrk |= (USE_FLOOR);
+		command_wrk = (USE_FLOOR);
 	}
 
 	/* Get the saved item index */
@@ -3445,6 +3456,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				{
 					if (!allow_equip)
 					{
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						bell("Cannot switch item selector!");
 						break;
 					}
@@ -3454,7 +3470,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				{
 					if (!allow_inven)
 					{
-						bell("Cannot switch item selector!");
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						break;
 					}
 					command_wrk = (USE_INVEN);
@@ -3471,7 +3491,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 					}
 					else
 					{
-						bell("Cannot switch item selector!");
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						break;
 					}
 				}

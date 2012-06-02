@@ -1766,7 +1766,7 @@ static bool store_sell(void)
 		item_tester_hook = NULL;
 
 		/* Get an item */
-		o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN));
+		o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN), (USE_INVEN));
 	}
 	else
 	{
@@ -1776,7 +1776,7 @@ static bool store_sell(void)
 		item_tester_hook = store_will_stock;
 
 		/* Get an item */
-		o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_STORE));
+		o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_STORE), (USE_INVEN));
 	}
 
 	/* Not a valid item */

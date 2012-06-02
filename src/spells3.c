@@ -1256,7 +1256,7 @@ bool brand_weapon(int brand_type)
 	/* Looking for a weapon */ /* moved below above to get all declarations at beginning of scope - Brett */
 	item_tester_hook = item_tester_hook_brandable;
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -1699,7 +1699,7 @@ bool alchemy(void)
 	q = "Turn which item to gold? ";
 	s = "You have nothing to turn to gold.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -1820,7 +1820,7 @@ bool polymorph_item(void)
 	q = "Polymorph which item? ";
 	s = "You have nothing to polymorph.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2188,7 +2188,7 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac, char power)
 	q = "Enchant which item? ";
 	s = "You have nothing to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2251,7 +2251,7 @@ bool artifact_scroll(void)
 	q = "Enchant which item? ";
 	s = "You have nothing to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2510,7 +2510,7 @@ static bool ident_spell_aux(int k_idx)
 	q = "Identify which item? ";
 	s = "You have nothing to identify.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2597,7 +2597,7 @@ bool mundane_spell(void)
 	q = "Use which item? ";
 	s = "You have nothing you can use.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2679,7 +2679,7 @@ bool identify_fully(void)
 	q = "Identify which item? ";
 	s = "You have nothing to *identify*.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2719,7 +2719,7 @@ bool identify_resistances(void)
 	q = "Probe which item? ";
 	s = "You have nothing to probe.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2783,7 +2783,7 @@ bool recharge(int power)
 	q = "Recharge which item? ";
 	s = "You have nothing to recharge.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -3075,7 +3075,7 @@ bool bless_weapon(void)
 	q = "Bless which weapon? ";
 	s = "You have weapon to bless.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return FALSE;
@@ -3189,7 +3189,7 @@ bool add_perm_lite(void)
 	q = "Enchant which weapon? ";
 	s = "You have weapon to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return FALSE;
@@ -4803,7 +4803,7 @@ bool rustproof(void)
 	q = "Rustproof which piece of armour? ";
 	s = "You have nothing to rustproof.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -6144,7 +6144,7 @@ bool enchant_pval(int num_try, int force)
 	q = "Infuse which item? ";
 	s = "You have nothing to infuse.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);

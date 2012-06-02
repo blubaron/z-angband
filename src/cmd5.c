@@ -2201,7 +2201,7 @@ void do_cmd_browse(void)
 	q = "Browse which book? ";
 	s = "You have no books that you can read.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -2268,7 +2268,7 @@ void do_cmd_study(bool force, object_type * o_ptr)
 	q = "Study which book? ";
 	s = "You have no books that you can read.";
 
-	if (!o_ptr) o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	if (!o_ptr) o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -3524,7 +3524,7 @@ static bool cast_chaos_spell(int spell, int power)
 			/* Get an item */
 			q = "Drain which item? ";
 			s = "You have nothing to drain.";
-			o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+			o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 			/* Not a valid item */
 			if (!o_ptr) return (FALSE);
 
@@ -4367,7 +4367,7 @@ static bool cast_arcane_spell(int spell, int power)
 			q = "Classify which object? ";
 			s = "You have nothing to classify! ";
 
-			o_ptr = get_item(q, s, USE_INVEN | USE_EQUIP | USE_FLOOR);
+			o_ptr = get_item(q, s, (USE_INVEN | USE_EQUIP | USE_FLOOR), (USE_INVEN));
 
 			if (!o_ptr) return (FALSE);
 
@@ -4661,7 +4661,7 @@ void do_cmd_cast(void)
 	q = "Use which book? ";
 	s = "You have no spell books!";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;

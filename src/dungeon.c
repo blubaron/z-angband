@@ -273,7 +273,7 @@ void sense_item(object_type *o_ptr, bool heavy, bool wield, bool msg)
 	/* Set the "inscription" */
 	o_ptr->feeling = feel;
 
-  if (!(p_ptr->muta3 & MUT3_BAD_LUCK) && (feel == FEEL_AVERAGE)) {
+  if ((feel == FEEL_AVERAGE) && !(p_ptr->muta3 & MUT3_BAD_LUCK)) {
     /* if we don't have bad luck and the item is average, just go ahead and 
      * id it. */
     identify_item(o_ptr);
@@ -843,7 +843,7 @@ bool psychometry(void)
 	q = (p_ptr->rp.pclass == CLASS_MINDCRAFTER ? "Meditate on which item? " : "Focus on which item? ");
 	s = "You have nothing appropriate.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);

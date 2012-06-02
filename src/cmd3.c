@@ -126,6 +126,7 @@ static int tval_to_idx(u16b x)
  */
 void do_cmd_inven(void)
 {
+#if 0
 	/* Save screen */
 	screen_save();
 
@@ -156,6 +157,56 @@ void do_cmd_inven(void)
 		/* Reset stuff */
 		p_ptr->cmd.new = 0;
 	}
+#endif
+	object_type *o_ptr;
+	char prompt[256];
+	char *no;
+	int item;
+	int ret = 3;
+	//int diff = weight_remaining();
+
+	/* Hack -- Start in "inventory" mode */
+	//p_ptr->cmd.arg = (USE_INVEN);
+
+	/* Hack -- show empty slots */
+	item_tester_full = TRUE;
+
+	/* Loop this menu until an object context menu says differently */
+	while (ret == 3) {
+		/* Save screen */
+		screen_save();
+
+		/* Prompt for a command */
+		strnfmt(prompt, 255, "carrying %d.%d pounds (%d%% of capacity). Item: ",
+				p_ptr->total_weight / 10, p_ptr->total_weight % 10,
+				(p_ptr->total_weight * 100) /
+				((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
+		no = "You have no items.";
+
+		/* Get an item to use a context command on (Display the inventory) */
+		o_ptr = get_item(prompt, no, (USE_EQUIP|USE_INVEN|USE_FLOOR), (USE_INVEN));
+		if (o_ptr) {
+
+			/* Load screen */
+			screen_load();
+
+			/* Track the object kind */
+			//track_object(item);
+
+			//if (o_ptr->kind) {
+			//	while ((ret = context_menu_object(o_ptr, item)) == 2);
+			ret = -1;
+			//}
+		} else {
+			/* Load screen */
+			screen_load();
+
+			ret = -1;
+		}
+	}
+
+	/* Hack -- hide empty slots */
+	item_tester_full = FALSE;
 }
 
 
@@ -164,6 +215,7 @@ void do_cmd_inven(void)
  */
 void do_cmd_equip(void)
 {
+#if 0
 	/* Save the screen */
 	screen_save();
 
@@ -194,6 +246,56 @@ void do_cmd_equip(void)
 		/* Reset stuff */
 		p_ptr->cmd.new = 0;
 	}
+#endif
+	object_type *o_ptr;
+	char prompt[256];
+	char *no;
+	int item;
+	int ret = 3;
+	//int diff = weight_remaining();
+
+	/* Hack -- Start in "equipment" mode */
+	//p_ptr->cmd.new = (USE_EQUIP);
+
+	/* Hack -- show empty slots */
+	item_tester_full = TRUE;
+
+	/* Loop this menu until an object context menu says differently */
+	while (ret == 3) {
+		/* Save screen */
+		screen_save();
+
+		/* Prompt for a command */
+		strnfmt(prompt, 255, "carrying %d.%d pounds (%d%% of capacity). Item: ",
+				p_ptr->total_weight / 10, p_ptr->total_weight % 10,
+				(p_ptr->total_weight * 100) /
+				((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
+		no = "You have no items.";
+
+		/* Get an item to use a context command on (Display the equipment) */
+		o_ptr = get_item(prompt, no, (USE_EQUIP|USE_INVEN|USE_FLOOR), (USE_EQUIP));
+		if (o_ptr) {
+
+			/* Load screen */
+			screen_load();
+
+			/* Track the object kind */
+			//track_object(item);
+
+			//if (o_ptr->kind) {
+			//	while ((ret = context_menu_object(o_ptr, item)) == 2);
+			ret = -1;
+			//}
+		} else {
+			/* Load screen */
+			screen_load();
+
+			ret = -1;
+		}
+	}
+
+	/* Hack -- hide empty slots */
+	item_tester_full = FALSE;
 }
 
 
@@ -219,7 +321,7 @@ void do_cmd_wield(void)
 	q = "Wear/Wield which item? ";
 	s = "You have nothing you can wear or wield.";
 
-	q_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	q_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!q_ptr) return;
@@ -374,7 +476,7 @@ void do_cmd_takeoff(void)
 	q = "Take off which item? ";
 	s = "You are not wearing anything to take off.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP));
+	o_ptr = get_item(q, s, (USE_EQUIP), (USE_EQUIP));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -418,7 +520,7 @@ void do_cmd_drop(void)
 	q = "Drop which item? ";
 	s = "You have nothing to drop.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -581,7 +683,7 @@ void do_cmd_destroy(void)
 	q = "Destroy which item? ";
 	s = "You have nothing to destroy.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -652,7 +754,7 @@ void do_cmd_observe(void)
 	q = "Examine which item? ";
 	s = "You have nothing to examine.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -689,7 +791,7 @@ void do_cmd_uninscribe(void)
 	q = "Un-inscribe which item? ";
 	s = "You have nothing to un-inscribe.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -735,7 +837,7 @@ void do_cmd_inscribe(void)
 	q = "Inscribe which item? ";
 	s = "You have nothing to inscribe.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -805,7 +907,7 @@ static void do_cmd_refill_lamp(void)
 	q = "Refill with which source of oil? ";
 	s = "You have no sources of oil.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -890,7 +992,7 @@ static void do_cmd_refill_torch(void)
 	q = "Refuel with which torch? ";
 	s = "You have no extra torches.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -2051,7 +2153,7 @@ void do_cmd_squelch(void)
 	q = "Squelch which item? ";
 	s = "You have nothing to squelch.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_FLOOR));
 
 	if (!o_ptr) return;
 
@@ -2238,7 +2340,7 @@ static void do_cmd_organize_aux(void)
 
 		if (!o_ptr)
 		{
-			o_ptr = get_item(q, s, (USE_INVEN));
+			o_ptr = get_item(q, s, (USE_INVEN), (USE_INVEN));
 
 			/* Not a valid item */
 			if (!o_ptr) return;

@@ -1012,7 +1012,7 @@ bool home_eat_food(void)
 	/*q = "Eat which item? ";
 	s = "You have nothing to eat.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_STORE));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_STORE), (USE_INVEN));
 
 	/* Not a valid item */
 	/*if (!o_ptr) return (FALSE);
@@ -1451,7 +1451,7 @@ bool enchant_item(s32b cost, bool to_hit, bool to_dam, bool to_ac, bool weap)
 	s = "You have nothing to improve.";
 
 	/* Get the item */
-	o_ptr = get_item(q, s, (USE_INVEN | USE_EQUIP));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_EQUIP), (USE_EQUIP));
 
 	/* No valid items */
 	if (!o_ptr) return (FALSE);
@@ -1543,7 +1543,7 @@ void building_recharge(s32b cost)
 	q = "Recharge which item? ";
 	s = "You have nothing to recharge.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* No valid item */
 	if (!o_ptr) return;

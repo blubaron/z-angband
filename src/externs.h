@@ -627,7 +627,7 @@ extern void display_equip(void);
 extern void show_list(s16b o_list_ptr, bool store);
 extern void show_equip(bool store);
 extern void toggle_inven_equip(void);
-extern object_type *get_item(cptr pmt, cptr str, int mode);
+extern object_type *get_item(cptr pmt, cptr str, int mode, int start);
 extern void delete_held_object(s16b *o_idx_ptr, object_type *o_ptr);
 extern void delete_dungeon_object(object_type *o_ptr);
 extern void delete_object(int x, int y);

@@ -3195,7 +3195,7 @@ void do_cmd_fire(void)
 	q = "Fire which item? ";
 	s = "You have nothing to fire.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -3224,7 +3224,7 @@ void do_cmd_throw_aux(int mult)
 	q = "Throw which item? ";
 	s = "You have nothing to throw.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
