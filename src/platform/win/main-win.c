@@ -3642,12 +3642,22 @@ static void process_menus(WORD wCmd)
 			break;
 		}
 		case IDM_WINDOW_OPT: {
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
+				plog("You may not do that right now.");
+				break;
+			}
 			Term_keypress('=');
 			Term_keypress('m');
 
 			break;
 		}
 		case IDM_WINDOW_RESET: {
+			/* Paranoia */
+			if (!p_ptr->cmd.inkey_flag || !initialized) {
+				plog("You may not do that right now.");
+				break;
+			}
 			if (MessageBox(NULL,
 				  "This will reset the size and layout of the angband windows\n based on your screen size. Do you want to continue?",
 				  "z+Angband", MB_YESNO|MB_ICONWARNING) == IDYES)
@@ -5276,6 +5286,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			//int highlight = 1;
 			char key;
 
+			button_kill_all();
 			//if (p_ptr->state.is_dead) highlight = 4;
 			/* Prompt the user */
 			if (savefile[0] != 0) {
@@ -5327,6 +5338,8 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 					if (savefile[0] != 0) {
 						/* show the graveyard */
 						tomb_menu(FALSE);
+
+						button_kill_all();
 
 						/* Show the initial screen again */
 						display_introduction();
