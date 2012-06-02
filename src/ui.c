@@ -1037,7 +1037,46 @@ void fmt_clean(char *buf)
 	*p = '\0';
 }
 
+/*
+ * count the number of displayed characters in a string with control characters
+ */
+int len_cstr(cptr str)
+{
+	cptr c = str;
+	int len = 0;
 
+	while (*c) {
+		if (*c == '$') {
+			/* the dollar sign is not displayed */
+			c++;
+			if ((*c >= 'A') && (*c <= 'R')) {
+				/* a color - not displayed */
+				c++;
+			} else
+			if ((*c >= 'U') && (*c <= 'X')) {
+				/* a button control - not displayed */
+				c++;
+			} else
+			if (*c == 'Y') {
+				/* a key press for a button - not displayed, nor is next char */
+				c+=2;
+			} else
+			{
+				/* this character, but not the dollar sign, are displayed */
+				len++;
+				/* Next position */
+				c++;
+			}
+		} else {
+			if (*c != '\n') {
+				len++;
+			}
+			/* Next position */
+			c++;
+		}
+	}
+	return len;
+}
 /*
  * Put a string with control characters at a given location
  */
