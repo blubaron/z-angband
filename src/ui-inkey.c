@@ -912,20 +912,24 @@ char inkey(void)
 
 		/* this was a mouse press, get the press (and translate it) */
 		Term_getmousepress(&b,&x,&y);
-		if ((ch& 0x07) == 2) {
+		b = b & 0x07;
+		if (b == 2) {
 			ch = ESCAPE;
 		} else
-		if ((ch& 0x07) == 4) {
+		if (b == 4) {
 			ch = '8';
 		} else
-		if ((ch& 0x07) == 5) {
+		if (b == 5) {
 			ch = '2';
 		} else
-		if ((ch& 0x07) == 6) {
+		if (b == 6) {
 			ch = '4';
 		} else
-		if ((ch& 0x07) == 7) {
+		if (b == 7) {
 			ch = '6';
+		} else
+		if (b == 3) {
+			ch = '\r';
 		} else
 		{
 			ch = '\n';

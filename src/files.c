@@ -2728,7 +2728,7 @@ void do_cmd_character(void)
 		}
 
 		/* Ignore left clicks */
-		else if (c == '\n')
+		else if ((c == '\n') || (c == '\r'))
 		{
 			c = c;
 		}

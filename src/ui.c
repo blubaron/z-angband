@@ -377,16 +377,16 @@ static bool show_option(int x, int y, menu_type *option, char c, bool scroll, bo
 			/* Highlight this option? */
 			if (scroll)
 			{
-				prtf(x, y, " %c) " CLR_L_BLUE "%s", c, option->text);
+				prtf(x, y, " $U%c) " CLR_L_BLUE "%s$V", c, option->text);
 			}
 			else
 			{
-				prtf(x, y, "*%c) %s", c, option->text);
+				prtf(x, y, "*$U%c) %s$V", c, option->text);
 			}
 		}
 		else
 		{
-			prtf(x, y, " %c) %s", c, option->text);
+			prtf(x, y, " $U%c) %s$V", c, option->text);
 		}
 
 		return (TRUE);
@@ -500,24 +500,24 @@ static int show_menu(int num, menu_type *options, int select, bool scroll,
 	 */
 	if (!cnt)
 	{
-		prtf(0, 0, "%s (No commands available, ESC=exit)", prompt);
+		prtf(0, 0, "%s (No commands available, $UESC=exit$Y%c$V)", prompt, ESCAPE);
 	}
 	else if (cnt == 1)
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (a), ESC=exit)", prompt ? prompt : "Select a command: ");
+		prtf(0, 0, "%s (Command (a), $UESC=exit$Y%c$V)", prompt ? prompt : "Select a command: ", ESCAPE);
 	}
 	else if (cnt < 19)
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (a-%c), ESC=exit)",
-			 prompt ? prompt : "Select a command: " ,I2A(cnt - 1));
+		prtf(0, 0, "%s (Command (a-%c), $UESC=exit$Y%c$V)",
+			 prompt ? prompt : "Select a command: " ,I2A(cnt - 1), ESCAPE);
 	}
 	else
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (0-%c), ESC=exit)",
-			 prompt ? prompt : "Select a command: " ,listsym[cnt - 1]);
+		prtf(0, 0, "%s (Command (0-%c), $UESC=exit$Y%c$V)",
+			 prompt ? prompt : "Select a command: " ,listsym[cnt - 1], ESCAPE);
 	}
 
 
@@ -616,6 +616,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	/* Save the screen */
 	screen_save();
 
+	/* store are previous buttons */
+	button_backup_all(TRUE);
+
 	/* Show the list */
 	cnt = show_menu(num, options, select, scroll, disp, prompt);
 
@@ -629,6 +632,8 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 
 		/* Restore the screen */
 		screen_load();
+		/* restore any previous mouse buttons */
+		button_restore();
 		return (FALSE);
 	}
 
@@ -636,23 +641,23 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	while (TRUE)
 	{
 		/* Try to get previously saved value */
-		if (!repeat_pull(&i))
-		{
+		if (!repeat_pull(&i)) {
 			/* Try to match with available options */
 			i = get_choice(&choice, num, &ask);
-    	}
+   	}
 
-    	/* Handle "cancel" */
-		if (i == -2)
-        {
+
+		/* Handle "cancel" */
+		if (i == -2) {
 			/* Restore the screen */
 			screen_load();
-        	return (FALSE);
-        }
+			/* restore any previous mouse buttons */
+			button_restore();
+			return (FALSE);
+		}
 
 		/* No match? */
-		if (i == -1)
-		{
+		if (i == -1) {
 			/* Pick default option */
 			if ((choice == '\r') || (choice == ' '))
 			{
@@ -685,6 +690,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				}
 				while(!(options[select].flags & MN_SELECT));
 
+				/* kill the current menu buttons */
+				button_kill_all();
+
 				/* Show the list */
 				show_menu(num, options, select, scroll, disp, prompt);
 
@@ -705,6 +713,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				}
 				while(!(options[select].flags & MN_SELECT));
 
+				/* kill the current menu buttons */
+				button_kill_all();
+
 				/* Show the list */
 				show_menu(num, options, select, scroll, disp, prompt);
 
@@ -720,6 +731,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				{
 					/* Show the information */
 					show_file(options[select].help, NULL, 0, 0);
+
+					/* kill the current menu buttons */
+					button_kill_all();
 
 					/* Show the list */
 					show_menu(num, options, select, scroll, disp, prompt);
@@ -757,6 +771,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 						/* Belay that order */
 						if (!get_check("Use %s? ", options[j].text))
 						{
+							/* kill the current menu buttons */
+							button_kill_all();
+
 							/* Show the list */
 							show_menu(num, options, select, scroll, disp, prompt);
 							break;
@@ -816,6 +833,8 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 		}
 	}
 
+	/* restore any previous mouse buttons */
+	button_restore();
 	/* Paranoia for dumb compilers */
 	quit("Unreachable code in display_menu");
 	return (FALSE);
