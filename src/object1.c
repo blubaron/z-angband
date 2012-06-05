@@ -3380,6 +3380,12 @@ object_type *get_item(cptr pmt, cptr str, int mode, int start)
 	if (allow_floor && (start == USE_FLOOR)) {
 		command_wrk = (USE_FLOOR);
 	} else
+	if (start == USE_EQUIP) {
+		/* force starting on the equipment screen if 
+		 * it was requested, for the show equipment command */
+		command_wrk = (USE_EQUIP);
+		allow_equip = TRUE;
+	} else
 
 	/* Use inventory if allowed */
 	if (allow_inven)
@@ -3461,7 +3467,6 @@ object_type *get_item(cptr pmt, cptr str, int mode, int start)
 						} else {
 							bell("Cannot switch item selector!");
 						}
-						bell("Cannot switch item selector!");
 						break;
 					}
 					command_wrk = (USE_EQUIP);
