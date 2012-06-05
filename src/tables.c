@@ -1752,6 +1752,7 @@ player_race race_info[MAX_RACES] =
 {
 	{
 		"Human",
+
 		{  0,  0,  0,  0,  0,  0 },
 		0,  0,  0,  0,  0,  10,  3,  0,
 		10,  100,
@@ -5757,6 +5758,8 @@ dun_gen_type old_dungeons[] =
  * room limit (0 means no limit)
  * flags,0}
  */
+dun_gen_type *dungeons;
+#if 0
 dun_gen_type dungeons[] =
 {
   /* feats used in towns */
@@ -6372,3 +6375,5 @@ dun_gen_type dungeons[] =
 		0,
 		DF_NONE, NULL},
 };
+#endif
+

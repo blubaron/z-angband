@@ -2644,12 +2644,12 @@ void generate_cave(void)
  */
 void pick_dungeon(dun_type * d_ptr, u32b dun_types, s16b idx)
 {
-	byte b = 0;
+	byte b = 0, c = 0;
 	byte num_bits = 0;
 	dun_gen_type *dg_ptr;
 
 	/* Just in case, defaults to vanilla dungeon */
-	int d_num  = 13;
+	int d_num  = 1;
 	int i;
 
   if ((idx >=0 ) && (idx < z_info->dun_max)) {
@@ -2665,16 +2665,16 @@ void pick_dungeon(dun_type * d_ptr, u32b dun_types, s16b idx)
 	  }
 
 	  /* Pick a bit */
-	  b = randint0(num_bits);
+	  c = randint0(num_bits) + 1;
 
 	  /* Figure out which bit we picked, and set d_num to the number of that bit. */
 	  for (i = 0; i < 32; i++)
 	  {
 		  if (dun_types & (1 << i)) b++;
 
-		  if (b == num_bits)
+		  if (b == c)
 		  {
-			  d_num = i+1;
+			  d_num = i;
 			  break;
 		  }
 	  }

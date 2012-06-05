@@ -556,11 +556,17 @@ static u16b insert_clearout_quest(u16b d_idx, int level, int x, int y, int p_num
 	}
 
 	/* Use dungeon type d_idx */
-	pick_dungeon(d_ptr, 1 << d_idx, -1);
+	pick_dungeon(d_ptr, 0, d_idx);
 
 	/* Set up level bounds */
 	d_ptr->min_level = level;
 	d_ptr->max_level = level + n - 1;
+
+	/* limit the size of the dungeon, because clearout
+	 * quests can be annoying */
+	if (!(d_ptr->flags & DF_MEDIUM|DF_SMALL)) {
+		d_ptr->flags |= DF_MEDIUM;
+	}
 
 	return(q_num);
 }

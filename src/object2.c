@@ -4180,7 +4180,7 @@ object_type *make_object(int level, int delta_level, obj_theme *theme)
  * Put an object on the ground.
  * We assume the grid is in bounds.
  */
-static bool put_object(object_type *o_ptr, int x, int y)
+bool put_object(object_type *o_ptr, int x, int y)
 {
 	/* Acquire grid */
 	cave_type *c_ptr = area(x, y);
@@ -4357,9 +4357,7 @@ void place_object(int x, int y, bool good, bool great, int delta_level)
 	c_ptr = area(x, y);
 
 	/* Do not generate items on "nasty" terrain */
-	if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-		(c_ptr->feat == FEAT_SHAL_WATER) || (c_ptr->feat == FEAT_SHAL_ACID))
-	{
+	if (f_info[c_ptr->feat].flags & FF_ICKY) {
 		return;
 	}
 
@@ -4532,9 +4530,8 @@ void drop_near(object_type *j_ptr, int chance, int x, int y)
 			if (!cave_nice_grid(c_ptr)) continue;
 
 			/* Not on "nasty" terrains */
-			if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-				(c_ptr->feat == FEAT_SHAL_ACID) ||
-				(c_ptr->feat == FEAT_SHAL_WATER)) continue;
+			if (f_info[c_ptr->feat].flags & FF_LIQUID)
+				continue;
 
 			/* Check to see if fields dissallow placement */
 			if (fields_have_flags(c_ptr, FIELD_INFO_NO_OBJCT))
@@ -4638,13 +4635,15 @@ void drop_near(object_type *j_ptr, int chance, int x, int y)
 		if (!cave_nice_grid(c_ptr)) continue;
 
 		/* Not on "nasty" terrains */
-		if ((c_ptr->feat == FEAT_SHAL_LAVA) ||
-			(c_ptr->feat == FEAT_SHAL_ACID) ||
-			(c_ptr->feat == FEAT_SHAL_WATER)) continue;
+		if (f_info[c_ptr->feat].flags & FF_LIQUID)
+			continue;
 
 		/* Okay */
 		flag = TRUE;
 	}
+
+	/* the object gets to the ground */
+	p_ptr->update |= (PU_OBJECTS);
 
 	/* Grid */
 	c_ptr = area(bx, by);

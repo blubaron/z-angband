@@ -173,7 +173,7 @@ void do_cmd_eat_food(void)
 	q = "Eat which item? ";
 	s = "You have nothing to eat.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -271,7 +271,7 @@ void do_cmd_quaff_potion(void)
 	q = "Quaff which potion? ";
 	s = "You have no potions to quaff.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -390,7 +390,7 @@ void do_cmd_read_scroll(void)
 	q = "Read which scroll? ";
 	s = "You have no scrolls to read.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -580,7 +580,7 @@ void do_cmd_use_staff(void)
 	q = "Use which staff? ";
 	s = "You have no staff to use.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -728,7 +728,7 @@ void do_cmd_aim_wand(void)
 	q = "Aim which wand? ";
 	s = "You have no wand to aim.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -879,7 +879,7 @@ void do_cmd_zap_rod(void)
 	q = "Zap which rod? ";
 	s = "You have no rod to zap.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -1057,7 +1057,7 @@ void do_cmd_activate(void)
 	s = "You have nothing to activate.";
 
 	/* Containers that activate?  Maybe someday.  */
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
@@ -1097,7 +1097,7 @@ void do_cmd_use(void)
 	s = "You have nothing to use.";
 
 	/* Containers that activate?  Maybe someday.  */
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return;

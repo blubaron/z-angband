@@ -3,16 +3,24 @@
   Maybe Todo:
     Finish enchant_pval? what is left to do?
 
-    When you die you loose 10% of total exp? 25%?
+    When you die you loose 10% of total exp? 25% of current level exp?
 
     Be able to abandon a quest and get another from the same quest giver after
-      a period of time.
+      a period of time. (cancel then insert a "wait" quest in the building?)
 
     Change spell gain for priests,paladins, and monks to be like spell gain
       for spellcasters? (for now I changed spell slots for priests, paladins,
       and monks back to 38, so they can get all of the spells in the life/death realms.)
 
-    Be able to forget a spell and free up the spell slot (respec)
+      maybe change priest spellcasting so that they can cast any spell in a
+      book that they have that is their level or lower. how should failure
+      rates be handled?
+
+    Be able to forget a spell and free up the spell slot (respec) Respec would
+      be a service from an appropriate building (zygurmist or mage guild) and
+      cost the cube of the number of spell slots used times the building cost
+      factor. respec would be for mages only since priests paladins and monks
+      can get all of their spells.
 
     Allow pets to travel through stairs with the player
 
@@ -33,6 +41,44 @@
       inventory to use, identify, etc. Pickup direct to, fire from, inspect in
       container should still work without using energy.
 
+    Neutral/Friendly townspeople can be generated at empty or blank buildings
+      and stores and walk to another building in the town, where they disappear.
+      Possibly select the person type based on the source or destination building.
+
+    Magesmiths can "make" magic items. when the player selects the command,
+      the store would create a randart. if the player does not want it, a
+      different randart is offered next. if the player wants it, a series of
+      quests is generated for the building, with the randart as the reward
+      after all of the quests. every item shown should cost some gold (~item
+      level in au? ~100au?) item level will be clvl + randrange(0, max(110, 2.5*clvl))?
+      
+      Most of the quests will be bounty quests for components used in making
+      the item. a bank loan for more than the value of the randart should be
+      one of the quests. or after all quests are done, the item is put on
+      layaway? perhaps the number of bounty quests will be such that the
+      levels of the monsters killed will be the square of the item level?
+      (item level count of monsters whose level is equal to the item level)
+      or 3d4 random bounty quests? if item level < 40?
+
+      The player can also offer an item to be used as the base of the randart.
+      Magesmith (armor) and Magesmith (weapon) will only offer appropriate
+      items. need to add a magesmith (jewelery) for rings, amulets, lights, etc.
+
+    if in stealth mode, player can pass through sleeping monsters. either by 
+      skipping past their position or by switching places with them. I prefer
+      the latter. or skip when there is only one monster in the way, for extra
+      energy, and switch otherwise.
+
+    be able to "pick up" tamed pets that were not summoned.
+
+    allow platforms to override parts of the ui.
+
+    add bank boxes to bank and change initial home to bank?
+
+    reduce stuff in dun_type and refer to dun_gen_type instead.
+      also be able to set dun_gen_type based on level range with/without
+       changing habitat.
+
     want set of tiles per dungeon that use floor, wall, door (open, closed,
       broken), stair up, stair down
     add generation (incl. vault spec.) and redirection of fountain,
@@ -44,23 +90,6 @@
     x?For find ruin quests, check if the place block is known first? I don't
       think quests should be given for known locations. Especially since
       mapmakers can now reveal the whole map.
-
-    Show time of day text under main screen? where? (from turn (of 10000)):
-      Sunrise (0)
-      Morning (833)
-      Late Morning (1667)
-      Noon (2500)
-      Afternoon (3333)
-      Late Afternoon (4167)
-      Sunset (5000)
-      Evening(5833)
-      Late Evening (6667)
-      Midnight(7500)
-      Late Night(8333)
-      Predawn(9167)
-    Only in Wilderness?(replace wilderness name) Night creatures still get
-      bonus in dungeons so no. After tile multipliers, put to right of
-      wilderness name and don't care if it is shown or not.
 
     vault symbol changes:
 #    & - 50% chance of treasure or trap  formerly *
@@ -97,17 +126,10 @@
 
     vault symbol additions:
 #    Q - quest boss or item, or monster up to 9 levels OOD and treasure up to 7 levels OOD
-#    + - visible door, locked
-#    ' - visible door, open
-#    | - pillar
-#    : - rubble from FA
 #    < - preferred connection point for corridors, or entry stairs if vault is the level
 #    > - exit stairs if vault is the level, or preferred connection point for corridors
 #    * - vein (quartz or magma, whichever matches the most adjacent tiles?)
 
-#    $ - "ordinary treasure" from FA
-#    x - chest
-#    ; - tree from FA
 #    ~ - water (river1 type)
 #    @ - water (lake type)
 #    - - water hide monster? (up to 9 levels OOD?)
@@ -117,15 +139,8 @@
 #    o - nothing
 #    , - fence? (border between floor and nothing)
 
-    vault symbols unchanged
-#    % - outside of the vault, where corridors may be connected
-#    # - granite
-#    X - impenetrable rock
-#    ^ - trap
-#    . - floor
-#   ' '- not part of room
 # other symbols vault specific defined by:
-# V:<sym>:<type>:<id> where type is R, K, F, or T (or g for monster group)
+#// V:<sym>:<type>:<id> where type is R, K, F, or T (or g for monster group)
 # V:<sym>:<feat>:<feat_mod_flags>:<r_idx>:<k_idx>:<ego>:<trap>? from Z2.4.0
 # if r_idx < 0 make hero from -r_idx
 # if k_idx < 0 make randart from -k_idx

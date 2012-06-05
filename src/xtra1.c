@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "button.h"
 
 
 /*
@@ -974,7 +975,7 @@ static void prt_state(void)
 	/* Nothing interesting */
 	else
 	{
-		put_fstr(COL_STATE, Term->hgt - 1, "      ");
+		put_fstr(COL_STATE, Term->hgt - 1, "       ");
 	}
 }
 
@@ -2135,8 +2136,8 @@ static void calc_mana(void)
 
 	/* Extract total mana */
 	msp = (adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] * levels / 25);
-  if (levels > 0)
-    msp += (adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] / 20);
+	if (levels > 0)
+		msp += (adj_mag_mana[p_ptr->stat[mp_ptr->spell_stat].ind] / 20);
 
 	/* Hack -- usually add one mana */
 	if (msp) msp++;
@@ -3399,6 +3400,7 @@ static void calc_bonuses(void)
 	{
 		SET_FLAG(p_ptr, TR_SH_COLD);
 	}
+
 	if (query_timed(TIMED_SH_FEAR))
 	{
 		SET_FLAG(p_ptr, TR_SH_FEAR);
@@ -3726,20 +3728,20 @@ static void calc_bonuses(void)
 	/* Affect Skill -- combat (throwing) (Level, by Class) */
 	p_ptr->skills[SKILL_THT] += (cp_ptr->x_thb * p_ptr->lev / 50);
 
-  /* Affect Skill -- apply stealth mode bunus */
-  if (p_ptr->state.searching == SEARCH_MODE_STEALTH) {
-    if (p_ptr->rp.pclass == CLASS_ROGUE) {
-      /* Apply an additional bonus for rogues */
-      p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 7) + 1;
-    } else
-    if (p_ptr->rp.pclass == CLASS_RANGER) {
-      /* Apply an additional bonus for rangers */
-      p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 10) + 1;
-    } else 
-    {
-      p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 13) + 1;
-    }
-  }
+	/* Affect Skill -- apply stealth mode bunus */
+	if (p_ptr->state.searching == SEARCH_MODE_STEALTH) {
+		if (p_ptr->rp.pclass == CLASS_ROGUE) {
+			/* Apply an additional bonus for rogues */
+			p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 7) + 1;
+		} else
+		if (p_ptr->rp.pclass == CLASS_RANGER) {
+			/* Apply an additional bonus for rangers */
+			p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 10) + 1;
+		} else 
+		{
+			p_ptr->skills[SKILL_STL] += (p_ptr->skills[SKILL_STL] / 13) + 1;
+		}
+	}
 
 	/* Limit Skill -- digging from 1 up */
 	if (p_ptr->skills[SKILL_DIG] < 1) p_ptr->skills[SKILL_DIG] = 1;
@@ -4050,17 +4052,20 @@ void update_stuff(void)
 	{
 		p_ptr->update &= ~(PU_DISTANCE);
 		p_ptr->update &= ~(PU_MONSTERS);
+		p_ptr->update &= ~(PU_OBJECTS);
 		update_monsters(TRUE);
 	}
 
 	if (p_ptr->update & (PU_MONSTERS))
 	{
 		p_ptr->update &= ~(PU_MONSTERS);
+		p_ptr->update &= ~(PU_OBJECTS);
 		update_monsters(FALSE);
 	}
 
 	if (p_ptr->update & (PU_OBJECTS)) {
 		p_ptr->update &= ~(PU_OBJECTS);
+		update_monsters(FALSE);
 	}
 }
 
@@ -4259,6 +4264,12 @@ void redraw_stuff(void)
 	{
 		p_ptr->redraw &= ~(PR_TIME);
 		prt_time();
+	}
+
+	if (p_ptr->redraw & (PR_BUTTONS))
+	{
+		p_ptr->redraw &= ~(PR_BUTTONS);
+		(void)button_print(0,0);
 	}
 
 	/* Do not update map it, doesn't exist */

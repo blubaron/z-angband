@@ -1169,7 +1169,7 @@ static void do_cmd_wiz_play(void)
 	q = "Play with which object? ";
 	s = "You have nothing to play with.";
 
-	q_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	q_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!q_ptr) return;

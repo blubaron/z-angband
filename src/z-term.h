@@ -231,6 +231,32 @@ struct term
 
 	errr (*pict_hook) (int x, int y, int n, const byte *ap, const char *cp,
 					   const byte *tap, const char *tcp);
+
+	/* draw a cave grid */
+	errr (*cave_hook) (int x, int y, int n, 
+		const void **grid, const int cx, const int cy); /* grid is actually cave_type** */
+
+	/* override the map display */
+	void (*view_map_hook)(term *t);
+
+	/* ui override hooks */
+	bool (*get_aim_dir_hook)(int *dp);
+	bool (*get_check_hook)(cptr prompt, ...);
+	bool (*get_string_hook)(char *buf, int len, cptr str, ...);
+	bool (*get_com_hook)(cptr prompt, char *command);
+	s32b (*get_quantity_big_hook)(cptr prompt, s32b max);
+	s16b (*get_quantity_hook)(cptr prompt, s16b max);
+	u32b (*get_number_hook)(cptr prompt, u32b initial);
+	void *(*get_item_hook)(cptr pmt, cptr str, int mode); /* return value is actually object_type */
+	void (*store_hook)(const void *f1_ptr); /* f1 is actually a pointer to feild_type */
+	void (*bldg_hook)(const void *f_ptr); /* f is actually a pointer to feild_type */
+	void (*character_hook)(void);
+	void (*destroy_hook)(void);
+	void (*inven_hook)(void);
+	void (*equip_hook)(void);
+	void (*browse_hook)(void);
+	void (*term_fresh_hook)(void);
+
 };
 
 
@@ -288,8 +314,10 @@ extern void Term_xtra(int n, int v);
 
 extern void Term_queue_char(int x, int y, byte a, char c, byte ta, char tc);
 
-extern void Term_queue_line(int x, int y, int n, byte *a, char *c, byte *ta,
+extern void Term_queue_line(int x, int y, int n, byte *a, char *s, byte *ta,
 							char *tc);
+extern void Term_queue_str(int x, int y, int n, byte a, char *s, byte ta,
+							char tc);
 
 extern void Term_fresh(void);
 extern errr Term_set_cursor(int v);
@@ -297,6 +325,8 @@ extern void Term_gotoxy(int x, int y);
 extern void Term_draw(int x, int y, byte a, char c);
 extern void Term_addch(byte a, char c);
 extern void Term_putch(int x, int y, byte a, char c);
+extern void Term_addstr(int n, byte a, char *s);
+extern void Term_putstr(int x, int y, int n, byte a, char *s);
 extern void Term_erase(int x, int y, int n);
 extern void Term_clear(void);
 extern void Term_redraw(void);

@@ -1821,7 +1821,7 @@ void print_building_options(cptr strings[], int num)
       case 2: x = 45; y = 20; break;
       case 3: x = 45; y = 21; break;
       }
-		  put_fstr(x, y, CLR_YELLOW "%s", strings[i]);
+		  put_fstr(x, y, CLR_YELLOW "$U%s$V", strings[i]);
     } else
     if (i < 9) {
       switch (i) {
@@ -1835,10 +1835,10 @@ void print_building_options(cptr strings[], int num)
       case 7: x =  1; y = 22; break;
       case 8: x =  1; y = 20; break;
       }
-		  put_fstr(x, y, CLR_YELLOW "%s", strings[i]);
+		  put_fstr(x, y, CLR_YELLOW "$U%s$V", strings[i]);
     } else
     {
-		  put_fstr(40 - len / 2, 20 - num + i, CLR_YELLOW "%s", strings[i]);
+		  put_fstr(40 - len / 2, 20 - num + i, CLR_YELLOW "$U%s$V", strings[i]);
     }
 	}
 }

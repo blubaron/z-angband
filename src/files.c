@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "script.h"
 #include "grafmode.h"
+#include "button.h"
 
 
 /*
@@ -1844,7 +1845,6 @@ static void display_player_flag_aux(int col, int row,
  * Special display, part 1
  */
 static void display_player_flag_info(void)
-
 {
 	int row;
 	int col;
@@ -2677,15 +2677,21 @@ void do_cmd_character(void)
 	/* Forever */
 	while (1)
 	{
+		/* backup any current mouse buttons */
+		button_backup_all(TRUE);
+
 		/* Display the player */
 		display_player(mode);
 
 		/* Prompt */
 		put_fstr(2, 23,
-					"['c' to change name, 'f' to file, 'p' for previous, 'n' for next, or ESC]");
+					"[$U'c' to change name$Yc$V, $U'f' to file$Yf$V, $U'p' for previous$Yp$V, $U'n' for next$Yn$V, or $UESC$Y%c$V]", ESCAPE);
 
 		/* Query */
 		c = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		/* Exit */
 		if (c == ESCAPE) break;
@@ -2710,15 +2716,21 @@ void do_cmd_character(void)
 		}
 
 		/* Decrease mode */
-		else if (c == 'p')
+		else if ((c == 'p') || (c == '8') || (c == '4'))
 		{
 			mode = (mode + DISPLAY_PLAYER_MAX - 1) % DISPLAY_PLAYER_MAX;
 		}
 
 		/* Increase mode */
-		else if (c == 'n')
+		else if ((c == 'n') || (c == '2') || (c == '6'))
 		{
 			mode = (mode + 1) % DISPLAY_PLAYER_MAX;
+		}
+
+		/* Ignore left clicks */
+		else if ((c == '\n') || (c == '\r'))
+		{
+			c = c;
 		}
 
 		/* Oops */
@@ -3219,7 +3231,6 @@ errr file_character(cptr name, bool full)
 #define RESIZE_SHOW_FILE	-2
 static cptr resize_name = NULL;
 static cptr resize_what = NULL;
-
 static int resize_line  = 0;
 static int resize_hgt   = 0;
 
@@ -3466,6 +3477,10 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	/* Save the number of "real" lines */
 	size = next;
 
+	/* backup previous menu buttons, so they do not 
+	 * interfere here */
+	button_backup_all(TRUE);
+
 	/* Display the file */
 	while (TRUE)
 	{
@@ -3621,7 +3636,91 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		else
 		{
 			/* Get a keypress */
-			k = inkey();
+			k = inkey_m();
+		}
+
+		if (k & 0x80) {
+			/* translate a mouse press */
+			char mb, mods;
+			int mx, my;
+			Term_getmousepress(&mb, &mx, &my);
+			mods = mb & 0x78;
+			mb = mb & 0x07;
+			k = 0;
+			if (mb == 2) {
+				/* go to the last screen */
+				if (mods & 32) {
+					k = ESCAPE;
+				}
+				break;
+			} else
+			if (mb == 1) {
+				/* if a menu, select the option, otherwise do nothing */
+				if (menu && (my > 2) && (my < hgt-2)) {
+					/* move the file pointer to the beginning of the file */
+					/* TODO: this is not portable */
+					fpos_t pos = ftell(fff);
+					fseek(fff, SEEK_SET, 0);
+
+					next = 0;
+					/* Goto the selected line */
+					while (next < line + my-2) {
+						/* Get a line */
+						if (my_raw_fgets(fff, buf, 1024)) break;
+
+						/* Skip tags/links */
+						if (prefix(buf, "***** ")) continue;
+
+						/* Count the lines */
+						next++;
+					}
+					next = 0;
+					/* get the desired line */
+					while (next == 0) {
+						/* Get a line */
+						if (my_raw_fgets(fff, buf, 1024)) break;
+
+						/* Skip tags/links */
+						if (prefix(buf, "***** ")) continue;
+
+						/* Count the lines */
+						next++;
+					}
+					/* see if the line is a menu item */
+					if (buf[0]) {
+						for (i = 0; i < 62; i++) {
+							if (strstr(buf, hook[i])) {
+								char *c = strchr(buf, '(');
+								k = *(c+1);
+								break;
+							}
+						}
+					}
+
+					fseek(fff, SEEK_SET, pos);
+				//k = ESCAPE;
+				}
+			} else
+			if (mb == 4) {
+				/* scroll up */
+				if (mods & 32) {
+					line -= (hgt - 4) / 2;
+				} else
+				{
+					line -= 1;
+				}
+				if (line < 0) line = 0;
+			} else
+			if (mb == 5) {
+				/* scroll down */
+				if (mods & 32) {
+					line += (hgt - 4) / 2;
+				} else
+				{
+					line += 1;
+				}
+			}
+			/* otherwise do nothing */
 		}
 
 		/* Correct hgt after a resize */
@@ -3821,6 +3920,9 @@ bool show_file(cptr name, cptr what, int line, int mode)
 
 	/* Restore the screen */
 	screen_load();
+
+	/* restore any previous menu buttons */
+	button_restore();
 
 	/* Close the file */
 	my_fclose(fff);

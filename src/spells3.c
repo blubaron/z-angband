@@ -379,6 +379,7 @@ void teleport_player(int dis)
 				continue;
 			}
 
+
 			/* No teleporting into vaults and such */
 			if (c_ptr->info & CAVE_ICKY) continue;
 
@@ -1255,7 +1256,7 @@ bool brand_weapon(int brand_type)
 	/* Looking for a weapon */ /* moved below above to get all declarations at beginning of scope - Brett */
 	item_tester_hook = item_tester_hook_brandable;
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -1698,7 +1699,7 @@ bool alchemy(void)
 	q = "Turn which item to gold? ";
 	s = "You have nothing to turn to gold.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -1819,7 +1820,7 @@ bool polymorph_item(void)
 	q = "Polymorph which item? ";
 	s = "You have nothing to polymorph.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2187,7 +2188,7 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac, char power)
 	q = "Enchant which item? ";
 	s = "You have nothing to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2250,7 +2251,7 @@ bool artifact_scroll(void)
 	q = "Enchant which item? ";
 	s = "You have nothing to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2509,7 +2510,7 @@ static bool ident_spell_aux(int k_idx)
 	q = "Identify which item? ";
 	s = "You have nothing to identify.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2596,7 +2597,7 @@ bool mundane_spell(void)
 	q = "Use which item? ";
 	s = "You have nothing you can use.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2678,7 +2679,7 @@ bool identify_fully(void)
 	q = "Identify which item? ";
 	s = "You have nothing to *identify*.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2718,7 +2719,7 @@ bool identify_resistances(void)
 	q = "Probe which item? ";
 	s = "You have nothing to probe.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -2782,7 +2783,7 @@ bool recharge(int power)
 	q = "Recharge which item? ";
 	s = "You have nothing to recharge.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -3074,7 +3075,7 @@ bool bless_weapon(void)
 	q = "Bless which weapon? ";
 	s = "You have weapon to bless.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return FALSE;
@@ -3188,7 +3189,7 @@ bool add_perm_lite(void)
 	q = "Enchant which weapon? ";
 	s = "You have weapon to enchant.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return FALSE;
@@ -4802,7 +4803,7 @@ bool rustproof(void)
 	q = "Rustproof which piece of armour? ";
 	s = "You have nothing to rustproof.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
@@ -4953,6 +4954,7 @@ bool curse_weapon(void)
 		/* Remove object knowledge */
 		o_ptr->kn_flags[0] = 0;
 		o_ptr->kn_flags[0] = 1;
+
 		o_ptr->kn_flags[0] = 2;
 		o_ptr->kn_flags[0] = 3;
 
@@ -6122,45 +6124,6 @@ bool do_stasis(int x, int y, int dam)
 
 	return (TRUE);
 }
-/*
- * Request a "number" from the user
- */
-u32b get_number(cptr prompt, u32b initial)
-{
-  u32b amt;
-
-	char tmp[80];
-
-	char buf[80];
-
-	/* Build a prompt if needed */
-	if (!prompt)
-	{
-		/* Build a prompt */
-		strnfmt(tmp, 80, "Enter a number: ");
-
-		/* Use that prompt */
-		prompt = tmp;
-	}
-
-
-	/* Default to zero */
-	amt = initial;
-
-	/* Build the default */
-	strnfmt(buf, 80, "%d", amt);
-
-	/* Ask for a quantity */
-	if (!get_string(buf, 20, prompt)) return (0);
-
-	/* Extract a number */
-	amt = (u32b) atol(buf);
-
-	if (amt) repeat_push(amt);
-
-	/* Return the result */
-	return (amt);
-}
 
 /*
  * Enchant an item (in the inventory or on the floor)
@@ -6181,27 +6144,27 @@ bool enchant_pval(int num_try, int force)
 	q = "Infuse which item? ";
 	s = "You have nothing to infuse.";
 
-	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR));
+	o_ptr = get_item(q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
 
-  if (!o_ptr->pval) {
-    /* only items that have a nonzero pval can be infused */
-	  msgf("You cannot infuse the %v!", OBJECT_FMT(o_ptr, FALSE, 0));
-    return (FALSE);
-  }
+	if (!o_ptr->pval) {
+		/* only items that have a nonzero pval can be infused */
+		msgf("You cannot infuse the %v!", OBJECT_FMT(o_ptr, FALSE, 0));
+		return (FALSE);
+	}
 	/* Describe */
 	msgf("The %v glow%s brightly!", OBJECT_FMT(o_ptr, FALSE, 0),
 			   ((o_ptr->number > 1) ? "" : "s"));
 
 	/* Enchant */
-  if (o_ptr->pval < 0) {
-    o_ptr->pval = 1;
-	  msgf("The %v ends up with a soft glow.", OBJECT_FMT(o_ptr, FALSE, 0));
-	  /* Something Happened */
-	  return (TRUE);
-  }
+	if (o_ptr->pval < 0) {
+		o_ptr->pval = 1;
+		msgf("The %v ends up with a soft glow.", OBJECT_FMT(o_ptr, FALSE, 0));
+		/* Something Happened */
+		return (TRUE);
+	}
 	/* Large piles resist enchantment */
 	//prob = o_ptr->number * 100;
 
@@ -6216,22 +6179,22 @@ bool enchant_pval(int num_try, int force)
 	for (i = 0; i < num_try; i++)
 	{
 		if (o_ptr->pval < 0) 
-      chance = 0;
+			chance = 0;
 		else if (o_ptr->pval > ENCHANT_MAX) 
-      chance = 1000;
+			chance = 1000;
 		else
 			chance = enchant_table[o_ptr->pval];
 
 		if (force || ((randint1(1000) > chance) && (one_in_(2))))
 		{
-  		change = 1;
+			change = 1;
 
-      o_ptr->pval += change;
+			o_ptr->pval += change;
 			okay = TRUE;
-      if (o_ptr->pval == 0)
-        o_ptr->pval = 1;
+			if (o_ptr->pval == 0)
+				o_ptr->pval = 1;
 		}
-  }
+	}
 	/* Failure */
 	if (!okay)
 	{
@@ -6261,80 +6224,80 @@ bool enchant_pval(int num_try, int force)
 
 bool shadow_jump(void)
 {
-  u32b seed;
+	u32b seed;
 	cptr q;
 	int i, n;
 	monster_race *r_ptr;
-  store_type *home;
-  s16b temp_list;
-  object_type *o_ptr;
+	store_type *home;
+	s16b temp_list;
+	object_type *o_ptr;
 
-  msgf("Warning: If you jump between shadows you will lose everything all houses except your main one!");
+	msgf("Warning: If you jump between shadows you will lose everything all houses except your main one!");
 
-	if (!get_check("Jump to another shadow?"))
+	if (!get_check("Jump to another shadow? "))
 	{
 		msgf("You decide to stay in this shadow.");
 		return FALSE;
 	}
 	q = "What number do you focus on? (0 to let your mind wander) ";
-  seed = get_number(q,0);
-  if (seed) {
-  	msgf("You clear your mind, focus on the number %d, and change the layers of shadow.", seed);
-  }
-  else
-  {
-  	msgf("You clear your mind and change the layers of shadow.");
-	  // Basic seed 
-	  seed = (time(NULL));
-  	msgf("The number %d comes to mind.", seed);
-  }
+	seed = get_number(q,0);
+	if (seed) {
+		msgf("You clear your mind, focus on the number %d, and change the layers of shadow.", seed);
+	}
+	else
+	{
+		msgf("You clear your mind and change the layers of shadow.");
+		// Basic seed 
+		seed = (time(NULL));
+		msgf("The number %d comes to mind.", seed);
+	}
 
-  /* Process fields under the player. */
-  // this is not needed anymore? Brett
+	/* Process fields under the player. */
+	// this is not needed anymore? Brett
 	//field_script(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_LEAVE, "");
 	//field_hook(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_LEAVE);
 
-  /* go through the monster list and clear questor flags and unique kills */
+	/* go through the monster list and clear questor flags and unique kills */
 	for (n = 0, i = 1; i < z_info->r_max; i++)
 	{
 		r_ptr = &r_info[i];
-    if (FLAG(r_ptr, RF_QUESTOR))
-    {
-  		r_ptr->flags[0] &= ~(RF0_QUESTOR);
-    }
-    if (FLAG(r_ptr, RF_UNIQUE) || FLAG(r_ptr, RF_UNIQUE_7))
-    {
-      r_ptr->cur_num = 0;
-    }
-  }
-  /* copy the current recall house inventory */
-  temp_list=0;
-  home = NULL;
-  if (p_ptr->home_place_num)
-  //if (p_ptr->home_place_num && p_ptr->home_store_num)
-  {
-    home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
-  }
-  if (home) {
-    if (home->type == BUILD_STORE_HOME) {
-	    o_ptr = get_list_item(home->stock, 0);
-      while (o_ptr) {
-	      /* Move the item to the temporary list */
-        move_object(&temp_list, &home->stock, o_ptr);
-        o_ptr->allocated = 2;
-        o_ptr = get_list_item(home->stock, 0);
-      }
-    }
-  }
-  /* reset artifacts not in player's inventory or starting house inventory */
+		if (FLAG(r_ptr, RF_QUESTOR))
+		{
+			r_ptr->flags[0] &= ~(RF0_QUESTOR);
+		}
+		if (FLAG(r_ptr, RF_UNIQUE) || FLAG(r_ptr, RF_UNIQUE_7))
+		{
+			r_ptr->cur_num = 0;
+		}
+	}
+	/* copy the current recall house inventory */
+	temp_list=0;
+	home = NULL;
+	if (p_ptr->home_place_num)
+	//if (p_ptr->home_place_num && p_ptr->home_store_num)
+	{
+		home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
+	}
+	if (home) {
+		if (home->type == BUILD_STORE_HOME) {
+			o_ptr = get_list_item(home->stock, 0);
+			while (o_ptr) {
+				/* Move the item to the temporary list */
+				move_object(&temp_list, &home->stock, o_ptr);
+				o_ptr->allocated = 2;
+				o_ptr = get_list_item(home->stock, 0);
+			}
+		}
+	}
+	/* reset artifacts not in player's inventory or starting house inventory */
 
-  message_flush();
-  //messages_free();
-  //messages_init();
+	message_flush();
+	//messages_free();
+	//messages_init();
 	// Wipe everything - to keep inventory, comment out a line in wipe all list
 	wipe_all_list();
 
-  // Use the complex RNG 
+	// Use the complex RNG 
 	Rand_quick = FALSE;
 
 	// Seed the "complex" RNG 
@@ -6346,52 +6309,52 @@ bool shadow_jump(void)
 	/* Create a new wilderness for the player */ 
 	create_wilderness();
 	
-  /* restore the players house inventory */
-  /* find the index of the home - Paranoia */
-  if (p_ptr->home_place_num == 0)
-  //if ((p_ptr->home_place_num == 0) || (p_ptr->home_store_num == 0))
-  {
-    for (i=0; i<place[p_ptr->place_num].numstores; i++)
-    {
-      if (place[p_ptr->place_num].store[i].type == BUILD_STORE_HOME)
-      {
-        p_ptr->home_place_num = p_ptr->place_num;
-        p_ptr->home_store_num = i;
-        break;
-      }
-    }
-  }
-  home = NULL;
-  if (p_ptr->home_place_num)
-  //if (p_ptr->home_place_num && p_ptr->home_store_num)
-  {
-    home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
-  }
-  if (home && temp_list) {
-    if (home->type == BUILD_STORE_HOME) {
-	    chg_virtue(V_SACRIFICE, -1);
-	    o_ptr = get_list_item(temp_list, 0);
-      while (o_ptr) {
-	      /* Move the item to the home stock list */
-        move_object(&home->stock, &temp_list, o_ptr);
+	/* restore the players house inventory */
+	/* find the index of the home - Paranoia */
+	if (p_ptr->home_place_num == 0)
+	//if ((p_ptr->home_place_num == 0) || (p_ptr->home_store_num == 0))
+	{
+		for (i=0; i<place[p_ptr->place_num].numstores; i++)
+		{
+			if (place[p_ptr->place_num].store[i].type == BUILD_STORE_HOME)
+			{
+				p_ptr->home_place_num = p_ptr->place_num;
+				p_ptr->home_store_num = i;
+				break;
+			}
+		}
+	}
+	  home = NULL;
+	  if (p_ptr->home_place_num)
+	  //if (p_ptr->home_place_num && p_ptr->home_store_num)
+	  {
+	    home = &(place[p_ptr->home_place_num].store[p_ptr->home_store_num]);
+	  }
+	  if (home && temp_list) {
+		if (home->type == BUILD_STORE_HOME) {
+			chg_virtue(V_SACRIFICE, -1);
+			o_ptr = get_list_item(temp_list, 0);
+			while (o_ptr) {
+				/* Move the item to the home stock list */
+				move_object(&home->stock, &temp_list, o_ptr);
 
-        /* Forget location */
-        o_ptr->iy = o_ptr->ix = 0;
+				/* Forget location */
+				o_ptr->iy = o_ptr->ix = 0;
 
-	      /* Forget Region */
-	      o_ptr->region = 0;
+				/* Forget Region */
+				o_ptr->region = 0;
 
-	      /* No longer marked */
-	      o_ptr->info &= ~(OB_SEEN);
+				/* No longer marked */
+				o_ptr->info &= ~(OB_SEEN);
 
-	      o_ptr = get_list_item(temp_list, 0);
-      }
-    }
-  }
-  /* clear the inventory lists */
-  delete_object_list(&temp_list);
+				o_ptr = get_list_item(temp_list, 0);
+			}
+		}
+	}
+	/* clear the inventory lists */
+	delete_object_list(&temp_list);
 
-  /* from teleport_player */
+	/* from teleport_player */
 	/* Notice movement */
 	Term_move_player();
 
@@ -6404,8 +6367,8 @@ bool shadow_jump(void)
 	lite_spot(p_ptr->px, p_ptr->py);
 
 	/* Process fields under the player. */
-  field_script(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER, "");
-  //field_hook(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER);
+	field_script(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER, "");
+	//field_hook(area(p_ptr->px, p_ptr->py), FIELD_ACT_PLAYER_ENTER);
 
 	/* Check for new panel (redraw map) */
 	verify_panel();
@@ -6422,10 +6385,11 @@ bool shadow_jump(void)
 	/* Handle stuff XXX XXX XXX */
 	handle_stuff();
 
-  //p_ptr->update |= (PU_VIEW | PU_MON_LITE);
+	//p_ptr->update |= (PU_VIEW | PU_MON_LITE);
 	p_ptr->window |= (PW_MONSTER);
 
 	msgf("You look around at this shadow.");
 
 	return TRUE;
 }
+

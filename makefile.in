@@ -25,7 +25,7 @@ exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
 
-DESTDIR = $(datadir)/games/zangband/
+DESTDIR = $(datadir)/games/z-angband/
 GAMEGROUP = @GAMEGROUP@
 
 CFLAGS += -DDEFAULT_PATH=\"$(DESTDIR)lib/\"
@@ -62,7 +62,7 @@ scandir = $(addprefix $(subdir),$(addsuffix /makefile.zb,$(dirs)))
 
 files = angdos.cfg readme z_faq.txt z_update.txt
 
-clean-files = zangband .default_path
+clean-files = z-angband .default_path
 distclean-files = *.bak gmon.out config.log config.status
 
 srcfiles = configure configure.in makefile makefile.in
@@ -72,7 +72,7 @@ srcfiles = configure configure.in makefile makefile.in
 ##
 ## Compile zangband.
 ##
-default: zangband
+default: z-angband
 
 INSTALL = 
 
@@ -102,9 +102,9 @@ endif
 ##
 ## Compile zangband.
 ##
-default: zangband .makefiles
+default: z-angband .makefiles
 
-zangband: $(objs-y)
+z-angband: $(objs-y)
 	$(LINK) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LIBS) $(DEFS)
 
 ##
@@ -136,15 +136,15 @@ base: dirs
 installbase: base
 	$(INSTALL)
 
-install: installbase zangband
-	cp zangband $(bindir)/zangband
+install: installbase z-angband
+	cp zangband $(bindir)/z-angband
 	if [ -n "$(GAMEGROUP)" ] ; then \
-		chgrp $(GAMEGROUP) $(bindir)/zangband; \
-		chmod g+s $(bindir)/zangband; \
+		chgrp $(GAMEGROUP) $(bindir)/z-angband; \
+		chmod g+s $(bindir)/z-angband; \
 	fi
 
 uninstall:
-	-rm -f $(bindir)/zangband
+	-rm -f $(bindir)/z-angband
 	-rm -rf $(DESTDIR)
 
 dist: base
@@ -182,9 +182,9 @@ VERSION := $(shell echo $(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)$(VER_EXTRA)$(VER_
 
 
 distgz: dist
-	cd $(datadir)/games && tar -cvf zangband.tar zangband
-	mv $(datadir)/games/zangband.tar ./zangband-$(VERSION).tar
-	gzip -9 zangband-$(VERSION).tar
+	cd $(datadir)/games && tar -cvf z-angband.tar z-angband
+	mv $(datadir)/games/z-angband.tar ./z-angband-$(VERSION).tar
+	gzip -9 z-angband-$(VERSION).tar
 	-rm -rf $(DESTDIR)
 
 # Minor cleaning

@@ -1173,5 +1173,10 @@ errr init_gcu(void)
 	return (0);
 }
 
+/* close the GCU port */
+void close_gcu(void)
+{
+}
+
 #endif /* USE_GCU */
 

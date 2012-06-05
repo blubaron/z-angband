@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "script.h"
 #include "grafmode.h"
+#include "button.h"
 
 /* Hack: For use in get_item & subroutines.  */
 s16b curr_container = 0;
@@ -2303,7 +2304,7 @@ void show_list(s16b o_list_ptr, bool store)
 		prtf(col ? col - 2 : col, j + 1, "");
 
 		/* Clear the line with the (possibly indented) index */
-		put_fstr(col, j + 1, "%c)", I2A(out_index[j]));
+		put_fstr(col, j + 1, "$U%c)", I2A(out_index[j]));
 
 		/* Display graphics for object, if desired */
 		a = object_attr(o_ptr);
@@ -2320,7 +2321,7 @@ void show_list(s16b o_list_ptr, bool store)
 		Term_draw(col + 3, j + 1, a, c);
 
 		/* Display the entry itself */
-		put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s",
+		put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 				 out_color[j], out_desc[j]);
 
 		/* Display the weight if needed */
@@ -2464,7 +2465,7 @@ void show_equip(bool store)
 		prtf(col ? col - 2 : col, j + 1, "");
 
 		/* Clear the line with the (possibly indented) index */
-		put_fstr(col, j + 1,"%c)", I2A(i));
+		put_fstr(col, j + 1,"$U%c)", I2A(i));
 
 		/* Show_equip_graph perm. on. */
 		a = object_attr(o_ptr);
@@ -2490,7 +2491,7 @@ void show_equip(bool store)
 			put_fstr(col + 5, j + 1, "%-14s: ", mention_use(i));
 
 			/* Display the entry itself */
-			put_fstr(col + 21, j + 1, "%s" CLR_SET_DEFAULT "%s",
+			put_fstr(col + 21, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 					 out_color[j], out_desc[j]);
 		}
 
@@ -2498,7 +2499,7 @@ void show_equip(bool store)
 		else
 		{
 			/* Display the entry itself */
-			put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s",
+			put_fstr(col + 5, j + 1, "%s" CLR_SET_DEFAULT "%s$V",
 					 out_color[j], out_desc[j]);
 		}
 
@@ -2903,10 +2904,10 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Inven:");
 
 			/* Append */
-			if (equip) strnfcat(out_val, 160, &len, " / for Equip,");
+			if (equip) strnfcat(out_val, 160, &len, " $U/ for Equip$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			break;
 		}
@@ -2923,13 +2924,13 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Contents:");
 
 			/* Append */
-			if (equip) strnfcat(out_val, 160, &len, " / for Inven,");
+			if (equip) strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			/* Append */
-			if (full_container) strnfcat(out_val, 160, &len, " * for container,");
+			if (full_container) strnfcat(out_val, 160, &len, " $U* for container$V,");
 
 			break;
 		}
@@ -2962,10 +2963,10 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 			len = strnfmt(out_val, 160, "Equip:");
 
 			/* Append */
-			if (inven) strnfcat(out_val, 160, &len, " / for Inven,");
+			if (inven) strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 
 			/* Append */
-			if (floor) strnfcat(out_val, 160, &len, " - for floor,");
+			if (floor) strnfcat(out_val, 160, &len, " $U- for floor$V,");
 
 			break;
 		}
@@ -2988,11 +2989,11 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 				/* Append */
 				if (inven)
 				{
-					strnfcat(out_val, 160, &len, " / for Inven,");
+					strnfcat(out_val, 160, &len, " $U/ for Inven$V,");
 				}
 				else if (equip)
 				{
-					strnfcat(out_val, 160, &len, " / for Equip,");
+					strnfcat(out_val, 160, &len, " $U/ for Equip$V,");
 				}
 			}
 			else
@@ -3006,7 +3007,7 @@ static void show_item_prompt(bool inven, bool equip, bool floor, bool store,
 	}
 
 	/* Show the prompt */
-	prtf(0, 0, "(%s ESC) %s", out_val, pmt);
+	prtf(0, 0, "(%s $UESC$Y%c$V) %s", out_val, ESCAPE, pmt);
 }
 
 /*
@@ -3244,7 +3245,7 @@ static object_type *recall_object_choice(int *command_wrk)
  * This version of get_item() includes the modifications due to the
  * easy_floor flag.  This flag changes how items on the floor are treated.
  */
-object_type *get_item(cptr pmt, cptr str, int mode)
+object_type *get_item(cptr pmt, cptr str, int mode, int start)
 {
 	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
 
@@ -3364,27 +3365,44 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 		item_tester_hook = NULL;
 
 		/* Done */
-		return (FALSE);
+		return NULL;
 	}
 
 	/* Analyze choices */
+
+	/* use a given mode if we can */
+	if (allow_inven && (start == USE_INVEN)) {
+		command_wrk = (USE_INVEN);
+	} else
+	if (allow_equip && (start == USE_EQUIP)) {
+		command_wrk = (USE_EQUIP);
+	} else
+	if (allow_floor && (start == USE_FLOOR)) {
+		command_wrk = (USE_FLOOR);
+	} else
+	if (start == USE_EQUIP) {
+		/* force starting on the equipment screen if 
+		 * it was requested, for the show equipment command */
+		command_wrk = (USE_EQUIP);
+		allow_equip = TRUE;
+	} else
 
 	/* Use inventory if allowed */
 	if (allow_inven)
 	{
 		command_wrk = (USE_INVEN);
-	}
+	} else
 
 	/* Use equipment if allowed */
-	else if (allow_equip)
+	if (allow_equip)
 	{
-		command_wrk |= (USE_EQUIP);
-	}
+		command_wrk = (USE_EQUIP);
+	} else
 
 	/* Use floor if allowed */
-	else if (allow_floor)
+	if (allow_floor)
 	{
-		command_wrk |= (USE_FLOOR);
+		command_wrk = (USE_FLOOR);
 	}
 
 	/* Get the saved item index */
@@ -3416,12 +3434,18 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 		/* Activate the correct term info */
 		toggle = toggle_windows(toggle, command_wrk);
 
+		/* backup existing buttons */
+		button_backup_all(TRUE);
+
 		/* Display the prompt */
 		show_item_prompt(allow_inven, allow_equip, allow_floor, store, pmt,
 						 full_container, command_wrk);
 
 		/* Get a key */
 		which = inkey();
+
+		/* restore previous buttons */
+		button_restore();
 
 		/* Parse it */
 		switch (which)
@@ -3438,7 +3462,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				{
 					if (!allow_equip)
 					{
-						bell("Cannot switch item selector!");
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						break;
 					}
 					command_wrk = (USE_EQUIP);
@@ -3447,7 +3475,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 				{
 					if (!allow_inven)
 					{
-						bell("Cannot switch item selector!");
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						break;
 					}
 					command_wrk = (USE_INVEN);
@@ -3464,7 +3496,11 @@ object_type *get_item(cptr pmt, cptr str, int mode)
 					}
 					else
 					{
-						bell("Cannot switch item selector!");
+						if (store) {
+							bell("You do not have any other items I am interested in!");
+						} else {
+							bell("Cannot switch item selector!");
+						}
 						break;
 					}
 				}

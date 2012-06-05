@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 /*
  * How often the autoroller will update the display and pause
@@ -1089,32 +1090,48 @@ static bool player_birth_aux_1(void)
 	/* Clear screen */
 	Term_clear();
 
+	/* Clear mouse buttons */
+	button_backup_all(TRUE);
+
 	/* Display some helpful information */
 	put_fstr(QUESTION_COL, HEADER_ROW,
 			"Please select your character from the menu below.\n"
-			"Use the movement keys to scroll the menu, 'enter' to select the current\n"
-			"menu item, '*' for a random menu item, 'ESC' to restart the character\n"
-			"selection, '=' for the birth options, '?' for help, or 'Ctrl-X' to quit.");
+			"Use the movement keys to scroll the menu, $U'enter' to select the current$Y\n$V\n"
+			"menu item, $U'*' for a random menu item$Y*$V, $U'ESC' to restart the character$Y%c$V\n"
+			"selection, $U'=' for the birth options$Y=$V, $U'?' for help$Y?$V, or $U'Ctrl-X' to quit$Y%c$V.",
+			ESCAPE, KTRL('X'));
 
-	if (!get_player_sex()) return (FALSE);
+	if (!get_player_sex()) {
+		button_restore();
+		return (FALSE);
+	}
 
 	/* Clean up */
-    clear_region(0, QUESTION_ROW, TABLE_ROW - 1);
+	clear_region(0, QUESTION_ROW, TABLE_ROW - 1);
 
 	/* Choose the players race */
-	if (!get_player_race()) return (FALSE);
+	if (!get_player_race()) {
+		button_restore();
+		return (FALSE);
+	}
 
 	/* Clean up */
 	clear_region(0, QUESTION_ROW, TABLE_ROW - 1);
 
 	/* Choose the players class */
-	if (!get_player_class()) return (FALSE);
+	if (!get_player_class()) {
+		button_restore();
+		return (FALSE);
+	}
 
 	/* Clean up */
 	clear_region(0, QUESTION_ROW, TABLE_ROW - 1);
 
 	/* Choose the magic realms */
-	if (!get_player_realms()) return (FALSE);
+	if (!get_player_realms()) {
+		button_restore();
+		return (FALSE);
+	}
 
 	/* Clear */
 	Term_clear();
@@ -1143,6 +1160,9 @@ static bool player_birth_aux_1(void)
 
 	/* Clear */
 	clear_from(15);
+
+	/* restore any previous mouse buttons */
+	button_restore();
 
 	/* Done */
 	return (TRUE);
@@ -1359,7 +1379,7 @@ static bool player_birth_aux_3(void)
 
 	bool flag;
 	bool previous = FALSE;
-  bool useweights = TRUE;
+	bool useweights = TRUE;
 
 	char ch;
 
@@ -1376,12 +1396,13 @@ static bool player_birth_aux_3(void)
 
 	s32b last_round;
 
+	/* Store any previous buttons */
+	button_backup_all(TRUE);
 
 	/*** Autoroll ***/
 
 	/* Initialize */
-	if (autoroller)
-	{
+	if (autoroller) {
 		char inp[80];
 
 		/* Clean up */
@@ -1403,8 +1424,7 @@ static bool player_birth_aux_3(void)
 		put_fstr(2, 15, "Enter weight for: ");
 
 		/* Output the prompts */
-		for (i = 0; i < A_MAX; i++)
-		{
+		for (i = 0; i < A_MAX; i++) {
 			/* Reset the "success" counter */
 			stat_match[i] = 0;
 
@@ -1413,8 +1433,7 @@ static bool player_birth_aux_3(void)
 		}
 
 		/* Input the minimum stats */
-		for (i = 0; i < A_MAX; i++)
-		{
+		for (i = 0; i < A_MAX; i++) {
 			/* In the Antiband version this is dependent on class & stat */
 			int def_weight = 50 + 5*cp_ptr->c_adj[i];
 			/* soften the extremes */
@@ -1422,8 +1441,7 @@ static bool player_birth_aux_3(void)
 			if (cp_ptr->c_adj[i] < -4) def_weight += 5;
 
 			/* Get a minimum stat */
-			while (TRUE)
-			{
+			while (TRUE) {
 				/* Move the cursor */
 				Term_gotoxy(10, 16 + i);
 
@@ -1450,40 +1468,33 @@ static bool player_birth_aux_3(void)
 	/* Clean up */
 	clear_from(10);
 
-  // decide if we are going to use the weights as stats
-  v = 0;
-	for (i = 0; i < A_MAX; i++)
-	{
-    if ((stat_weight[i] > 20) || (stat_weight[i] < 5))
-    {
-      useweights = FALSE;
-      break;
-    }
-    v += stat_weight[i];
-  }
+	/* decide if we are going to use the weights as stats */
+	v = 0;
+	for (i = 0; i < A_MAX; i++) {
+		if ((stat_weight[i] > 20) || (stat_weight[i] < 5)) {
+			useweights = FALSE;
+			break;
+		}
+		v += stat_weight[i];
+	}
 
 	/*** Generate ***/
 
 	/* Roll */
-	while (TRUE)
-	{
+	while (TRUE) {
 		int col = 42;
 
-    if (useweights && (v == 86))
-    {
-      /* use the weights as stats directly */
-		  for (i = 0; i < A_MAX; i++)
-		  {
-        /* copy the stats to stat_use so the money generated is correct */
-			  stat_use[i] =  10 * (stat_weight[i] + rp_ptr->r_adj[i] + cp_ptr->c_adj[i]);
-        /* Set the stat */
-        p_ptr->stat[i].cur = p_ptr->stat[i].max = stat_use[i];
-		  }
-    }
-    else
+		if (useweights && (v == 86)) {
+			/* use the weights as stats directly */
+			for (i = 0; i < A_MAX; i++) {
+				/* copy the stats to stat_use so the money generated is correct */
+				stat_use[i] =  10 * (stat_weight[i] + rp_ptr->r_adj[i] + cp_ptr->c_adj[i]);
+				/* Set the stat */
+				p_ptr->stat[i].cur = p_ptr->stat[i].max = stat_use[i];
+			}
+		} else
 		/* Feedback */
-		if (autoroller)
-		{
+		if (autoroller) {
 			s32b best_score;
 			s32b cur_score;
 
@@ -1496,8 +1507,7 @@ static bool player_birth_aux_3(void)
 			put_fstr(col + 13, 2, "  Roll");
 
 			/* Put the stat weights */
-			for (i = 0; i < A_MAX; i++)
-			{
+			for (i = 0; i < A_MAX; i++) {
 				/* Label stats */
 				put_fstr(col, i + 3, stat_names[i]);
 
@@ -1512,17 +1522,15 @@ static bool player_birth_aux_3(void)
 			put_fstr(col + 13, 10, "Round:");
 
 			/* Indicate the state */
-			put_fstr(col + 13, 12, "(Hit ESC to stop)");
+			put_fstr(col + 13, 12, "$U(Hit ESC to stop)$Y%c$V",ESCAPE);
 
 			best_score = -1;
-			for (i = 0; i < A_MAX; i++)
-			{
+			for (i = 0; i < A_MAX; i++) {
 				stat_save[i] = 3;
 			}
 
 			/* Auto-roll */
-			while (TRUE)
-			{
+			while (TRUE) {
 				/* Get a new character */
 				get_stats();
 
@@ -1534,17 +1542,14 @@ static bool player_birth_aux_3(void)
 
 				/* Calculate a score for the rolled stats */
 				cur_score = 0;
-				for (i = 0; i < A_MAX; i++)
-				{
+				for (i = 0; i < A_MAX; i++) {
 		   			cur_score += (p_ptr->stat[i].cur) * stat_weight[i];
 				}
 
 				/* Compare current score against saved stats */
-				if (cur_score > best_score)
-				{
+				if (cur_score > best_score) {
 					best_score = cur_score;
-					for (i = 0; i < A_MAX; i++)
-					{
+					for (i = 0; i < A_MAX; i++) {
 						stat_save[i] = p_ptr->stat[i].cur;
 					}
 				}
@@ -1556,11 +1561,9 @@ static bool player_birth_aux_3(void)
 				flag = (!(auto_round % AUTOROLLER_STEP));
 
 				/* Update display occasionally */
-				if (flag || (auto_round < last_round + 100))
-				{
+				if (flag || (auto_round < last_round + 100)) {
 					/* Put the stats (and percents) */
-					for (i = 0; i < A_MAX; i++)
-					{
+					for (i = 0; i < A_MAX; i++) {
 						/* Put the stat */
 						put_fstr(col + 13, 3 + i, CLR_L_GREEN "%v",
 								 stat_format, stat_use[i]);
@@ -1584,14 +1587,12 @@ static bool player_birth_aux_3(void)
 			}
 
 			/* Load best stat set rolled */
-			for (i = 0; i < A_MAX; i++)
-			{
+			for (i = 0; i < A_MAX; i++) {
 				p_ptr->stat[i].cur = p_ptr->stat[i].max = stat_save[i];
 			}
-		}
+		} else
 
 		/* Otherwise just get a character */
-		else
 		{
 			/* Get a new character */
 			get_stats();
@@ -1623,8 +1624,7 @@ static bool player_birth_aux_3(void)
 		p_ptr->muta3 = 0;
 
 		/* Input loop */
-		while (TRUE)
-		{
+		while (TRUE) {
 			/* Calculate the bonuses and hitpoints */
 			p_ptr->update |= (PU_BONUS | PU_HP);
 
@@ -1637,15 +1637,22 @@ static bool player_birth_aux_3(void)
 			/* Fully rested */
 			p_ptr->csp = p_ptr->msp;
 
+			/* Store any previous buttons */
+			button_backup_all(TRUE);
+
 			/* Display the player */
 			display_player(mode);
 
 			/* Prepare a prompt (must squeeze everything in) */
-			prtf(2, 23, "['r' to reroll%s, 'n' for next screen, or Enter to accept]",
-				previous ? ", 'p' for prev": "");
+			prtf(2, 22, "[Press $U'?' for help$Y?$V, $U'=' for options$Y=$V]");
+			prtf(2, 23, "[$U'r' to reroll$Yr$V%s, $U'n' for next screen$Yn$V, or $UEnter to accept$Y\n$V]",
+				previous ? ", $U'p' for prev$Yp$V": "");
 
 			/* Prompt and get a command */
 			ch = inkey();
+
+			/* restore any previous buttons */
+			button_restore();
 
 			/* Quit */
 			if (ch == KTRL('X')) quit(NULL);
@@ -1660,26 +1667,26 @@ static bool player_birth_aux_3(void)
 			if ((ch == ' ') || (ch == 'r')) break;
 
 			/* Previous character */
-			if (previous && (ch == 'p'))
-			{
+			if (previous && (ch == 'p')) {
 				load_prev_data();
 				continue;
 			}
 
 			/* Increase mode */
-			if (ch == 'n')
-			{
+			if ((ch == 'n') || (ch == '2') || (ch == '6')) {
 				mode = (mode + 1) % DISPLAY_PLAYER_MAX;
+			} else
+			/* Decrease mode */
+			if ((ch == '8') || (ch == '4')) {
+				mode = (mode + DISPLAY_PLAYER_MAX - 1) % DISPLAY_PLAYER_MAX;
 			}
 
 			/* Help */
-			if (ch == '?')
-			{
+			if (ch == '?') {
 				(void)show_file("birth.txt#CharDisplay", NULL, 0, 0);
 				continue;
 			}
-			else if (ch == '=')
-			{
+			else if (ch == '=') {
 				do_cmd_options(OPT_FLAG_BIRTH | OPT_FLAG_SERVER |
 							   OPT_FLAG_PLAYER);
 				continue;
@@ -1698,6 +1705,9 @@ static bool player_birth_aux_3(void)
 		/* Note that a previous roll exists */
 		previous = TRUE;
 	}
+
+	/* restore any previous buttons */
+	button_restore();
 
 	/* Clear prompt */
 	clear_from(23);
@@ -1725,18 +1735,6 @@ static bool player_rebirth(void)
 	if (!rebirth_ptr->can_rebirth)
 		return FALSE;
 	
-	/* Only query if we're not in competition mode */
-	if (!competition_mode)
-	{
-		/* if short-circuits so we don't need the nesting here, but
-		 * it makes things clearer. */
-		if (!get_check("Rebirth?"))
-			return FALSE;
-	}
-	
-	/* We are doing a rebirth! */
-	rebirth = TRUE;
-	
 	/* Sex */
 	p_ptr->rp.psex = rebirth_ptr->rp.psex;
 	sp_ptr = &sex_info[p_ptr->rp.psex];
@@ -1745,29 +1743,14 @@ static bool player_rebirth(void)
 	p_ptr->rp.prace = rebirth_ptr->rp.prace;
 	rp_ptr = &race_info[p_ptr->rp.prace];
 
-	/* Give beastman a mutation at character birth */
-	if (p_ptr->rp.prace == RACE_BEASTMAN)
-	{
-		p_ptr->change |= (PC_MUTATE);
-	}
-
 	/* Class */
 	p_ptr->rp.pclass = rebirth_ptr->rp.pclass;
 	cp_ptr = &class_info[p_ptr->rp.pclass];
 	mp_ptr = &magic_info[p_ptr->rp.pclass];
 
-	/* Starting spell slots */
-	for (i = 0; i < SPELL_LAYERS; i++)
-	{
-		p_ptr->spell_slots[i] = magic_info[p_ptr->rp.pclass].max_spells[i];
-	}
-
 	/* Realms */
 	p_ptr->spell.realm[0] = rebirth_ptr->realm[0];
 	p_ptr->spell.realm[1] = rebirth_ptr->realm[1];
-
-	/* Initialize player quests */
-	init_player_quests();
 
 	/* Level one */
 	p_ptr->max_lev = p_ptr->lev = 1;
@@ -1780,12 +1763,6 @@ static bool player_rebirth(void)
 
 	/* Initial hitpoints */
 	p_ptr->mhp = p_ptr->rp.hitdie;
-
-	/* player_hp[] */
-	for (i = 0; i < PY_MAX_LEVEL; i++)
-	{
-		p_ptr->player_hp[i] = rebirth_ptr->player_hp[i];
-	}
 
 	/* Age, weight, height */
 	p_ptr->rp.age = rebirth_ptr->rp.age;
@@ -1807,8 +1784,7 @@ static bool player_rebirth(void)
 	p_ptr->au = rebirth_ptr->au;
 	
 	/* Stats */
-	for (i = 0; i < A_MAX; i++)
-	{
+	for (i = 0; i < A_MAX; i++) {
 		p_ptr->stat[i].cur = rebirth_ptr->stat[i];
 		p_ptr->stat[i].max = rebirth_ptr->stat[i];
 	}
@@ -1824,6 +1800,48 @@ static bool player_rebirth(void)
 
 	/* Fully rested */
 	p_ptr->csp = p_ptr->msp;
+
+	/* Only query if we're not in competition mode */
+	if (!competition_mode) {
+		/* if short-circuits so we don't need the nesting here, but
+		 * it makes things clearer. */
+		/* Display the player */
+		display_player(DISPLAY_PLAYER_STANDARD);
+
+		/* check for rebirth */
+		if (!get_check("Rebirth? ")) {
+			/* clear the info we set for the player display */
+			player_wipe();
+
+			return FALSE;
+		}
+	}
+	
+	/* We are doing a rebirth! */
+	rebirth = TRUE;
+
+	/* Give beastman a mutation at character birth */
+	if (p_ptr->rp.prace == RACE_BEASTMAN) {
+		p_ptr->change |= (PC_MUTATE);
+	}
+
+	/* Starting spell slots */
+	for (i = 0; i < SPELL_LAYERS; i++) {
+		p_ptr->spell_slots[i] = magic_info[p_ptr->rp.pclass].max_spells[i];
+	}
+	
+	/* player_hp[] */
+	for (i = 0; i < PY_MAX_LEVEL; i++) {
+		p_ptr->player_hp[i] = rebirth_ptr->player_hp[i];
+	}
+
+	/* Need to set these */
+	p_ptr->muta1 = 0;
+	p_ptr->muta2 = 0;
+	p_ptr->muta3 = 0;
+
+	/* Initialize player quests */
+	init_player_quests();
 
 	/* Done */
 	return (TRUE);
@@ -1841,38 +1859,34 @@ static bool player_birth_aux(void)
 	if (!player_birth_aux_1()) return FALSE;
 
 	/* Point based */
-	if (point_based)
-	{
+	if (point_based) {
 		if (!player_birth_aux_2()) return FALSE;
 	}
 
 	/* Auto-roll */
-	else
-	{
+	else {
 		if (!player_birth_aux_3()) return FALSE;
 	}
 
 	/* Save stuff for rebirth */
 	rebirth_ptr->rp.sc = p_ptr->rp.sc;
 	rebirth_ptr->chaos_patron = p_ptr->chaos_patron;
-	for (i = 0; i < A_MAX; i++)
-	{
+	for (i = 0; i < A_MAX; i++) {
 		rebirth_ptr->stat[i] = p_ptr->stat[i].cur;
 	}
 	rebirth_ptr->au = p_ptr->au;
 
-    /* Apply some randomness */
-    for (i = 0; i < A_MAX; i++)
-    {
-        p_ptr->stat[i].cur += (s16b) randint0(10);
-        p_ptr->stat[i].max = p_ptr->stat[i].cur;
-    }
+	/* Apply some randomness */
+	for (i = 0; i < A_MAX; i++) {
+		p_ptr->stat[i].cur += (s16b) randint0(10);
+		p_ptr->stat[i].max = p_ptr->stat[i].cur;
+	}
 
-    /* Calculate the bonuses and hitpoints */
-    p_ptr->update |= (PU_BONUS | PU_HP);
+	/* Calculate the bonuses and hitpoints */
+	p_ptr->update |= (PU_BONUS | PU_HP);
 
-    /* Update stuff */
-    update_stuff();
+	/* Update stuff */
+	update_stuff();
 
 	/* Get a name, prepare savefile */
 	/* TODO: During rebirth, would be nice to make the "successor" of the current name. */
@@ -1881,15 +1895,21 @@ static bool player_birth_aux(void)
 	/* Initialize the virtues */
 	get_virtues();
 
+	/* Store any previous buttons */
+	button_backup_all(TRUE);
+
 	/* Display the player */
 	display_player(DISPLAY_PLAYER_STANDARD);
 
 	/* Prompt for it */
 	prtf(10, 23,
-		"['Ctrl-X' to suicide, 'Del' to start over, or Enter to continue]");
+		"[$U'Ctrl-X' to suicide$Y%c$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]", KTRL('X'), KTRL('H'));
 
 	/* Get a key */
 	ch = inkey();
+
+	/* restore any previous buttons */
+	button_restore();
 
 	/* Quit */
 	if (ch == KTRL('X')) quit(NULL);
@@ -1913,8 +1933,7 @@ static bool player_birth_aux(void)
 void player_birth(void)
 {
 	/* Create a new character */
-	while (1)
-	{
+	while (TRUE) {
 		/* Wipe the player */
 		player_wipe();
 
@@ -1923,8 +1942,7 @@ void player_birth(void)
 	}
 
 	/* Create a note file if that option is set */
-	if (take_notes)
-	{
+	if (take_notes) {
 		add_note_type(NOTE_BIRTH);
 	}
 
@@ -1939,8 +1957,7 @@ void player_birth(void)
 	 * we don't pick a fresh seed for world generation.  Otherwise,
 	 * pick one.
 	 */
-	if (!rebirth || !competition_mode)
-	{
+	if (!rebirth || !competition_mode) {
 		msgf("Re-seeding the world...");
 		rebirth_ptr->world_seed = randint0(0x10000000);
 	}
@@ -1956,8 +1973,7 @@ void player_birth(void)
 	 * that shouldn't have it and "RF_QUESTOR" from all monsters
 	 * that shouldn't have it.  
 	 */
-	if (competition_mode)
-	{
+	if (competition_mode) {
 		wipe_all_heroes();
 		wipe_all_quest_flags();
 	}

@@ -369,6 +369,12 @@ int init_tnb(int argc, cptr *argv)
 	return (0);
 }
 
+/* close the tk port */
+void close_tnb(void)
+{
+}
+
+
 #endif /* PLATFORM_X11 */
 
 #endif /* USE_TNB */

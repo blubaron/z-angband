@@ -265,8 +265,11 @@ static int see_interesting(int x, int y)
  *   What moves to remove from consideration if both the
  *   checks listed pass.
  */
-//typedef long long _u64b;
+#ifdef WIN32
 typedef unsigned _int64 _u64b;
+#else
+typedef long long _u64b;
+#endif
 
 static const struct
 {
@@ -872,6 +875,22 @@ static void run_wall(void)
 
 /****** Pathfinding code ******/
 /*    modified from angband   */
+/*
+ * Pathfinding section from angband
+ * Copyright (c) 2004-2007 Christophe Cavalaria, Leon Marrick (pathfinding)
+ *
+ * This work is free software; you can redistribute it and/or modify it
+ * under the terms of either:
+ *
+ * a) the GNU General Public License as published by the Free Software
+ *    Foundation, version 2, or
+ *
+ * b) the "Angband licence":
+ *    This software may be copied and distributed for educational, research,
+ *    and not for profit purposes provided that this copyright and statement
+ *    are included in all such copies.  Other copyrights may also apply.
+ */
+
 #define MARK_DISTANCE(c,d) if ((c <= MAX_PF_LENGTH) && (c > d)) { c = d; try_again = TRUE;}
 
 int find_player_path(int x, int y)
@@ -890,10 +909,10 @@ int find_player_path(int x, int y)
 	int oxl, oyl, exl, eyl;
 	static int dir_search[8] = {2,4,6,8,1,3,7,9};
 
+	s16b mddx[10], mddy[10];
 	int i, j, k, dir;
 	int cur_distance;
 	bool try_again;
-	cave_type *c_ptr;
 	feature_type *feat;
 
 	ox = MAX(p_ptr->px - MAX_PF_RADIUS / 2, p_ptr->min_wid);
@@ -928,10 +947,18 @@ int find_player_path(int x, int y)
 	/* another algorithm to try to reduce the number of passes */
 	cur_distance = 2;
 	for (dir = 1; dir < 10; dir++) {
+		/* preapply this operation since it is the same for all of
+		 * the loops below */
+		mddx[dir] = ox - ddx[dir];
+		mddy[dir] = oy - ddy[dir];
+
 		if (dir != 5) {
-			MARK_DISTANCE(terrain[p_ptr->py - oy + ddy[dir]][p_ptr->px - ox + ddx[dir]], cur_distance);
+			MARK_DISTANCE(terrain[p_ptr->py - mddy[dir]][p_ptr->px - mddx[dir]], cur_distance);
 		}
 	}
+	/* paranoia */
+	mddx[0] = ox - ddx[0];
+	mddy[0] = oy - ddy[0];
 
 	do {
 		try_again = FALSE;
@@ -949,7 +976,7 @@ int find_player_path(int x, int y)
 				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
 					for (dir = 1; dir < 10; dir++) {
 						if (dir != 5) {
-							 MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+							 MARK_DISTANCE(terrain[j - mddy[dir]][i - mddx[dir]], cur_distance);
 						}
 					}
 				}
@@ -961,7 +988,7 @@ int find_player_path(int x, int y)
 				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
 					for (dir = 1; dir < 10; dir++) {
 						if (dir != 5) {
-							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+							MARK_DISTANCE(terrain[j - mddy[dir]][i - mddx[dir]], cur_distance);
 						}
 					}
 				}
@@ -973,7 +1000,7 @@ int find_player_path(int x, int y)
 				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
 					for (dir = 1; dir < 10; dir++) {
 						if (dir != 5) {
-							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+							MARK_DISTANCE(terrain[j - mddy[dir]][i - mddx[dir]], cur_distance);
 						}
 					}
 				}
@@ -985,7 +1012,7 @@ int find_player_path(int x, int y)
 				if ((cur_distance > 0) && (cur_distance < MAX_PF_LENGTH)) {
 					for (dir = 1; dir < 10; dir++) {
 						if (dir != 5) {
-							MARK_DISTANCE(terrain[j - oy + ddy[dir]][i - ox + ddx[dir]], cur_distance);
+							MARK_DISTANCE(terrain[j - mddy[dir]][i - mddx[dir]], cur_distance);
 						}
 					}
 				}
@@ -1020,7 +1047,7 @@ int find_player_path(int x, int y)
 		for (k = 0; k < 8; k++)
 		{
 			dir = dir_search[k];
-			if (terrain[j - oy + ddy[dir]][i - ox + ddx[dir]] == cur_distance)
+			if (terrain[j - mddy[dir]][i - mddx[dir]] == cur_distance)
 				break;
 		}
 

@@ -137,3 +137,34 @@ errr string_free(cptr str)
 	/* Success */
 	return (0);
 }
+
+
+/*
+ * Append more text to a constant string, adding the same thing as 'str'
+ */
+cptr string_append(cptr base, cptr str)
+{
+	huge len = 0;
+	cptr t = base;
+	char *s, *res;
+
+	/* Simple sillyness */
+	if (!str) return (str);
+
+	/* Get the number of chars in the string, including terminator */
+	while (base[len++]) /* loop */ ;
+	while (str[len++]) /* loop */ ;
+
+	/* Allocate space for the string */
+	s = res = (char *)(ralloc(len));
+
+	/* Copy the string (with terminator) */
+	while ((*s++ = *t++) != 0) /* loop */ ;
+	s--;
+	t = str;
+	while ((*s++ = *t++) != 0) /* loop */ ;
+	s = '\0';
+
+	/* Return the allocated, initialized, string */
+	return (res);
+}

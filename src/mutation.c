@@ -1187,7 +1187,7 @@ void mutation_power_aux(const mutation_type *mut_ptr)
 		q = "Drain which item? ";
 		s = "You have nothing to drain.";
 
-		o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR));
+		o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR), (USE_INVEN));
 
 		/* Not a valid item */
 		if (!o_ptr) return;

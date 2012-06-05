@@ -2938,7 +2938,8 @@ void disturb(bool stop_search)
 	}
 
 	/* Cancel searching if requested */
-	if (stop_search && p_ptr->state.searching)
+	if (stop_search && p_ptr->state.searching
+		&& (p_ptr->state.searching != SEARCH_MODE_SWING))
 	{
 		/* Cancel */
 		p_ptr->state.searching = SEARCH_MODE_NONE;

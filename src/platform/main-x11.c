@@ -1458,6 +1458,28 @@ static infoclr *clr[256];
  */
 static byte color_table[256][4];
 
+#ifdef USE_GRAPHICS
+typedef struct XTilesheet XTilesheet;
+struct XTilesheet
+{
+	XImage *color;
+	XImage *mask;
+	byte CellWidth;
+	byte CellHeight;
+	int ImageWidth;
+	int ImageHeight;
+};
+extern bool ReadTiles(char* filename, XTilesheet *tiles);
+extern bool FreeTiles(XTilesheet *tiles);
+
+static XTilesheet tiles; /* tiles loaded from disk */
+static XTilesheet viewtiles; /* tiles that are displayed on screen */
+static XTilesheet maptiles; /* tiles same size as font */
+
+#endif /* USE_GRAPHICS */
+
+extern bool SaveWindow(infowin *win, char*filename);
+
 /*
  * Forward declare
  */
@@ -1639,6 +1661,31 @@ static void react_keypress(XKeyEvent *ev)
 	}
 }
 
+/*
+ * Process a keypress event
+ *
+ * Also appears in "main-xaw.c".
+ */
+static void react_mousepress(XButtonEvent *ev)
+{
+	int mods, x, y;
+
+	/* Extract four "modifier flags" */
+	mods = 0;
+	if (ev->state & ControlMask) mods |= 2;
+	if (ev->state & ShiftMask) mods |= 1;
+	if (ev->state & Mod1Mask) mods |= 4;
+	//if (ev->state & Mod2Mask) mods |= 8;
+
+	/* The co-ordinates are only used in Angband format. */
+	pixel_to_square(&x, &y, ev->x, ev->y);
+	
+	/* switch buttons 2 and 3 to match other platforms (for 3 button mice) */
+	if (ev->button == 3) ev->button = 2;
+	else if (ev->button == 2) ev->button = 3;
+
+	Term_mousepress(ev->button, mods, x, y);
+}
 
 /*
  * Convert co-ordinates from starting corner/opposite corner to minimum/maximum.
@@ -2062,6 +2109,23 @@ static errr CheckEvent(bool wait)
 	/* Switch on the Type */
 	switch (xev->type)
 	{
+		case ButtonRelease:
+		{
+			/* Nothing */
+			break;
+		}
+		case ButtonPress:
+		{
+			if (xev->type == ButtonPress) {
+				/* Hack -- use "old" term */
+				Term_activate(&old_td->t);
+
+				/* Process the key */
+				react_mousepress(&(xev->xbutton));
+			}
+			break;
+		}
+#if 0
 		case ButtonPress:
 		case ButtonRelease:
 		{
@@ -2086,7 +2150,7 @@ static errr CheckEvent(bool wait)
 
 			break;
 		}
-
+#endif
 		case MotionNotify:
 		{
 			/* Where is the mouse */
@@ -2799,7 +2863,6 @@ errr init_x11(int argc, char *argv[])
 		plog_fmt("Ignoring option: %s", argv[i]);
 	}
 
-
 	/* Init the Metadpy if possible */
 	if (Metadpy_init_name(dpy_name)) return (-1);
 	
@@ -2979,4 +3042,7 @@ errr init_x11(int argc, char *argv[])
 	return (0);
 }
 
+void close_x11(void)
+{
+}
 #endif /* USE_X11 */

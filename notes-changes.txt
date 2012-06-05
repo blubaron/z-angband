@@ -358,6 +358,11 @@ enum
 #    | - pillar
 #    : - rubble from FA
 #    $ - "ordinary treasure" from FA
+#    x - chest
+#    ; - tree from FA
+#    ~ - water (river1 type) - just water
+#    @ - water (lake type) - just water
+#    - - water hide monster? (up to 9 levels OOD?)
 
     modified main map display so it always uses tile multipliers of 1, whether
       or not bigtile mode is used.
@@ -400,7 +405,10 @@ enum
 
     players can deposit and withdraw gold from banks.
     fixed bank loan quest (a quest known flag was missing where the quest was inserted).
-    *started to add ability to store an item from stores and pay for it later in banks.
+    Added ability to store an item from stores and pay for it later in banks.
+     make sure you have space in your pack for it, or you will be charged an
+     additional 50 gold. Warning: once you buy an item on lay away, you cannot
+     buy another on lay away until the first one has been paid for.
 
     bounty quest rewards no longer give stat gain.
 
@@ -421,7 +429,7 @@ enum
        it turns any mode off.
       the additional modes use the same speed penalty as search mode.
 
-    *started adding the resurrection items.
+    *started adding items to resurrect the player when s/he dies.
 
     gave spellcasters a bit more starting mana
 
@@ -430,6 +438,39 @@ enum
 
     *added ability to play repeated games without exiting on Windows (from Sil)
      includes use of keyboard presses for the options. *not quite working yet.
+
+    *Added support for tile multipliers larger than 2x1. Mostly working. Screen
+     just to the right of the map is not being cleared though.
+     *some messages have blank spots in them. the messages in the message 
+      sub window are ok though.
+
+    Added time of day text on the status bar. It is displayed to the right of
+     the dungeon level / place name, if the screen is large enough (>90 chars).
+
+    *Added basic mouse support. 
+     *need to implement context menus.
+
+    Added a pathfinding run mode.
+    *Started adding additional run modes to follow roads and waterways
+
+    *Added mouse buttons in most screens. the buttons are "on top" of text in 
+      the screen, always on top of the list of possible keys, and they send the
+      keypress.
+     *need to add more buttons, esp for options, knowledge screens, map
+     *need to add main screen buttons - character, inventory/equip, study, map,
+      search mode, target current target/show monster list.
+
+    *Got the X11 console working again. *need to readd graphics/png support.
+
+    Allow mouse wheel to scroll some menus, ie it can change the character
+      screen. added to X11 and Windows.
+
+    Gave some stores a service to make more of ammo the player already has.
+      for instance, if in a fletcher, and sell two ammo out of a stack, 20
+      appear in the store? (so need to have at least 3 in inventory) so far
+      just arcane/unique flether. *potions and scrolls too?
+
+    Allow for smaller levels and slower breeders in clearout quests.
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the

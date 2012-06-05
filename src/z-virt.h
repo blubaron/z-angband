@@ -160,4 +160,7 @@ extern cptr string_make(cptr str);
 /* Free a string allocated with "string_make()" */
 extern errr string_free(cptr str);
 
+/* Add more to a "dynamic string" */
+extern cptr string_append(cptr base, cptr str);
+
 #endif /* INCLUDED_Z_VIRT_H */

@@ -139,8 +139,8 @@ struct feature_type
 	byte xl_attr;	/* Desired feature attribute when bright */
 	char xl_char;	/* Desired feature character when bright */
 
-	/*byte name_len;	/* length of name string */
-	/*byte text_len;	/* length of feature description string */
+	/*byte name_len;*/	/* length of name string */
+	/*byte text_len;*/	/* length of feature description string */
 };
 
 
@@ -1830,8 +1830,8 @@ struct player_type
 	bool birth[OPT_BIRTH];
 	u32b squelch[(SQUELCHMAX/32)];
 
-	byte ob_count;
-	byte dc_count;
+	byte ob_count; /* the number of owned buildings */
+	byte dc_count; /* the number of outstanding death chests */
 	u16b used_ankhs; /* the number of ankhs used with this character */
 	//byte qb_count;
 	//byte ql_count;
@@ -2089,12 +2089,12 @@ struct dun_gen_type
 	u16b pillar;            /* Override terrain type */
 	u16b stairs_closed;     /* Override terrain type */
 	
-	/*u16b wallsupport;     /* Override terrain type */
-	/*u16b freq_small;      /* frequency of small levels */
+	/*u16b wallsupport;*/     /* Override terrain type */
+	/*u16b freq_small;*/      /* frequency of small levels */
 
-	/*u16b statue;          /* Override terrain type */
-	/*u16b fountain;        /* Override terrain type */
-	/*u16b window;          /* Override terrain type */
+	/*u16b statue;*/          /* Override terrain type */
+	/*u16b fountain;*/        /* Override terrain type */
+	/*u16b window;*/          /* Override terrain type */
 
 	stream_gen_type vein[2]; /* For magma veins, etc. */
 	stream_gen_type river[2];
@@ -2115,8 +2115,8 @@ struct dun_gen_type
 
 	u32b flags;             /* Extra flags */
 
-	//u32b name;              /* Name (offset) */
-	//u32b text;              /* Text (offset) */
+	/*u32b name; */             /* Name (offset) */
+	/*u32b text; */             /* Text (offset) */
 
 	char *name;
 	char *text;

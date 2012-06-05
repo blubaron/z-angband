@@ -2002,4 +2002,9 @@ errr init_dos(void)
 	return 0;
 }
 
+/* close the DOS port */
+void close_dos(void)
+{
+}
+
 #endif /* USE_DOS */

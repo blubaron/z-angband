@@ -2945,7 +2945,7 @@ const dun_gen_type *pick_dungeon_type(void)
 	/* Calculate the total possibilities */
 	//for (d_ptr = dungeons, total = 0; d_ptr->habitat; d_ptr++)
 	//{
-  for (i = 0; i < z_info->dun_max; i++) {
+  for (i = 0, total = 0; i < z_info->dun_max; i++) {
     if ((dungeons[i].flags) & DF_BASIC) {
       d_ptr = &(dungeons[i]);
 		  /* Count this possibility */

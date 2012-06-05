@@ -390,7 +390,6 @@ static void rd_item(object_type *o_ptr)
 	if (o_ptr->tval == TV_CONTAINER && sf_version >= 56)
 		rd_s16b(&o_ptr->contents_o_idx);
 
-
 	rd_byte((byte *)(&o_ptr->allocated));
 
 	rd_byte(&o_ptr->feeling);
@@ -830,6 +829,7 @@ static void rd_store(int town_num, int store_num)
 
 	/* Hack - Initialise the store (even if not really a store) */
 	store_init(town_num, store_num, type);
+
 
 	/* Finish initialisation */
 	if (sf_version >= 49)

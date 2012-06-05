@@ -3,6 +3,7 @@
 /* Purpose: Angband user interface -SF- */
 
 #include "angband.h"
+#include "button.h"
 
 
 /*
@@ -22,13 +23,12 @@ void center_string(char *buf, uint max, cptr fmt, va_list *vp)
 	cptr str;
 
 	char tmp[1024];
-
-    int size;
+	int size;
 
 	/* Unused parameter */
 	(void)fmt;
 
-    /* Get the size of the string to center in */
+	/* Get the size of the string to center in */
 	size = va_arg(*vp, int);
 
 	/* Get the string to center with. */
@@ -58,7 +58,7 @@ void binary_fmt(char *buf, uint max, cptr fmt, va_list *vp)
 
 	int len = 0;
 
-    u32b arg;
+	u32b arg;
 
 	/* Unused parameter */
 	(void)fmt;
@@ -66,7 +66,7 @@ void binary_fmt(char *buf, uint max, cptr fmt, va_list *vp)
 	/* Pre-terminate buffer */
 	buf[0] = '\0';
 
-    /* Get the argument */
+	/* Get the argument */
 	arg = va_arg(*vp, u32b);
 
 	/* Scan the flags */
@@ -126,6 +126,7 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 		hgt = Term->hgt - TABLE_ROW - 1;
 
 		/* Redraw the list */
+		button_backup_all(FALSE);
 		for (i = 0; ((i + top < num) && (i <= hgt)); i++)
 		{
 			if (i + top < 26)
@@ -145,15 +146,18 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 			if (i == (cur - top))
 			{
 				/* Highlight the current selection */
-				put_fstr(col, i + TABLE_ROW, CLR_L_BLUE "%s", buf);
+				put_fstr(col, i + TABLE_ROW, CLR_L_BLUE "$U%s$V", buf);
 			}
 			else
 			{
-				put_fstr(col, i + TABLE_ROW, buf);
+				put_fstr(col, i + TABLE_ROW, "$U%s$V", buf);
 			}
 		}
 
-		if (done) return (cur);
+		if (done) {
+			button_restore();
+			return (cur);
+		}
 
 		/* Display auxiliary information if any is available. */
 		if (hook) hook(choices[cur]);
@@ -162,6 +166,8 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 		Term_gotoxy(col, TABLE_ROW + cur - top);
 
 		c = inkey();
+
+		button_restore();
 
 		if (c == KTRL('X'))
 		{
@@ -371,16 +377,16 @@ static bool show_option(int x, int y, menu_type *option, char c, bool scroll, bo
 			/* Highlight this option? */
 			if (scroll)
 			{
-				prtf(x, y, " %c) " CLR_L_BLUE "%s", c, option->text);
+				prtf(x, y, " $U%c) " CLR_L_BLUE "%s$V", c, option->text);
 			}
 			else
 			{
-				prtf(x, y, "*%c) %s", c, option->text);
+				prtf(x, y, "*$U%c) %s$V", c, option->text);
 			}
 		}
 		else
 		{
-			prtf(x, y, " %c) %s", c, option->text);
+			prtf(x, y, " $U%c) %s$V", c, option->text);
 		}
 
 		return (TRUE);
@@ -494,24 +500,24 @@ static int show_menu(int num, menu_type *options, int select, bool scroll,
 	 */
 	if (!cnt)
 	{
-		prtf(0, 0, "%s (No commands available, ESC=exit)", prompt);
+		prtf(0, 0, "%s (No commands available, $UESC=exit$Y%c$V)", prompt, ESCAPE);
 	}
 	else if (cnt == 1)
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (a), ESC=exit)", prompt ? prompt : "Select a command: ");
+		prtf(0, 0, "%s (Command (a), $UESC=exit$Y%c$V)", prompt ? prompt : "Select a command: ", ESCAPE);
 	}
 	else if (cnt < 19)
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (a-%c), ESC=exit)",
-			 prompt ? prompt : "Select a command: " ,I2A(cnt - 1));
+		prtf(0, 0, "%s (Command (a-%c), $UESC=exit$Y%c$V)",
+			 prompt ? prompt : "Select a command: " ,I2A(cnt - 1), ESCAPE);
 	}
 	else
 	{
 		/* Display the prompt */
-		prtf(0, 0, "%s (Command (0-%c), ESC=exit)",
-			 prompt ? prompt : "Select a command: " ,listsym[cnt - 1]);
+		prtf(0, 0, "%s (Command (0-%c), $UESC=exit$Y%c$V)",
+			 prompt ? prompt : "Select a command: " ,listsym[cnt - 1], ESCAPE);
 	}
 
 
@@ -604,11 +610,14 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	/* Calculate the number of strings we have */
 	while (options[num].text) num++;
 
-    /* Paranoia XXX XXX XXX */
+	/* Paranoia XXX XXX XXX */
 	message_flush();
 
 	/* Save the screen */
 	screen_save();
+
+	/* store are previous buttons */
+	button_backup_all(TRUE);
 
 	/* Show the list */
 	cnt = show_menu(num, options, select, scroll, disp, prompt);
@@ -623,6 +632,8 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 
 		/* Restore the screen */
 		screen_load();
+		/* restore any previous mouse buttons */
+		button_restore();
 		return (FALSE);
 	}
 
@@ -630,23 +641,23 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	while (TRUE)
 	{
 		/* Try to get previously saved value */
-		if (!repeat_pull(&i))
-		{
+		if (!repeat_pull(&i)) {
 			/* Try to match with available options */
 			i = get_choice(&choice, num, &ask);
-    	}
+   	}
 
-    	/* Handle "cancel" */
-		if (i == -2)
-        {
+
+		/* Handle "cancel" */
+		if (i == -2) {
 			/* Restore the screen */
 			screen_load();
-        	return (FALSE);
-        }
+			/* restore any previous mouse buttons */
+			button_restore();
+			return (FALSE);
+		}
 
 		/* No match? */
-		if (i == -1)
-		{
+		if (i == -1) {
 			/* Pick default option */
 			if ((choice == '\r') || (choice == ' '))
 			{
@@ -679,6 +690,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				}
 				while(!(options[select].flags & MN_SELECT));
 
+				/* kill the current menu buttons */
+				button_kill_all();
+
 				/* Show the list */
 				show_menu(num, options, select, scroll, disp, prompt);
 
@@ -699,6 +713,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				}
 				while(!(options[select].flags & MN_SELECT));
 
+				/* kill the current menu buttons */
+				button_kill_all();
+
 				/* Show the list */
 				show_menu(num, options, select, scroll, disp, prompt);
 
@@ -714,6 +731,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				{
 					/* Show the information */
 					show_file(options[select].help, NULL, 0, 0);
+
+					/* kill the current menu buttons */
+					button_kill_all();
 
 					/* Show the list */
 					show_menu(num, options, select, scroll, disp, prompt);
@@ -751,6 +771,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 						/* Belay that order */
 						if (!get_check("Use %s? ", options[j].text))
 						{
+							/* kill the current menu buttons */
+							button_kill_all();
+
 							/* Show the list */
 							show_menu(num, options, select, scroll, disp, prompt);
 							break;
@@ -810,6 +833,8 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 		}
 	}
 
+	/* restore any previous mouse buttons */
+	button_restore();
 	/* Paranoia for dumb compilers */
 	quit("Unreachable code in display_menu");
 	return (FALSE);
@@ -1031,18 +1056,56 @@ void fmt_clean(char *buf)
 	*p = '\0';
 }
 
+/*
+ * count the number of displayed characters in a string with control characters
+ */
+int len_cstr(cptr str)
+{
+	cptr c = str;
+	int len = 0;
 
+	while (*c) {
+		if (*c == '$') {
+			/* the dollar sign is not displayed */
+			c++;
+			if ((*c >= 'A') && (*c <= 'R')) {
+				/* a color - not displayed */
+				c++;
+			} else
+			if ((*c >= 'U') && (*c <= 'X')) {
+				/* a button control - not displayed */
+				c++;
+			} else
+			if (*c == 'Y') {
+				/* a key press for a button - not displayed, nor is next char */
+				c+=2;
+			} else
+			{
+				/* this character, but not the dollar sign, are displayed */
+				len++;
+				/* Next position */
+				c++;
+			}
+		} else {
+			if (*c != '\n') {
+				len++;
+			}
+			/* Next position */
+			c++;
+		}
+	}
+	return len;
+}
 /*
  * Put a string with control characters at a given location
  */
-static void put_cstr(int col, int row, cptr str, bool clear)
+void put_cstr(int col, int row, cptr str, bool clear)
 {
 	cptr c = str;
 
 	/* Default to white */
 	byte a = TERM_WHITE;
 	byte da = a;
-
 	int x = col;
 
 	/* Clear line, position cursor */
@@ -1087,6 +1150,56 @@ static void put_cstr(int col, int row, cptr str, bool clear)
 			else if (*c == 'R')
 			{
 				a = da;
+				c++;
+
+				continue;
+			}
+
+			/* Start a button area */
+			else if (*c == 'U')
+			{
+				(void)button_add_start(row, x,*(c+1));
+				c++;
+
+				continue;
+			}
+
+			/* End a button area */
+			else if (*c == 'V')
+			{
+				(void)button_add_end(NULL ,0, row, x);
+				c++;
+
+				continue;
+			}
+
+			/* Set the keypress of the current button area */
+			else if (*c == 'Y')
+			{
+				(void)button_last_key(*(c+1));
+				c+=2;
+
+				continue;
+			}
+
+			/* add a one word button */
+			else if (*c == 'W')
+			{
+				int len = 0;
+				const char *pc = c+1;
+				while (*pc && !isspace(*(pc++))) {
+					len++;
+				}
+				(void)button_add_2d(row,x,row,x+len,NULL,*(c+1));
+				c++;
+
+				continue;
+			}
+
+			/* add a one character button */
+			else if (*c == 'X')
+			{
+				(void)button_add_2d(row,x,row,x,NULL,*(c+1));
 				c++;
 
 				continue;
@@ -1269,6 +1382,30 @@ void roff(cptr str, ...)
 			{
 				a = da;
 
+				continue;
+			}
+
+			/* currently roff is only used in monster and object descriptions
+			 * so we do not need button support here, so just skip characters */
+			else if (*s == 'U')
+			{
+				continue;
+			}
+			else if (*s == 'V')
+			{
+				continue;
+			}
+			else if (*s == 'Y')
+			{
+				s++;
+				continue;
+			}
+			else if (*s == 'W')
+			{
+				continue;
+			}
+			else if (*s == 'X')
+			{
 				continue;
 			}
 
@@ -1600,7 +1737,7 @@ bool get_string(char *buf, int len, cptr str, ...)
 {
 	bool res;
 
-    va_list vp;
+	va_list vp;
 
 	char prompt[1024];
 
@@ -1648,7 +1785,7 @@ static bool get_check_base(bool def, bool esc, cptr prompt)
 	message_flush();
 
 	/* Prompt for it */
-	prtf(0, 0, "%.70s[y/n] ", prompt);
+	prtf(0, 0, "%.70s[$Xy/$Xn] ", prompt);
 
 	/* Get an acceptable answer */
 	while (TRUE)
@@ -1830,6 +1967,46 @@ s32b get_quantity_big(cptr prompt, s32b max)
 s16b get_quantity(cptr prompt, s16b max)
 {
 	return ((s16b)(get_quantity_big)(prompt, max));
+}
+
+/*
+ * Request a "number" from the user
+ */
+u32b get_number(cptr prompt, u32b initial)
+{
+	u32b amt;
+
+	char tmp[80];
+
+	char buf[80];
+
+	/* Build a prompt if needed */
+	if (!prompt)
+	{
+		/* Build a prompt */
+		strnfmt(tmp, 80, "Enter a number: ");
+
+		/* Use that prompt */
+		prompt = tmp;
+	}
+
+
+	/* Default to zero */
+	amt = initial;
+
+	/* Build the default */
+	strnfmt(buf, 80, "%d", amt);
+
+	/* Ask for a quantity */
+	if (!get_string(buf, 20, prompt)) return (0);
+
+	/* Extract a number */
+	amt = (u32b) atol(buf);
+
+	if (amt) repeat_push(amt);
+
+	/* Return the result */
+	return (amt);
 }
 
 /*
