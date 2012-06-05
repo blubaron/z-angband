@@ -126,47 +126,11 @@ static int tval_to_idx(u16b x)
  */
 void do_cmd_inven(void)
 {
-#if 0
-	/* Save screen */
-	screen_save();
-
-	/* Hack -- show empty slots */
-	item_tester_full = TRUE;
-
-	/* Display the inventory */
-	show_list(p_ptr->inventory, FALSE);
-
-	/* Hack -- hide empty slots */
-	item_tester_full = FALSE;
-
-	/* Get a command */
-	prtf(0, 0, "Inventory: carrying %d.%d pounds (%d%% of capacity). Command: ",
-			p_ptr->total_weight / 10, p_ptr->total_weight % 10,
-			(p_ptr->total_weight * 100) /
-			((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
-
-	/* Get a new command */
-	p_ptr->cmd.new = inkey();
-
-	/* Load screen */
-	screen_load();
-
-	/* Process "Escape" */
-	if (p_ptr->cmd.new == ESCAPE)
-	{
-		/* Reset stuff */
-		p_ptr->cmd.new = 0;
-	}
-#endif
 	object_type *o_ptr;
 	char prompt[256];
 	char *no;
 	int item;
 	int ret = 3;
-	//int diff = weight_remaining();
-
-	/* Hack -- Start in "inventory" mode */
-	//p_ptr->cmd.arg = (USE_INVEN);
 
 	/* Hack -- show empty slots */
 	item_tester_full = TRUE;
@@ -183,7 +147,7 @@ void do_cmd_inven(void)
 				((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
 		no = "You have no items.";
 
-		/* Get an item to use a context command on (Display the inventory) */
+		/* Get an item to use a context command on (Start in "inventory" mode) */
 		o_ptr = get_item(prompt, no, (USE_EQUIP|USE_INVEN|USE_FLOOR), (USE_INVEN));
 		if (o_ptr) {
 
@@ -215,47 +179,11 @@ void do_cmd_inven(void)
  */
 void do_cmd_equip(void)
 {
-#if 0
-	/* Save the screen */
-	screen_save();
-
-	/* Hack -- show empty slots */
-	item_tester_full = TRUE;
-
-	/* Display the equipment */
-	show_equip(FALSE);
-
-	/* Hack -- undo the hack above */
-	item_tester_full = FALSE;
-
-	/* Get a command */
-	prtf(0, 0, "Equipment: carrying %d.%d pounds (%d%% of capacity). Command: ",
-			p_ptr->total_weight / 10, p_ptr->total_weight % 10,
-			(p_ptr->total_weight * 100) /
-			((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
-
-	/* Get a new command */
-	p_ptr->cmd.new = inkey();
-
-	/* Restore the screen */
-	screen_load();
-
-	/* Process "Escape" */
-	if (p_ptr->cmd.new == ESCAPE)
-	{
-		/* Reset stuff */
-		p_ptr->cmd.new = 0;
-	}
-#endif
 	object_type *o_ptr;
 	char prompt[256];
 	char *no;
 	int item;
 	int ret = 3;
-	//int diff = weight_remaining();
-
-	/* Hack -- Start in "equipment" mode */
-	//p_ptr->cmd.new = (USE_EQUIP);
 
 	/* Hack -- show empty slots */
 	item_tester_full = TRUE;
@@ -272,7 +200,7 @@ void do_cmd_equip(void)
 				((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
 		no = "You have no items.";
 
-		/* Get an item to use a context command on (Display the equipment) */
+		/* Get an item to use a context command on (Start in "equipment" mode) */
 		o_ptr = get_item(prompt, no, (USE_EQUIP|USE_INVEN|USE_FLOOR), (USE_EQUIP));
 		if (o_ptr) {
 
