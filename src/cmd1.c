@@ -804,6 +804,9 @@ void carry(int pickup)
 			continue;
 		}
 
+		/* update stuff */
+		p_ptr->update |= (PU_OBJECTS);
+
 		/* Test for auto-pickup, which overrides squelching & auto-destroy */
 		if (auto_pickup_okay(o_ptr))
 		{
