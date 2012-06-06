@@ -4080,7 +4080,7 @@ void do_cmd_view_law_map(void)
 	int px = p_ptr->px;
 
 	int cy, cx;
-	itn tw, th;
+	int tw, th;
 
 	void (*hook) (void);
 
