@@ -4123,6 +4123,13 @@ void get_character_name(void)
 	/* Save the player name */
 	strcpy(tmp, player_name);
 
+	/* if we do not have a player name, start with a
+	 * request for a random one */
+	if (tmp[0] < 33) {
+		tmp[0] = '*';
+		tmp[1] = '\0';
+	}
+
 	/* Prompt for a new name */
 	if (get_string(tmp, sizeof(tmp), "Enter a name for your character (* for random): "))
 	{
