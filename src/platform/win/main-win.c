@@ -2071,7 +2071,7 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 	} else {
 		(*x) = (ox - td->size_ow1) / td->tile_wid;
 		(*y) = (oy - td->size_oh1) / td->tile_hgt;
-	
+	/*
 		if ((tile_height_mult > 1)
 				&& ((*y) > Term->scr->big_y1)
 				&& ((*y) <= Term->scr->big_y2)
@@ -2085,7 +2085,7 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 				&& ((*x) > Term->scr->big_x1))
 		{
 			(*x) = (((*x) - Term->scr->big_x1) / tile_width_mult) + Term->scr->big_x1;
-		}
+		}*/
 	}
 }
 
@@ -2225,12 +2225,13 @@ static errr Term_wipe_win(int x, int y, int n)
 	square_to_pixel(&(rc.left), &(rc.top), x, y);
 	square_to_pixel(&(rc.right), &(rc.bottom), x + n, y+1);
 
+	if ((rc.right > rc.left) && (rc.bottom > rc.top)) {
 	hdc = GetDC(td->w);
 	SetBkColor(hdc, RGB(0, 0, 0));
 	SelectObject(hdc, td->font_id);
 	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
 	ReleaseDC(td->w, hdc);
-
+	}
 	/* Success */
 	return 0;
 }
