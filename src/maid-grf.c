@@ -1148,6 +1148,9 @@ void do_cmd_view_map(void)
 
 	void (*hook) (void);
 
+	/* Save screen */
+	screen_save();
+
 	/* No overhead map in vanilla town mode. */
 	if (!p_ptr->depth && vanilla_town) return;
 
@@ -1392,6 +1395,23 @@ void do_cmd_view_map(void)
 		}
 	}
 
+	/* Hack - Clear the right and bottom edges */
+	wid = Term->wid - tw;
+	for (hgt = 0; hgt < Term->hgt - th; hgt++) {
+		for (wid = Term->wid - tw; wid < Term->wid; wid++) {
+			Term_queue_char(wid,  hgt,
+				Term->attr_blank, Term->char_blank,
+				Term->attr_blank, Term->char_blank);
+		}
+	}
+	for (hgt = Term->hgt - th; hgt < Term->hgt; hgt++) {
+		for (wid = 0; wid < Term->wid; wid++) {
+			Term_queue_char(wid,  hgt,
+				Term->attr_blank, Term->char_blank,
+				Term->attr_blank, Term->char_blank);
+		}
+	}
+
 	/* restore the tile multipliers */
 	tile_width_mult = tw;
 	tile_height_mult = th;
@@ -1404,6 +1424,9 @@ void do_cmd_view_map(void)
 
 	/* restore any previous mouse buttons */
 	button_restore();
+
+	/* Load screen */
+	screen_load();
 
 	/* Hack - Flush it */
 	Term_fresh();
