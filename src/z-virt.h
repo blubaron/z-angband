@@ -129,6 +129,8 @@
 #define KILL(P) \
 	((P)=FREE(P))
 
+#define ZFREE(P) \
+	((P)=FREE(P))
 
 
 /**** Available variables ****/
