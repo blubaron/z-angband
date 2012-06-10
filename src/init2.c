@@ -1888,8 +1888,8 @@ void cleanup_angband(void)
 		string_free(macro__act[i]);
 	}
 
-	ZFREE((void *)macro__pat);
-	ZFREE((void *)macro__act);
+	ZFREE(macro__pat);
+	ZFREE(macro__act);
 
 	/* Free the keymaps */
 	for (i = 0; i < KEYMAP_MODES; ++i)

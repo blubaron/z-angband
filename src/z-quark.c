@@ -219,8 +219,8 @@ errr quarks_free(void)
 	}
 
 	/* Free the list of "quarks" */
-	ZFREE((void *)quark__str);
-	ZFREE((void *)quark__ref);
+	ZFREE(quark__str);
+	ZFREE(quark__ref);
 
 	/* Success */
 	return (0);

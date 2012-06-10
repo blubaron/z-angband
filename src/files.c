@@ -3657,10 +3657,11 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			if (mb == 1) {
 				/* if a menu, select the option, otherwise do nothing */
 				if (menu && (my > 2) && (my < hgt-2)) {
+					fpos_t pos;
 					/* move the file pointer to the beginning of the file */
 					/* TODO: this is not portable */
-					fpos_t pos = ftell(fff);
-					fseek(fff, SEEK_SET, 0);
+					fgetpos(fff, &pos);
+					fseek(fff, 0, SEEK_SET);
 
 					next = 0;
 					/* Goto the selected line */
@@ -3697,7 +3698,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						}
 					}
 
-					fseek(fff, SEEK_SET, pos);
+					fsetpos(fff, &pos);
 				//k = ESCAPE;
 				}
 			} else
