@@ -360,6 +360,7 @@ void message_add(cptr str, u16b type)
 
 			/* Kill "dead" messages */
 			if (o >= message__head)
+
 			{
 				/* Track oldest message */
 				message__last = i + 1;
@@ -465,9 +466,9 @@ errr messages_init(void)
 void messages_free(void)
 {
 	/* Free the messages */
-	FREE(message__ptr);
-	FREE(message__buf);
-	FREE(message__type);
+	ZFREE(message__ptr);
+	ZFREE(message__buf);
+	ZFREE(message__type);
 }
 
 

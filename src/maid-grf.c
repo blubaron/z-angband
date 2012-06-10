@@ -513,14 +513,14 @@ void del_overhead_map(void)
 	int i, j;
 
 	/* Free refcount for cache blocks */
-	FREE(map_cache_refcount);
+	ZFREE(map_cache_refcount);
 
 	/* Cache block locations */
-	FREE(map_cache_x);
-	FREE(map_cache_y);
+	ZFREE(map_cache_x);
+	ZFREE(map_cache_y);
 
-  if (map_cache)
-  {
+	if (map_cache)
+	{
 	  /* Delete each block */
 	  for (i = 0; i < MAP_CACHE; i++)
 	  {
@@ -537,9 +537,9 @@ void del_overhead_map(void)
 	  }
 
 	  /* Free the list of pointers to blocks */
-	  FREE(map_cache);
-  }
-  if (map_grid) {
+	  ZFREE(map_cache);
+	}
+	if (map_grid) {
 	  for (i = 0; i < WILD_SIZE; i++)
 	  {
 		  /* Free one row of the wilderness */
@@ -547,8 +547,8 @@ void del_overhead_map(void)
 	  }
 
 	  /* Free the overhead map itself */
-	  FREE(map_grid);
-  }
+	  ZFREE(map_grid);
+	}
 }
 
 

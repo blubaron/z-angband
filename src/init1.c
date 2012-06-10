@@ -5564,10 +5564,10 @@ void clear_dun_info()
 	int i;
 	/* still using hardcoded dungeons */
 	if (dun_name)
-		FREE(dun_name);
+		ZFREE(dun_name);
 
 	if (dun_text)
-		FREE(dun_text);
+		ZFREE(dun_text);
 
  	if (dungeons) {
 		for (i=0; i < z_info->dun_max; i++) {
@@ -5578,8 +5578,7 @@ void clear_dun_info()
 				string_free(dungeons[i].text);
 			}
 		}
-		FREE(dungeons);
-		dungeons = NULL;
+		ZFREE(dungeons);
 	}
 }
 

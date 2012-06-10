@@ -619,8 +619,7 @@ void button_free(void)
 		button_stack = NULL;
 	}
 	if (button_1d_list) {
-		FREE(button_1d_list);
-		button_1d_list = NULL;
+		ZFREE(button_1d_list);
 	}
 
 	button_num = 0;

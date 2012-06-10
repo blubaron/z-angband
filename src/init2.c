@@ -705,13 +705,13 @@ static errr free_info(header *head)
 #endif /* HAVE_MMAP */
 
 	if (head->info_size)
-		FREE(head->info_ptr);
+		ZFREE(head->info_ptr);
 
 	if (head->name_size)
-		FREE(head->name_ptr);
+		ZFREE(head->name_ptr);
 
 	if (head->text_size)
-		FREE(head->text_ptr);
+		ZFREE(head->text_ptr);
 
 	/* Success */
 	return (0);
@@ -1888,8 +1888,8 @@ void cleanup_angband(void)
 		string_free(macro__act[i]);
 	}
 
-	FREE((void *)macro__pat);
-	FREE((void *)macro__act);
+	ZFREE((void *)macro__pat);
+	ZFREE((void *)macro__act);
 
 	/* Free the keymaps */
 	for (i = 0; i < KEYMAP_MODES; ++i)
@@ -1897,32 +1897,33 @@ void cleanup_angband(void)
 		for (j = 0; j < 256; ++j)
 		{
 			string_free(keymap_act[i][j]);
+			keymap_act[i][j] = NULL;
 		}
 	}
 
 	/* Free the allocation tables */
-	FREE(alloc_ego_table);
-	FREE(alloc_race_table);
-	FREE(alloc_kind_table);
+	ZFREE(alloc_ego_table);
+	ZFREE(alloc_race_table);
+	ZFREE(alloc_kind_table);
 
 	/* Free the towns */
-	FREE(place);
+	ZFREE(place);
 
 	/* Free the stores */
-	FREE(store_cache);
+	ZFREE(store_cache);
 
 	/* Free the quest list */
-	FREE(quest);
+	ZFREE(quest);
 
 	/* Free the lore, monster, and object lists */
-	FREE(m_list);
-	FREE(o_list);
+	ZFREE(m_list);
+	ZFREE(o_list);
 
 #ifdef MONSTER_FLOW
 
 	/* Flow arrays */
-	FREE(cave_when);
-	FREE(cave_cost);
+	ZFREE(cave_when);
+	ZFREE(cave_cost);
 
 #endif /* MONSTER_FLOW */
 
@@ -1986,13 +1987,13 @@ void cleanup_angband(void)
 	quarks_free();
 
 	/* free stuff from init_w_info */
-	FREE(wild_choice_tree);
-	FREE(wild_gen_data);
+	ZFREE(wild_choice_tree);
+	ZFREE(wild_gen_data);
 	/* free stuff from init_t_info */
-	FREE(t_info);
-	FREE(fld_list);
+	ZFREE(t_info);
+	ZFREE(fld_list);
 	/* free stuff from init_mg_info */
-	FREE(mg_info);
+	ZFREE(mg_info);
 	/* free stuff from init_dun_info */
 	clear_dun_info();
 
@@ -2025,6 +2026,23 @@ void cleanup_angband(void)
 	string_free(ANGBAND_DIR_XTRA_FONT);
 	string_free(ANGBAND_DIR_XTRA_GRAF);
 	string_free(ANGBAND_DIR_XTRA_SOUND);
+
+	ANGBAND_DIR = NULL;
+	ANGBAND_DIR_APEX = NULL;
+	ANGBAND_DIR_BONE = NULL;
+	ANGBAND_DIR_DATA = NULL;
+	ANGBAND_DIR_EDIT = NULL;
+	ANGBAND_DIR_SCRIPT = NULL;
+	ANGBAND_DIR_FILE = NULL;
+	ANGBAND_DIR_HELP = NULL;
+	ANGBAND_DIR_INFO = NULL;
+	ANGBAND_DIR_SAVE = NULL;
+	ANGBAND_DIR_PREF = NULL;
+	ANGBAND_DIR_USER = NULL;
+	ANGBAND_DIR_XTRA = NULL;
+	ANGBAND_DIR_XTRA_FONT = NULL;
+	ANGBAND_DIR_XTRA_GRAF = NULL;
+	ANGBAND_DIR_XTRA_SOUND = NULL;
 }
 
 
