@@ -1203,7 +1203,8 @@ void get_map_size(int *x, int *y)
 	wid -= COL_MAP + 1;
 
 	/* Hack - bigmap has half resolution */
-	if (use_bigtile) wid = wid / 2;
+	if (tile_width_mult > 1) 	wid = wid / tile_width_mult;
+	if (tile_height_mult > 1) 	hgt = hgt / tile_height_mult;
 
 	/* Return values */
 	*x = wid;
@@ -1220,14 +1221,12 @@ static bool panel_bounds(int x, int y, int wid, int hgt)
 	int xmax, ymax;
 
 	/* Hack - vanilla town is special */
-	if (vanilla_town && (!p_ptr->depth) && !use_bigtile)
-	{
+	if (vanilla_town && (!p_ptr->depth)
+			&& !((tile_width_mult == 1) && (tile_height_mult == 1))) {
 		/* Same bounds all the time */
 		x = max_wild * WILD_BLOCK_SIZE / 2 - wid / 2 - 15;
 		y = max_wild * WILD_BLOCK_SIZE / 2 - hgt / 2 - 5;
-	}
-	else
-	{
+	} else {
 		/* Bounds */
 		if (y > p_ptr->max_hgt - hgt) y = p_ptr->max_hgt - hgt;
 		if (y < p_ptr->min_hgt) y = p_ptr->min_hgt;
@@ -1240,8 +1239,7 @@ static bool panel_bounds(int x, int y, int wid, int hgt)
 
 	/* Handle "changes" */
 	if ((x != p_ptr->panel_x1) || (y != p_ptr->panel_y1) ||
-		(xmax != p_ptr->panel_x2) || (ymax != p_ptr->panel_y2))
-	{
+		(xmax != p_ptr->panel_x2) || (ymax != p_ptr->panel_y2)) {
 		/* Save the new panel info */
 		p_ptr->panel_x1 = x;
 		p_ptr->panel_y1 = y;
@@ -1385,8 +1383,7 @@ void map_panel_size(void)
 	get_map_size(&wid, &hgt);
 
 	/* Set bigreion if required */
-	if (use_bigtile)
-	{
+	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
 		Term_bigregion(COL_MAP, ROW_MAP, ROW_MAP + hgt - 1);
 	}
 

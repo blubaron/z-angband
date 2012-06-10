@@ -991,6 +991,17 @@ static void Term_fresh_row_both(int y, int x1, int x2)
 		/* Draw pending chars (black) */
 		else
 		{
+			/* hack fix clearing lines when using a height multiplier > 1 */
+			if ((Term->scr->big_x1 > - 1) && (fx+fn > Term->scr->big_x1)
+					&& (y >= Term->scr->big_y1) && (y >= Term->scr->big_y2)
+					&& (Term->scr->wipe_bigtile <1)) {
+				if (fx < Term->scr->big_x1) {
+					fn = Term->scr->big_x1 - fx;
+				} else {
+					fx = fn - fx;
+					fn = 1;
+				}
+			}
 			(void)((*Term->wipe_hook) (fx, y, fn));
 		}
 	}
@@ -1891,9 +1902,14 @@ errr Term_redraw_section(int x1, int y1, int x2, int y2)
 	/* Hack - make bigtile work */
 	if (Term->scr->big_x1 != -1)
 	{
-		x1 = (x1 - 1) / 2;
-		x2 = x2 * 2;
+		x1 = (x1 - 1) / tile_width_mult;
+		x2 = x2 * tile_width_mult;
 	}
+	/*if ((Term->scr->big_y1 != -1) || (Term->scr->big_y2 != -1))
+	{
+		y1 = (y1 - 1) / tile_height_mult;
+		y2 = y2 * tile_height_mult;
+	}*/
 	
 	/* Bounds checking */
 	if (y2 >= Term->hgt) y2 = Term->hgt - 1;

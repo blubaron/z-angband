@@ -2270,8 +2270,8 @@ static void process_click(char press, int xpos, int ypos)
 	bool meta = press & 8;
 	int x,y;
 
-	y = ypos-ROW_MAP + p_ptr->panel_y1;
-	x = xpos-COL_MAP + p_ptr->panel_x1;
+	y = ((ypos-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+	x = ((xpos-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
 
 	/* Check for a valid location */
 	//if (!in_bounds_fully(y, x)) return;
@@ -2302,7 +2302,7 @@ static void process_click(char press, int xpos, int ypos)
 
 			} else
 			if (button == 2) {
-				do_cmd_inven();
+ 				do_cmd_rest();
 			}
 		} else
 		if (ctrl) {
@@ -2329,7 +2329,7 @@ static void process_click(char press, int xpos, int ypos)
  				do_cmd_stay(TRUE);
 			} else
 			if (button == 2) {
- 				do_cmd_rest();
+				do_cmd_inven();
 			}
 		}
 	} else

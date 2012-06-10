@@ -240,7 +240,6 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 	current_graphics_mode = get_graphics_mode(graphics);
 	if (current_graphics_mode && current_graphics_mode->file) {
 		/* Try the file */
-		//path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/%s",current_graphics_mode->file);
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",current_graphics_mode->file));
 
 		/* Use the file if it exists */
@@ -280,7 +279,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
  */
 bool is_bigtiled(int x, int y)
 {
-	if ((use_bigtile)
+	if (((tile_width_mult > 1) || (tile_height_mult > 1))
 		&& (y >= Term->scr->big_y1)
 		&& (y <= Term->scr->big_y2)
 		&& (x >= Term->scr->big_x1))
@@ -293,20 +292,18 @@ bool is_bigtiled(int x, int y)
 
 void toggle_bigtile(void)
 {
-	if (use_bigtile)
+	if ((tile_width_mult > 1) || (tile_height_mult > 1))
 	{
 		/* Hack - disable bigtile mode */
 		Term_bigregion(-1, -1, -1);
 
-		use_bigtile = FALSE;
-    tile_width_mult = 1;
-    tile_height_mult = 1;
+		tile_width_mult = 1;
+		tile_height_mult = 1;
 	}
 	else
 	{
-		use_bigtile = TRUE;
-    tile_width_mult = 2;
-    tile_height_mult = 1;
+		tile_width_mult = 2;
+		tile_height_mult = 1;
 	}
 
 	/* Hack - redraw everything + recalc bigtile regions */
@@ -1147,9 +1144,12 @@ void do_cmd_view_map(void)
 	int cy, cx;
 	int wid, hgt;
   
-  int tw/*,th*/;
+	int tw, th;
 
 	void (*hook) (void);
+
+	/* Save screen */
+	screen_save();
 
 	/* No overhead map in vanilla town mode. */
 	if (!p_ptr->depth && vanilla_town) return;
@@ -1169,15 +1169,16 @@ void do_cmd_view_map(void)
 	/* Clear the screen */
 	Term_clear();
 
-  /* store the tile multipliers */
-  tw = use_bigtile;
-  use_bigtile = 0;
+	/* store the tile multipliers */
+	tw = tile_width_mult;
+	th = tile_height_mult;
+	tile_width_mult = 1;
+	tile_height_mult = 1;
 
 	/* store the previous buttons */
 	button_backup_all(TRUE);
 
-	if (p_ptr->depth)
-	{
+	if (p_ptr->depth) {
 		/* In the dungeon - All we have to do is display the map */
 
 		/* Get size */
@@ -1202,9 +1203,7 @@ void do_cmd_view_map(void)
 
 		/* Get any key */
 		(void)inkey();
-	}
-	else
-	{
+	} else {
 		/* Offset from player */
 		int x, y;
 
@@ -1222,8 +1221,7 @@ void do_cmd_view_map(void)
 
 		/* In the wilderness - Display the map + move it around */
 
-		while (TRUE)
-		{
+		while (TRUE) {
 			/* Reset offset of map */
 			cx = x;
 			cy = y;
@@ -1343,34 +1341,29 @@ void do_cmd_view_map(void)
 			}
 
 			/* Allow a redraw */
-			if (c == KTRL('R'))
-			{
+			if (c == KTRL('R')) {
 				/* Do the redraw */
 				do_cmd_redraw();
 
 				continue;
 			}
 
-			if ((c == '~') || (c == '|')) // Added by Brett
-			{
-    		/* Check artifacts, uniques, objects, quests etc. */
-		    do_cmd_knowledge();
-        continue;
-			}
-      else
+			if ((c == '~') || (c == '|')) { // Added by Brett
+				/* Check artifacts, uniques, objects, quests etc. */
+				do_cmd_knowledge();
+				continue;
+			} else
 			/* Accept '*' or a direction -- MT */
-			if ((c == '*') || (c == 't') || (c == 'h') || (c == 'q'))
-      { 
-        // key is checked here, to trap the key press, so it does not
-        // leave the map when not on a town
-			  /* On a town?  -- MT */
-			  if (w_ptr->place)
-			  {
-          /* Check if this is an info command */
-				  if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
-				  /* Display info for this town -- MT */
-				  //single_town_info(w_ptr->place);
-			  }
+			if ((c == '*') || (c == 't') || (c == 'h') || (c == 'q')) { 
+				// key is checked here, to trap the key press, so it does not
+				// leave the map when not on a town
+				/* On a town?  -- MT */
+				if (w_ptr->place) {
+					/* Check if this is an info command */
+					if (do_cmd_view_map_aux(c, w_ptr->place)) continue;
+					/* Display info for this town -- MT */
+					//single_town_info(w_ptr->place);
+				}
 				continue;
 			}
 
@@ -1402,8 +1395,26 @@ void do_cmd_view_map(void)
 		}
 	}
 
-  /* restore the tile multipliers */
-  use_bigtile = tw;
+	/* Hack - Clear the right and bottom edges */
+	wid = Term->wid - tw;
+	for (hgt = 0; hgt < Term->hgt - th; hgt++) {
+		for (wid = Term->wid - tw; wid < Term->wid; wid++) {
+			Term_queue_char(wid,  hgt,
+				Term->attr_blank, Term->char_blank,
+				Term->attr_blank, Term->char_blank);
+		}
+	}
+	for (hgt = Term->hgt - th; hgt < Term->hgt; hgt++) {
+		for (wid = 0; wid < Term->wid; wid++) {
+			Term_queue_char(wid,  hgt,
+				Term->attr_blank, Term->char_blank,
+				Term->attr_blank, Term->char_blank);
+		}
+	}
+
+	/* restore the tile multipliers */
+	tile_width_mult = tw;
+	tile_height_mult = th;
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = hook;
@@ -1413,6 +1424,9 @@ void do_cmd_view_map(void)
 
 	/* restore any previous mouse buttons */
 	button_restore();
+
+	/* Load screen */
+	screen_load();
 
 	/* Hack - Flush it */
 	Term_fresh();
@@ -2837,8 +2851,7 @@ void display_map(int *cx, int *cy)
 
 
 	/* Hack - disable bigtile mode */
-	if (use_bigtile)
-	{
+	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
 		Term_bigregion(-1, -1, -1);
 	}
 
@@ -3087,9 +3100,7 @@ void display_map(int *cx, int *cy)
 				}
 			}
 		}
-	}
-	else
-	{
+	} else {
 		yrat = p_ptr->max_hgt - p_ptr->min_hgt;
 		xrat = p_ptr->max_wid - p_ptr->min_wid;
 
@@ -3730,8 +3741,7 @@ void display_law_map(int *cx, int *cy)
 
 
 	/* Hack - disable bigtile mode */
-	if (use_bigtile)
-	{
+	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
 		Term_bigregion(-1, -1, -1);
 	}
 
@@ -4093,6 +4103,7 @@ void do_cmd_view_law_map(void)
 	int px = p_ptr->px;
 
 	int cy, cx;
+	int tw, th;
 
 	void (*hook) (void);
 
@@ -4113,6 +4124,12 @@ void do_cmd_view_law_map(void)
 
 	/* Clear the screen */
 	Term_clear();
+
+	/* store the tile multipliers */
+	tw = tile_width_mult;
+	th = tile_height_mult;
+	tile_width_mult = 1;
+	tile_height_mult = 1;
 
 	{
 		/* Offset from player */
@@ -4195,6 +4212,10 @@ void do_cmd_view_law_map(void)
 			}
 		}
 	}
+
+	/* restore the tile multipliers */
+	tile_width_mult = tw;
+	tile_height_mult = th;
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = hook;
