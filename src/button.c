@@ -199,11 +199,16 @@ int button_add_end(const char *label, keycode_t keypress,
 		button->label = string_make(label);
 	}
 	if (button_add_2d_hook) {
-		int res = (*button_add_2d_hook) (button);
+		int res = (*button_add_2d_hook) (button->top, button->left,
+			button->bottom, button->right, button->label, button->key);
 		if (res) { // if res != 0
 			if (res == 1) {
-				/* pop the button off of the stack, but don't free it */
+				/* pop the button off of the stack */
 				button_stack = button->next;
+				/* free the button */
+				if (button->label)
+					string_free(button->label);
+				FREE(button);
 			}
 			return res;
 		}

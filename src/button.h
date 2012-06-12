@@ -8,7 +8,7 @@ typedef char keycode_t;
 
 /** Function prototype for the UI to provide to create native buttons */
 //typedef int (*button_add_2d_f)(button_mouse* button);
-typedef int (*button_add_2d_f)(struct _button_mouse_2d*);
+typedef int (*button_add_2d_f)(int, int, int, int, const char *, keycode_t);
 typedef int (*button_add_1d_f)(const char *, keycode_t);
 
 /** Function prototype for the UI to provide to remove native buttons */
