@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 #define MUT_CHAOS_PATRON 57
 
@@ -97,6 +98,9 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 	/* Save the screen */
 	screen_save();
 
+	/* backup any previous mouse buttons */
+	button_backup_all(TRUE);
+
 	/* Display a list of spells */
 	print_spells(spells, num, 14, 1, sp_e.r);
 
@@ -108,7 +112,7 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 	window_stuff();
 
 	/* Build a prompt (accept all spells) */
-	(void)strnfmt(out_val, 78, "(%^ss, ESC=exit) %^s which %s? ", p, prompt, p);
+	(void)strnfmt(out_val, 78, "(%^ss, $UESC=exit$Y%c$V) %^s which %s? ", p, ESCAPE, prompt, p);
 
 	/* Get a spell from the user */
 	while (get_com(out_val, &choice))
@@ -163,6 +167,8 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 	/* Restore the screen */
 	screen_load();
 
+	/* restore any previous mouse buttons */
+	button_restore();
 
 	/* Show choices */
 	/* Update */
@@ -2149,6 +2155,9 @@ void do_cmd_browse_aux(const object_type *o_ptr)
 	/* Save the screen */
 	screen_save();
 
+	/* backup any previous mouse buttons */
+	button_backup_all(TRUE);
+
 	/* Display the spells */
 	print_spells(spells, num, 14, 1, (o_ptr->tval - TV_BOOKS_MIN));
 
@@ -2173,6 +2182,9 @@ void do_cmd_browse_aux(const object_type *o_ptr)
 
 	/* Restore the screen */
 	screen_load();
+
+	/* restore any previous mouse buttons */
+	button_restore();
 }
 
 
@@ -4626,6 +4638,7 @@ void do_cmd_cast(void)
 	bool cast;
 	spell_external sp;
 
+
 	const cptr prayer =
 		((mp_ptr->spell_book == TV_LIFE_BOOK) ? "prayer" : "spell");
 
@@ -5252,6 +5265,9 @@ bool shadow_magic (int sval, byte p, bool is_spell)
 	/* Determine the realm to use */
 	screen_save();
 
+	/* backup any previous mouse buttons */
+	button_backup_all(TRUE);
+
 	prtf(20, 1, "");
 
 	for (i = 0; i < NUM_REALMS; i++)
@@ -5318,7 +5334,7 @@ bool shadow_magic (int sval, byte p, bool is_spell)
 	print_all_spells(spells, num, 20, 1, realm);
 
 	/* Build a prompt (accept all spells) */
-	(void)strnfmt(out_val, 78, "(Spells, ESC=exit) Mimic which spell? ");
+	(void)strnfmt(out_val, 78, "(Spells, $UESC=exit$Y%c$V) Mimic which spell? ",ESCAPE);
 
 	/* Get a spell from the user */
 	while (get_com(out_val, &choice))
@@ -5358,6 +5374,9 @@ bool shadow_magic (int sval, byte p, bool is_spell)
 	}
 
 	screen_load();
+
+	/* restore any previous mouse buttons */
+	button_restore();
 
 	/* Allow user to abort */
 	if (spell < 0)

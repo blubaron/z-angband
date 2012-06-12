@@ -380,6 +380,7 @@ void teleport_player(int dis)
 			}
 
 
+
 			/* No teleporting into vaults and such */
 			if (c_ptr->info & CAVE_ICKY) continue;
 
@@ -4438,8 +4439,8 @@ static void print_spells_aux(byte *spells, int num, int x, int y, int realm, boo
 		/* Skip illegible spells */
 		if (s_ptr->slevel > PY_MAX_LEVEL)
 		{
-			prtf(x, y + i + 1, CLR_L_DARK "  %c) %-30s",
-					 I2A(i), "(illegible)");
+			prtf(x, y + i + 1, CLR_L_DARK "  $U%c) %-30s",
+					 I2A(i), "(illegible)$V");
 			continue;
 		}
 
@@ -4481,7 +4482,7 @@ static void print_spells_aux(byte *spells, int num, int x, int y, int realm, boo
 		if (sp.r == REALM_NATURE-1 && !p_ptr->depth) pow = POWER(100+pow,25)-100;
 
 		/* Dump the spell --(-- */
-		prtf(x, y + i + 1, "  %c) %-30s%2d %4d %3d%% %s%2d%%" CLR_DEFAULT "%s",
+		prtf(x, y + i + 1, "  $U%c) %-30s%2d %4d %3d%% %s%2d%%$V" CLR_DEFAULT "%s",
 				I2A(i), spell_name(sp),
 				(int)s_ptr->slevel, spell_mana(sp),
 				/* Hack: no warning means this is shadow magic: impose 5% min. failure rate in display. */
