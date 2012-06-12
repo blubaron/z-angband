@@ -8,7 +8,7 @@ subdir = ./src/
 ## ##### Zangband Files to compile #####
 ##
 
-CFLAGS += -Isrc -Isrc/platform -Isrc/platform/win
+CFLAGS += -Isrc -Isrc/platform -Isrc/libpng -Isrc/platform/win
 
 ##
 ## The Zangband source files
