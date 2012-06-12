@@ -116,6 +116,10 @@ SOURCE=.\src\cave.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\cmd0.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\cmd1.c
 # End Source File
 # Begin Source File

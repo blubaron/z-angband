@@ -128,6 +128,7 @@ OBJ = \
 	cmd3.obj \
 	cmd2.obj \
 	cmd1.obj \
+	cmd0.obj \
 	cave.obj \
 	button.obj \
 	bldg.obj \

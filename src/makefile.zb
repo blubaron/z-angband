@@ -24,7 +24,7 @@ NORMOBJS := $(addprefix src/,\
 	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o cmd7.o \
         store.o birth.o load.o ui.o hero.o button.o \
 	wizard1.o wizard2.o grid.o streams.o rooms.o \
-	generate.o dungeon.o game.o init1.o init2.o \
+	generate.o dungeon.o game.o init1.o init2.o cmd0.o \
 	effects.o quest1.o quest2.o racial.o run.o script.o \
 	artifact.o mutation.o flavor.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o wild4.o \
