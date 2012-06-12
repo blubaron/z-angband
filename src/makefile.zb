@@ -17,7 +17,6 @@ CFLAGS += -Isrc -Isrc/platform -Isrc/platform/win
 NORMOBJS := $(addprefix src/,\
 	variable.o tables.o util.o cave.o \
 	signals.o ui-inkey.o userid.o \
-	z-file.o z-msg.o z-quark.o \
 	object1.o object2.o monster1.o monster2.o \
 	xtra1.o xtra2.o spells1.o spells2.o \
 	melee1.o melee2.o save.o files.o fields.o \
@@ -55,6 +54,7 @@ LUAWOBJS := $(addprefix src/,\
 ##
 
 ZUTILOBJS := $(addprefix src/,\
+	z-file.o z-msg.o z-quark.o \
 	z-util.o z-virt.o z-form.o z-rand.o z-term.o)
 	
 ##
@@ -62,9 +62,23 @@ ZUTILOBJS := $(addprefix src/,\
 ##
 
 ##
+## The libpng files
+##
+
+PNGOBJS := $(addprefix src/libpng/zlib_1_2_5/,\
+	adler32.o compress.o crc32.o gzclose.o gzlib.o gzread.o gzwrite.o \
+	infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o) \
+	$(addprefix src/libpng/, \
+	png.o pngerror.o pngget.o pngmem.o pngpread.o pngset.o \
+	pngread.o pngrio.o pngrtran.o pngrutil.o pngtrans.o \
+	pngwio.o pngwrite.o pngwtran.o pngwutil.o)
+
+LIBS += -lm
+	
+##
 ## Normal list of object files.
 ##
-objs-y += $(ZUTILOBJS) $(LUAWOBJS) $(NORMOBJS) $(ANGOBJS)
+objs-y += $(ZUTILOBJS) $(PNGOBJS) $(LUAWOBJS) $(NORMOBJS) $(ANGOBJS)
 
 ##
 ## Extra object files depending on the ports
