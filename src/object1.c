@@ -3828,6 +3828,104 @@ object_type *get_item(cptr pmt, cptr str, int mode, int start)
 }
 
 /*
+ * test if the player is carrying a particulat object.
+ */
+object_type *player_has(int tval, int sval)
+{
+	object_type *q_ptr, *q2_ptr;
+	int i;
+
+	/* Test equipment */
+	for (i = 0; i < EQUIP_MAX; i++) {
+		q_ptr = &(p_ptr->equipment[i]);
+
+		/* Only want valid items */
+		if ((q_ptr->tval == tval) && (q_ptr->k_idx)) {
+			if (sval && (q_ptr->sval != sval)) {
+				continue;
+			}
+			return q_ptr;
+		}
+	}
+
+	/* Test Inventory */
+	OBJ_ITT_START (p_ptr->inventory, q_ptr)
+	{
+		/* Only want valid items */
+		if ((q_ptr->tval == tval) && (q_ptr->k_idx)) {
+			if (sval) {
+				if (q_ptr->sval == sval) {
+					return q_ptr;
+				}
+			} else {
+				return q_ptr;
+			}
+		}
+
+		/* Check inside containers */
+		if (q_ptr->tval == TV_CONTAINER && q_ptr->contents_o_idx)
+		{
+			OBJ_ITT_START(q_ptr->contents_o_idx, q2_ptr)
+			{
+				if ((q2_ptr->tval == tval) && (q2_ptr->k_idx)) {
+					if (sval) {
+						if (q2_ptr->sval == sval) {
+							return q2_ptr;
+						}
+					} else {
+						return q2_ptr;
+					}
+				}
+			}
+			OBJ_ITT_END;
+		}
+	}
+	OBJ_ITT_END;
+
+	return NULL;
+}
+
+object_type *player_has_idx(int kidx)
+{
+	object_type *q_ptr, *q2_ptr;
+	int i;
+
+	/* Test equipment */
+	for (i = 0; i < EQUIP_MAX; i++) {
+		q_ptr = &(p_ptr->equipment[i]);
+
+		/* Only want valid items */
+		if (q_ptr->k_idx && (q_ptr->k_idx == kidx)) {
+			return q_ptr;
+		}
+	}
+
+	/* Test Inventory */
+	OBJ_ITT_START (p_ptr->inventory, q_ptr)
+	{
+		/* Only want valid items */
+		if (q_ptr->k_idx && (q_ptr->k_idx == kidx)) {
+			return q_ptr;
+		}
+
+		/* Check inside containers */
+		if (q_ptr->tval == TV_CONTAINER && q_ptr->contents_o_idx)
+		{
+			OBJ_ITT_START(q_ptr->contents_o_idx, q2_ptr)
+			{
+				if (q2_ptr->k_idx && (q2_ptr->k_idx == kidx)) {
+					return q2_ptr;
+				}
+			}
+			OBJ_ITT_END;
+		}
+	}
+	OBJ_ITT_END;
+
+	return NULL;
+}
+
+/*
  * Print out full description to the given file.
  */
 static void dump_full_item_aux(FILE *fff, object_type *o_ptr, int indent)
