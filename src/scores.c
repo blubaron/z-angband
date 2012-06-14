@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 
 /*
@@ -1074,6 +1075,7 @@ void ingame_score(bool *initialized, bool game_in_progress)
 		/* Shut the high score file */
 		(void)fd_close(highscore_fd);
 
+
 		/* Forget the high score fd */
 		highscore_fd = -1;
 
@@ -1345,11 +1347,14 @@ void tomb_menu(bool dump)
 	char ch;
 	bool auto_done = FALSE;
 
+	/* backup any current buttons */
+	button_backup_all(TRUE);
+
 	/* You are dead */
 	print_tomb();
 
 	/* Describe options */
-	prtf(0, 23, "(D) Dump char record  (C) Show char info  (T) Show top scores  (ESC) Exit");
+	prtf(0, 23, "$U(D) Dump char record$Yd$V  $U(C) Show char info$Yc$V  $U(T) Show top scores$Yt$V  $U(ESC) Exit$Y%c$V", ESCAPE);
 
 	/* Flush messages */
 	message_flush();
@@ -1392,6 +1397,9 @@ void tomb_menu(bool dump)
 
 					/* XXX We now have an unmatched Term_save() */
 					Term_load();
+
+					/* restore any previous buttons */
+					button_restore();
 
 					/* Go home, we're done */
 					return;
@@ -1449,6 +1457,9 @@ void tomb_menu(bool dump)
 		/* Restore the screen */
 		Term_load();
 	}
+
+	/* restore any previous buttons */
+	button_restore();
 }
 
 static void close_game_handle_death(void)
@@ -1493,11 +1504,12 @@ static void close_game_handle_death(void)
 	/* Enter player in high score list */
 	enter_score();
 
-  tomb_menu(auto_dump);
+	tomb_menu(auto_dump);
 }
 
 
 /*
+
  * Close up the current game (player may or may not be dead)
  *
  * This function is called only from "main.c" and "signals.c".
