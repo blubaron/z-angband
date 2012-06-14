@@ -1660,6 +1660,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_FOOD:
 		case TV_POTION:
 		case TV_SCROLL:
+		case TV_SPIRIT:
 		{
 			/* Food and Potions and Scrolls */
 

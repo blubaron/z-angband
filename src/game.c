@@ -372,6 +372,83 @@ bool game_change_level(void)
 	/* Accidental Death */
 	if (p_ptr->state.playing && p_ptr->state.is_dead)
 	{
+		object_type *o_ptr;
+		o_ptr = player_has(TV_SPIRIT, 0);
+		if (o_ptr) {
+			/* Message */
+			msgf("As your conciousness fades, you feel engery coming from one of your items.");
+			message_flush();
+
+			cheat_death();
+			p_ptr->used_ankhs++;
+
+			/* remove the item from the player */
+			if (o_ptr->number > 1) {
+				o_ptr->number -= 1;
+			} else {
+				delete_held_object(&(p_ptr->inventory), o_ptr);
+			}
+
+			/* TODO create a death chest quest and move all items to death chest storage */
+
+			/* move the player somewhere, same as recall for now TODO change */
+			if (p_ptr->depth) {
+				p_ptr->depth = 0;
+				change_level(p_ptr->depth);
+				msgf("You open your eyes and see that you are back on the surface.");
+			} else
+			if (p_ptr->home_place_num && p_ptr->home_store_num) {
+				/* Move the player from its current wilderness location to its primary home
+				 * Copied from building_magetower() - Brett */
+
+				place_type *pl_ptr2 = &place[p_ptr->home_place_num];
+				store_type *st_ptr2 = &pl_ptr2->store[p_ptr->home_store_num];
+
+				msgf("You open your eyes and find yourself at home.");
+
+				/* Move the player */
+				p_ptr->px = pl_ptr2->x * 16 + st_ptr2->x;
+				p_ptr->py = pl_ptr2->y * 16 + st_ptr2->y;
+
+				p_ptr->wilderness_x = p_ptr->px;
+				p_ptr->wilderness_y = p_ptr->py;
+
+				/* Notice player location */
+				Term_move_player();
+
+				/* Remove all monster lights */
+				lite_n = 0;
+
+				/* Mark the entire view as forgotten */
+				view_n = 0;
+
+				/* Notice the move */
+				move_wild();
+
+				/* Check for new panel (redraw map) */
+				verify_panel();
+
+				/* Update stuff */
+				p_ptr->update |= (PU_VIEW | PU_FLOW | PU_MON_LITE);
+
+				/* Update the monsters */
+				p_ptr->update |= (PU_DISTANCE);
+
+				/* Window stuff */
+				p_ptr->window |= (PW_OVERHEAD | PW_DUNGEON);
+			} else
+			{
+				p_ptr->depth = 0;
+				change_level(p_ptr->depth);
+				msgf("You open your eyes and see that you are back on the surface.");
+			}
+
+			/* Leaving */
+			p_ptr->state.leaving = TRUE;
+
+			/* restore player energy */
+			p_ptr->energy = 100;
+		} else
 		/* Mega-Hack -- Allow player to cheat death */
 		if ((p_ptr->state.wizard || cheat_live) && !get_check("Die? "))
 		{

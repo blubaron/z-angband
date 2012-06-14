@@ -839,6 +839,7 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_FLASK:
 		case TV_CHEST:
 		case TV_CONTAINER:
+		case TV_SPIRIT:
 		{
 			/* Some objects are easy to describe */
 			break;

@@ -68,6 +68,7 @@
 #define TV_DRAG_ARMOR   38		/* Dragon Scale Mail */
 #define TV_LITE         39		/* Lites (including Specials) */
 #define TV_AMULET       40		/* Amulets (including Specials) */
+#define TV_SPIRIT       41		/* Ankhs (resurrection items) */
 #define TV_RING         45		/* Rings (including Specials) */
 #define TV_STAFF        55
 #define TV_WAND         65

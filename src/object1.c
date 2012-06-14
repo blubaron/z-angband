@@ -3972,6 +3972,7 @@ static void dump_full_item_aux(FILE *fff, object_type *o_ptr, int indent)
 		o_ptr->tval == TV_JUNK ||
 		o_ptr->tval == TV_STATUE ||
 		o_ptr->tval == TV_FIGURINE ||
+		o_ptr->tval == TV_SPIRIT ||
 		o_ptr->tval == TV_FOOD ||
 		o_ptr->tval == TV_CHEST ||
 		o_ptr->tval == TV_FLASK ||

@@ -69,6 +69,7 @@ static const tval_desc tvals[] =
 	{TV_JUNK, "Junk"},
 	{TV_SKELETON, "Skeleton"},
 	{TV_CONTAINER, "Container"},
+	{TV_SPIRIT, "Ankh"},
 	{0, NULL}
 };
 
@@ -117,7 +118,8 @@ static int tval_to_idx(u16b x)
 		case TV_JUNK: return 39;
 		case TV_SKELETON: return 40;
 		case TV_CONTAINER: return 41;
-		default: return 42;
+		case TV_SPIRIT: return 42;
+		default: return 43;
 	}
 }
 

@@ -118,6 +118,7 @@ static const grouper group_item[] =
 
 	{TV_SPIKE, "Various"},
 	{TV_LITE, NULL},
+	{TV_SPIRIT, NULL},
 	{TV_FLASK, NULL},
 	{TV_JUNK, NULL},
 	{TV_BOTTLE, NULL},

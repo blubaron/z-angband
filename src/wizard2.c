@@ -789,6 +789,7 @@ static const tval_desc tvals[] =
 	{TV_JUNK, "Junk"},
 	{TV_SKELETON, "Skeleton"},
 	{TV_CONTAINER, "Container"},
+	{TV_SPIRIT, "Ankh"},
 	{0, NULL}
 };
 
