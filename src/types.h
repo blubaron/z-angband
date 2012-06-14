@@ -115,8 +115,8 @@ typedef struct feature_type feature_type;
 
 struct feature_type
 {
-	//feature_type *next;
-	//u16b idx;
+	/*feature_type *next;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -165,8 +165,8 @@ typedef struct object_kind object_kind;
 
 struct object_kind
 {
-	//object_kind *next;
-	//u16b idx;
+	/*object_kind *next;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -241,8 +241,8 @@ typedef struct artifact_type artifact_type;
 
 struct artifact_type
 {
-	//artifact_type *next;
-	//u16b idx;
+	/*artifact_type *next;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -284,8 +284,8 @@ typedef struct ego_item_type ego_item_type;
 
 struct ego_item_type
 {
-	//ego_item_type *next;
-	//u16b idx;
+	/*ego_item_type *next;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -356,8 +356,8 @@ typedef struct monster_race monster_race;
 
 struct monster_race
 {
-	//monster_race *next;
-	//u16b idx;
+	/*monster_race *next;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -458,8 +458,8 @@ struct vault_symbol
   struct vault_symbol *pNext;
 
 	byte sym;	/* symbol that will be used */
-	//byte type;	/* type of id (feature, field, monster, object, monster group, or object tval) */
-	//u16b id;	/* id used with the symbol */
+	/*byte type;*/	/* type of id (feature, field, monster, object, monster group, or object tval) */
+	/*u16b id;*/	/* id used with the symbol */
 	byte flags;
 	u16b feat;	/* feature used */
 	u16b feat_mod_flags;	/* feature used */
@@ -483,8 +483,8 @@ typedef struct vault_type vault_type;
 
 struct vault_type
 {
-	//vault_type *next;
-	//u16b vidx;
+	/*vault_type *next;*/
+	/*u16b vidx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -497,9 +497,9 @@ struct vault_type
 	byte wid;	/* Vault width */
 
 	vault_symbol *pSymbols;
-	//floor_note *notes;
-	//u32b line;
-	//u32b message;
+	/*floor_note *notes;*/
+	/*u32b line;*/
+	/*u32b message;*/
 	u16b vidx;
 };
 
@@ -965,8 +965,8 @@ struct rbm_type
 typedef struct field_thaum field_thaum;
 struct field_thaum
 {
-  //field_thaum *next;
-  //u16b idx;
+	/*field_thaum *next;*/
+	/*u16b idx;*/
 	char *name;	/* The name of the field */
 
 	byte f_attr;	/* attribute */

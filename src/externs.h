@@ -637,8 +637,7 @@ extern void compact_objects(int size);
 extern void wipe_o_list(void);
 extern void wipe_objects(int rg_idx);
 extern object_type *add_object_list(s16b *o_idx_ptr, object_type *o_ptr);
-extern void move_object(s16b *tgt_list_ptr, s16b *cur_list_ptr,
-						object_type *o_ptr);
+extern void move_object(s16b *tgt_list_ptr, s16b *cur_list_ptr, object_type *o_ptr);
 extern void swap_objects(object_type *o1_ptr, object_type *o2_ptr);
 extern void get_obj_num_prep(object_hook_type object_hook);
 extern s16b get_obj_num(int level, int min_level);
@@ -695,8 +694,7 @@ extern void item_increase(object_type *o_ptr, int num);
 extern void item_increase_silent(object_type *o_ptr, int num);
 extern bool inven_carry_okay(const object_type *o_ptr);
 extern bool inven_carry_okay_no_containers(const object_type *o_ptr);
-extern object_type *reorder_objects_aux(object_type *q_ptr,
-										object_comp comp_func, u16b o_idx);
+extern object_type *reorder_objects_aux(object_type *q_ptr, object_comp comp_func, u16b o_idx);
 extern object_type *inven_carry(object_type *o_ptr);
 extern object_type *inven_carry_no_containers(object_type *o_ptr);
 extern object_type *inven_takeoff(object_type *o_ptr);
@@ -1204,7 +1202,7 @@ extern int max_dun_level_reached(void);
 extern cptr building_name(byte build_type);
 extern void building_char(byte build_type, byte *a, char *c);
 extern cptr dungeon_type_name(u32b dun);
-//extern dun_gen_type dungeons[];
+/*extern dun_gen_type dungeons[];*/
 extern dun_gen_type *dungeons;
 extern void draw_quest_stair(place_type *pl_ptr);
 extern void refresh_quest_stair(place_type *pl_ptr);

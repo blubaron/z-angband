@@ -122,8 +122,8 @@
 #define DF_DENSE		0x00004000  /* 2x monster generation */
 #define DF_POOLS		0x00008000  /* multiple very small lakes */  /* Not implemented */
 #define DF_PURE_CASTLE	0x00010000  /* Castle occupies the whole level */
-//#define DF_CAVERN 	0x00020000  /* Cavern occupies the whole level*/
-//#define DF_LABRINTH	0x00040000  /* Labrinth occupies the whole level */
+/*#define DF_CAVERN 	0x00020000 */ /* Cavern occupies the whole level*/
+/*#define DF_LABRINTH	0x00040000 */ /* Labrinth occupies the whole level */
 #define DF_BASIC  	0x00080000  /* this type is a regular dungeon, that appears in the wilderness */
 #define DF_GUARDED	0x00100000  /* this dungeon is always guarded in the wilderness */
 
@@ -1262,7 +1262,7 @@ enum
 	FF_QUEST        = 0x00000800, /* player can enter a quest level here */
 	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature */
 	FF_MARK         = 0x00002000, /* memorized on map when seen*/
-	//FF_INTERESTING  = 0x00002000, /* allow stopping here when looking around  */
+	/*FF_INTERESTING  = 0x00002000, *//* allow stopping here when looking around  */
 	FF_OVERLAY      = 0x00004000, /* draw on top of base feature */
 	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path */
 	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold */
@@ -1315,13 +1315,13 @@ enum
 	FF_STATUE       = 0x10000000, /* if terrain is a statue of some sort */
 	FF_SUPPORT      = 0x20000000, /* if terrain is a wall support of some sort */
 	FF_TEXT         = 0x40000000, /* if terrain displays custom text of some sort */
-	FF_ORGANIC      = 0x80000000, /* from FA, nothing expected of it, here to fill out bits */
+	FF_ORGANIC      = 0x80000000 /* from FA, nothing expected of it, here to fill out bits */
 };
 
 #define FF_MASK_INTERESTING FF_QUEST | FF_TRAP | FF_CLOSED | FF_CLOSEABLE | \
                             FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | \
                             FF_EXIT_UP | FF_EXIT_DOWN | FF_PATTERN | FF_BROKEN |\
-                            FF_DIG_CUSTOM | FF_DIG_FOOD // | FF_INTERESTING
+                            FF_DIG_CUSTOM | FF_DIG_FOOD
 #define FF_MASK_INTERESTING2 FF_FOUNTAIN | FF_STATUE | FF_TEXT
 
 /*** Terrain Feature Indexes (see "lib/edit/f_info.txt") ***/
@@ -4004,24 +4004,24 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 /*
  * Determine if a "legal" grid is a "floor" grid
  */
-//#define cave_floor_grid(C) \
-//    (!(f_info[(C)->feat].flags & FF_BLOCK))
+/*#define cave_floor_grid(C) \
+    (!(f_info[(C)->feat].flags & FF_BLOCK))*/
 #define cave_floor_grid(C) \
     (!(f_info[(C)->feat].flags & FF_NO_LOS) && (f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
 /*
  * Determine if a "legal" grid is a "wall" grid
  */
-//#define cave_wall_grid(C) \
-//    (f_info[(C)->feat].flags & FF_BLOCK)
+/*#define cave_wall_grid(C) \
+    (f_info[(C)->feat].flags & FF_BLOCK)*/
 #define cave_wall_grid(C) \
     (!(f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
-    //((f_info[(C)->feat].flags & FF_NO_LOS) && !(f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
+    /*((f_info[(C)->feat].flags & FF_NO_LOS) && !(f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))*/
 
 /*
  * A sight-blocking grid that doesn't block movement
  */
-//#define cave_semi_grid(C) \
-//	(f_info[(C)->feat].flags & FF_BLOCK_LOS)
+/*#define cave_semi_grid(C) \
+	(f_info[(C)->feat].flags & FF_BLOCK_LOS)*/
 #define cave_semi_grid(C) \
     ((f_info[(C)->feat].flags & FF_NO_LOS) && (f_info[(C)->feat].flags & (FF_PWALK|FF_MWALK)))
 
@@ -4084,8 +4084,8 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 /*
  * Is the grid worth remembering?
  */
-//#define cave_mem_grid(C) \
-//	(f_info[(C)->feat].flags & FF_MARK)
+/*#define cave_mem_grid(C) \
+	(f_info[(C)->feat].flags & FF_MARK)*/
 
 /*
  * Determine if a "legal" grid is within "los" of the player
