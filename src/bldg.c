@@ -2438,7 +2438,7 @@ void build_cmd_spellbooks(int price)
 
 void build_cmd_food (int price)
 {
-    object_type *o_ptr, *j_ptr;
+	object_type *o_ptr, *j_ptr;
 
 	/* Make sure the player has enough gold. */
 	if (!test_gold(price))
@@ -2465,6 +2465,44 @@ void build_cmd_food (int price)
 	else
 	{
 		j_ptr = inven_carry(o_ptr);
+		msgf("You have %v (%c).", OBJECT_FMT(j_ptr, TRUE, 3), I2A(get_item_position(p_ptr->inventory, j_ptr)));
+		message_flush();
+	}
+}
+
+/*
+ * Player pays price for an ankh.
+ */
+void build_cmd_ankh(int price)
+{
+	object_type *o_ptr, *j_ptr;
+
+	/* Make sure the player has enough gold. */
+	if (!test_gold(price))
+		return;
+
+	/* Charge money */
+	p_ptr->au -= price;
+
+	current_object_source.type = OM_STORE;
+	current_object_source.place_num = p_ptr->place_num;
+	current_object_source.depth = 0;
+	/* Hack: gets data */
+	(void)get_current_store();
+
+	o_ptr = object_prep(lookup_kind(TV_SPIRIT,1));
+
+	/* Make sure we can carry it */
+	if (!inven_carry_okay(o_ptr))
+	{
+		drop_near(o_ptr, -1, p_ptr->px, p_ptr->py);
+		msgf ("You can't carry it so I placed it outside.");
+		message_flush();
+	}
+	else
+	{
+		j_ptr = inven_carry(o_ptr);
+		msgf("Here you go, I hope you don't need it.");
 		msgf("You have %v (%c).", OBJECT_FMT(j_ptr, TRUE, 3), I2A(get_item_position(p_ptr->inventory, j_ptr)));
 		message_flush();
 	}

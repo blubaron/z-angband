@@ -963,6 +963,7 @@ extern void build_cmd_spellbooks(int price);
 extern bool build_cmd_recall (void);
 extern void build_cmd_grave (void);
 extern void build_cmd_food (int price);
+extern void build_cmd_ankh (int price);
 extern void build_cmd_loan(int factor);
 extern void building_bank_info(void);
 extern void build_cmd_bank_deposit(void);

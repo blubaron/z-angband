@@ -2033,8 +2033,12 @@ D:3:0:0:0:0:0:0:0
 L:SBINIT:place_sb(rand_range(90, 125), 0)
 L:PENTER:do_cmd_bldg(field)
 L:BUILD1:building_options("R) Restore Stats (".. 20 * factor .."gp)",
-L:BUILD1:          "A) Buy Ankh (".. (factor * 1500) .."gp)")
+L:BUILD1:          "A) Buy Ankh (".. (factor * 15000) .."gp)")
 L:BUILD2:local cost
+L:BUILD2:if (command == 'A') then
+L:BUILD2:	build_cmd_ankh(factor*15000)
+L:BUILD2:       done = TRUE
+L:BUILD2:end
 L:BUILD2:if (command == 'R') then
 L:BUILD2:	cost = 20 * factor
 L:BUILD2:	if (test_gold(cost) == TRUE) then
@@ -2275,12 +2279,12 @@ L:BUILD1:	building_options(rstring,
 L:BUILD1:          "B) Blessing (".. (factor / 3).. "gp)",
 L:BUILD1:          "C) Remove Curse",
 L:BUILD1:          "R) Restoration (".. (factor * 15)/2 .."gp)",
-L:BUILD1:          "A) Buy Ankh (".. (factor * 1500) .."gp)")
+L:BUILD1:          "A) Buy Ankh (".. (factor * 15000) .."gp)")
 L:BUILD1:else
 L:BUILD1:	building_options(rstring, 
 L:BUILD1:          "B) Blessing (".. (factor * 2) .."gp)",
 L:BUILD1:          "R) Restoration (".. (factor * 30) .."gp)",
-L:BUILD1:          "A) Buy Ankh (".. (factor * 1500) .."gp)")
+L:BUILD1:          "A) Buy Ankh (".. (factor * 15000) .."gp)")
 L:BUILD1:end
 L:BUILD2:local cost
 L:BUILD2:if (command == 'B') then
@@ -2294,6 +2298,10 @@ L:BUILD2:         else inc_blessed(500) end
 L:BUILD2:		message_flush()
 L:BUILD2:	end
 L:BUILD2:	done = TRUE
+L:BUILD2:end
+L:BUILD2:if (command == 'A') then
+L:BUILD2:	build_cmd_ankh(factor*15000)
+L:BUILD2:       done = TRUE
 L:BUILD2:end
 L:BUILD2:if (command == 'Q') then
 L:BUILD2:       if (is_member() == TRUE) then cost = 5 else cost = 0 end
@@ -2310,8 +2318,8 @@ L:BUILD2:else	cost = factor * 30  end
 L:BUILD2:	if (test_gold(cost) == TRUE) then
 L:BUILD2:		if (building_healer() == TRUE) then
 L:BUILD2:			player.au = player.au - cost
-L:BUILD2:		else
-L:BUILD2:			msgf("You are in fine health already.")
+#L:BUILD2:		else
+#L:BUILD2:			msgf("You are in fine health already.")
 L:BUILD2:		end
 L:BUILD2:         message_flush()
 L:BUILD2:	end

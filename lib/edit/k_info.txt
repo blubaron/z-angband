@@ -7065,7 +7065,7 @@ D:It can hold up to 160.0 stones of items
 # ocassionally, but not found in dungeons. I do not know how to do
 # this though. for now, buy in cathedrals or healers.
 N:702:& Ankh~
-G:&:U
+G:?:U
 I:41:1:1000
 W:50:0:05:87000
 A:0/0
@@ -7078,7 +7078,7 @@ D: However, your items and gold will remain in the dungeon.
 # how much the player can get if it is sold. The effect is the same as
 # the normal ankh.
 N:703:& Ankh~
-G:&:U
+G:?:U
 I:41:2:1000
 W:50:0:05:100
 A:0/0

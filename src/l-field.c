@@ -876,6 +876,20 @@ static int toluaI_field_build_cmd_food00(lua_State* tolua_S)
  return 0;
 }
 
+/* function: build_cmd_ankh */
+static int toluaI_field_build_cmd_ankh00(lua_State* tolua_S)
+{
+ if (!tolua_istype(tolua_S,1,LUA_TNUMBER,0) ||
+     !tolua_isnoobj(tolua_S,2))
+ {
+  TOLUA_ERR_FN(build_cmd_ankh);
+ } else {
+  int price = ((int)  tolua_getnumber(tolua_S,1,0));
+  build_cmd_ankh(price);
+ }
+ return 0;
+}
+
 /* function: in_quest */
 static int toluaI_field_in_quest00(lua_State* tolua_S)
 {
@@ -982,6 +996,7 @@ int tolua_field_open (lua_State* tolua_S)
  TOLUA_FUN(check_mortgage,toluaI_field_check_mortgage00);
  TOLUA_FUN(build_next_quest,toluaI_field_build_next_quest00);
  TOLUA_FUN(build_cmd_food,toluaI_field_build_cmd_food00);
+ TOLUA_FUN(build_cmd_ankh,toluaI_field_build_cmd_ankh00);
  TOLUA_FUN(in_quest,toluaI_field_in_quest00);
  return 1;
 }
@@ -1067,5 +1082,6 @@ void tolua_field_close (lua_State* tolua_S)
  TOLUA_UNDEF(check_mortgage);
  TOLUA_UNDEF(build_next_quest);
  TOLUA_UNDEF(build_cmd_food);
+ TOLUA_UNDEF(build_cmd_ankh);
  TOLUA_UNDEF(in_quest);
 }
