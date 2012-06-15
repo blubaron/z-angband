@@ -208,7 +208,7 @@ TOLUA = src/lua/tolua
 endif
 
 dust-files += src/*~
-clean-files += src/*.bak src/*.o src/l-*.c
+clean-files += src/*.bak src/*.o
 distclean-files += autoconf.h
 
 srcdirlist += src
@@ -217,15 +217,15 @@ notsrcfiles += src/compress.c src/autoconf.h
 srcfiles += src/*.c src/*.h src/platform/*.c src/platform/*.h\
 		 src/platform/win/*.c src/platform/win/*.h \
 		 src/platform/win/zplus.rc src/platform/win/zplus.ico \
-		 src/platform/angband.xpm src/platform/zangband.icns src/makefile* src/l-*.pkg \
+		 src/platform/angband.xpm src/platform/zangband.icns src/makefile* \
 		 src/autoconf.h.in
 
 # scan other source directories
 dirs := lua platform/tk
 include $(scandir)
 
-$(LUAWSRCS): %.c: %.pkg src/lua/tolua $(TOLUALUAOBJS)
-	$(TOLUA) -n $(subst l-,,$(notdir $*)) -o $@ $<
+#$(LUAWSRCS): %.c: %.pkg src/lua/tolua $(TOLUALUAOBJS)
+#	$(TOLUA) -n $(subst l-,,$(notdir $*)) -o $@ $<
 
 # List of makefiles in other build system so we can test them
 makefiles := $(addprefix src/,\
