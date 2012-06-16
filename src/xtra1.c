@@ -645,17 +645,37 @@ static void prt_sp(void)
 
 	color = CLR_L_GREEN;
 
-	if (p_ptr->csp >= p_ptr->msp)
-	{
-		color = CLR_L_GREEN;
-	}
-	else if (p_ptr->csp > (p_ptr->msp * hitpoint_warn) / 10)
-	{
-		color = CLR_YELLOW;
-	}
-	else
-	{
-		color = CLR_RED;
+	if (p_ptr->csp < p_ptr->msp) {
+		switch ((p_ptr->csp * 10) / (p_ptr->msp+1)) {
+		case 9:
+		{
+			color = CLR_L_WHITE;
+			break;
+		}
+		case 8:
+		case 7:
+		{
+			color = CLR_YELLOW;
+			break;
+		}
+		case 6:
+		case 5:
+		{
+			color = CLR_ORANGE;
+			break;
+		}
+		case 4:
+		case 3:
+		{
+			color = CLR_L_RED;
+			break;
+		}
+		default:
+		{
+			color = CLR_RED;
+			break;
+		}
+		}
 	}
 
 	/* Show mana */
