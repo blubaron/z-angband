@@ -561,21 +561,44 @@ static void prt_hp(void)
 #endif /* !VARIABLE_PLAYER_GRAPH */
 
 	color = CLR_L_GREEN;
+	color_player = TERM_WHITE;
 
-	if (p_ptr->chp >= p_ptr->mhp)
-	{
-		color = CLR_L_GREEN;
-		color_player = TERM_WHITE;
-	}
-	else if (p_ptr->chp > (p_ptr->mhp * hitpoint_warn) / 10)
-	{
-		color = CLR_YELLOW;
-		color_player = TERM_ORANGE;
-	}
-	else
-	{
-		color = CLR_RED;
-		color_player = TERM_RED;
+	if (p_ptr->chp < p_ptr->mhp) {
+		switch ((p_ptr->chp * 10) / (p_ptr->mhp+1)) {
+		case 9:
+		{
+			color = CLR_L_WHITE;
+			color_player = TERM_L_WHITE;
+			break;
+		}
+		case 8:
+		case 7:
+		{
+			color = CLR_YELLOW;
+			color_player = TERM_YELLOW;
+			break;
+		}
+		case 6:
+		case 5:
+		{
+			color = CLR_ORANGE;
+			color_player = TERM_ORANGE;
+			break;
+		}
+		case 4:
+		case 3:
+		{
+			color = CLR_L_RED;
+			color_player = TERM_L_RED;
+			break;
+		}
+		default:
+		{
+			color = CLR_RED;
+			color_player = TERM_RED;
+			break;
+		}
+		}
 	}
 
 	put_fstr(COL_HP, ROW_HP, "HP %s%4d" CLR_WHITE "/" CLR_L_GREEN "%4d", color, p_ptr->chp, p_ptr->mhp);
@@ -3400,6 +3423,7 @@ static void calc_bonuses(void)
 	{
 		SET_FLAG(p_ptr, TR_SH_COLD);
 	}
+
 
 	if (query_timed(TIMED_SH_FEAR))
 	{
