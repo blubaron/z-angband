@@ -1954,7 +1954,7 @@ static void calc_spells(void)
 		{
 			/* Skip when this realm doesn't have this spell, or we've already
 				forgotton this one. */
-			if (!p_ptr->spell.data[i].flags & present_flg[r] || new[i][r]) continue;
+			if (!(p_ptr->spell.data[i].flags & present_flg[r]) || new[i][r]) continue;
 
 			if (!(p_ptr->spell.data[i].flags & forgot_flg[r]))
 			{
