@@ -5216,20 +5216,20 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 
 	/* Process 'S' for "the first type of streamer" (one line only) */
 	if (buf[0] == 'S') {
-		int feat1, feat2, chance, size, number;
+		int feat1, feat2, rarity, size, number;
 
 		/* There better be a current dun_ptr */
 		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (5 != sscanf(buf + 2, "%d:%d:%d:%d:%d",
-						&feat1, &feat2, &size, &number, &chance))
+						&feat1, &feat2, &rarity, &size, &number))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		dun_ptr->vein[0].shal = feat1;
 		dun_ptr->vein[0].deep = feat2;
-		dun_ptr->vein[0].rarity = chance;
+		dun_ptr->vein[0].rarity = rarity;
 		dun_ptr->vein[0].size = size;
 		dun_ptr->vein[0].number = number;
 		return (0);
@@ -5237,20 +5237,20 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 
 	/* Process 's' for "the second type of streamer" (one line only) */
 	if (buf[0] == 's') {
-		int feat1, feat2, chance, size, number;
+		int feat1, feat2, rarity, size, number;
 
 		/* There better be a current dun_ptr */
 		if (!dun_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (5 != sscanf(buf + 2, "%d:%d:%d:%d:%d",
-						&feat1, &feat2, &size, &number, &chance))
+						&feat1, &feat2, &rarity, &size, &number))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		dun_ptr->vein[1].shal = feat1;
 		dun_ptr->vein[1].deep = feat2;
-		dun_ptr->vein[1].rarity = chance;
+		dun_ptr->vein[1].rarity = rarity;
 		dun_ptr->vein[1].size = size;
 		dun_ptr->vein[1].number = number;
 		return (0);

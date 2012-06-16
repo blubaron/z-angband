@@ -22,8 +22,8 @@
 # w: stair_up_feat : stair_down : quest_stair : pillar_feat
 # C: monsters : objects : doors : traps : rubble : stairs : tunnels
 # c: small_levels : arena_levels : cavern_levels : labrinth_levels : vault_levels : city_levels
-# S: streamer1feat : s1_t_feat : s1_size : s1_number : s1_t_chance
-# s: streamer2feat : s2_t_feat : s2_size : s2_number : s2_t_chance
+# S: streamer1feat : s1_t_feat : s1_t_rarity : s1_size : s1_number
+# s: streamer2feat : s2_t_feat : s2_t_rarity : s2_size : s2_number
 # V: river1feat_shallow : r1_deep : r1_rarity : r1_size
 # v: river2feat_shallow : r2_deep : r2_rarity : r2_size
 # l: lake_feat_shallow : lake_deep : lake_rarity : lake_size
@@ -70,12 +70,14 @@
 # and city levels.
 
 # 'S' is for the first type of streamer that changes the wall type -
-# feature, treasure_feature, streamer width, number of streamers, 
-# and chance of treasure feature.
+# feature, treasure_feature, one in rarity chance of treasure feature,
+# streamer width, and number of streamers. if treasure feature is not
+# used, rarity should be set to 0
 
 # 's' is for the second type of streamer that changes the wall type -
-# feature, treasure_feature, streamer width, number of streamers, 
-# and chance of treasure feature.
+# feature, treasure_feature, one in rarity chance of treasure feature,
+# streamer width, and number of streamers. if treasure feature is not
+# used, rarity should be set to 0
 
 # 'V' is for the first type of river that may be generated - shallow
 # water feature, deep water feature, rarity, and width.
