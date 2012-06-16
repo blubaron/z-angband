@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "button.h"
 
 #define MAX_VAMPIRIC_DRAIN 100
 
@@ -507,7 +508,7 @@ void search(void)
 
 	cave_type *c_ptr;
 	object_type *o_ptr;
-  feature_type *feat;
+	feature_type *feat;
 
 	/* Start with base search ability */
 	chance = p_ptr->skills[SKILL_SNS];
@@ -555,24 +556,24 @@ void search(void)
 					}
 				}
 
-        feat  = &(f_info[c_ptr->feat]);
+				feat  = &(f_info[c_ptr->feat]);
 				/* Secret door */
 				//if (c_ptr->feat == FEAT_SECRET)
 				if (feat->flags & FF_HIDDEN)
 				{
 
 					/* Pick a door */
-          if (feat->base_feat) {
+					if (feat->base_feat) {
 					  /* Message */
 					  msgf("You have found a secret %s.", f_name + f_info[feat->base_feat].name);
 					  create_closed_door(x, y, feat->base_feat);
-          } else {
+					} else {
 					  /* Message */
-            if (feat->flags & FF_DOOR) {
+					  if (feat->flags & FF_DOOR) {
 					    msgf("You have found a secret door.");
 					    create_closed_door(x, y, the_feat(FEAT_CLOSED));
-            }
-          }
+					  }
+					}
 
 					/* Disturb */
 					disturb(FALSE);
@@ -866,8 +867,11 @@ void carry(int pickup)
 					/* Paranoia XXX XXX XXX */
 					message_flush();
 
+					/* backup any previous butons */
+					button_backup_all(TRUE);
+
 					/* Prompt for it */
-					prtf(0, 0, "Pick up %s? [y/n/k] ", o_name);
+					prtf(0, 0, "Pick up %s? [$Xy/$Xn/$Xk] ", o_name);
 
 					/* Get an acceptable answer */
 					while (TRUE)
@@ -878,7 +882,7 @@ void carry(int pickup)
 							char b;
 							/* this was a mouse press, get the press and translate it */
 							Term_getmousepress(&b,&x,&y);
-							if ((i & 0x0F) == 1) {
+							if ((b & 0x0F) == 1) {
 								i = 'y';
 								break;
 							}
@@ -889,6 +893,9 @@ void carry(int pickup)
 						if (strchr("YyNnKk", i)) break;
 						bell("Illegal pick-up command!");
 					}
+
+					/* restore any previous butons */
+					button_restore();
 
 					/* Erase the prompt */
 					clear_msg();
@@ -2800,11 +2807,11 @@ void move_player(int dir, int do_pickup)
 		}
 		else
 		{
-      if (p_ptr->state.searching == SEARCH_MODE_SWING) {
-        py_attack_swing(x,y);
-      } else {
-			  py_attack(x, y);
-      }
+			if (p_ptr->state.searching == SEARCH_MODE_SWING) {
+				py_attack_swing(x,y);
+			} else {
+				py_attack(x, y);
+			}
 			oktomove = FALSE;
 		}
 	}
@@ -2855,20 +2862,20 @@ void move_player(int dir, int do_pickup)
 	  {
 		  if (!FLAG(p_ptr, TR_WILD_WALK))
 			  p_ptr->state.energy_use += 10;
-    }
-    else if (feat->flags & FF_NO_LOS)
+	  }
+	  else if (feat->flags & FF_NO_LOS)
 	  {
 		  if (!FLAG(p_ptr, TR_WILD_WALK))
 			  p_ptr->state.energy_use += 20;
-    }
+	  }
 	}
 
 	/* Closed door */
 	//else if (c_ptr->feat == FEAT_CLOSED)
 	else if ((feat->flags & FF_DOOR) && (feat->flags & FF_CLOSED))
-  { 
-    /* TODO eventually just test for the closed flag, and let do_open_cmd_aux
-            open it in the right way  */
+	{ 
+		/* TODO eventually just test for the closed flag, and let do_open_cmd_aux
+		 * open it in the right way  */
 		/* Pass through the door? */
 		if (p_can_pass_walls && (feat->flags & FF_PPASS))
 		{
@@ -2936,7 +2943,7 @@ void move_player(int dir, int do_pickup)
 		/* Notice things */
 		else
 		{
-      /* trees, jungle, etc */
+			/* trees, jungle, etc */
 			if (feat->flags & FF_WILD)
 			{
 				msgf(MSGT_HITWALL, "The %s is impassable.", f_name + feat->name);
