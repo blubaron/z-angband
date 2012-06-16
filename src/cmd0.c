@@ -195,8 +195,9 @@ void process_click(char press, int xpos, int ypos)
 	} else
 	if (button == 1) {
 #if (0)
-		if (p_ptr->timed[TMD_CONFUSED]) {
-			cmd_insert(CMD_WALK);
+		if (query_timed(TIMED_CONFUSED)) {
+			p_ptr->cmd.dir = randint0(8) + 1;
+			do_cmd_walk(FALSE);
 		} else
 #endif
 		{
@@ -208,6 +209,7 @@ void process_click(char press, int xpos, int ypos)
 			if (ctrl) {
 				/* control-click - alter */
 				p_ptr->cmd.dir = coords_to_dir(x, y);
+				p_ptr->cmd.arg = 11;
 				do_cmd_alter();
 			} else
 			if (alt) {
@@ -220,7 +222,7 @@ void process_click(char press, int xpos, int ypos)
 				if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
 						&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1)) {
 					p_ptr->cmd.dir = coords_to_dir(x, y);
-					do_cmd_walk(always_pickup);
+					do_cmd_walk(FALSE);
 				} else {
 					/* if not, pathfind to that spot */
 					do_cmd_pathfind(x,y);

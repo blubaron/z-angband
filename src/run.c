@@ -932,7 +932,7 @@ int find_player_path(int x, int y)
 		for (i = ox; i < ex; i++) {
 			feat  = &(f_info[parea(i, j)->feat]);
 			if ((parea(i, j)->feat == 0)
-				|| (feat->flags & FF_PWALK)
+				|| (feat->flags & FF_PWALK) || (feat->flags & FF_CLOSED)
 				|| ((feat->flags & FF_PPASS) && (FLAG(p_ptr, TR_PASS_WALL)))) {
 				terrain[j - oy][i - ox] = MAX_PF_LENGTH;
 			} else {
