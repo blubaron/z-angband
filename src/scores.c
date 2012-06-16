@@ -177,6 +177,9 @@ static long total_points(void)
 	/* Penalize the human "beginner" race */
 	if (p_ptr->rp.prace == RACE_HUMAN) mult -= 20;
 
+	/* Penalize deaths */
+	if (p_ptr->used_ankhs > 0) mult -= 10*p_ptr->used_ankhs;
+
 	/* Vanilla town is harder than normal */
 	if (vanilla_town) mult += 5;
 
