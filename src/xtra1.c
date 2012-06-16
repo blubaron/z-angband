@@ -563,8 +563,8 @@ static void prt_hp(void)
 	color = CLR_L_GREEN;
 	color_player = TERM_WHITE;
 
-	if (p_ptr->chp < p_ptr->mhp) {
-		switch ((p_ptr->chp * 10) / (p_ptr->mhp+1)) {
+	if ((p_ptr->mhp > 0) && (p_ptr->chp < p_ptr->mhp)) {
+		switch ((p_ptr->chp * 10) / p_ptr->mhp) {
 		case 9:
 		{
 			color = CLR_L_WHITE;
@@ -645,8 +645,8 @@ static void prt_sp(void)
 
 	color = CLR_L_GREEN;
 
-	if (p_ptr->csp < p_ptr->msp) {
-		switch ((p_ptr->csp * 10) / (p_ptr->msp+1)) {
+	if ((p_ptr->msp > 0) && (p_ptr->csp < p_ptr->msp)) {
+		switch ((p_ptr->csp * 10) / p_ptr->msp) {
 		case 9:
 		{
 			color = CLR_L_WHITE;
