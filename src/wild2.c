@@ -172,6 +172,7 @@ static byte wild_first_town[START_STORE_NUM] =
 	BUILD_STORE_TEMPLE,
 	BUILD_STORE_MAGIC,
 	BUILD_BLACK0,
+	BUILD_BANK,
 	BUILD_EMPTY,
 };
 
@@ -432,6 +433,7 @@ static void select_building_restrictions(byte pop, byte magic, int law, u16b *bu
 
 	/* Not more than one magetower per city */
 	if (build[BUILD_MAGETOWER0] || build[BUILD_MAGETOWER1]) {
+
 		wild_build[BUILD_MAGETOWER0].gen = 0;
 		wild_build[BUILD_MAGETOWER1].gen = 0;
 	}
@@ -776,6 +778,7 @@ static bool create_city(int x, int y, int town_num)
 	magic = (byte) randint0(256);
 
 	/* Generate plasma factal */
+
 	clear_temp_block();
 	set_temp_corner_val(WILD_BLOCK_SIZE * 64);
 	set_temp_mid((u16b) (WILD_BLOCK_SIZE * pop));
@@ -2667,6 +2670,7 @@ static void draw_dun_city(dun_type *dun)
 	{
 		for (j = -8; j <= 8; j++)
 		{
+
 			c_ptr = cave_p(x0+i,y0+j);
 			c_ptr->info |= CAVE_ICKY;
 		}
