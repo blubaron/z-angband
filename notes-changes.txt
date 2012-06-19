@@ -427,9 +427,10 @@ enum
       to use, press the toggle search button (shift-s) within 2 seconds of the
        previous press of the toggle search button. After two seconds, pressing
        it turns any mode off.
-      the additional modes use the same speed penalty as search mode.
+      the additional modes use the same speed penalty as search mode. (half
+       with no speed bonus)
 
-    *started adding items to resurrect the player when s/he dies.
+    Added items to resurrect the player when s/he dies.
 
     gave spellcasters a bit more starting mana
 
@@ -442,7 +443,9 @@ enum
     *Added support for tile multipliers larger than 2x1. Mostly working. Screen
      just to the right of the map is not being cleared though.
      *some messages have blank spots in them. the messages in the message 
-      sub window are ok though.
+      sub window are ok though. *need to change screen setup to be similar 
+      to angband, for context menus in the middle of the screen and the screen
+      not changing when a few of the map lines are overwriten with text.
 
     Added time of day text on the status bar. It is displayed to the right of
      the dungeon level / place name, if the screen is large enough (>90 chars).
@@ -456,7 +459,7 @@ enum
     *Added mouse buttons in most screens. the buttons are "on top" of text in 
       the screen, always on top of the list of possible keys, and they send the
       keypress.
-     *need to add more buttons, esp for options, knowledge screens, map
+     *need to add more buttons, esp for targeting/looking
      *need to add main screen buttons - character, inventory/equip, study, map,
       search mode, target current target/show monster list.
 
