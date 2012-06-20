@@ -2457,7 +2457,45 @@ static void process_energy(void)
 	process_fields();
 }
 
-
+bool add_main_buttons(void)
+{
+	int i, hgt;
+	hgt = Term->hgt - 1;
+	/* character screen */
+	button_add_2d(ROW_TITLE, COL_TITLE, ROW_EXP, COL_MAP, NULL, 'C');
+	/* inventory */
+	button_add_2d(ROW_EQUIPPY, COL_EQUIPPY, ROW_EQUIPPY, COL_MAP, NULL, 'I');
+	/* target */
+	button_add_2d(ROW_TARGET_NAME, COL_INFO, ROW_INFO, COL_MAP, NULL, 'l');
+	/* search */
+	button_add_2d(hgt, COL_STATE,hgt, COL_AFRAID, NULL, 'S');
+	/* study */
+	button_add_2d(hgt, COL_STUDY, hgt, COL_DEPTH, NULL, 'G');
+	/* map */
+	if (Term->wid > COL_DEPTH+30)  {
+		i = COL_DEPTH+20;
+	} else {
+		i = Term->wid;
+	}
+	button_add_2d(hgt, COL_DEPTH, hgt, i, NULL, 'M');
+	/* time */
+	if (Term->wid > COL_DEPTH+30)  {
+		if (Term->wid > COL_DEPTH+35)  {
+			i = COL_DEPTH+35;
+		} else {
+			i = Term->wid;
+		}
+		button_add_2d(hgt, COL_DEPTH+20, hgt, Term->wid, NULL, KTRL('T'));
+	}
+	/* wield */
+	button_add_2d(ROW_AC, COL_AC, ROW_AC, COL_MAP>>1, NULL, 'w');
+	/* takeoff */
+	button_add_2d(ROW_AC, COL_MAP>>1, ROW_AC, COL_MAP, NULL, 't');
+	/* use */
+	button_add_2d(ROW_GOLD, COL_GOLD, ROW_GOLD, COL_MAP>>1, NULL, 'u');
+	/* cast */
+	button_add_2d(ROW_GOLD, COL_MAP>>1, ROW_GOLD, COL_MAP, NULL, 'm');
+}
 
 /*
  * Interact with the current dungeon level.
@@ -2492,6 +2530,8 @@ bool dungeon_init_level(void)
 	/* Cancel the health bar */
 	health_track(0);
 
+	/* create some mouse buttons for the main screen */
+	add_main_buttons();
 
 	/* Check visual effects.  Should this be here? */
 	p_ptr->change |= (PC_SHIMMER | PC_REPAIR);
@@ -2680,6 +2720,8 @@ bool dungeon_play_frame(void)
 }
 void dungeon_close_level(void)
 {
+	/* remove all buttons, namely the main screen ones */
+	button_kill_all();
 
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;

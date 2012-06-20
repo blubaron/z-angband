@@ -190,6 +190,36 @@ void process_click(char press, int xpos, int ypos)
 			} else
 			if (button == 2) {
 				do_cmd_inven();
+			} else
+			/* temporary commands until context menus are implemented */
+			if (button == 3) {
+				do_cmd_use_terrain();
+			} else
+			if (button == 4) {
+				do_cmd_use();
+			} else
+			if (button == 5) {
+				/* Cast a spell */
+				if (FLAG(p_ptr, TR_NO_MAGIC))
+				{
+					cptr which_power = "magic";
+					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+						which_power = "psionic powers";
+					else if (mp_ptr->spell_book == TV_LIFE_BOOK)
+						which_power = "prayer";
+
+					msgf("An anti-magic shell disrupts your %s!",
+							   which_power);
+
+					p_ptr->state.energy_use = 0;
+				}
+				else
+				{
+					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+						do_cmd_mindcraft();
+					else
+						do_cmd_cast();
+				}
 			}
 		}
 	} else
@@ -689,8 +719,8 @@ void process_command(void)
 
 		case 'u':
 		{
-			/* Use a staff */
-			do_cmd_use_staff();
+			/* Use an item (including staves) */
+			do_cmd_use();
 			break;
 		}
 

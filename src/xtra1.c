@@ -1018,7 +1018,8 @@ static void prt_state(void)
 	/* Nothing interesting */
 	else
 	{
-		put_fstr(COL_STATE, Term->hgt - 1, "       ");
+		put_fstr(COL_STATE, Term->hgt - 1, CLR_L_DARK "Search ");
+		//put_fstr(COL_STATE, Term->hgt - 1, "       ");
 	}
 }
 
@@ -1096,7 +1097,7 @@ static void prt_study(void)
 	}
 	else
 	{
-		put_fstr(COL_STUDY, Term->hgt - 1, "     ");
+		put_fstr(COL_STUDY, Term->hgt - 1, CLR_L_DARK "Study");
 	}
 }
 

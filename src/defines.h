@@ -1217,13 +1217,13 @@
 
 #define COL_CONFUSED    		13	/* "Confused" */
 
-#define COL_AFRAID              22	/* "Afraid" */
+#define COL_AFRAID              49	/* "Afraid" */
 
-#define COL_POISONED		    29	/* "Poisoned" */
+#define COL_POISONED		    22	/* "Poisoned" */
 
-#define COL_STATE               38	/* <state> */
+#define COL_STATE               42	/* <state> */
 
-#define COL_SPEED               45	/* "Slow (-NN)" or "Fast (+NN)" */
+#define COL_SPEED               31	/* "Slow (-NN)" or "Fast (+NN)" */
 
 #define COL_STUDY               56	/* "Study" */
 
