@@ -645,16 +645,18 @@ bool auto_pickup_okay(const object_type *o_ptr)
 
 		/* If there's no =g, it can't be an auto-pickup, because
 		   different inscriptions don't merge. */
-		return (FALSE);
+		/*return (FALSE);*/
 	}
 	/* No =g on o_ptr; see if we can find an inventory item that forces auto_pickup. */
-	else
+	/*else */
 	{
 		object_type *j_ptr;
 
 		/* Similar slot? */
 		OBJ_ITT_DFS_START (p_ptr->inventory, j_ptr)
 		{
+			/* the below code is already part of object_similar */
+#if 0
 			/* Check if the item can be combined with an inscribed object */
 			if (object_similar(j_ptr, o_ptr) && j_ptr->inscription)
 			{
@@ -689,6 +691,20 @@ bool auto_pickup_okay(const object_type *o_ptr)
 				/* If we can combine, auto pickup is okay. */
 				if (j_ptr->number + o_ptr->number <= stack_size) return (TRUE);
 			}
+#endif
+			/* Check if the item can be combined with an inscribed object */
+			if (object_similar(j_ptr, o_ptr)
+				&& (j_ptr->inscription == o_ptr->inscription))
+			{
+				return TRUE;
+			}
+			/*if (j_ptr->tval == TV_CONTAINER
+				&& object_can_contain(j_ptr, o_ptr)
+				&& container_has_similar(j_ptr, o_ptr))
+			{
+				return TRUE;
+			}*/
+
 		}
 		OBJ_ITT_END;
 	}
@@ -917,18 +933,26 @@ void carry(int pickup)
 					//if ((i == 'A') || (i == 'a'))
 					//{
 						/* try to use alchemy on it */
-						/*if (has charged rod of alchemy ) SV_ROD_ALCHEMY TV_ROD
-						{
+						/*fo_ptr = player_has(TV_SCROLL, SV_SCROLL_ALCHEMY);
+						if (fo_ptr)	{
 							alchemy_aux(o_ptr); // need to split this fn from alchemy()
+							if (fo_ptr->number > 1) {
+								fo_ptr->number--;
+							} else {
+								delete_held_object(fo_ptr);
+							}
+						} else {
+							fo_ptr = player_has(TV_ROD, SV_ROD_ALCHEMY);
+							if (fo_ptr && !item_is_recharging(o_ptr)) {
+								alchemy_aux(o_ptr); // need to split this fn from alchemy()
+								o_ptr->timeout += k_info[o_ptr->k_idx].pval;
+							}	else
+							if (has spell of alchemy and mana) (sorcercy spell 25)
+							{
+								alchemy_aux(o_ptr); // need to split this fn from alchemy()
+							}
 						}
-						else if (has scroll of alchemy ) SV_SCROLL_ALCHEMY TV_SCROLL
-						{
-							alchemy_aux(o_ptr); // need to split this fn from alchemy()
-						}
-						else if (has spell of alchemy and mana) (sorcercy spell 25)
-						{
-							alchemy_aux(o_ptr); // need to split this fn from alchemy()
-						}
+						fo_ptr = NULL;
             */
 					//}
 				}
@@ -1016,8 +1040,11 @@ void carry(int pickup)
 			/* Paranoia XXX XXX XXX */
 			message_flush();
 
+			/* backup any previous butons */
+			button_backup_all(TRUE);
+
 			/* Prompt for it */
-			prtf(0, 0,"Pick up %v? [y/n/k] ", OBJECT_FMT(fo_ptr, TRUE, 3));
+			prtf(0, 0,"Pick up %v? [$Xy/$Xn/$Xk] ", OBJECT_FMT(fo_ptr, TRUE, 3));
 
 			/* Get an acceptable answer */
 			while (TRUE)
@@ -1039,6 +1066,9 @@ void carry(int pickup)
 				if (strchr("YyNnKk", i)) break;
 				bell("Illegal pick-up command!");
 			}
+
+			/* restore any previous butons */
+			button_restore();
 
 			/* Erase the prompt */
 			clear_msg();
