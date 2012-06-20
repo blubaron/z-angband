@@ -898,9 +898,14 @@ void carry(int pickup)
 							char b;
 							/* this was a mouse press, get the press and translate it */
 							Term_getmousepress(&b,&x,&y);
-							if ((b & 0x0F) == 1) {
-								i = 'y';
-								break;
+							if ((b & 0x07) == 1) {
+								/* get the map coord and see if the click was on it */
+								y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+								x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+								if ((y == p_ptr->py) && (x == p_ptr->px)) {
+									i = 'y';
+									break;
+								}
 							}
 							/* other presses are equivalent to no */
  						}
@@ -1055,9 +1060,14 @@ void carry(int pickup)
 					char b;
 					/* this was a mouse press, get the press and translate it */
 					Term_getmousepress(&b,&x,&y);
-					if ((i & 0x0F) == 1) {
-						i = 'y';
-						break;
+					if ((b & 0x07) == 1) {
+						/* get the map coord and see if the click was on it */
+						y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+						x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+						if ((y == p_ptr->py) && (x == p_ptr->px)) {
+							i = 'y';
+							break;
+						}
 					}
 					/* other presses are equivalent to no */
  				}
