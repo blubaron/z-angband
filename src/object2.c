@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "button.h"
 
 /*
  * Temp object used to return an object not allocated via o_pop().
@@ -6064,7 +6065,7 @@ void display_koff(int k_idx)
 	int realm;
 
 	/* Erase the window */
-    clear_from(0);
+	clear_from(0);
 
 	/* No info */
 	if (!k_idx) return;
@@ -6102,10 +6103,16 @@ void display_koff(int k_idx)
 			}
 		}
 
+		/* backup any previous mouse buttons */
+		button_backup_all(TRUE);
+
 		/* Print spells */
 		print_spells(spells, num, 0, 2,
 					 ((q_ptr->tval == REALM1_BOOK) ?
 					 	 p_ptr->spell.realm[0] - 1 : p_ptr->spell.realm[1] - 1));
+
+		/* restore any previous mouse buttons */
+		button_restore();
 	}
 }
 
