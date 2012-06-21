@@ -31,6 +31,7 @@ int button_add_end(const char *label, keycode_t keypress,
 int button_add_2d(int top, int left, int bottom, int right,
                   const char *label, keycode_t keypress);
 int button_last_key(keycode_t newkey);
+int button_set_fn(int (*button_process_fn)(keycode_t));
 
 bool button_backup_all(bool kill_all);
 void button_restore(void);

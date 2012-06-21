@@ -12,6 +12,7 @@
 
 #include "angband.h"
 #include "script.h"
+#include "button.h"
 
 #define TY_CURSE_CHANCE 100
 
@@ -2457,10 +2458,27 @@ static void process_energy(void)
 	process_fields();
 }
 
+bool use_main_menu; /* whether a port is using the textui menu bar */
+int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
+
 bool add_main_buttons(void)
 {
 	int i, hgt;
 	hgt = Term->hgt - 1;
+
+	if (use_main_menu && main_menu_bar_fn) {
+		button_set_fn(main_menu_bar_fn);
+		/* setup the main menu bar 
+		 * if the screen is big enough put in bottom left corner, otherwise put
+		 * in blank line in center of info panel */
+		if (hgt > 23) {
+			button_add_2d(hgt-1, 0, hgt-1, 10, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), '~');
+		} else {
+			button_add_2d(ROW_BLANK, COL_BLANK, ROW_BLANK, COL_MAP, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), '~');
+		}
+		button_set_fn(NULL);
+	}
+
 	/* character screen */
 	button_add_2d(ROW_TITLE, COL_TITLE, ROW_EXP, COL_MAP, NULL, 'C');
 	/* inventory */
@@ -2495,6 +2513,8 @@ bool add_main_buttons(void)
 	button_add_2d(ROW_GOLD, COL_GOLD, ROW_GOLD, COL_MAP>>1, NULL, 'u');
 	/* cast */
 	button_add_2d(ROW_GOLD, COL_MAP>>1, ROW_GOLD, COL_MAP, NULL, 'm');
+
+	return TRUE;
 }
 
 /*

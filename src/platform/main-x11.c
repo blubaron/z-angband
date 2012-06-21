@@ -95,6 +95,7 @@
 
 
 #include "angband.h"
+#include "button.h"
 
 
 #ifdef USE_X11
@@ -1479,6 +1480,13 @@ static XTilesheet maptiles; /* tiles same size as font */
 #endif /* USE_GRAPHICS */
 
 extern bool SaveWindow(infowin *win, char*filename);
+
+extern bool use_main_menu; /* whether a port is using the textui menu bar */
+extern int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
+int menu_bar_x11(keycode_t buttonid)
+{
+	return 1;
+}
 
 /*
  * Forward declare
@@ -3038,6 +3046,8 @@ errr init_x11(int argc, char *argv[])
 	/* Activate the "Angband" window screen */
 	Term_activate(&data[0].t);
 
+	use_main_menu = TRUE;
+	main_menu_bar_fn = menu_bar_x11;
 	/* Success */
 	return (0);
 }

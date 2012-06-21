@@ -52,6 +52,7 @@ struct _button_mouse_2d
 	byte mods;                   /*!< modifiers sent with the press */
 	//byte id;
 	//byte list;                 /*!< button list to switch to on press */
+	int (*fn)(keycode_t);        /*!< a function to call when this button is pressed */
 };
 
 typedef struct _button_mouse_1d
@@ -77,6 +78,8 @@ typedef struct _button_backup
 static button_mouse *button_stack;
 static button_mouse_1d *button_1d_list;
 static button_backup *button_backups;
+
+static int (*button_call_fn)(keycode_t);
 
 static int button_num;
 static int button_1d_start_x;
@@ -170,6 +173,7 @@ int button_add_start(int top, int left, keycode_t keypress)
 	button->bottom = top;
 	button->mods = 0;
 	button->key = keypress;
+	button->fn = NULL;
 
 	button->next = button_stack;
 	button_stack = button;
@@ -197,6 +201,9 @@ int button_add_end(const char *label, keycode_t keypress,
 			(void)string_free(button->label);
 		}
 		button->label = string_make(label);
+	}
+	if (button_call_fn) {
+		button->fn = button_call_fn;
 	}
 	if (button_add_2d_hook) {
 		int res = (*button_add_2d_hook) (button->top, button->left,
@@ -238,6 +245,11 @@ int button_last_key(keycode_t newkey)
 		return -1;
 	}
 	button->key = newkey;
+	return 0;
+}
+int button_set_fn(int (*button_process_fn)(keycode_t))
+{
+	button_call_fn = button_process_fn;
 	return 0;
 }
 
@@ -637,9 +649,10 @@ void button_free(void)
 
 /**
  * Return the character represented by a button at screen position (x, y),
- * or 0.
+ * or 0. if the character is negative (has the 0x80 bit set), whatever calls this should ignore
+ * the value, and the input event.
  */
-char button_get_key(int x, int y)
+keycode_t button_get_key(int x, int y)
 {
 	int i;
 
@@ -648,10 +661,17 @@ char button_get_key(int x, int y)
 	while (bttn) {
 		if ((y >= bttn->top) && (y <= bttn->bottom)
 				&& (x >= bttn->left) && (x <= bttn->right)) {
+			if (bttn->fn) {
+				int res = bttn->fn(bttn->key);
+				if (res > 1) return (keycode_t)res;
+				if (res == 0) return bttn->key;
+				return 0x80;
+			} else
 			if (bttn->key & 0x80) {
 				mouse_press = bttn->key;
 				return mouse_press;
-			} else {
+			} else
+			{
 				mouse_press = 0;
 				return bttn->key;
 			}
