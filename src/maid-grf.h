@@ -313,6 +313,7 @@ extern int cur_num;
 /* Extern Functions */
 extern void build_gamma_table(int gamma);
 extern cptr get_default_font(int term_num);
+char *analyze_file(char *path, int *wp, int *hp);
 extern bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename);
 extern bool is_bigtiled(int x, int y);
 extern void toggle_bigtile(void);

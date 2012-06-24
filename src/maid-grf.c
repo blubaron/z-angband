@@ -224,6 +224,51 @@ cptr get_default_font(int term_num)
 	return (font);
 }
 
+/*
+ * Hack -- given a simple filename, extract the "font size" info
+ *
+ * Return a pointer to a static buffer holding the capitalized base name.
+ */
+char *analyze_file(char *path, int *wp, int *hp)
+{
+	int wid, hgt;
+
+	char *s, *p;
+
+	/* Start at the end */
+	p = path + strlen(path) - 1;
+
+	/* Back up to divider */
+	while ((p >= path) && (*p != ':') && (*p != '\\')) --p;
+
+	/* Advance to file name */
+	++p;
+
+	/* Capitalize */
+	for (s = p; *s; ++s)
+	{
+		/* Capitalize (be paranoid) */
+		if (islower((unsigned char)*s)) *s = toupper((unsigned char)*s);
+	}
+
+	/* Find first 'X' */
+	s = strchr(p, 'X');
+
+	/* Extract font width */
+	wid = atoi(p);
+
+	/* Extract height */
+	hgt = s ? atoi(s+1) : 0;
+
+	/* Save results */
+	(*wp) = wid;
+	(*hp) = hgt;
+
+	/* Result */
+	return (p);
+}
+
+
 #ifdef USE_GRAPHICS
 /*
  * Make sure the graphical tiles we want are available.
@@ -1546,6 +1591,7 @@ const byte darking_colours[16] =
 
 
 #ifdef VARIABLE_PLAYER_GRAPH
+
 
 /* Magic numbers */
 #define BMP_FIRST_PC_CLASS		164

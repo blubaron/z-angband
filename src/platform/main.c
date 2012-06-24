@@ -528,7 +528,8 @@ int main(int argc, char *argv[])
 			case 'G':
 			case 'g':
 			{
-				arg_graphics = TRUE;
+				arg_graphics = 1;
+				if (argv[i][2]) arg_graphics = atoi(&(argv[i][2]));
 				break;
 			}
 			
