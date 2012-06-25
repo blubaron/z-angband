@@ -1234,11 +1234,18 @@ static void save_prefs_aux(term_data *td, ini_settings *ini, cptr sec_name)
 	ini_setting_set_string(ini, sec_name, "NumRows", buf, 256);
 
 	/* Window position (x) */
-	strnfmt(buf, 256, "%d", td->win->x);
+	strnfmt(buf, 256, "%d", td->win->x - Metadpy->wmbdr_x);
 	ini_setting_set_string(ini, sec_name, "PositionX", buf, 256);
 
 	/* Window position (y) */
-	strnfmt(buf, 256, "%d", td->win->y);
+	if (td->win->y == 2*Metadpy->wmbdr_y) {
+		/* HACK - special case what usually happens when the initial
+		 * y pos is 0 ( or <Metadpy->wmbdr_y) */
+		buf[0] = '0';
+		buf[1] = '\0';
+	} else {
+		strnfmt(buf, 256, "%d", td->win->y - Metadpy->wmbdr_y);
+	}
 	ini_setting_set_string(ini, sec_name, "PositionY", buf, 256);
 
 	/* Border position (x) */
@@ -2155,7 +2162,15 @@ static errr CheckEvent(bool wait)
 			/* Save the new Window Parms */
 			Infowin->x = xev->xconfigure.x;
 			Infowin->y = xev->xconfigure.y;
-			
+
+			/* Hack - store the values of the first configure which
+			 * should be the window border width and window title bar
+			 * height  */
+			if ((Metadpy->wmbdr_x == 0) && xev->xconfigure.x) {
+				Metadpy->wmbdr_x = xev->xconfigure.x;
+				Metadpy->wmbdr_y = xev->xconfigure.y;
+			}
+
 			if ((Infowin->w != xev->xconfigure.width) ||
 				(Infowin->h != xev->xconfigure.height))
 			{
@@ -2613,6 +2628,12 @@ static errr term_data_init(term_data *td, int i)
 	Infowin_set(td->win);
 	Infowin_init_top(x, y, wid, hgt, 0,
 	                 Metadpy->fg, Metadpy->bg);
+	if ((Infowin->x != x) && (Infowin->x - x > Metadpy->wmbdr_x)) {
+		Metadpy->wmbdr_x = Infowin->x - x;
+	}
+	if ((Infowin->y != y) && (Infowin->y - y > Metadpy->wmbdr_y)) {
+		Metadpy->wmbdr_y = Infowin->y - y;
+	}
 
 	/* Ask for certain events */
 	Infowin_set_mask(ExposureMask | StructureNotifyMask | KeyPressMask |

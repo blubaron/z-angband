@@ -96,6 +96,9 @@ struct metadpy
 	uint height;
 	uint depth;
 
+	int wmbdr_x;
+	int wmbdr_y;
+
 	Pixell black;
 	Pixell white;
 
