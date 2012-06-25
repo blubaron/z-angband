@@ -2905,7 +2905,7 @@ errr init_x11(int argc, char *argv[])
 		}
 
 		/* Load the graphical tiles */
-		tiles_raw = ReadBMP(dpy, filename);
+		tiles_raw = ReadBMP(dpy, filename, NULL, NULL);
 		
 		if (tiles_raw)
 		{

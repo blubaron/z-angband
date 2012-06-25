@@ -3316,7 +3316,7 @@ errr init_xpj(int argc, char *argv[])
 	dpy = Metadpy->dpy;	
 
 	/* Load the graphical tiles */
-	tiles_raw = ReadBMP(dpy, filename);
+	tiles_raw = ReadBMP(dpy, filename, NULL, NULL);
 
 	/* Initialize the windows */
 	for (i = 0; i < num_term; i++)

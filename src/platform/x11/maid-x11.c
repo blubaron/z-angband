@@ -239,7 +239,7 @@ static void rd_u32b(FILE *fff, u32b *ip)
  * Assumes that the bitmap has a size such that no padding is needed in
  * various places.  Currently only handles bitmaps with 3 to 256 colors.
  */
-XImage *ReadBMP(Display *dpy, char *Name)
+XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 {
 	Visual *visual = DefaultVisual(dpy, DefaultScreen(dpy));
 
@@ -386,6 +386,9 @@ XImage *ReadBMP(Display *dpy, char *Name)
 	}
 
 	fclose(f);
+
+	if (ret_wid) *ret_wid = infoheader.biWidth;
+	if (ret_hgt) *ret_hgt =  infoheader.biHeight;
 
 	return Res;
 }

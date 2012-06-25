@@ -49,7 +49,7 @@
   ((unsigned)(keysym) >= 0xFF00)
 
 extern u32b create_pixel(Display *dpy, byte red, byte green, byte blue);
-extern XImage *ReadBMP(Display *dpy, char *Name);
+extern XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt);
 extern bool smoothRescaling;
 extern XImage *ResizeImage(Display *dpy, XImage *Im,
 	int ix, int iy, int ox, int oy);
