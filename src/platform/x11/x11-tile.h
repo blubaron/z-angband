@@ -18,6 +18,8 @@
 #ifndef INCLUDED_X11_TILE_H
 #define INCLUDED_X11_TILE_H
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "h-basic.h"
 
 #ifdef USE_GRAPHICS
@@ -26,14 +28,23 @@ struct XTilesheet
 {
 	XImage *color;
 	XImage *mask;
-	byte CellWidth;
-	byte CellHeight;
 	int ImageWidth;
 	int ImageHeight;
+	byte CellWidth;
+	byte CellHeight;
+	byte bFlags;
+	byte bReserved;
+	/* extra info for isometric tilesets */
+	byte CellCenterX;
+	byte CellCenterY;
+	byte CellShiftX;
+	byte CellShiftY;
 };
 
-extern bool ReadTiles(char* filename, XTilesheet *tiles);
-extern bool FreeTiles(XTilesheet *tiles);
+extern int ReadTiles(char* filename, XTilesheet *tiles);
+extern int FreeTiles(XTilesheet *tiles);
+extern int ResizeTiles(XTilesheet *dest, XTilesheet *src); /* looks at cell sizes for scaling info */
+extern int SaveTiles(char* filename, XTilesheet *tiles);
 #endif /* USE_GRAPHICS */
 
 #endif /* INCLUDED_X11_TILE_H */
