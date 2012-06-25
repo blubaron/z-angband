@@ -623,7 +623,10 @@ int main(int argc, char *argv[])
 	/* Process the player name */
 	process_player_name(TRUE);
 
-
+	/* load the possible graphics modes */
+	if (!init_graphics_modes("graphics.txt")) {
+		plog("Graphics list load failed");
+	}
 
 	/* Install "quit" hook */
 	quit_aux = quit_hook;

@@ -1909,8 +1909,8 @@ static void scan_pending_windows(void)
 			Infowin_set(td->win);
 			
 			/* Determine "proper" number of rows/cols */
-			cols = ((Infowin->w - (ox + ox)) / td->fnt->wid);
-			rows = ((Infowin->h - (oy + oy)) / td->fnt->hgt);
+			cols = ((Infowin->w - (ox + ox)) / td->tile_wid);
+			rows = ((Infowin->h - (oy + oy)) / td->tile_hgt);
 			
 			/* Hack -- minimal size */
 			if (cols < 1) cols = 1;
@@ -1924,8 +1924,8 @@ static void scan_pending_windows(void)
 			}
 			
 			/* Desired size of window */
-			wid = cols * td->fnt->wid + (ox + ox);
-			hgt = rows * td->fnt->hgt + (oy + oy);
+			wid = cols * td->tile_wid + (ox + ox);
+			hgt = rows * td->tile_hgt + (oy + oy);
 			
 			/* Resize the windows if any "change" is needed */
 			if ((Infowin->w != wid) || (Infowin->h != hgt))
@@ -2183,8 +2183,8 @@ static errr CheckEvent(bool wait)
 			}
 			
 			/* Determine "proper" number of rows/cols */
-			cols = ((Infowin->w - (ox + ox)) / td->fnt->wid);
-			rows = ((Infowin->h - (oy + oy)) / td->fnt->hgt);
+			cols = ((Infowin->w - (ox + ox)) / td->tile_wid);
+			rows = ((Infowin->h - (oy + oy)) / td->tile_hgt);
 			
 			/* Hack -- minimal size */
 			if (cols < 1) cols = 1;
@@ -2198,8 +2198,8 @@ static errr CheckEvent(bool wait)
 			}
 			
 			/* Desired size of window */
-			wid = cols * td->fnt->wid + (ox + ox);
-			hgt = rows * td->fnt->hgt + (oy + oy);
+			wid = cols * td->tile_wid + (ox + ox);
+			hgt = rows * td->tile_hgt + (oy + oy);
 			
 			/* Resize the windows if any "change" is needed */
 			if ((Infowin->w != wid) || (Infowin->h != hgt))
@@ -2453,7 +2453,7 @@ static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp,
 
 	term_data *td = (term_data*)(Term->data);
 	
-	int wid, hgt = td->fnt->hgt;
+	int wid, hgt = td->tile_hgt;
 	XImage *tiles;
 
 	/* Starting point */
@@ -2471,12 +2471,12 @@ static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp,
 		if (is_bigtiled(ox + i, oy))
 		{
 			tiles = td->b_tiles;
-			wid = td->fnt->twid;
+			wid = td->tile_wid * tile_width_mult;
 		}
 		else
 		{
 			tiles = td->tiles;
-			wid = td->fnt->wid;
+			wid = td->tile_wid;
 		}
 			
 		/* For extra speed - cache these values */
@@ -2908,7 +2908,7 @@ errr init_x11(int argc, char *argv[])
 	/* Try graphics */
 	if (arg_graphics)
 	{
-		(void) pick_graphics(graphmode, &pict_wid, &pict_hgt, filename);
+		(void) pick_graphics(arg_graphics, &pict_wid, &pict_hgt, filename);
 	}
 
 	/* Load graphics */
@@ -2951,7 +2951,7 @@ errr init_x11(int argc, char *argv[])
 				{
 					o_td = &data[j];
 
-					if ((td->fnt->wid == o_td->fnt->wid) && (td->fnt->hgt == o_td->fnt->hgt))
+					if ((td->fnt->wid == o_td->fnt->wid) && (td->fnt->hgt == o_td->tile_hgt))
 					{
 						/* Use same graphics */
 						td->tiles = o_td->tiles;
@@ -2963,11 +2963,11 @@ errr init_x11(int argc, char *argv[])
 				/* Resize Tiles */
 				if (!td->tiles)
 				{
-					if (arg_bigtile)
+					if ((tile_width_mult > 1) || (tile_height_mult > 1))
 					{
 						td->b_tiles = ResizeImage(dpy, tiles_raw,
-													pict_wid, pict_hgt,
-													td->fnt->twid, td->fnt->hgt);
+							pict_wid, pict_hgt,
+							td->tile_wid*tile_width_mult, td->tile_hgt * tile_height_mult);
 					}
 					else
 					{
@@ -2975,7 +2975,7 @@ errr init_x11(int argc, char *argv[])
 					}
 					td->tiles = ResizeImage(dpy, tiles_raw,
 					                        pict_wid, pict_hgt,
-					                        td->fnt->wid, td->fnt->hgt);
+					                        td->tile_wid, td->tile_hgt);
 				}
 			}
 
@@ -2998,15 +2998,15 @@ errr init_x11(int argc, char *argv[])
 			while (jj >>= 1) ii <<= 1;
 
 			/* Pad the scanline to a multiple of 4 bytes */
-			total = td->fnt->twid * ii;
+			total = td->tile_wid * ii * tile_width_mult;
 			total = (total + 3) & ~3;
 			total *= td->fnt->hgt;
 
 			TmpData = (char *)malloc(total);
 
 			td->TmpImage = XCreateImage(dpy,visual,depth,
-				ZPixmap, 0, TmpData,
-				td->fnt->twid, td->fnt->hgt, 32, 0);
+				ZPixmap, 0, TmpData, td->tile_wid*tile_width_mult,
+				td->tile_hgt * tile_height_mult, 32, 0);
 		}
 	}
 
