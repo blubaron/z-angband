@@ -86,6 +86,7 @@ struct metadpy
 	Screen *screen;
 	Window root;
 	Colormap cmap;
+	Atom wmDeleteWindow; /* this is used to intercept window closing requests */
 
 	char *name;
 

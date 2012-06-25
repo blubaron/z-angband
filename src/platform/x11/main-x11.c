@@ -232,6 +232,9 @@ static errr Metadpy_init_2(Display *dpy, cptr name)
 	m->color = ((m->depth > 1) ? 1 : 0);
 	m->mono = ((m->color) ? 0 : 1);
 
+	/* register our interest in close window requests */
+	m->wmDeleteWindow = XInternAtom(m->dpy, "WM_DELETE_WINDOW",FALSE);
+
 	/* Return "success" */
 	return (0);
 }
@@ -459,6 +462,8 @@ static errr Infowin_init_data(Window dad, int x, int y, int w, int h,
 	/* Start out selecting No events */
 	XSelectInput(Metadpy->dpy, xid, 0L);
 
+	/* register our interest in close window requests */
+	XSetWMProtocols(Metadpy->dpy, xid, &(Metadpy->wmDeleteWindow), 1);
 
 	/*** Prepare the new infowin ***/
 
@@ -2189,6 +2194,35 @@ static errr CheckEvent(bool wait)
 				Infowin_resize(wid, hgt);
 			}
 			
+			break;
+		}
+
+		/* a requested message type */
+		case ClientMessage:
+		{
+			if ((Atom)xev->xclient.data.l[0] == Metadpy->wmDeleteWindow) {
+				if (character_generated) {
+					if (!p_ptr->cmd.inkey_flag) {
+						plog("You may not do that right now.");
+						break;
+					}
+					/* forget messages */
+					msg_flag = FALSE;
+
+					/* save the game */
+#ifdef ZANGBAND
+					do_cmd_save_game(FALSE);
+#else /* ZANGBAND */
+					do_cmd_save_game();
+#endif /* ZANGBAND */
+				}
+
+				/* Free resources */
+				cleanup_angband();
+
+				/* Quit */
+				quit(NULL);
+			}
 			break;
 		}
 	}
