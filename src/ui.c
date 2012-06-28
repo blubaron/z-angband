@@ -1033,6 +1033,22 @@ void fmt_clean(char *buf)
 
 				continue;
 			}
+			if ((*c >= 'U') && (*c <= 'X'))
+			{
+				/* Ignore it */
+				c++;
+
+
+				continue;
+			}
+			if (*c == 'Y')
+			{
+				/* Ignore it */
+				c+=2;
+
+
+				continue;
+			}
 
 			/*
 			 * Hack XXX XXX - otherwise, ignore the dollar sign
