@@ -18,8 +18,11 @@
 #ifndef INCLUDED_X11_TILE_H
 #define INCLUDED_X11_TILE_H
 
+#ifndef __MAKEDEPEND__
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#endif /* __MAKEDEPEND__ */
+#include "z-config.h"
 #include "h-basic.h"
 
 #ifdef USE_GRAPHICS
@@ -41,10 +44,10 @@ struct XTilesheet
 	byte CellShiftY;
 };
 
-extern int ReadTiles(char* filename, XTilesheet *tiles);
+extern int ReadTiles(Display *dpy, char* filename, XTilesheet *tiles);
 extern int FreeTiles(XTilesheet *tiles);
-extern int ResizeTiles(XTilesheet *dest, XTilesheet *src); /* looks at cell sizes for scaling info */
-extern int SaveTiles(char* filename, XTilesheet *tiles);
+extern int ResizeTiles(Display *dpy, XTilesheet *dest, XTilesheet *src); /* looks at cell sizes for scaling info */
+extern int SaveTiles(Display *dpy, char* filename, XTilesheet *tiles);
 #endif /* USE_GRAPHICS */
 
 #endif /* INCLUDED_X11_TILE_H */

@@ -16,19 +16,19 @@
  *    are included in all such copies.  Other copyrights may also apply.
  */
 
+#include "angband.h"
 #include "x11-tile.h"
 #include "maid-x11.h"
 
 #ifdef USE_GRAPHICS
 
-int LoadPNG(char *filename, XImage **ret_color, XImage **ret_mask,
+int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	int *ret_wid, int *ret_hgt, bool premultiply);
-int SavePNG(char *filename, XImage *color, XImage *mask,
+int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
 	int wid, int hgt, bool premultiply);
 
-int ReadTiles(char* filename, XTilesheet *tiles)
+int ReadTiles(Display *dpy, char* filename, XTilesheet *tiles)
 {
-	Display *dpy = Metadpy->dpy;
 	XImage *tiles_raw = NULL;
 	XImage *mask_raw = NULL;
 	char *ext;
@@ -52,7 +52,7 @@ int ReadTiles(char* filename, XTilesheet *tiles)
 				mask_raw = ReadBMP(dpy, filename, NULL, NULL);
 				if (!mask_raw) {
 					if (tiles_raw)
-						XFREE(tiles_raw);
+						XDestroyImage(tiles_raw);
 					plog_fmt("Cannot read mask file '%s'.", filename);
 					return -4;
 				}
@@ -64,13 +64,19 @@ int ReadTiles(char* filename, XTilesheet *tiles)
 		}
 	} else
 	if (strncmp(ext+1, "png", 3) == 0) {
-		if (tiles->bFlag & 1) {
-			/* load for alphablending */
+		if (tiles->bFlags & 1) {
+			/* alpha blending not supported yet, so just load the file normally */
+			if (LoadPNG(dpy, filename, &tiles_raw, &mask_raw, &wid, &hgt, FALSE) < 0) {
+				plog_fmt("Cannot read file '%s'.", filename);
+				return -4;
+			}
+#if 0
+			/* load with an expectation of alpha values, rather than a mask */
 			/* png files are not supposed to have their color premultiplied
 			 * with alpha, so see if the given file is already premultiplied */
 			if (strstr(filename, "_pre")) {
 				/* if so, just load it */
-				if (LoadPNG(filename, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
+				if (LoadPNG(dpy, filename, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
 					plog_fmt("Cannot read file '%s'.", filename);
 					return -4;
 				}
@@ -101,25 +107,26 @@ int ReadTiles(char* filename, XTilesheet *tiles)
 				}
 				if (ext2 && (filelen < 1018)) {
 					/* at this point we know the file exists, so load it */
-					if (LoadPNG(modname, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
+					if (LoadPNG(dpy, modname, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
 						plog_fmt("Cannot read premultiplied version of file '%s'.", filename);
 						return -4;
 					}
 				} else
 				/* if not, load the base file and premultiply it */
 				{
-					if (LoadPNG(filename, &tiles_raw, NULL, &wid, &hgt, TRUE) < 0) {
+					if (LoadPNG(dpy, filename, &tiles_raw, NULL, &wid, &hgt, TRUE) < 0) {
 						plog_fmt("Cannot read premultiplied version of file '%s'.", filename);
 						return -4;
 					}
 					/* save the premultiplied file */
-					/*if (SavePNG(modname, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
+					/*if (SavePNG(dpy, modname, &tiles_raw, NULL, &wid, &hgt, FALSE) < 0) {
 						plog_fmt("Cannot write premultiplied version of file '%s'.", filename);
 					}*/
 				}
 			}
+#endif
 		} else {
-			if (LoadPNG(filename, &tiles_raw, &mask_raw, &wid, &hgt, FALSE) < 0) {
+			if (LoadPNG(dpy, filename, &tiles_raw, &mask_raw, &wid, &hgt, FALSE) < 0) {
 				plog_fmt("Cannot read file '%s'.", filename);
 				return -4;
 			}
@@ -149,29 +156,24 @@ int FreeTiles(XTilesheet *tiles)
 	}
 	if (tiles->color) {
 		XDestroyImage(tiles->color);
-		tiles->color = NULL;
 	}
 	if (tiles->mask) {
 		XDestroyImage(tiles->mask);
-		tiles->mask = NULL;
 	}
-	ImageWidth = ImageHeight = 0;
-	CellWidth = CellHeight = 0;
-	bFlags = bReserved = 0;
-	CellCenterX = CellCenterY = 0;
-	CellShiftX = CellShiftY = 0;
+	tiles->color = NULL;
+	tiles->mask = NULL;
+	tiles->ImageWidth = tiles->ImageHeight = 0;
+	tiles->CellWidth = tiles->CellHeight = 0;
+	tiles->bFlags = tiles->bReserved = 0;
+	tiles->CellCenterX = tiles->CellCenterY = 0;
+	tiles->CellShiftX = tiles->CellShiftY = 0;
 	return 0;
 }
 
-int ResizeTiles(XTilesheet *dest, XTilesheet *src)
+int ResizeTiles(Display *dpy, XTilesheet *dest, XTilesheet *src)
 {
-	if (!(src->color) && !(src->mask)) {
+	if (!(src->color)) {
 		return-1;
-	}
-	if ((dest->CellWidth == src->CellWidth)
-		&& (dest->CellHeight == src->CellHeight))
-	{
-		return 0;
 	}
 	if ((dest->CellWidth == 0) || (dest->CellHeight == 0)
 		|| (src->CellWidth == 0) || (src->CellHeight == 0))
@@ -209,7 +211,7 @@ int ResizeTiles(XTilesheet *dest, XTilesheet *src)
 		dest->CellCenterX = dest->CellWidth * src->CellCenterX / src->CellWidth;
 	else
 		dest->CellCenterX = 0;
-	if (src->CellCentery)
+	if (src->CellCenterY)
 		dest->CellCenterY = dest->CellHeight * src->CellCenterY / src->CellHeight;
 	else
 		dest->CellCenterY = 0;
@@ -225,18 +227,18 @@ int ResizeTiles(XTilesheet *dest, XTilesheet *src)
 	return 0;
 }
 
-int SaveTiles(char* filename, XTilesheet *tiles)
+int SaveTiles(Display *dpy, char* filename, XTilesheet *tiles)
 {
-	ext = strrchr(filename, '.');
+	char *ext = strrchr(filename, '.');
 	if (!ext) {
 		return -1;
 	}
 	if (strncmp(ext+1, "png", 3) == 0) {
-		return SavePNG(filename, tiles->color, tiles->mask, tiles->ImageWidth, tiles->ImageHeight, FALSE);
+		return SavePNG(dpy, filename, tiles->color, tiles->mask, tiles->ImageWidth, tiles->ImageHeight, FALSE);
 	}
-	plog_fmt("Unknown file type trying to save tiles: %s", fielname);
+	plog_fmt("Unknown file type trying to save tiles: %s", filename);
 	return -1;
 }
-#endif /* USE_GRAPHICS */
 
+#endif /* USE_GRAPHICS */
 

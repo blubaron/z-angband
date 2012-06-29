@@ -18,8 +18,10 @@
 #ifndef INCLUDED_X11_TERM_H
 #define INCLUDED_X11_TERM_H
 
+#ifndef __MAKEDEPEND__
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#endif /* __MAKEDEPEND__ */
 #include "h-basic.h"
 /* Specifications for settings initialization file.
  * 
@@ -238,9 +240,6 @@ struct term_data
 	XClassHint *classh;
 	XSizeHints *sizeh;
 #ifdef USE_GRAPHICS
-
-	XImage *tiles;
-	XImage *b_tiles;
 
 	/* Temporary storage for overlaying tiles. */
 	XImage *TmpImage;

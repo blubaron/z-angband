@@ -31,6 +31,7 @@
 #include "angband.h"
 #include "button.h"
 #include "settings.h"
+#include "grafmode.h"
 #include "x11-term.h"
 #include "x11-tile.h"
 
@@ -1051,13 +1052,19 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 {
 	(*x) = (ox - Infowin->ox) / Infofnt->wid;
 	(*y) = (oy - Infowin->oy) / Infofnt->hgt;
-	
-	if ((use_bigtile) && ((*y) >= Term->scr->big_y1)
+#if 0	
+	if (((*y) >= Term->scr->big_y1)
 		&& ((*y) <= Term->scr->big_y2)
 		&& ((*x) >= Term->scr->big_x1))
 	{
-		(*x) -= ((*x) - Term->scr->big_x1 + 1) / 2;
+		if (tile_width_mult > 1) {
+			(*x) -= ((*x) - Term->scr->big_x1 + 1) / tile_width_mult;
+		}
+		if (tile_height_mult > 1) {
+			(*y) -= ((*y) - Term->scr->big_y1 + 1) / tile_height_mult;
+		}
 	}
+#endif
 }
 
 /*
@@ -1066,18 +1073,26 @@ static void pixel_to_square(int *x, int *y, int ox, int oy)
 static void square_to_pixel(int *x, int *y, int ox, int oy)
 {
 	term_data *td = (term_data*)(Term->data);
-	(*y) = oy * td->tile_hgt + Infowin->oy;
 	
-	if ((tile_width_mult > 1) && (oy >= Term->scr->big_y1)
+	if ((tile_width_mult > 1)
+			&& (oy >= Term->scr->big_y1)
 			&& (oy <= Term->scr->big_y2)
 			&& (ox > Term->scr->big_x1))
 	{
 		(*x) = ox * td->tile_wid * tile_width_mult + Infowin->ox -
 				Term->scr->big_x1 * td->tile_wid * (tile_width_mult-1);
-	}
-	else
-	{
+	} else {
 		(*x) = ox * td->tile_wid + Infowin->ox;
+	}
+	if ((tile_height_mult > 1)
+			&& (oy > Term->scr->big_y1)
+			&& (oy <= Term->scr->big_y2)
+			&& (ox >= Term->scr->big_x1))
+	{
+		(*y) = oy * td->tile_hgt * tile_height_mult + Infowin->oy -
+				Term->scr->big_y1 * td->tile_hgt * (tile_height_mult-1);
+	} else {
+		(*y) = oy * td->tile_hgt + Infowin->oy;
 	}
 }
 
@@ -2371,7 +2386,7 @@ static errr Term_curs_x11(int x, int y)
 	{
 		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
 			 x1, y1,
-			 Infofnt->twid - 1, Infofnt->hgt - 1);
+			 Infofnt->wid * tile_width_mult - 1, Infofnt->hgt * tile_height_mult - 1);
 	}
 	else
 	{
@@ -2453,8 +2468,9 @@ static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp,
 
 	term_data *td = (term_data*)(Term->data);
 	
-	int wid, hgt = td->tile_hgt;
+	int wid, hgt;
 	XImage *tiles;
+	XImage *mask;
 
 	/* Starting point */
 	square_to_pixel(&x, &y, ox, oy);
@@ -2470,15 +2486,19 @@ static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp,
 		/* What are we drawing? */
 		if (is_bigtiled(ox + i, oy))
 		{
-			tiles = td->b_tiles;
-			wid = td->tile_wid * tile_width_mult;
+			tiles = viewtiles.color;
+			mask = viewtiles.mask;
+			wid = viewtiles.CellWidth;
+			hgt = viewtiles.CellHeight;
 		}
 		else
 		{
-			tiles = td->tiles;
-			wid = td->tile_wid;
+			tiles = maptiles.color;
+			mask = maptiles.mask;
+			wid = maptiles.CellWidth;
+			hgt = maptiles.CellHeight;
 		}
-			
+
 		/* For extra speed - cache these values */
 		x1 = (c & 0x7F) * wid;
 		y1 = (a & 0x7F) * hgt;
@@ -2486,52 +2506,75 @@ static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp,
 		/* For extra speed - cache these values */
 		x2 = (tc & 0x7F) * wid;
 		y2 = (ta & 0x7F) * hgt;
-			
-		/* Optimise the common case */
-		if (((x1 == x2) && (y1 == y2)) ||
-		    !(((byte)ta & 0x80) && ((byte)tc & 0x80)))
-		{
-			/* Draw object / terrain */
+
+		if (mask) {
+			/* Draw terrain */
 			XPutImage(Metadpy->dpy, td->win->win,
 						clr[0]->gc,
 						tiles,
-						x1, y1,
+						x2, y2,
 						x, y,
 						wid, hgt);
-		}
-		else
-		{
-			/* Mega Hack^2 - assume the top left corner is "blank" */
-			if (arg_graphics == GRAPHICS_DAVID_GERVAIS)
-				blank = XGetPixel(tiles, 0, 0);
-			else
-				blank = XGetPixel(tiles, 0, hgt * 6);
-	
-			for (k = 0; k < wid; k++)
-			{
-				for (l = 0; l < hgt; l++)
-				{
-					/* If mask set... */
-					if ((pixel = XGetPixel(tiles, x1 + k, y1 + l)) == blank)
-					{
-						/* Output from the terrain */
-						pixel = XGetPixel(tiles, x2 + k, y2 + l);
-
-						if (pixel == blank) pixel = 0L;
-					}
-
-					/* Store into the temp storage. */
-					XPutPixel(td->TmpImage, k, l, pixel);
-				}
+			/* Draw object */
+			if (((x1 != x2) || (y1 != y2))) {
+				XSetFunction(Metadpy->dpy, clr[0]->gc, GXand);
+				XPutImage(Metadpy->dpy, td->win->win,
+							clr[0]->gc,
+							mask,
+							x1, y1,
+							x, y,
+							wid, hgt);
+				XSetFunction(Metadpy->dpy, clr[0]->gc, GXor);
+				XPutImage(Metadpy->dpy, td->win->win,
+							clr[0]->gc,
+							tiles,
+							x1, y1,
+							x, y,
+							wid, hgt);
+				XSetFunction(Metadpy->dpy, clr[0]->gc, GXcopy);
 			}
+		} else {
+			/* Optimise the common case */
+			if (((x1 == x2) && (y1 == y2)) ||
+			    !(((byte)ta & 0x80) && ((byte)tc & 0x80)))
+			{
+				/* Draw object / terrain */
+				XPutImage(Metadpy->dpy, td->win->win,
+							clr[0]->gc,
+							tiles,
+							x1, y1,
+							x, y,
+							wid, hgt);
+			} else {
+				/* Mega Hack^2 - assume the top left corner is "blank" */
+				blank = XGetPixel(tiles, 0, 0);
+	
+				for (k = 0; k < wid; k++)
+				{
+					for (l = 0; l < hgt; l++)
+					{
+						/* If mask set... */
+						if ((pixel = XGetPixel(tiles, x1 + k, y1 + l)) == blank)
+						{
+							/* Output from the terrain */
+							pixel = XGetPixel(tiles, x2 + k, y2 + l);
+
+							if (pixel == blank) pixel = 0L;
+						}
+
+						/* Store into the temp storage. */
+						XPutPixel(td->TmpImage, k, l, pixel);
+					}
+				}
 
 
-			/* Draw to screen */
-			XPutImage(Metadpy->dpy, td->win->win,
-						clr[0]->gc,
-						td->TmpImage,
-						0, 0, x, y,
-						wid, hgt);
+				/* Draw to screen */
+				XPutImage(Metadpy->dpy, td->win->win,
+							clr[0]->gc,
+							td->TmpImage,
+							0, 0, x, y,
+							wid, hgt);
+			}
 		}
 			
 		x += wid;
@@ -2750,20 +2793,6 @@ errr init_x11(int argc, char *argv[])
 
 	int num_term = 3;
 
-	char filename[1024];
-
-#ifdef USE_GRAPHICS
-
-	int pict_wid = 0;
-	int pict_hgt = 0;
-	
-	int graphmode = GRAPHICS_NONE;
-
-	char *TmpData;
-
-#endif /* USE_GRAPHICS */
-
-
 	/* Parse args */
 	for (i = 1; i < argc; i++)
 	{
@@ -2818,10 +2847,10 @@ errr init_x11(int argc, char *argv[])
 		td->pos_y = i*10;
 		td->bdr_x = 0;
 		td->bdr_y = 0;
-		//if (i)
-		//	td->font_want = string_make("8X13");
-		//else
-		//	td->font_want = string_make("10X20");
+		/*if (i)
+			td->font_want = string_make("8X13");
+		else
+			td->font_want = string_make("10X20");*/
 		td->font_want = string_make(get_default_font(i));
 		(void)analyze_file(td->font_want, &wid, &hgt);
 		td->tile_wid = wid;
@@ -2908,90 +2937,75 @@ errr init_x11(int argc, char *argv[])
 	/* Try graphics */
 	if (arg_graphics)
 	{
-		(void) pick_graphics(arg_graphics, &pict_wid, &pict_hgt, filename);
-	}
-
-	/* Load graphics */
-	if (use_graphics)
-	{
+		int res;
+		graphics_mode *mode;
+		char filename[1024];
 		Display *dpy = Metadpy->dpy;
+		term_data *td = &data[0];
 
-		XImage *tiles_raw;
-		
-		/* Initialize */
-		for (i = 0; i < num_term; i++)
-		{
-			term_data *td = &data[i];
-			td->tiles = NULL;
-		}
-
-		/* Load the graphical tiles */
-		tiles_raw = ReadBMP(dpy, filename, NULL, NULL);
-		
-		if (tiles_raw)
-		{
-			/* Initialize the windows */
-			for (i = 0; i < num_term; i++)
-			{
-				int j;
-
-				term_data *td = &data[i];
-				term_data *o_td = NULL;
-
-				term *t = &td->t;
-
-				/* Graphics hook */
-				t->pict_hook = Term_pict_x11;
-
-				/* Use graphics sometimes */
-				t->higher_pict = TRUE;
-
-				/* Look for another term with same font size */
-				for (j = 0; j < i; j++)
-				{
-					o_td = &data[j];
-
-					if ((td->fnt->wid == o_td->fnt->wid) && (td->fnt->hgt == o_td->tile_hgt))
-					{
-						/* Use same graphics */
-						td->tiles = o_td->tiles;
-						td->b_tiles = o_td->b_tiles;
-						break;
-					}
-				}
-				
-				/* Resize Tiles */
-				if (!td->tiles)
-				{
-					if ((tile_width_mult > 1) || (tile_height_mult > 1))
-					{
-						td->b_tiles = ResizeImage(dpy, tiles_raw,
-							pict_wid, pict_hgt,
-							td->tile_wid*tile_width_mult, td->tile_hgt * tile_height_mult);
-					}
-					else
-					{
-						td->b_tiles = NULL;
-					}
-					td->tiles = ResizeImage(dpy, tiles_raw,
-					                        pict_wid, pict_hgt,
-					                        td->tile_wid, td->tile_hgt);
-				}
+		mode = get_graphics_mode(arg_graphics);
+		if (mode && mode->file) {
+			if (mode->alphablend) {
+				/* set or clear the flags needed in the ReadTiles function */
+				tiles.bFlags |= 1;
+			} else {
+				tiles.bFlags &= ~1;
 			}
 
-			/* Free tiles_raw */
-			FREE(tiles_raw);
+			/* Try the file */
+			path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
+
+			res = ReadTiles(dpy, filename, &tiles);
+			if (res >= 0) {
+				/* set the cell size used during resize */
+				tiles.CellWidth = mode->cell_width;
+				tiles.CellHeight = mode->cell_height;
+
+				/* copy the tiles to the other tile sheets */
+				viewtiles.CellWidth = td->tile_wid * tile_width_mult;
+				viewtiles.CellHeight = td->tile_hgt * tile_height_mult;
+				res = ResizeTiles(dpy, &viewtiles, &tiles);
+
+				maptiles.CellWidth = td->tile_wid;
+				maptiles.CellHeight = td->tile_hgt;
+				res = ResizeTiles(dpy, &maptiles, &tiles);
+
+				use_graphics = arg_graphics;
+				current_graphics_mode = mode;
+			}
+			if (res < 0) {
+				use_graphics = 0;
+				tile_width_mult = 1;
+				tile_height_mult = 1;
+			}
+		} else {
+			plog("Desired graphics mode not found.");
+			use_graphics = 0;
+			tile_width_mult = 1;
+			tile_height_mult = 1;
 		}
 
-		/* Initialize the transparency masks */
-		for (i = 0; i < num_term; i++)
-		{
-			term_data *td = &data[i];
+		/* Initialize the windows */
+		for (i = 0; i < num_term; i++) {
+			char *TmpData;
+			int j;
 			int ii, jj;
 			int depth = DefaultDepth(dpy, DefaultScreen(dpy));
 			Visual *visual = DefaultVisual(dpy, DefaultScreen(dpy));
 			int total;
 
+			term_data *td = &data[i];
+			term_data *o_td = NULL;
+
+			term *t = &td->t;
+
+			/* Graphics hook */
+			t->pict_hook = Term_pict_x11;
+
+			/* Use graphics sometimes */
+			t->higher_pict = TRUE;
+
+			/* Initialize the transparency masks */
 			/* Determine total bytes needed for image */
 			ii = 1;
 			jj = (depth - 1) >> 2;
@@ -3000,7 +3014,7 @@ errr init_x11(int argc, char *argv[])
 			/* Pad the scanline to a multiple of 4 bytes */
 			total = td->tile_wid * ii * tile_width_mult;
 			total = (total + 3) & ~3;
-			total *= td->fnt->hgt;
+			total *= td->tile_hgt;
 
 			TmpData = (char *)malloc(total);
 
@@ -3036,6 +3050,10 @@ void close_x11(void)
 		save_prefs(ini_file);
 		string_free(ini_file);
 	}
+
+	FreeTiles(&tiles);
+	FreeTiles(&viewtiles);
+	FreeTiles(&maptiles);
 
 	for (i = 0; i < MAX_TERM_DATA; i++) {
 		td = &data[i];
