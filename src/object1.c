@@ -46,19 +46,19 @@ void reset_visuals(void)
 		/* Assume we will use the underlying values */
 		f_ptr->x_attr = f_ptr->d_attr;
 		f_ptr->x_char = f_ptr->d_char;
-    if (f_ptr->x_attr < 16) {
+		if (f_ptr->x_attr < 16) {
 			/* If is ascii graphics */
-		  f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
-		  f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
-		  f_ptr->xd_char = f_ptr->x_char;
-		  f_ptr->xl_char = f_ptr->x_char;
-    } else
-    {
-		  f_ptr->xd_attr = f_ptr->x_attr;
-		  f_ptr->xl_attr = f_ptr->x_attr;
-		  f_ptr->xd_char = f_ptr->x_char;
-		  f_ptr->xl_char = f_ptr->x_char;
-    }
+			f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
+			f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
+			f_ptr->xd_char = f_ptr->x_char;
+			f_ptr->xl_char = f_ptr->x_char;
+		} else
+		{
+			f_ptr->xd_attr = f_ptr->x_attr;
+			f_ptr->xl_attr = f_ptr->x_attr;
+			f_ptr->xd_char = f_ptr->x_char;
+			f_ptr->xl_char = f_ptr->x_char;
+		}
 
 		/* No extra information */
 		/*f_ptr->w_attr = 0;
@@ -95,15 +95,20 @@ void reset_visuals(void)
 		t_ptr->f_char = t_ptr->d_char;
 	}
 
-  if (use_graphics)
+	if (use_graphics)
 	{
-    graphics_mode *mode = get_graphics_mode(use_graphics);
-    if (mode && strstr(mode->pref,".prf")) {
-      (void)process_pref_file(mode->pref);
-    } else {
-		  /* Process "graf.prf" */
-		  (void)process_pref_file("graf.prf");
-    }
+		graphics_mode *mode = get_graphics_mode(use_graphics);
+
+		/* Process "graf.prf" */
+		(void)process_pref_file("graf.prf");
+
+		if (mode && strstr(mode->pref,".prf")) {
+			/* A pref file name was given in graphics.txt. The
+			 * desired pref file would not have been loaded
+			 * with the default file, unless the system default
+			 * was not written correctly */
+			(void)process_pref_file(mode->pref);
+		}
 	}
 
 	/* Normal symbols */
@@ -115,7 +120,7 @@ void reset_visuals(void)
 
 	/* Reset the fake monochrome flag */
 	fake_monochrome = (!use_graphics
-					   || streq(ANGBAND_SYS, "ibm")) ? TRUE : FALSE;
+	                   || streq(ANGBAND_SYS, "ibm")) ? TRUE : FALSE;
 
 	/* Fields have to notice the change of visuals. */
 	init_fields();
