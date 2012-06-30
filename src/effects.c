@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 /*
  * Returns a pointer to the value that stores the time left on the given type of effect.
@@ -2779,11 +2780,17 @@ void take_hit(int damage, cptr hit_from)
 				/* Show all the messages */
 				message_flush();
 
+				/* backup any previous buttons */
+				button_backup_all(TRUE);
+
 				/* Alert the user to the problem */
-				put_fstr(0, 0, "Emergency stop.  Press 'c' to continue.");
+				put_fstr(0, 0, "$UEmergency stop.  Press 'c' to continue.$Yc$V");
 
 				/* Wait for acknowledgement */
 				while (inkey() != 'c') ;
+
+				/* restore any previous buttons */
+				button_restore();
 
 				disturb(TRUE);
 			}

@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 
 /*
@@ -3035,18 +3036,28 @@ bool get_aim_dir(int *dp)
 	/* Ask until satisfied */
 	while (!dir)
 	{
+		/* backup any previous buttons */
+		button_backup_all(TRUE);
+
 		/* Choose a prompt */
 		if (!target_okay())
 		{
-			p = "Direction ('*' to choose a target, 'c' for closest, Escape to cancel)? ";
+			p = "Direction ($U'*' to choose a target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y\033$V)? ";
 		}
 		else
 		{
-			p = "Direction ('5' for target, '*' to re-target, 'c' for closest, Escape to cancel)? ";
+			p = "Direction ($U'5' for target$Y5$V, $U'*' to re-target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y\033$V)? ";
 		}
 
 		/* Get a command (or Cancel) */
-		if (!get_com(p, &command)) break;
+		if (!get_com(p, &command)) {
+			/* restore any previous buttons */
+			button_restore();
+			break;
+		}
+
+		/* restore any previous buttons */
+		button_restore();
 
 		/* Convert various keys to "standard" keys */
 		switch (command)

@@ -11,6 +11,7 @@
  */
 
 #include "angband.h"
+#include "button.h"
 
 	/* Level gained, cost, %fail, name */
 mindcraft_power mindcraft_powers[MINDCRAFT_MAX] =
@@ -157,12 +158,15 @@ static int get_mindcraft_power(int *sn)
 		}
 	}
 
-	/* Build a prompt (accept all spells) */
-	(void)strnfmt(out_val, 78, "(%^ss %c-%c, ESC=exit) Use which %s? ",
-				  p, I2A(0), I2A(num - 1), p);
-
 	/* Save the screen */
 	screen_save();
+
+	/* backup any previous buttons */
+	button_backup_all(TRUE);
+
+	/* Build a prompt (accept all spells) */
+	(void)strnfmt(out_val, 78, "(%^ss %c-%c, $UESC=exit$Y%c%V) Use which %s? ",
+				  p, I2A(0), I2A(num - 1), ESCAPE, p);
 
 	/* Display a list of spells */
 	prtf(x, y, "");
@@ -207,7 +211,7 @@ static int get_mindcraft_power(int *sn)
 		mindcraft_info(comment, i);
 
 		/* Dump the spell --(-- */
-		prtf(x, y + i + 1, "  %c) %-30s%2d %4d %3d%%%s",
+		prtf(x, y + i + 1, "  $U%c) %-30s%2d %4d %3d%%%s$V",
 				I2A(i), spell.name,
 				spell.min_lev, spell.mana_cost, chance, comment);
 	}
@@ -247,6 +251,9 @@ static int get_mindcraft_power(int *sn)
 		/* Stop the loop */
 		flag = TRUE;
 	}
+
+	/* restore any previous buttons */
+	button_restore();
 
 	/* Restore the screen */
 	screen_load();
