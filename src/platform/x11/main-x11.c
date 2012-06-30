@@ -1881,6 +1881,117 @@ static void handle_button(Time time, int x, int y, int button, bool press)
 	if (!press && button == 1) copy_x11_end(time);
 }
 #endif /* if 0 */
+errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const byte *tap, const char *tcp);
+int init_graphics_x11()
+{
+	int res, i;
+	graphics_mode *mode;
+	char filename[1024];
+	Display *dpy = Metadpy->dpy;
+	term_data *td = &data[0];
+
+	mode = get_graphics_mode(arg_graphics);
+	if (mode && mode->file) {
+		if (mode->alphablend) {
+			/* set or clear the flags needed in the ReadTiles function */
+			tiles.bFlags |= 1;
+		} else {
+			tiles.bFlags &= ~1;
+		}
+
+		/* Try the file */
+		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
+
+		res = ReadTiles(dpy, filename, &tiles);
+		if (res >= 0) {
+			/* set the cell size used during resize */
+			tiles.CellWidth = mode->cell_width;
+			tiles.CellHeight = mode->cell_height;
+
+			/* copy the tiles to the other tile sheets */
+			viewtiles.CellWidth = td->tile_wid * tile_width_mult;
+			viewtiles.CellHeight = td->tile_hgt * tile_height_mult;
+			res = ResizeTiles(dpy, &viewtiles, &tiles);
+
+			maptiles.CellWidth = td->tile_wid;
+			maptiles.CellHeight = td->tile_hgt;
+			res = ResizeTiles(dpy, &maptiles, &tiles);
+
+			current_graphics_mode = mode;
+		}
+		if (res < 0) {
+			return res;
+		}
+	} else {
+		plog_fmt("Desired graphics mode (%d) not found.", arg_graphics);
+		return -2;
+	}
+
+	/* Initialize the windows */
+	for (i = 0; i < MAX_TERM_DATA; i++) {
+		char *TmpData;
+		int j;
+		int ii, jj;
+		int depth = DefaultDepth(dpy, DefaultScreen(dpy));
+		Visual *visual = DefaultVisual(dpy, DefaultScreen(dpy));
+		int total;
+
+		term_data *td = &data[i];
+		term_data *o_td = NULL;
+
+		term *t = &td->t;
+
+		/* Graphics hook */
+		/*if (current_graphics_mode->alphablend) {
+			t->pict_hook = Term_pict_alpha_x11;
+		} else {*/
+			t->pict_hook = Term_pict_x11;
+		/*}*/
+
+		/* Use graphics sometimes */
+		t->higher_pict = TRUE;
+
+		if (!(td->visible)) continue;
+
+		/* Initialize the transparency masks */
+		/* Determine total bytes needed for image */
+		ii = 1;
+		jj = (depth - 1) >> 2;
+		while (jj >>= 1) ii <<= 1;
+
+		/* Pad the scanline to a multiple of 4 bytes */
+		total = td->tile_wid * ii * tile_width_mult;
+		total = (total + 3) & ~3;
+		total *= td->tile_hgt;
+
+		TmpData = (char *)malloc(total);
+
+		td->TmpImage = XCreateImage(dpy,visual,depth,
+			ZPixmap, 0, TmpData, td->tile_wid*tile_width_mult,
+			td->tile_hgt * tile_height_mult, 32, 0);
+	}
+
+	return 0;
+}
+
+void close_graphics_x11()
+{
+	int i;
+
+	FreeTiles(&tiles);
+	FreeTiles(&viewtiles);
+	FreeTiles(&maptiles);
+	current_graphics_mode = NULL;
+
+	for (i = 0; i < MAX_TERM_DATA; i++) {
+		/* Graphics hook */
+		data[i].t.pict_hook = NULL;
+
+		/* Use graphics sometimes */
+		data[i].t.higher_pict = FALSE;
+	}
+}
+
 
 /*
  * Delay resizing/redrawing windows so that don't waste cpu
@@ -2329,7 +2440,71 @@ static errr Term_xtra_x11_react(void)
 			}
 		}
 	}
+#if 0
+#ifdef USE_GRAPHICS
 
+	/* Handle "arg_graphics" */
+	if (use_graphics != arg_graphics)
+	{
+		/* Switch off transparency */
+		use_transparency = FALSE;
+		
+		/* Free any existing images */
+		FreeTiles(&tiles);
+		FreeTiles(&viewtiles);
+		FreeTiles(&maptiles);
+
+		/* Initialize (if needed) */
+		if (arg_graphics && (init_graphics() < 0))
+		{
+			/* Warning */
+			plog("Cannot initialize graphics!");
+
+			/* Cannot enable */
+			arg_graphics = GRAPHICS_NONE;
+			tile_width_mult = 1;
+			tile_height_mult = 1;
+		}
+    
+		/* Change setting */
+		use_graphics = arg_graphics;
+
+		/* Reset visuals */
+		#ifdef ANGBAND_2_8_1
+			reset_visuals();
+		#else /* ANGBAND_2_8_1 */
+			reset_visuals(TRUE);
+		#endif /* ANGBAND_2_8_1 */
+
+	}
+
+#endif /* USE_GRAPHICS */
+
+
+	/* Clean up windows */
+	for (i = 0; i < MAX_TERM_DATA; i++)
+	{
+		term *old = Term;
+
+		term_data *td = &data[i];
+
+		/* Update resized windows */
+		if ((td->cols != td->t.wid) || (td->rows != td->t.hgt))
+		{
+			/* Activate */
+			Term_activate(&td->t);
+
+			/* Hack -- Resize the term */
+			Term_resize(td->cols, td->rows);
+
+			/* Redraw the contents */
+			Term_redraw();
+
+			/* Restore */
+			Term_activate(old);
+		}
+	}
+#endif
 	/* Success */
 	return (0);
 }
@@ -2449,7 +2624,7 @@ static errr Term_text_x11(int x, int y, int n, byte a, cptr s)
 /*
  * Draw some graphical characters.
  */
-static errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const byte *tap, const char *tcp)
+errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const byte *tap, const char *tcp)
 {
 	int i;
 	int x1 = 0, y1 = 0;
@@ -2855,6 +3030,7 @@ errr init_x11(int argc, char *argv[])
 		(void)analyze_file(td->font_want, &wid, &hgt);
 		td->tile_wid = wid;
 		td->tile_hgt = hgt;
+		td->TmpImage = NULL;
 		if (i < num_term) {
 			td->visible = 1;
 		}
@@ -2932,11 +3108,27 @@ errr init_x11(int argc, char *argv[])
 		}
 	}
 	
+	/* Activate the "Angband" window screen */
+	Term_activate(&data[0].t);
 
 #ifdef USE_GRAPHICS
 	/* Try graphics */
 	if (arg_graphics)
 	{
+		int res;
+		msgf("Loading graphics...");
+		res = init_graphics_x11();
+		if (res < 0) {
+			use_graphics = 0;
+			tile_width_mult = 1;
+			tile_height_mult = 1;
+			msgf("Loading graphics...Failed");
+			close_graphics_x11();
+		} else {
+			use_graphics = arg_graphics;
+			msgf("Loading graphics...Done");
+		}
+#if 0
 		int res;
 		graphics_mode *mode;
 		char filename[1024];
@@ -2945,6 +3137,7 @@ errr init_x11(int argc, char *argv[])
 
 		mode = get_graphics_mode(arg_graphics);
 		if (mode && mode->file) {
+			msgf("Loading graphics...");
 			if (mode->alphablend) {
 				/* set or clear the flags needed in the ReadTiles function */
 				tiles.bFlags |= 1;
@@ -2972,11 +3165,13 @@ errr init_x11(int argc, char *argv[])
 
 				use_graphics = arg_graphics;
 				current_graphics_mode = mode;
+				msgf("Loading graphics...Done");
 			}
 			if (res < 0) {
 				use_graphics = 0;
 				tile_width_mult = 1;
 				tile_height_mult = 1;
+				msgf("Loading graphics...Failed");
 			}
 		} else {
 			plog("Desired graphics mode not found.");
@@ -2986,7 +3181,7 @@ errr init_x11(int argc, char *argv[])
 		}
 
 		/* Initialize the windows */
-		for (i = 0; i < num_term; i++) {
+		for (i = 0; i < MAX_TERM_DATA; i++) {
 			char *TmpData;
 			int j;
 			int ii, jj;
@@ -3005,6 +3200,7 @@ errr init_x11(int argc, char *argv[])
 			/* Use graphics sometimes */
 			t->higher_pict = TRUE;
 
+			if (!(td->visible)) continue;
 			/* Initialize the transparency masks */
 			/* Determine total bytes needed for image */
 			ii = 1;
@@ -3022,6 +3218,7 @@ errr init_x11(int argc, char *argv[])
 				ZPixmap, 0, TmpData, td->tile_wid*tile_width_mult,
 				td->tile_hgt * tile_height_mult, 32, 0);
 		}
+#endif
 	}
 
 #endif /* USE_GRAPHICS */
@@ -3049,17 +3246,20 @@ void close_x11(void)
 	if (ini_file) {
 		save_prefs(ini_file);
 		string_free(ini_file);
+		ini_file = NULL;
 	}
 
-	FreeTiles(&tiles);
-	FreeTiles(&viewtiles);
-	FreeTiles(&maptiles);
+	close_graphics_x11();
 
 	for (i = 0; i < MAX_TERM_DATA; i++) {
 		td = &data[i];
 		t = &td->t;
 
 		if (td->font_want) string_free(td->font_want);
+
+		if (td->TmpImage) {
+			XDestroyImage(td->TmpImage);
+		}
 
 		/* Free size hints */
 		if (td->sizeh) XFree(td->sizeh);

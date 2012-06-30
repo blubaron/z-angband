@@ -199,6 +199,17 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 		png_ptr = NULL;
 	}
 
+	/* premultiply the alpha data if we need to */
+	/*if (premultiply && (color_type == PNG_COLOR_TYPE_RGBA)) {
+		int x;
+		u32b *srcrow;
+		for (y = 0; y < height; ++y) {
+			srcrow = (u32b*) (color_data + row_bytes*y);
+			for (x = 0; x < width; ++x) {
+			}
+		}
+	}*/
+
 	/* create the Image structure */
 	color = XCreateImage(dpy, visual, scr_depth, ZPixmap, 0,
 			(char*)color_data, width, height, 32, 0);
@@ -271,7 +282,7 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	return 0;
 }
 int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
-	int wid, int hgt, bool premultiply)
+	int wid, int hgt, bool unpremultiply)
 {
 	return -1;
 #if 0
