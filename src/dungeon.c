@@ -2480,9 +2480,9 @@ bool add_main_buttons(void)
 	}
 
 	/* character screen */
-	button_add_2d(ROW_TITLE, COL_TITLE, ROW_EXP, COL_MAP, NULL, 'C');
+	button_add_2d(ROW_RACE, COL_RACE, ROW_TITLE, COL_MAP, NULL, 'C');
 	/* inventory */
-	button_add_2d(ROW_EQUIPPY, COL_EQUIPPY, ROW_EQUIPPY, COL_MAP, NULL, 'I');
+	button_add_2d(ROW_EQUIPPY, COL_EQUIPPY, ROW_EQUIPPY+2, COL_MAP, NULL, 'I');
 	/* target */
 	button_add_2d(ROW_TARGET_NAME, COL_INFO, ROW_INFO, COL_MAP, NULL, 'l');
 	/* search */
@@ -2506,13 +2506,13 @@ bool add_main_buttons(void)
 		button_add_2d(hgt, COL_DEPTH+20, hgt, Term->wid, NULL, KTRL('T'));
 	}
 	/* wield */
-	button_add_2d(ROW_AC, COL_AC, ROW_AC, COL_MAP>>1, NULL, 'w');
+	button_add_2d(ROW_AC, COL_AC, ROW_SP, COL_MAP>>1, NULL, 'w');
 	/* takeoff */
-	button_add_2d(ROW_AC, COL_MAP>>1, ROW_AC, COL_MAP, NULL, 't');
+	button_add_2d(ROW_AC, COL_MAP>>1, ROW_SP, COL_MAP, NULL, 't');
 	/* use */
-	button_add_2d(ROW_GOLD, COL_GOLD, ROW_GOLD, COL_MAP>>1, NULL, 'u');
+	button_add_2d(ROW_LEVEL, COL_GOLD, ROW_GOLD, COL_MAP>>1, NULL, 'u');
 	/* cast */
-	button_add_2d(ROW_GOLD, COL_MAP>>1, ROW_GOLD, COL_MAP, NULL, 'm');
+	button_add_2d(ROW_LEVEL, COL_MAP>>1, ROW_GOLD, COL_MAP, NULL, 'm');
 
 	return TRUE;
 }
