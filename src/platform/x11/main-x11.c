@@ -2163,7 +2163,10 @@ static errr CheckEvent(bool wait)
 				Term_activate(&old_td->t);
 
 				/* Process the key */
-				react_mousepress(&(xev->xbutton));
+				if (window == 0) {
+					/* only send the press if it was in the main window */
+					react_mousepress(&(xev->xbutton));
+				}
 			}
 			break;
 		}
