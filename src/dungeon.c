@@ -2488,7 +2488,9 @@ bool add_main_buttons(void)
 	/* search */
 	button_add_2d(hgt, COL_STATE,hgt, COL_AFRAID, NULL, 'S');
 	/* study */
-	button_add_2d(hgt, COL_STUDY, hgt, COL_DEPTH, NULL, 'G');
+	if (p_ptr->spell.realm[0]) {
+		button_add_2d(hgt, COL_STUDY, hgt, COL_DEPTH, NULL, 'G');
+	}
 	/* map */
 	if (Term->wid > COL_DEPTH+30)  {
 		i = COL_DEPTH+20;
@@ -2573,6 +2575,7 @@ bool dungeon_init_level(void)
 
 
 	/* Enter "xtra" mode */
+
 	character_xtra = TRUE;
 
 	/* Window stuff */

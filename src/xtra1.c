@@ -1091,13 +1091,14 @@ static void prt_speed(void)
 
 static void prt_study(void)
 {
-	if (p_ptr->new_spells)
-	{
+	if (p_ptr->new_spells) {
 		put_fstr(COL_STUDY, Term->hgt - 1, "Study");
-	}
-	else
-	{
+	} else
+	if (p_ptr->spell.realm[0]) {
 		put_fstr(COL_STUDY, Term->hgt - 1, CLR_L_DARK "Study");
+	} else
+	{
+		put_fstr(COL_STUDY, Term->hgt - 1, "     ");
 	}
 }
 
