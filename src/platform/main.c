@@ -138,6 +138,7 @@ static void quit_hook(cptr s)
 			}
 		}
 	}
+	close_graphics_modes();
 }
 
 
