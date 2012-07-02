@@ -3119,109 +3119,15 @@ errr init_x11(int argc, char *argv[])
 	if (arg_graphics)
 	{
 		int res;
-		msgf("Loading graphics...");
 		res = init_graphics_x11();
 		if (res < 0) {
 			use_graphics = 0;
 			tile_width_mult = 1;
 			tile_height_mult = 1;
-			msgf("Loading graphics...Failed");
 			close_graphics_x11();
 		} else {
 			use_graphics = arg_graphics;
-			msgf("Loading graphics...Done");
 		}
-#if 0
-		int res;
-		graphics_mode *mode;
-		char filename[1024];
-		Display *dpy = Metadpy->dpy;
-		term_data *td = &data[0];
-
-		mode = get_graphics_mode(arg_graphics);
-		if (mode && mode->file) {
-			msgf("Loading graphics...");
-			if (mode->alphablend) {
-				/* set or clear the flags needed in the ReadTiles function */
-				tiles.bFlags |= 1;
-			} else {
-				tiles.bFlags &= ~1;
-			}
-
-			/* Try the file */
-			path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
-
-			res = ReadTiles(dpy, filename, &tiles);
-			if (res >= 0) {
-				/* set the cell size used during resize */
-				tiles.CellWidth = mode->cell_width;
-				tiles.CellHeight = mode->cell_height;
-
-				/* copy the tiles to the other tile sheets */
-				viewtiles.CellWidth = td->tile_wid * tile_width_mult;
-				viewtiles.CellHeight = td->tile_hgt * tile_height_mult;
-				res = ResizeTiles(dpy, &viewtiles, &tiles);
-
-				maptiles.CellWidth = td->tile_wid;
-				maptiles.CellHeight = td->tile_hgt;
-				res = ResizeTiles(dpy, &maptiles, &tiles);
-
-				use_graphics = arg_graphics;
-				current_graphics_mode = mode;
-				msgf("Loading graphics...Done");
-			}
-			if (res < 0) {
-				use_graphics = 0;
-				tile_width_mult = 1;
-				tile_height_mult = 1;
-				msgf("Loading graphics...Failed");
-			}
-		} else {
-			plog("Desired graphics mode not found.");
-			use_graphics = 0;
-			tile_width_mult = 1;
-			tile_height_mult = 1;
-		}
-
-		/* Initialize the windows */
-		for (i = 0; i < MAX_TERM_DATA; i++) {
-			char *TmpData;
-			int j;
-			int ii, jj;
-			int depth = DefaultDepth(dpy, DefaultScreen(dpy));
-			Visual *visual = DefaultVisual(dpy, DefaultScreen(dpy));
-			int total;
-
-			term_data *td = &data[i];
-			term_data *o_td = NULL;
-
-			term *t = &td->t;
-
-			/* Graphics hook */
-			t->pict_hook = Term_pict_x11;
-
-			/* Use graphics sometimes */
-			t->higher_pict = TRUE;
-
-			if (!(td->visible)) continue;
-			/* Initialize the transparency masks */
-			/* Determine total bytes needed for image */
-			ii = 1;
-			jj = (depth - 1) >> 2;
-			while (jj >>= 1) ii <<= 1;
-
-			/* Pad the scanline to a multiple of 4 bytes */
-			total = td->tile_wid * ii * tile_width_mult;
-			total = (total + 3) & ~3;
-			total *= td->tile_hgt;
-
-			TmpData = (char *)malloc(total);
-
-			td->TmpImage = XCreateImage(dpy,visual,depth,
-				ZPixmap, 0, TmpData, td->tile_wid*tile_width_mult,
-				td->tile_hgt * tile_height_mult, 32, 0);
-		}
-#endif
 	}
 
 #endif /* USE_GRAPHICS */
