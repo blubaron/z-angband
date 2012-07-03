@@ -389,6 +389,11 @@ bool game_change_level(void)
 				delete_held_object(&(p_ptr->inventory), o_ptr);
 			}
 
+			/* remove some of the players experience */
+			if (p_ptr->lev > 3) {
+				lose_exp(p_ptr->exp / 4);
+			}
+
 			/* TODO create a death chest quest and move all items to death chest storage */
 
 			/* move the player somewhere, same as recall for now TODO change */
