@@ -239,7 +239,8 @@ void process_click(char press, int xpos, int ypos)
 			if (ctrl) {
 				/* control-click - alter */
 				p_ptr->cmd.dir = coords_to_dir(x, y);
-				p_ptr->cmd.arg = 11;
+				p_ptr->cmd.arg = 16;
+				p_ptr->cmd.cmd = '+';
 				do_cmd_alter();
 			} else
 			if (alt) {
