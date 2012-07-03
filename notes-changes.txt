@@ -140,7 +140,7 @@ magic scrolls and general backpacks.
     Implemented 4 sizes of jewelry pouches, food sacks, and weapon belts. Also
       a high level general backpack.
 
-   Added a second backup to rotate with for autosave_b. tests if autosave_freq
+    Added a second backup to rotate with for autosave_b. tests if autosave_freq
       is odd or even when deciding which suffix to use, and adds or subtracts 1
       so that the other suffix would be used next time. odd is even+1
 
@@ -367,7 +367,7 @@ enum
     modified main map display so it always uses tile multipliers of 1, whether
       or not bigtile mode is used.
 
-    *Move dungeon type info from tables.c (line 5191) to a file (dungeons.txt and dungeons.raw)
+    Move dungeon type info from tables.c (line 5191) to a file (dungeons.txt and dungeons.raw)
       use dun_gen_type structure
       since we have seperate attr/char pairs for each lighting level in
         features, remove the USE_TRANS flag and add EXIT_DOWN and EXIT_UP flags
@@ -378,7 +378,6 @@ enum
       added new features and test graphics for graveyard doors
       added new features and test graphics for horror/pit dungeons
       added new features and test graphics for temple/city dungeons
-      *still using static array in tables.c
 
     renamed edit files not used by tilepicker to more readable name.
 
@@ -431,6 +430,10 @@ enum
        with no speed bonus)
 
     Added items to resurrect the player when s/he dies.
+     *still need to remove gold/items from the player and put in a "death
+      chest", which would appear on the level the player was killed on. and
+      keep appearing each tile level is visited, until the chest is opened.
+      probably use a grave graphic.
 
     gave spellcasters a bit more starting mana
 
@@ -446,6 +449,7 @@ enum
       sub window are ok though. *need to change screen setup to be similar 
       to angband, for context menus in the middle of the screen and the screen
       not changing when a few of the map lines are overwriten with text.
+     *X11 crashes when the tile height multiplier is > 1
 
     Added time of day text on the status bar. It is displayed to the right of
      the dungeon level / place name, if the screen is large enough (>90 chars).
@@ -460,10 +464,21 @@ enum
       the screen, always on top of the list of possible keys, and they send the
       keypress.
      *need to add more buttons, esp for targeting/looking
-     *need to add main screen buttons - character, inventory/equip, study, map,
-      search mode, target current target/show monster list.
+     *Added main screen buttons, but some of them are not in obvious places.
+      clicking on search changes the search mode, clicking on study tries to
+      study a book. clicking on the place name/dungeon level shows the map. if
+      the broad time of day is shown, clicking on it gives the detailed time
+      of day. In the info panel, clicking on the equipment line shows the
+      inventory. clicking the race to class title lines shows the character
+      screen. clicking the left side of the level to gold lines will use an
+      item from inventory. clicking the right side will cast magic if possible.
+      clicking the left side of the ac to sp lines will wield an item. clicking
+      the right side will take an item off.
+      *still need target current target/show monster list.
 
-    *Got the X11 console working again. *need to readd graphics/png support.
+    Got the X11 console/graphics working again. Added png and tile mask file
+      support. Added ability to load/save a settings file.
+      *need to add a system menu.
 
     Allow mouse wheel to scroll some menus, ie it can change the character
       screen. added to X11 and Windows.
