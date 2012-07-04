@@ -263,6 +263,114 @@ void process_click(char press, int xpos, int ypos)
 //#endif
 	} else
 	if (button == 2) {
+		cave_type *c_ptr = area(x,y);
+		pcave_type *pc_ptr = parea(x,y);
+		bool doub = FALSE;
+
+		/* make sure we have sen the grid */
+		if (!(pc_ptr->player & GRID_KNOWN)) {
+			return;
+		}
+
+		/* Hack -- hallucination */
+		if (query_timed(TIMED_IMAGE)) {
+			prtf(0,0, "You see something strange");
+			return;
+		}
+
+		if ((p_ptr->target_row == y) && (p_ptr->target_col == x)) {
+			doub = TRUE;
+		}
+		if (c_ptr->m_idx && target_able(c_ptr->m_idx)) {
+			int m_idx = c_ptr->m_idx;
+			monster_type *m_ptr = &(m_list[m_idx]);
+			char m_name[80];
+
+			if ((m_ptr->smart & SM_MIMIC) && mimic_desc(m_name, &(r_info[m_ptr->r_idx]))) {
+				prtf(0, 0, "You see a %s", m_name);
+			} else
+			if (doub) {
+				/* show the recall info */
+				/* Save */
+				screen_save();
+
+				/* Recall on screen */
+				screen_roff_mon(m_ptr->r_idx, 0);
+
+				/* Command */
+				(void)inkey();
+
+				/* Restore */
+				screen_load();
+			} else
+			{
+				/* target the monster */
+				if (m_ptr->r_idx) {
+					monster_race_track(m_ptr->r_idx);
+				}
+				health_track(m_idx);
+				p_ptr->target_who = m_idx;
+
+				prtf(0, 0, "You see %v", MONSTER_FMT(m_ptr, 0x08));
+			}
+		} else {
+			/* cancel health tracking */
+			health_track(0);
+			p_ptr->target_who = 0;
+			/* mention what is in the grid cell */
+			if (c_ptr->o_idx) {
+				object_type *o_ptr = &(o_list[c_ptr->o_idx]);
+				if (o_ptr->k_idx) {
+					object_kind_track(o_ptr->k_idx);
+				}
+				prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
+			} else
+			if (c_ptr->fld_idx) {
+				cptr name = NULL, s3;
+				char fld_name[41];
+				field_type *f_ptr = &(fld_list[c_ptr->fld_idx]);
+				field_thaum *t_ptr = &(t_info[f_ptr->t_idx]);
+
+				if (f_ptr->info & FIELD_INFO_MARK) {
+				/* See if it has a special name */
+				field_script_single(f_ptr, FIELD_ACT_LOOK, ":s", LUA_RETURN(name));
+				if (name) {
+					/* Copy the string into the temp buffer */
+					strncpy(fld_name, name, 40);
+
+					/* Anything there? */
+					if (!fld_name[0]) {
+						/* Default to field name */
+						strncpy(fld_name, t_ptr->name, 40);
+					}
+
+					/* Free string allocated to hold return value */
+					string_free(name);
+				} else {
+					/* Default to field name */
+					strncpy(fld_name, t_ptr->name, 40);
+				}
+				s3 = is_a_vowel(fld_name[0]) ? "an " : "a ";
+
+				/* Describe the field */
+				prtf(0, 0, "You see %s%s", s3, fld_name);
+				}
+			} else
+			if (pc_ptr->feat) {
+				cptr name, s3;
+				name = f_name + f_info[pc_ptr->feat].name;
+				if (f_info[pc_ptr->feat].flags & FF_OBJECT) {
+					/* Pick proper indefinite article */
+					s3 = (is_a_vowel(name[0])) ? "an " : "a ";
+				} else  {
+					s3 = "";
+				}
+				prtf(0, 0, "You see %s%s", s3, name);
+				
+			}
+		}
+		p_ptr->target_row = y;
+		p_ptr->target_col = x;
 #if (0)
 		int m_idx = cave->m_idx[y][x];
 		if (m_idx && target_able(m_idx)) {
