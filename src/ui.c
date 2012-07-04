@@ -783,6 +783,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 					/* Hack - restore the screen */
 					if (options[j].flags & MN_CLEAR)
 					{
+						/* restore any previous mouse buttons */
+						button_restore();
+
 						screen_load();
 					}
 
@@ -791,6 +794,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 						/* Hack - restore the screen */
 						if (!(options[j].flags & MN_CLEAR))
 						{
+							/* restore any previous mouse buttons */
+							button_restore();
+
 							/* Restore the screen */
 							screen_load();
 						}
@@ -806,6 +812,9 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 					if (options[j].flags & MN_CLEAR)
 					{
 						screen_save();
+
+						/* store are previous buttons */
+						button_backup_all(TRUE);
 					}
 
 					/*
