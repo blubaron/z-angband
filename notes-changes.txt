@@ -408,6 +408,7 @@ enum
      make sure you have space in your pack for it, or you will be charged an
      additional 50 gold. Warning: once you buy an item on lay away, you cannot
      buy another on lay away until the first one has been paid for.
+     *Lay away (item) may corrupt save files.
 
     bounty quest rewards no longer give stat gain.
 
@@ -432,8 +433,10 @@ enum
     Added items to resurrect the player when s/he dies.
      *still need to remove gold/items from the player and put in a "death
       chest", which would appear on the level the player was killed on. and
-      keep appearing each tile level is visited, until the chest is opened.
-      probably use a grave graphic.
+      keep appearing each time level is visited, until the chest is opened
+      (emptied?). probably use a grave graphic.
+     *players lose 25% of their total exp (atleast 1 level) when a
+      resurrection item is used. change to 10% when death chests are added?
 
     gave spellcasters a bit more starting mana
 

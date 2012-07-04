@@ -3,8 +3,6 @@
   Maybe Todo:
     Finish enchant_pval? what is left to do?
 
-    When you die you loose 10% of total exp? 25% of current level exp?
-
     Be able to abandon a quest and get another from the same quest giver after
       a period of time. (cancel then insert a "wait" quest in the building?)
 
