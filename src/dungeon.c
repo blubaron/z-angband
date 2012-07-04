@@ -2482,7 +2482,7 @@ bool add_main_buttons(void)
 	/* character screen */
 	button_add_2d(ROW_RACE, COL_RACE, ROW_TITLE, COL_MAP, NULL, 'C');
 	/* inventory */
-	button_add_2d(ROW_EQUIPPY, COL_EQUIPPY, ROW_EQUIPPY+2, COL_MAP, NULL, 'I');
+	button_add_2d(ROW_EQUIPPY, COL_EQUIPPY, ROW_EQUIPPY+2, COL_MAP, NULL, 'i');
 	/* target */
 	button_add_2d(ROW_TARGET_NAME, COL_INFO, ROW_INFO, COL_MAP, NULL, 'l');
 	/* search */

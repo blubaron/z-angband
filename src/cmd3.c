@@ -155,14 +155,18 @@ void do_cmd_inven(void)
 
 			/* Load screen */
 			screen_load();
-
-			/* Track the object kind */
-			//track_object(item);
-
-			//if (o_ptr->kind) {
-			//	while ((ret = context_menu_object(o_ptr, item)) == 2);
 			ret = -1;
-			//}
+
+			/* show the context menu */
+			if (o_ptr->k_idx) {
+				/* Track the object kind */
+				object_kind_track(o_ptr->k_idx);
+
+				/* for now just inspect it */
+				identify_fully_aux(o_ptr);
+
+				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+			}
 		} else {
 			/* Load screen */
 			screen_load();
@@ -208,14 +212,18 @@ void do_cmd_equip(void)
 
 			/* Load screen */
 			screen_load();
-
-			/* Track the object kind */
-			//track_object(item);
-
-			//if (o_ptr->kind) {
-			//	while ((ret = context_menu_object(o_ptr, item)) == 2);
 			ret = -1;
-			//}
+
+			/* show the context menu */
+			if (o_ptr->k_idx) {
+				/* Track the object kind */
+				object_kind_track(o_ptr->k_idx);
+
+				/* for now just inspect it */
+				identify_fully_aux(o_ptr);
+
+				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+			}
 		} else {
 			/* Load screen */
 			screen_load();
