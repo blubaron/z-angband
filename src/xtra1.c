@@ -702,20 +702,20 @@ static void prt_depth(void)
 				/* Is this a quest to find a ruin? */
 				if (quest[q_num].type == QUEST_TYPE_FIND_PLACE)
 				{
-					prtf(COL_DEPTH, Term->hgt - 1, "     Ruin");
+					prtf(COL_DEPTH, Term->hgt - 1, "     Ruin        ");
 				}
 				/* then it is this a wilderness quest */
 				else if (quest[q_num].type == QUEST_TYPE_WILD)
 				{
-					prtf(COL_DEPTH, Term->hgt - 1, "     Quest");
+					prtf(COL_DEPTH, Term->hgt - 1, "      Quest      ");
 				}
 				/* fixed quest.  Only alert if there are stairs there. */
 				else
 				{
 					if (quest_stairs_active(p_ptr->place_num))
-						prtf(COL_DEPTH, Term->hgt -1, "     Quest");
+						prtf(COL_DEPTH, Term->hgt -1, "      Quest      ");
 					else
-						prtf(COL_DEPTH, Term->hgt -1, "   Wilderness");
+						prtf(COL_DEPTH, Term->hgt -1, "    Wilderness   ");
 				}
 
 			}
@@ -726,16 +726,16 @@ static void prt_depth(void)
 		}
 		else
 		{
-			prtf(COL_DEPTH, Term->hgt - 1, "   Wilderness");
+			prtf(COL_DEPTH, Term->hgt - 1, "    Wilderness   ");
 		}
 	}
 	else if (depth_in_feet)
 	{
-		prtf(COL_DEPTH, Term->hgt - 1, "     %d ft", p_ptr->depth * 50);
+		prtf(COL_DEPTH, Term->hgt - 1, "     %4d ft     ", p_ptr->depth * 50);
 	}
 	else
 	{
-		prtf(COL_DEPTH, Term->hgt - 1, "     Lev %d", p_ptr->depth);
+		prtf(COL_DEPTH, Term->hgt - 1, "     Lev %d     ", p_ptr->depth);
 	}
 }
 
