@@ -1995,6 +1995,10 @@ void cleanup_angband(void)
 	}
 
 	/* cleanup the player structure */
+	if (p_ptr->bank_layaway) {
+		object_wipe(p_ptr->bank_layaway);
+		ZFREE(p_ptr->bank_layaway);
+	}
 	if (p_ptr->pwild) {
 		for (i = 0; i < WILD_VIEW; i++) {
 			/* Free each block */

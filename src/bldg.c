@@ -2675,7 +2675,7 @@ void build_cmd_item_layaway(void)
 
 						/* cleanup the object */
 						object_wipe(p_ptr->bank_layaway);
-						p_ptr->bank_layaway = NULL;
+						ZFREE(p_ptr->bank_layaway);
 					} else {
 						p_ptr->bank_layaway_gold = 50;
 						msgf ("You have paid off the item, but you cannot carry anymore items.");

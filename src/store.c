@@ -2243,11 +2243,18 @@ static void store_layaway(void)
 			/* move the item to the lay away spot */
 			p_ptr->bank_layaway_gold = price;
 			p_ptr->bank_layaway_paid = 0;
-			if (p_ptr->bank_layaway) {
-				object_copy(o_ptr, p_ptr->bank_layaway);
-			} else {
-				p_ptr->bank_layaway = object_dup(o_ptr);
+
+			if (!(p_ptr->bank_layaway)) {
+				p_ptr->bank_layaway = ZNEW(object_type);
 			}
+			object_copy(p_ptr->bank_layaway, j_ptr);
+			/* Allocate quarks */
+			quark_dup(p_ptr->bank_layaway->xtra_name);
+			quark_dup(p_ptr->bank_layaway->inscription);
+
+			for (i = 0; i < MAX_TRIGGER; i++)
+				quark_dup(p_ptr->bank_layaway->trigger[i]);
+			/* j_ptr will be wiped at the next object_prep or _dup */
 
 			/* show the results */
 			msgf("You can pay for %v at any bank.", OBJECT_FMT(j_ptr, TRUE, 3));

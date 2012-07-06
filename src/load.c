@@ -1395,89 +1395,80 @@ static void rd_extra(void)
 
 	/* 48 byte future use area - Brett */
 	/* Read some location information - Brett*/
-  if (sf_version >= 62) {
-    /* The main home info - Brett*/
-	  rd_s16b(&p_ptr->home_place_num);
-	  rd_s16b(&p_ptr->home_store_num);
-  } else {
-    /* skip the bytes that would be used for the home
-     * and mark to look for an appropriate place later */
-    for (i = 0; i < 4; i++) rd_byte(&tmp8u);
-    p_ptr->home_place_num = 0;
-    p_ptr->home_store_num = 0;
-  }
-  if (sf_version >= 63) {
-    /* read the palace information */
-	  rd_s16b(&p_ptr->capital_place_num);
-	  rd_s16b(&p_ptr->capital_store_num);
-	  rd_s16b(&p_ptr->capital_dun_num);
+	if (sf_version >= 62) {
+		/* The main home info - Brett*/
+		rd_s16b(&p_ptr->home_place_num);
+		rd_s16b(&p_ptr->home_store_num);
+	} else {
+		/* skip the bytes that would be used for the home
+		 * and mark to look for an appropriate place later */
+		for (i = 0; i < 4; i++) rd_byte(&tmp8u);
+		p_ptr->home_place_num = 0;
+		p_ptr->home_store_num = 0;
+	}
+	if (sf_version >= 63) {
+		/* read the palace information */
+		rd_s16b(&p_ptr->capital_place_num);
+		rd_s16b(&p_ptr->capital_store_num);
+		rd_s16b(&p_ptr->capital_dun_num);
 
-    /* skip some space that might be used to store additional
-       places/buildings in the future, to place static quests */
-    for (i = 0; i < 16; i++) rd_byte(&tmp8u);
+		/* skip some space that might be used to store additional
+		   places/buildings in the future, to place static quests */
+		for (i = 0; i < 16; i++) rd_byte(&tmp8u);
 
-    /* Read the amount of gold in the bank */
-	  rd_u32b(&p_ptr->bank_gold);
-	  rd_u32b(&p_ptr->bank_layaway_gold);
-    if (p_ptr->bank_layaway_gold) {
-      object_type temp;
-  	  rd_u32b(&p_ptr->bank_layaway_paid);
-      /* create the layaway object */
-      //p_ptr->bank_layaway = 
-      rd_item(&temp);
-      /*if (!p_ptr->bank_layaway) {
-  	    p_ptr->bank_layaway = object_prep(temp.k_idx);
-      } else {
-	      /* Delete old static object */ /*
-	      object_wipe(p_ptr->bank_layaway);
-      }
- 	    object_copy(p_ptr->bank_layaway, &temp);
+		/* Read the amount of gold in the bank */
+		rd_u32b(&p_ptr->bank_gold);
+		rd_u32b(&p_ptr->bank_layaway_gold);
+		if (p_ptr->bank_layaway_gold) {
+			rd_u32b(&p_ptr->bank_layaway_paid);
+			/* create the layaway object */
+			if (!(p_ptr->bank_layaway)) {
+				p_ptr->bank_layaway = ZNEW(object_type);
+			}
+			rd_item(p_ptr->bank_layaway);
+		} else {
+			p_ptr->bank_layaway_paid = 0;
+			if (p_ptr->bank_layaway) {
+				object_wipe(p_ptr->bank_layaway);
+				FREE(p_ptr->bank_layaway);
+			}
+			p_ptr->bank_layaway = NULL;
+		}
+		/* Read the number of owned buildings */
+		rd_byte(&p_ptr->ob_count);
+		/* Read the number of death chests */
+		rd_byte(&p_ptr->dc_count);
+		/* Read the number of times ankhs have been used */
+		rd_u16b(&p_ptr->used_ankhs);
+	} else {
+		/* skip the bytes and mark to look for an appropriate place later */
+		for (i = 0; i < 6; i++) rd_byte(&tmp8u);
+		p_ptr->capital_place_num = 0;
+		p_ptr->capital_store_num = 0;
+		p_ptr->capital_dun_num = 0;
 
-      /* Allocate quarks */ /*
-	    quark_dup(p_ptr->bank_layaway->xtra_name);
-	    quark_dup(p_ptr->bank_layaway->inscription);
+		/* skip some space that might be used to store additional
+		   places/buildings in the future, to place static quests */
+		for (i = 0; i < 16; i++) rd_byte(&tmp8u);
 
-	    for (i = 0; i < MAX_TRIGGER; i++)
-		    quark_dup(p_ptr->bank_layaway->trigger[i]);
-
-      delete_static_object(temp);*/
-    } else {
-      p_ptr->bank_layaway_paid = 0;
-      p_ptr->bank_layaway = NULL;
-    }
-    /* Read the number of owned buildings */
-    rd_byte(&p_ptr->ob_count);
-    /* Read the number of death chests */
-    rd_byte(&p_ptr->dc_count);
-    /* Read the number of times ankhs have been used */
-    rd_u16b(&p_ptr->used_ankhs);
-  } else {
-    /* skip the bytes and mark to look for an appropriate place later */
-    for (i = 0; i < 6; i++) rd_byte(&tmp8u);
-    p_ptr->capital_place_num = 0;
-    p_ptr->capital_store_num = 0;
-    p_ptr->capital_dun_num = 0;
-
-    /* skip some space that might be used to store additional
-       places/buildings in the future, to place static quests */
-    for (i = 0; i < 16; i++) rd_byte(&tmp8u);
-
-    /* Read the amount of gold in the bank */
-    for (i = 0; i < 4; i++) rd_byte(&tmp8u);
-    p_ptr->bank_gold = 0;
-    p_ptr->bank_layaway_gold = 0;
-    p_ptr->bank_layaway_paid = 0;
-    p_ptr->bank_layaway = NULL;
-    /* Read the number of owned buildings */
-    rd_byte(&tmp8u);
-    p_ptr->ob_count = 0;
-    /* Read the number of death chests */
-    rd_byte(&tmp8u);
-    p_ptr->dc_count = 0;
-    rd_byte(&tmp8u);
-    rd_byte(&tmp8u);
-    p_ptr->used_ankhs = 0;
-  }
+		/* Read the amount of gold in the bank */
+		for (i = 0; i < 4; i++) rd_byte(&tmp8u);
+		p_ptr->bank_gold = 0;
+		/* Read the amount of any bank lay away item */
+		for (i = 0; i < 4; i++) rd_byte(&tmp8u);
+		p_ptr->bank_layaway_gold = 0;
+		p_ptr->bank_layaway_paid = 0;
+		p_ptr->bank_layaway = NULL;
+		/* Read the number of owned buildings */
+		rd_byte(&tmp8u);
+		p_ptr->ob_count = 0;
+		/* Read the number of death chests */
+		rd_byte(&tmp8u);
+		p_ptr->dc_count = 0;
+		rd_byte(&tmp8u);
+		rd_byte(&tmp8u);
+		p_ptr->used_ankhs = 0;
+	}
 	/* Future use */
 	for (i = 0; i < 10; i++) rd_byte(&tmp8u);
 
