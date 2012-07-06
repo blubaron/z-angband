@@ -1888,8 +1888,10 @@ void cleanup_angband(void)
 		string_free(macro__act[i]);
 	}
 
-	ZFREE(macro__pat);
-	ZFREE(macro__act);
+	FREE((void*)macro__pat);
+	macro__pat = NULL;
+	FREE((void*)macro__act);
+	macro__act = NULL;
 
 	/* Free the keymaps */
 	for (i = 0; i < KEYMAP_MODES; ++i)
@@ -1976,6 +1978,8 @@ void cleanup_angband(void)
 		FREE(cave[i]);
 	}
 #endif /* 0 */
+
+	/* cleanup the player structure */
 
 	/* Free the buttons */
 	button_free();
