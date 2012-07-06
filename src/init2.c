@@ -1879,7 +1879,7 @@ void init_angband(void)
 
 void cleanup_angband(void)
 {
-	int i, j;
+	int i, j, k;
 
 	/* Free the macros */
 	for (i = 0; i < macro__num; ++i)
@@ -1892,6 +1892,8 @@ void cleanup_angband(void)
 	macro__pat = NULL;
 	FREE((void*)macro__act);
 	macro__act = NULL;
+	ZFREE(macro__cmd);
+	ZFREE(macro__buf);
 
 	/* Free the keymaps */
 	for (i = 0; i < KEYMAP_MODES; ++i)
@@ -1932,54 +1934,91 @@ void cleanup_angband(void)
 	/* Delete the overhead map */
 	del_overhead_map();
 
-/*
- * Note that this causes problems if Zangband exits due to an error
- * parsing the info files since at that point the wilderness is not
- * initiated. It works fine thereafter.
- */
-#if 0
-
-	This code is wrong - the wilderness works differently now. - SF -
-		/* Free the wilderness */
-	for (i = 0; i < WILD_SIZE; i++)
-	{
-		/* Free one row of the wilderness */
-		FREE(wild[i]);
-	}
-
-	/* Free the wilderness itself */
-	FREE(wild);
-
-
 	/* Free cache of wilderness blocks */
-	for (i = 0; i < WILD_BLOCKS; i++)
-	{
-		/* Free rows of a block */
-		for (j = 0; j < WILD_BLOCK_SIZE; j++)
-		{
-			FREE(wild_cache[i][j]);
-		}
+	if (wild_cache) {
+		for (i = 0; i < WILD_CACHE; i++) {
+			/* Free rows of a block */
+			for (j = 0; j < WILD_BLOCK_SIZE; j++)
+			{
+				FREE(wild_cache[i][j]);
+			}
 
-		/* Free block */
-		FREE(wild_cache[i]);
+			/* Free block */
+			FREE(wild_cache[i]);
+		}
+		FREE(wild_cache);
+		wild_cache = NULL;
 	}
 
 	/* Free temporary wilderness block */
-	for (i = 0; i < WILD_BLOCK_SIZE + 1; i++)
-	{
-		/* Allocate one row of the temp_block */
-		FREE(temp_block[i]);
+	if (temp_block[0]) {
+		for (i = 0; i < WILD_BLOCK_SIZE + 1; i++) {
+			/* Allocate one row of the temp_block */
+			FREE(temp_block[i]);
+			temp_block[i] = NULL;
+		}
 	}
 
-	/* Free the cave */
-	for (i = 0; i < MAX_HGT; i++)
-	{
-		/* Allocate one row of the cave */
-		FREE(cave[i]);
+	/* Free the wilderness */
+	if (wild) {
+		for (i = 0; i < WILD_SIZE; i++)
+		{
+			/* Free one row of the wilderness */
+			FREE(wild[i]);
+		}
+
+		/* Free the wilderness itself */
+		FREE(wild);
+		wild = NULL;
 	}
-#endif /* 0 */
+	if (wild_grid) {
+		for (i = 0; i < WILD_SIZE; i++)
+		{
+			/* Free one row of the wilderness */
+			FREE(wild_grid[i]);
+		}
+
+		/* Free the wilderness itself */
+		FREE(wild_grid);
+		wild_grid = NULL;
+	}
+	if (wild_refcount) {
+		for (i = 0; i < WILD_SIZE; i++)
+		{
+			/* Free one row of the wilderness */
+			FREE(wild_refcount[i]);
+		}
+
+		/* Free the wilderness itself */
+		FREE(wild_refcount);
+		wild_refcount = NULL;
+	}
 
 	/* cleanup the player structure */
+	if (p_ptr->pwild) {
+		for (i = 0; i < WILD_VIEW; i++) {
+			/* Free each block */
+			for (j = 0; j < WILD_VIEW; j++) {
+				for (k = 0; k < WILD_BLOCK_SIZE; k++) {
+					FREE(p_ptr->pwild[i][j][k]);
+				}
+				FREE(p_ptr->pwild[i][j]);
+			}
+		}
+		FREE(p_ptr->pwild);
+		p_ptr->pwild = NULL;
+	}
+	if (p_ptr->pcave[0]) {
+		/* Free the cave */
+		for (i = 0; i < MAX_HGT; i++) {
+			/* Free one row of the cave */
+			ZFREE(p_ptr->pcave[i]);
+		}
+	}
+
+	/* Free the region list */
+	ZFREE(rg_list);
+	ZFREE(ri_list);
 
 	/* Free the buttons */
 	button_free();
