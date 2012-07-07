@@ -1949,6 +1949,17 @@ errr vinfo_init(void)
 	/* Success */
 	return (0);
 }
+void vinfo_close(void)
+{
+	int i;
+	/* Free the project_data array */
+	if (project_data[0]) {
+		for (i = 0; i < VINFO_MAX_SLOPES; i++) {
+			/* Free the list of squares intersected by this slope */
+			ZFREE(project_data[i]);
+		}
+	}
+}
 
 /*
  * Calculate the complete field of view using a new algorithm

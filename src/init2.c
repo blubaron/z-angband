@@ -1875,7 +1875,7 @@ void init_angband(void)
 }
 
 
-
+void vinfo_close(void);
 
 void cleanup_angband(void)
 {
@@ -1910,7 +1910,23 @@ void cleanup_angband(void)
 	ZFREE(alloc_race_table);
 	ZFREE(alloc_kind_table);
 
+	/* String of terrain characters along one row of the map */
+	if (mp_ta) KILL(mp_ta);
+	if (mp_tc) KILL(mp_tc);
+
+	/* String of characters along one row of the map */
+	if (mp_a) KILL(mp_a);
+	if (mp_c) KILL(mp_c);
+
 	/* Free the towns */
+	for (i = 0; i < z_info->wp_max; i++) {
+		if (place[i].store) {
+			FREE(place[i].store);
+		}
+		if (place[i].dungeon) {
+			FREE(place[i].dungeon);
+		}
+	}
 	ZFREE(place);
 
 	/* Free the stores */
@@ -1922,6 +1938,14 @@ void cleanup_angband(void)
 	/* Free the lore, monster, and object lists */
 	ZFREE(m_list);
 	ZFREE(o_list);
+
+	vinfo_close();
+
+	/* Free spell effect colors */
+	for (i = 0; i < MAX_GF; i++) {
+		FREE(gf_color[i]);
+		gf_color[i] = NULL;
+	}
 
 #ifdef MONSTER_FLOW
 
@@ -2008,6 +2032,7 @@ void cleanup_angband(void)
 				}
 				FREE(p_ptr->pwild[i][j]);
 			}
+			FREE(p_ptr->pwild[i]);
 		}
 		FREE(p_ptr->pwild);
 		p_ptr->pwild = NULL;
@@ -2021,6 +2046,18 @@ void cleanup_angband(void)
 	}
 
 	/* Free the region list */
+	/* Wipe each active region */
+	for (i = 1; i < rg_max; i++)
+	{
+		/*
+		 * Hack - use del_region rather than unref_region.
+		 *
+		 * This function will not clean up all outstanding
+		 * references to the regions.  Only call this when you
+		 * know no such references exist.
+		 */
+		if (rg_list[i]) del_region(i);
+	}
 	ZFREE(rg_list);
 	ZFREE(ri_list);
 
@@ -2037,6 +2074,11 @@ void cleanup_angband(void)
 	ZFREE(wild_choice_tree);
 	ZFREE(wild_gen_data);
 	/* free stuff from init_t_info */
+	if (t_info) {
+		for (i = 0; i < z_info->t_max; i++) {
+			FREE(t_info[i].name);
+		}
+	}
 	ZFREE(t_info);
 	ZFREE(fld_list);
 	/* free stuff from init_mg_info */
@@ -2045,7 +2087,9 @@ void cleanup_angband(void)
 	clear_dun_info();
 
 	/* Free the info, name, and text arrays */
+	free_info(&s_head);
 	free_info(&v_head);
+	ZFREE(h_list);
 	free_info(&r_head);
 	free_info(&e_head);
 	free_info(&a_head);
