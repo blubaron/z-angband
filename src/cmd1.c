@@ -2739,7 +2739,8 @@ void move_player(int dir, int do_pickup)
 	pcave_type *pc_ptr;
 	monster_type *m_ptr;
 	object_type *o_ptr;
-  feature_type *feat;
+	feature_type *feat;
+	pcave_type *opc_ptr;
 
 	char m_name[80];
 
@@ -2765,10 +2766,11 @@ void move_player(int dir, int do_pickup)
 		}
 	}
 
+	opc_ptr = parea(px,py);
 	/* Examine the destination */
 	c_ptr = area(x, y);
 	pc_ptr = parea(x, y);
-  feat  = &(f_info[c_ptr->feat]);
+	feat  = &(f_info[c_ptr->feat]);
 
 	/* Get the monster */
 	m_ptr = &m_list[c_ptr->m_idx];
@@ -3124,18 +3126,24 @@ void move_player(int dir, int do_pickup)
 		/*
 		 * Is the disturb_traps option set and out of detection range?
 		 */
-		if (disturb_traps && !(pc_ptr->player & GRID_DTCT) &&
-			p_ptr->state.detected)
-		{
-			/* We are out of range */
+		if (opc_ptr->player & GRID_DTCT) {
+			p_ptr->redraw |= PR_DETECT;
+			if (disturb_traps && !(pc_ptr->player & GRID_DTCT) &&
+				p_ptr->state.detected)
+			{
+				/* We are out of range */
+	
+				msgf("Out of trap detection range.");
 
-			msgf("Out of trap detection range.");
+				/* Reset the detection flag */
+				p_ptr->state.detected = FALSE;
 
-			/* Reset the detection flag */
-			p_ptr->state.detected = FALSE;
-
-			/* Disturb the player */
-			disturb(FALSE);
+				/* Disturb the player */
+				disturb(FALSE);
+			}
+		} else
+		if (pc_ptr->player & GRID_DTCT) {
+			p_ptr->redraw |= PR_DETECT;
 		}
 
 		/* Spontaneous Searching */

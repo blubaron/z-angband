@@ -2219,7 +2219,7 @@ enum
 #define PR_MAP          0x04000000L	/* Display Map */
 #define PR_WIPE         0x08000000L	/* Hack -- Total Redraw */
 #define PR_BUTTONS      0x10000000L	/* Redraw buttons */
-/* xxx */
+#define PR_DETECT       0x20000000L	/* Redraw trap detection status */
 /* xxx */
 /* xxx */
 

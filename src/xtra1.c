@@ -890,7 +890,12 @@ static void prt_afraid(void)
 	}
 	else
 	{
-		put_fstr(COL_AFRAID, Term->hgt - 1, "      ");
+		pcave_type *pc_ptr = parea(p_ptr->px, p_ptr->py);
+		if (pc_ptr->player & GRID_DTCT) {
+			put_fstr(COL_AFRAID, Term->hgt - 1, CLR_L_GREEN " DTrap");
+		} else {
+			put_fstr(COL_AFRAID, Term->hgt - 1, "      ");
+		}
 	}
 }
 
@@ -4276,9 +4281,9 @@ void redraw_stuff(void)
 		prt_confused();
 	}
 
-	if (p_ptr->redraw & (PR_AFRAID))
+	if (p_ptr->redraw & (PR_AFRAID|PR_DETECT))
 	{
-		p_ptr->redraw &= ~(PR_AFRAID);
+		p_ptr->redraw &= ~(PR_AFRAID|PR_DETECT);
 		prt_afraid();
 	}
 
