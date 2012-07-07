@@ -1,0 +1,198 @@
+diff --git a/src/platform/main.c b/src/platform/main.c
+index cab543d..a6ce3fe 100644
+--- a/src/platform/main.c
++++ b/src/platform/main.c
+@@ -107,6 +107,9 @@ static const struct module_type sound_modules[] =
+ 	{ "none", {"No sound", NULL}, init_sound_dummy, close_sound_dummy },
+ };
+ 
++void mem_finish(void);
++extern huge mem_alloc_stop_size;
++extern huge mem_alloc_stop_id;
+ 
+ /*
+  * A hook for "quit()".
+@@ -139,6 +142,7 @@ static void quit_hook(cptr s)
+ 		}
+ 	}
+ 	close_graphics_modes();
++mem_finish();
+ }
+ 
+ 
+diff --git a/src/platform/win/main-win.c b/src/platform/win/main-win.c
+index 38caed2..ea0b019 100644
+--- a/src/platform/win/main-win.c
++++ b/src/platform/win/main-win.c
+@@ -4925,7 +4925,9 @@ static void hook_plog(cptr str)
+ 	}
+ }
+ 
+-
++void mem_finish(void);
++extern huge mem_alloc_stop_size;
++extern huge mem_alloc_stop_id;
+ /*
+  * Display error message and quit (see "z-util.c")
+  */
+@@ -5010,6 +5012,7 @@ static void hook_quit(cptr str)
+ 	cleanup_angband();
+ #endif /* HAS_CLEANUP */
+ 
++	mem_finish();
+ 	exit(0);
+ }
+ 
+diff --git a/src/z-virt.c b/src/z-virt.c
+index 47d5f22..8bb8754 100644
+--- a/src/z-virt.c
++++ b/src/z-virt.c
+@@ -14,6 +14,75 @@
+ 
+ #include "z-util.h"
+ 
++#ifdef WINDOWS
++#include <windows.h>
++#endif
++
++huge alloc_mem;
++huge dealloc_mem;
++huge alloc_count;
++huge dealloc_count;
++huge mem_alloc_stop_size;
++huge mem_alloc_stop_id;
++
++typedef struct _mem_tracker_entry {
++	struct _mem_tracker_entry *next;
++	huge size;
++	huge id;
++	vptr mem;
++} mem_tracker_entry;
++mem_tracker_entry *mem_tracker_root;
++mem_tracker_entry *mem_tracker_end;
++void mem_finish(void)
++{
++	int count;
++	mem_tracker_entry *me, *next;
++#ifdef WINDOWS
++        char output[1024];
++#endif
++	if ((dealloc_mem != alloc_mem) || (dealloc_count != alloc_count)) {
++		me = mem_tracker_root;
++		count = 0;
++		while (me) {
++			count++;
++#ifdef WINDOWS
++                        sprintf(output, "allocation %d size %d outstanding.\n",me->id, me->size);
++                        OutputDebugString(output);
++#else
++			printf("allocation %d size %d outstanding.\n",me->id, me->size);
++#endif
++			me = me->next;
++		}
++#ifdef WINDOWS
++                sprintf(output, "Not all memory was freed.\n%d outstauding memory blocks\n%d outstanding bytes\n",count, alloc_mem-dealloc_mem);
++                OutputDebugString(output);
++#else
++		printf("Not all memory was freed.\n %d outstauding memory blocks\n %d outstanding bytes\n",count, alloc_mem-dealloc_mem);
++#endif
++	}
++#ifdef WINDOWS
++        sprintf(output, "Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
++        OutputDebugString(output);
++        sprintf(output, "Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
++        OutputDebugString(output);
++#else
++	printf("Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
++	printf("Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
++#endif
++	me = mem_tracker_root;
++	while (me) {
++		next = me->next;
++		if (rnfree_aux) {
++			(void) ((*rnfree_aux) (me->mem));
++		}  else {
++			free(me->mem);
++		}
++		free(me);
++		me = next;
++	}
++	mem_tracker_root = NULL;
++	mem_tracker_end = NULL;
++}
+ 
+ /*
+  * Optional auxiliary "rnfree" function
+@@ -25,9 +94,30 @@ vptr (*rnfree_aux) (vptr) = NULL;
+  */
+ vptr rnfree(vptr p)
+ {
++mem_tracker_entry *me = mem_tracker_root, *prev = NULL;
+ 	/* Easy to free nothing */
+ 	if (!p) return (NULL);
+ 
++while (me) {
++  if (me->mem == p) {
++    dealloc_mem += me->size;
++    dealloc_count++;
++    if (mem_tracker_root == me) {
++      mem_tracker_root = me->next;
++    }
++    if (mem_tracker_end == me) {
++      mem_tracker_end = prev;
++    }
++    if (prev) {
++      prev->next = me->next;
++    }
++    free((char *)me);
++    me = NULL;
++    break;
++  }
++  prev = me;
++  me = me->next;
++}
+ 	/* Use the "aux" function */
+ 	if (rnfree_aux) return ((*rnfree_aux) (p));
+ 
+@@ -88,7 +178,39 @@ vptr ralloc(huge len)
+ 
+ 	/* We were able to acquire memory */
+ 	if (!mem) mem = rpanic(len);
+-
++if (mem) {
++  mem_tracker_entry *me;
++  alloc_mem += len;
++  alloc_count++;
++  me = (mem_tracker_entry *)malloc(sizeof(mem_tracker_entry));
++  if (me) {
++    me->next = NULL;
++    me->size = len;
++    me->id = alloc_count;
++    me->mem = mem;
++    if (!mem_tracker_root) {
++      mem_tracker_root = me;
++    }
++    if (mem_tracker_end) {
++      mem_tracker_end->next = me;
++    }
++    mem_tracker_end = me;
++  } else {
++    me = (mem_tracker_entry *)rpanic(len);
++  }
++  if (mem_alloc_stop_id && (mem_alloc_stop_id == alloc_count)) {
++#ifdef WINDOWS
++    DebugBreak();
++#else
++#endif
++  }
++  if (mem_alloc_stop_size && (mem_alloc_stop_size == len)) {
++#ifdef WINDOWS
++    DebugBreak();
++#else
++#endif
++  }
++}
+ 	/* Return the memory, if any */
+ 	return (mem);
+ }
+
