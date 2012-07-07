@@ -1426,6 +1426,14 @@ static void rd_extra(void)
 				p_ptr->bank_layaway = ZNEW(object_type);
 			}
 			rd_item(p_ptr->bank_layaway);
+			/* Paranoia - clear the item if it is invalid */
+			if (p_ptr->bank_layaway->k_idx == 0) {
+				object_wipe(p_ptr->bank_layaway);
+				FREE(p_ptr->bank_layaway);
+				p_ptr->bank_layaway_gold = 0;
+				p_ptr->bank_layaway_paid = 0;
+				p_ptr->bank_layaway = NULL;
+			}
 		} else {
 			p_ptr->bank_layaway_paid = 0;
 			if (p_ptr->bank_layaway) {
