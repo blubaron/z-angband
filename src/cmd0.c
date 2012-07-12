@@ -251,7 +251,8 @@ void process_click(char press, int xpos, int ypos)
 			{
 				/* if the click was adjacent to the player, walk in that direction */
 				if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
-						&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1)) {
+						&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
+				{
 					p_ptr->cmd.dir = coords_to_dir(x, y);
 					do_cmd_walk(FALSE);
 				} else {
@@ -318,6 +319,15 @@ void process_click(char press, int xpos, int ypos)
 			health_track(0);
 			p_ptr->target_who = 0;
 			/* mention what is in the grid cell */
+			if (doub && (y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
+				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
+			{
+				/* if the click was adjacent to the player, alter in that direction */
+				p_ptr->cmd.dir = coords_to_dir(x, y);
+				p_ptr->cmd.arg = 16;
+				p_ptr->cmd.cmd = '+';
+				do_cmd_alter();
+			} else
 			if (c_ptr->o_idx) {
 				object_type *o_ptr = &(o_list[c_ptr->o_idx]);
 				if (o_ptr->k_idx) {
