@@ -858,7 +858,12 @@ static void prt_blind(void)
 	}
 	else
 	{
-		put_fstr(COL_BLIND, Term->hgt - 1, "     ");
+		pcave_type *pc_ptr = parea(p_ptr->px, p_ptr->py);
+		if (pc_ptr->player & GRID_DTCT) {
+			put_fstr(COL_BLIND, Term->hgt - 1, CLR_L_GREEN "DTrap");
+		} else {
+			put_fstr(COL_BLIND, Term->hgt - 1, "     ");
+		}
 	}
 }
 
@@ -890,12 +895,7 @@ static void prt_afraid(void)
 	}
 	else
 	{
-		pcave_type *pc_ptr = parea(p_ptr->px, p_ptr->py);
-		if (pc_ptr->player & GRID_DTCT) {
-			put_fstr(COL_AFRAID, Term->hgt - 1, CLR_L_GREEN " DTrap");
-		} else {
-			put_fstr(COL_AFRAID, Term->hgt - 1, "      ");
-		}
+		put_fstr(COL_AFRAID, Term->hgt - 1, "      ");
 	}
 }
 
@@ -4269,9 +4269,9 @@ void redraw_stuff(void)
 		prt_hunger();
 	}
 
-	if (p_ptr->redraw & (PR_BLIND))
+	if (p_ptr->redraw & (PR_BLIND|PR_DETECT))
 	{
-		p_ptr->redraw &= ~(PR_BLIND);
+		p_ptr->redraw &= ~(PR_BLIND|PR_DETECT);
 		prt_blind();
 	}
 
@@ -4281,9 +4281,9 @@ void redraw_stuff(void)
 		prt_confused();
 	}
 
-	if (p_ptr->redraw & (PR_AFRAID|PR_DETECT))
+	if (p_ptr->redraw & (PR_AFRAID))
 	{
-		p_ptr->redraw &= ~(PR_AFRAID|PR_DETECT);
+		p_ptr->redraw &= ~(PR_AFRAID);
 		prt_afraid();
 	}
 
