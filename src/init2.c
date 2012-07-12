@@ -1935,6 +1935,20 @@ void cleanup_angband(void)
 	/* Free the quest list */
 	ZFREE(quest);
 
+	character_dungeon = FALSE;
+	/* Wipe each active region */
+	for (i = 1; i < rg_max; i++)
+	{
+		/*
+		 * Hack - use del_region rather than unref_region.
+		 *
+		 * This function will not clean up all outstanding
+		 * references to the regions.  Only call this when you
+		 * know no such references exist.
+		 */
+		if (rg_list[i]) del_region(i);
+	}
+
 	/* Free the lore, monster, and object lists */
 	ZFREE(m_list);
 	ZFREE(o_list);
@@ -2046,18 +2060,6 @@ void cleanup_angband(void)
 	}
 
 	/* Free the region list */
-	/* Wipe each active region */
-	for (i = 1; i < rg_max; i++)
-	{
-		/*
-		 * Hack - use del_region rather than unref_region.
-		 *
-		 * This function will not clean up all outstanding
-		 * references to the regions.  Only call this when you
-		 * know no such references exist.
-		 */
-		if (rg_list[i]) del_region(i);
-	}
 	ZFREE(rg_list);
 	ZFREE(ri_list);
 
