@@ -267,11 +267,7 @@ void process_click(char press, int xpos, int ypos)
 		cave_type *c_ptr = area(x,y);
 		pcave_type *pc_ptr = parea(x,y);
 		bool doub = FALSE;
-
-		/* make sure we have sen the grid */
-		if (!(pc_ptr->player & GRID_KNOWN)) {
-			return;
-		}
+		int m_idx = c_ptr->m_idx;
 
 		/* Hack -- hallucination */
 		if (query_timed(TIMED_IMAGE)) {
@@ -282,8 +278,7 @@ void process_click(char press, int xpos, int ypos)
 		if ((p_ptr->target_row == y) && (p_ptr->target_col == x)) {
 			doub = TRUE;
 		}
-		if (c_ptr->m_idx && target_able(c_ptr->m_idx)) {
-			int m_idx = c_ptr->m_idx;
+		if (m_idx && m_list[m_idx].r_idx && m_list[m_idx].ml) {
 			monster_type *m_ptr = &(m_list[m_idx]);
 			char m_name[80];
 
@@ -306,9 +301,7 @@ void process_click(char press, int xpos, int ypos)
 			} else
 			{
 				/* target the monster */
-				if (m_ptr->r_idx) {
-					monster_race_track(m_ptr->r_idx);
-				}
+				monster_race_track(m_ptr->r_idx);
 				health_track(m_idx);
 				p_ptr->target_who = m_idx;
 
@@ -330,10 +323,12 @@ void process_click(char press, int xpos, int ypos)
 			} else
 			if (c_ptr->o_idx) {
 				object_type *o_ptr = &(o_list[c_ptr->o_idx]);
-				if (o_ptr->k_idx) {
-					object_kind_track(o_ptr->k_idx);
+				if (o_ptr->info & (OB_SEEN)) {
+					if (o_ptr->k_idx) {
+						object_kind_track(o_ptr->k_idx);
+					}
+					prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
 				}
-				prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
 			} else
 			if (c_ptr->fld_idx) {
 				cptr name = NULL, s3;
@@ -366,7 +361,7 @@ void process_click(char press, int xpos, int ypos)
 				prtf(0, 0, "You see %s%s", s3, fld_name);
 				}
 			} else
-			if (pc_ptr->feat) {
+			if (pc_ptr->feat && (pc_ptr->player & GRID_KNOWN)) {
 				cptr name, s3;
 				name = f_name + f_info[pc_ptr->feat].name;
 				if (f_info[pc_ptr->feat].flags & FF_OBJECT) {
