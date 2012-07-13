@@ -3128,15 +3128,14 @@ void move_player(int dir, int do_pickup)
 		 */
 		if (opc_ptr->player & GRID_DTCT) {
 			p_ptr->redraw |= PR_DETECT;
-			if (disturb_traps && !(pc_ptr->player & GRID_DTCT) &&
-				p_ptr->state.detected)
-			{
+			if (disturb_traps && !(pc_ptr->player & GRID_DTCT)) {
 				/* We are out of range */
-	
-				msgf("Out of trap detection range.");
+				if (p_ptr->state.detected) {
+					msgf("Out of trap detection range.");
 
-				/* Reset the detection flag */
-				p_ptr->state.detected = FALSE;
+					/* Reset the detection flag */
+					p_ptr->state.detected = FALSE;
+				}
 
 				/* Disturb the player */
 				disturb(FALSE);
