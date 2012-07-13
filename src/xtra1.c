@@ -747,53 +747,53 @@ static void prt_time(void)
   if (Term->wid > COL_DEPTH + 30) {
     int hour = (turn % TOWN_DAY) / TOWN_HOUR;
 	  if (p_ptr->depth) {
-      if (hour > 22) {
+      if (hour >= 22) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Morning");
       } else
-      if (hour > 16) {
+      if (hour >= 16) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "     Night");
       } else
-      if (hour > 10) {
+      if (hour >= 10) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Evening");
       } else
-      if (hour > 4) {
+      if (hour >= 4) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "    Midday");
       } else
       {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Morning");
       }
     } else {
-      if (hour > 22) {
+      if (hour >= 22) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Predawn");
       } else
-      if (hour > 20) {
+      if (hour >= 20) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Night");
       } else
-      if (hour > 18) {
+      if (hour >= 18) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "  Midnight");
       } else
-      if (hour > 16) {
+      if (hour >= 16) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Evening");
       } else
-      if (hour > 14) {
+      if (hour >= 14) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Evening");
       } else
-      if (hour > 12) {
+      if (hour >= 12) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "    Sunset");
       } else
-      if (hour > 10) {
+      if (hour >= 10) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Afternoon");
       } else
-      if (hour > 8) {
+      if (hour >= 8) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, " Afternoon");
       } else
-      if (hour > 6) {
+      if (hour >= 6) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "      Noon");
       } else
-      if (hour > 4) {
+      if (hour >= 4) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Morning");
       } else
-      if (hour > 2) {
+      if (hour >= 2) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Morning");
       } else
       {
