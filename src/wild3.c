@@ -1486,6 +1486,7 @@ static void add_monsters_block(int x, int y)
  * Record that a wilderness location has been seen, and
  * so have any places that are there.
  */
+void wild_discover(int wx, int wy);
 void wild_discover(int wx, int wy)
 {
   /* declatations moved here because in ansi c, declarations have to
@@ -1817,6 +1818,7 @@ static void shift_left(void)
 
 
 /* Delete a wilderness block */
+void del_block(int x, int y);
 void del_block(int x, int y)
 {
 	blk_ptr block_ptr;
@@ -2444,7 +2446,7 @@ void wipe_all_list(void)
 	int i;
 
 	/* Hack - cull the players inventory */
-	//if (p_ptr->inventory) delete_object_list(&p_ptr->inventory);
+	/*if (p_ptr->inventory) delete_object_list(&p_ptr->inventory);*/
 
 	/* Clear the store cache */
 	for (i = 0; i < store_cache_num; i++)
