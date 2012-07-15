@@ -3082,8 +3082,19 @@ void display_map(int *cx, int *cy)
 						}
 
 						case PL_FARM:
-							/* Don't draw farms on the map. */
+						{
+							/* Only show one grid of a farm on the map. */
+							if (((x + i) == pl_ptr->x)
+								&& ((y+ j) == pl_ptr->y)
+								&& (t_info[FT_BUILD_FARM].info & FIELD_INFO_VIS))
+							{
+								ma[j + 1][i + 1] = t_info[FT_BUILD_FARM].f_attr;
+								mc[j + 1][i + 1] = t_info[FT_BUILD_FARM].f_char;
+								if (t_info[FT_BUILD_FARM].info & FIELD_INFO_FEAT)
+									feat = FEAT_NONE;								
+							}
 							break;
+						}
 
 						case PL_QUEST_STAIR:
 							/* Make stairs appear if the quest is "on" */
