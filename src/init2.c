@@ -1874,12 +1874,40 @@ void init_angband(void)
 	note("[Initialization complete]");
 }
 
-
+/* prototypes for functions needed by cleanup */
 void vinfo_close(void);
+void del_block(int x, int y);
 
 void cleanup_angband(void)
 {
 	int i, j, k;
+
+	/* clean up wilderness blocks */
+	current_quest = NULL;
+	character_dungeon = FALSE;
+
+	if (wild_grid) {
+		for (j = 0; j < WILD_SIZE; j++) {
+			for (i = 0; i < WILD_SIZE; i++) {
+				/* see if we need to free an individual block memory */
+				if (wild_grid[j][i])
+					del_block(i,j);
+			}
+		}
+	}
+
+	/* Wipe each active region */
+	for (i = 1; i < rg_max; i++)
+	{
+		/*
+		 * Hack - use del_region rather than unref_region.
+		 *
+		 * This function will not clean up all outstanding
+		 * references to the regions.  Only call this when you
+		 * know no such references exist.
+		 */
+		if (rg_list[i]) del_region(i);
+	}
 
 	/* Free the macros */
 	for (i = 0; i < macro__num; ++i)
@@ -1934,20 +1962,6 @@ void cleanup_angband(void)
 
 	/* Free the quest list */
 	ZFREE(quest);
-
-	character_dungeon = FALSE;
-	/* Wipe each active region */
-	for (i = 1; i < rg_max; i++)
-	{
-		/*
-		 * Hack - use del_region rather than unref_region.
-		 *
-		 * This function will not clean up all outstanding
-		 * references to the regions.  Only call this when you
-		 * know no such references exist.
-		 */
-		if (rg_list[i]) del_region(i);
-	}
 
 	/* Free the lore, monster, and object lists */
 	ZFREE(m_list);

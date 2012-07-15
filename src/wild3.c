@@ -1817,7 +1817,7 @@ static void shift_left(void)
 
 
 /* Delete a wilderness block */
-static void del_block(int x, int y)
+void del_block(int x, int y)
 {
 	blk_ptr block_ptr;
 	int xx, yy;
@@ -1835,8 +1835,7 @@ static void del_block(int x, int y)
 	if (wild_refcount[y][x]) return;
 
 	/* Is there a place? */
-	if (w_ptr->done.place)
-	{
+	if (w_ptr->done.place) {
 		/* Decrease refcount region */
 		pl_ptr->region = unref_region(pl_ptr->region);
 	}
@@ -1844,10 +1843,8 @@ static void del_block(int x, int y)
 	/* Time to delete it - get block pointer */
 	block_ptr = wild_grid[y][x];
 
-	for (xx = 0; xx < WILD_BLOCK_SIZE; xx++)
-	{
-		for (yy = 0; yy < WILD_BLOCK_SIZE; yy++)
-		{
+	for (yy = 0; yy < WILD_BLOCK_SIZE; yy++) {
+		for (xx = 0; xx < WILD_BLOCK_SIZE; xx++) {
 			/* Clear old terrain data */
 			block_ptr[yy][xx].info = 0;
 			block_ptr[yy][xx].feat = 0;
@@ -1888,8 +1885,7 @@ static void allocate_block(int x, int y)
 	wild_refcount[y][x]++;
 
 	/* Need to make the block if it doesn't exist */
-	if (!wild_grid[y][x])
-	{
+	if (!wild_grid[y][x]) {
 		/* Paranoia */
 		if (wc_cnt >= WILD_CACHE) quit("Out of wilderness cache");
 
@@ -1897,8 +1893,7 @@ static void allocate_block(int x, int y)
 		wild_grid[y][x] = wild_cache[wc_cnt++];
 
 		/* Are we in the process of loading the game? */
-		if (character_loaded)
-		{
+		if (character_loaded) {
 
 			/* Generate the block */
 			gen_block(x, y);
@@ -1908,11 +1903,10 @@ static void allocate_block(int x, int y)
 				/* Increase refcount for region */
 				incref_region(place[place_num].region);
 			}
-		}
+		} else
 
 		/* We need to make sure the refcounted regions work */
-		else if (place_num)
-		{
+		if (place_num) {
 			place_type *pl_ptr = &place[place_num];
 
 			/* Do we need to make the map? */
