@@ -59,6 +59,10 @@ index 47d5f22..8bb8754 100644
 +huge dealloc_mem;
 +huge alloc_count;
 +huge dealloc_count;
++huge mem_alloc;
++huge mem_count;
++huge mem_max_alloc;
++huge mem_max_count;
 +huge mem_alloc_stop_size;
 +huge mem_alloc_stop_id;
 +
@@ -83,28 +87,31 @@ index 47d5f22..8bb8754 100644
 +		while (me) {
 +			count++;
 +#ifdef WINDOWS
-+                        sprintf(output, "allocation %d size %d outstanding.\n",me->id, me->size);
-+                        OutputDebugString(output);
++			sprintf(output, "allocation %d size %d outstanding.\n",me->id, me->size);
++			OutputDebugString(output);
 +#else
 +			printf("allocation %d size %d outstanding.\n",me->id, me->size);
 +#endif
 +			me = me->next;
 +		}
 +#ifdef WINDOWS
-+                sprintf(output, "Not all memory was freed.\n%d outstauding memory blocks\n%d outstanding bytes\n",count, alloc_mem-dealloc_mem);
-+                OutputDebugString(output);
++		sprintf(output, "Not all memory was freed.\n%d outstauding memory blocks\n%d outstanding bytes\n",count, alloc_mem-dealloc_mem);
++		OutputDebugString(output);
 +#else
 +		printf("Not all memory was freed.\n %d outstauding memory blocks\n %d outstanding bytes\n",count, alloc_mem-dealloc_mem);
 +#endif
 +	}
 +#ifdef WINDOWS
-+        sprintf(output, "Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
-+        OutputDebugString(output);
-+        sprintf(output, "Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
-+        OutputDebugString(output);
++	sprintf(output, "Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
++	OutputDebugString(output);
++	sprintf(output, "Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
++	OutputDebugString(output);
++	sprintf(output, "Max: %d allocated and %d calls.\n", mem_max_alloc, mem_max_count);
++	OutputDebugString(output);
 +#else
 +	printf("Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
 +	printf("Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
++	printf("Max: %d allocated and %d calls.\n", mem_max_alloc, mem_max_count);
 +#endif
 +	me = mem_tracker_root;
 +	while (me) {
@@ -123,7 +130,7 @@ index 47d5f22..8bb8754 100644
  
  /*
   * Optional auxiliary "rnfree" function
-@@ -25,9 +94,30 @@ vptr (*rnfree_aux) (vptr) = NULL;
+@@ -25,9 +98,30 @@ vptr (*rnfree_aux) (vptr) = NULL;
   */
  vptr rnfree(vptr p)
  {
@@ -135,6 +142,8 @@ index 47d5f22..8bb8754 100644
 +  if (me->mem == p) {
 +    dealloc_mem += me->size;
 +    dealloc_count++;
++    mem_alloc -= me->size;
++    mem_count--;
 +    if (mem_tracker_root == me) {
 +      mem_tracker_root = me->next;
 +    }
@@ -154,7 +163,7 @@ index 47d5f22..8bb8754 100644
  	/* Use the "aux" function */
  	if (rnfree_aux) return ((*rnfree_aux) (p));
  
-@@ -88,7 +178,39 @@ vptr ralloc(huge len)
+@@ -88,7 +184,39 @@ vptr ralloc(huge len)
  
  	/* We were able to acquire memory */
  	if (!mem) mem = rpanic(len);
@@ -163,6 +172,12 @@ index 47d5f22..8bb8754 100644
 +  mem_tracker_entry *me;
 +  alloc_mem += len;
 +  alloc_count++;
++  mem_alloc += len;
++  mem_count++;
++  if (mem_alloc > mem_max_alloc)
++    mem_max_alloc = mem_alloc;
++  if (mem_count > mem_max_count)
++    mem_max_count = mem_count;
 +  me = (mem_tracker_entry *)malloc(sizeof(mem_tracker_entry));
 +  if (me) {
 +    me->next = NULL;
