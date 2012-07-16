@@ -374,7 +374,7 @@ static void game_usage(void)
 	puts("  -f       Request fiddle (verbose) mode");
 	puts("  -w       Request wizard mode");
 	puts("  -v       Request sound mode");
-	puts("  -g       Request graphics mode");
+	puts("  -g#      Request graphics mode #n");
 	puts("  -t       Request bigtile mode");
 	puts("  -o       Request original keyset (default)");
 	puts("  -r       Request rogue-like keyset");
@@ -558,7 +558,7 @@ int main(int argc, char *argv[])
 			case 'S':
 			case 's':
 			{
-				show_score = atoi(&argv[i][2]);
+				show_score = atoi(&(argv[i][2]));
 				if (show_score <= 0) show_score = 10;
 				break;
 			}
