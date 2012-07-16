@@ -20,6 +20,15 @@ index cab543d..a6ce3fe 100644
  }
  
  
+@@ -472,6 +476,7 @@ static void quit_hook(cptr s)
+ 	argv0 = argv[0];
+ 
+ 
++/* stop on a particular memory allocation */
++mem_alloc_stop_id = 0;
+ 
+ #ifdef USE_286
+ 	/* Attempt to use XMS (or EMS) memory for swap space */
 diff --git a/src/platform/win/main-win.c b/src/platform/win/main-win.c
 index 38caed2..ea0b019 100644
 --- a/src/platform/win/main-win.c
@@ -43,6 +52,15 @@ index 38caed2..ea0b019 100644
  	exit(0);
  }
  
+@@ -5209,6 +5212,7 @@ static void hook_quit(cptr str)
+
+	/* Unused parameter */
+	(void)nCmdShow;
++/* stop on a particular memory allocation */
++mem_alloc_stop_id = 0;
+
+#ifdef USE_SAVER
+	if (lpCmdLine && ((*lpCmdLine == '-') || (*lpCmdLine == '/'))) {
 diff --git a/src/z-virt.c b/src/z-virt.c
 index 47d5f22..8bb8754 100644
 --- a/src/z-virt.c
@@ -53,6 +71,8 @@ index 47d5f22..8bb8754 100644
  
 +#ifdef WINDOWS
 +#include <windows.h>
++#else
++#include <execinfo.h>
 +#endif
 +
 +huge alloc_mem;
@@ -74,6 +94,8 @@ index 47d5f22..8bb8754 100644
 +} mem_tracker_entry;
 +mem_tracker_entry *mem_tracker_root;
 +mem_tracker_entry *mem_tracker_end;
++void mem_finish(void);
++void mem_tracker_trace(void);
 +void mem_finish(void)
 +{
 +	int count;
@@ -90,7 +112,7 @@ index 47d5f22..8bb8754 100644
 +			sprintf(output, "allocation %d size %d outstanding.\n",me->id, me->size);
 +			OutputDebugString(output);
 +#else
-+			printf("allocation %d size %d outstanding.\n",me->id, me->size);
++			printf("allocation %d size %d outstanding.\n"(int),me->id, (int)me->size);
 +#endif
 +			me = me->next;
 +		}
@@ -98,7 +120,7 @@ index 47d5f22..8bb8754 100644
 +		sprintf(output, "Not all memory was freed.\n%d outstauding memory blocks\n%d outstanding bytes\n",count, alloc_mem-dealloc_mem);
 +		OutputDebugString(output);
 +#else
-+		printf("Not all memory was freed.\n %d outstauding memory blocks\n %d outstanding bytes\n",count, alloc_mem-dealloc_mem);
++		printf("Not all memory was freed.\n %d outstauding memory blocks\n %d outstanding bytes\n",count, (int)alloc_mem-(int)dealloc_mem);
 +#endif
 +	}
 +#ifdef WINDOWS
@@ -109,9 +131,9 @@ index 47d5f22..8bb8754 100644
 +	sprintf(output, "Max: %d allocated and %d calls.\n", mem_max_alloc, mem_max_count);
 +	OutputDebugString(output);
 +#else
-+	printf("Allocated: %d in %d calls.\n", alloc_mem, alloc_count);
-+	printf("Deallocated: %d in %d calls.\n", dealloc_mem, dealloc_count);
-+	printf("Max: %d allocated and %d calls.\n", mem_max_alloc, mem_max_count);
++	printf("Allocated: %d in %d calls.\n", (int)alloc_mem, (int)alloc_count);
++	printf("Deallocated: %d in %d calls.\n", (int)dealloc_mem, (int)dealloc_count);
++	printf("Max: %d allocated and %d calls.\n", (int)mem_max_alloc, (int)mem_max_count);
 +#endif
 +	me = mem_tracker_root;
 +	while (me) {
@@ -127,6 +149,30 @@ index 47d5f22..8bb8754 100644
 +	mem_tracker_root = NULL;
 +	mem_tracker_end = NULL;
 +}
++#ifndef WINDOWS
++/* Stop execution or print the stack trace, depending on platform. To get
++ * function names in the trace (on linux) add "-rdynamic" to the linker
++ * flags ("LDFLAGS :=") line in the makefile in the main directory and make
++ * a clean build.
++ */
++void mem_tracker_trace()
++{
++	int size, i;
++	void *stack[200];
++	char **strings;
++
++	size = backtrace(stack,200);
++	if (size) {
++		strings = backtrace_symbols(array, size);
++		printf("Stack (%d lines):\n",size);
++
++		for (i = 0; i < size; i++) {
++			printf("%s\n", strings[i]);
++		}
++		free(strings);
++	}
++}
++#endif
  
  /*
   * Optional auxiliary "rnfree" function
@@ -198,12 +244,14 @@ index 47d5f22..8bb8754 100644
 +#ifdef WINDOWS
 +    DebugBreak();
 +#else
++    mem_tracker_trace();
 +#endif
 +  }
 +  if (mem_alloc_stop_size && (mem_alloc_stop_size == len)) {
 +#ifdef WINDOWS
 +    DebugBreak();
 +#else
++    mem_tracker_trace();
 +#endif
 +  }
 +}
