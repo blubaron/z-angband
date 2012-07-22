@@ -167,9 +167,9 @@ distcheck: dist
 	-rm -rf temp2
 	-rm -rf $(DESTDIR)
 
-VER_MAJOR := `grep "\#define VER_MAJOR" src/version.h | sed s/\#define\ VER_MAJOR\ //`
-VER_MINOR := `grep "\#define VER_MINOR" src/version.h | sed s/\#define\ VER_MINOR\ //`
-VER_PATCH := `grep "\#define VER_PATCH" src/version.h | sed s/\#define\ VER_PATCH\ //`
+VER_MAJOR := `grep "\#define VER_MAJOR" src/version.h | sed s/\#define\ VER_MAJOR\ // | sed s/\n//`
+VER_MINOR := `grep "\#define VER_MINOR" src/version.h | sed s/\#define\ VER_MINOR\ // | sed s/\n//`
+VER_PATCH := `grep "\#define VER_PATCH" src/version.h | sed s/\#define\ VER_PATCH\ // | sed s/\n//`
 VER_EXTRA := \
 	`grep "\#define VER_EXTRA" src/version.h | sed s/\#define\ VER_EXTRA\ /pre/ | sed s/pre0//`
 VER_AFTER := \
