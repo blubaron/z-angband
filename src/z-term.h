@@ -186,6 +186,9 @@ struct term
 
 	byte attr_blank;
 	char char_blank;
+	byte attr_special;
+	char char_big;
+	char char_cave;
 
 	char *key_queue;
 
@@ -355,5 +358,6 @@ extern errr term_nuke(term *t);
 extern errr term_init(term *t, int w, int h, int k);
 
 extern errr Term_bigregion(int x1, int y1, int y2);
+extern bool Term_is_bigtiled(int x, int y);
 
 #endif /* INCLUDED_Z_TERM_H */

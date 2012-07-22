@@ -510,6 +510,31 @@ static errr Term_pict_hack(int x, int y, int n, const byte *ap, const char *cp,
 	return (-1);
 }
 
+#if 0
+/*
+ * Hack -- fake hook for "Term_cave()" (see above)
+ */
+extern errr Term_cave_hack(int x, int y, int n, const void **grid, const int cx, const int cy)
+
+/*
+ * Hack -- fake hook for "Term_pict()" (see above)
+ */
+errr Term_cave_hack(int x, int y, int n, const void **grid, const int cx, const int cy)
+{
+	byte a;
+	char c;
+	byte ta;
+	char tc;
+
+	map_info(x,y,&a,&c,&ta,&tc);
+
+	/* Compiler silliness */
+	if (x || y || n || ap || cp || tap || tcp) return (-2);
+
+	/* Oops */
+	return (-1);
+}
+#endif
 
 
 /*** Efficient routines ***/
@@ -1451,26 +1476,37 @@ void Term_fresh(void)
 			byte ota = old_taa[tx];
 			char otc = old_tcc[tx];
 
+#if 0
+			/* see if we need to draw the old spot using the cave function */
+			if ((oa == Term->attr_special) && (oc == Term->char_cave)) {
+				int cy = ota;
+				int cx = (byte)otc;
+				(void)((*Term->cave_hook) (tx, ty, 1, NULL, &cx, &cy));
+			} else
+			/* Make no changes to a big tiled spot */
+			if ((oa == Term->attr_special) && (oc == Term->char_big)) {
+				(void)ty;
+			} else
+#endif
 			/* Hack -- use "Term_pict()" always */
 			if (Term->always_pict)
 			{
 				(void)((*Term->pict_hook) (tx, ty, 1, &oa, &oc, &ota, &otc));
-			}
+			} else
 
 			/* Hack -- use "Term_pict()" sometimes */
-			else if (Term->higher_pict && (oa & 0x80))
+			if (Term->higher_pict && (oa & 0x80))
 			{
 				(void)((*Term->pict_hook) (tx, ty, 1, &oa, &oc, &ota, &otc));
-			}
+			} else
 
 			/* Hack -- restore the actual character */
-			else if (oa || Term->always_text)
+			if (oa || Term->always_text)
 			{
 				(void)((*Term->text_hook) (tx, ty, 1, oa, &oc));
-			}
+			} else
 
 			/* Hack -- erase the grid */
-			else
 			{
 				(void)((*Term->wipe_hook) (tx, ty, 1));
 			}
@@ -2592,6 +2628,10 @@ errr term_init(term *t, int w, int h, int k)
 	t->attr_blank = 0;
 	t->char_blank = ' ';
 
+	/* Default special markers */
+	t->attr_special = 0;
+	t->char_big = 1;
+	t->char_cave = 2;
 
 	/* Success */
 	return (0);
@@ -2611,3 +2651,33 @@ errr Term_bigregion(int x1, int y1, int y2)
     /* Success */
 	return (0);
 }
+
+/*
+ * Is a square in a bigtiled region?
+ */
+bool Term_is_bigtiled(int x, int y)
+{
+	if (((tile_width_mult > 1) || (tile_height_mult > 1))
+		&& (y >= Term->scr->big_y1)
+		&& (y <= Term->scr->big_y2)
+		&& (x >= Term->scr->big_x1))
+	{
+		return (TRUE);
+	}
+	/* eventual new way */
+	/*
+	if ((Term->scr->a[y][x+1] == Term->attr_special)
+		&& (Term->scr->a[y][x+1] == Term->char_big))
+	{
+		return (TRUE);
+	}
+	if ((Term->scr->a[y+1][x] == Term->attr_special)
+		&& (Term->scr->a[y+1][x] == Term->char_big))
+	{
+		return (TRUE);
+	}
+	*/
+	return (FALSE);
+}
+
+
