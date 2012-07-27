@@ -1730,6 +1730,219 @@ bool target_okay(void)
 }
 
 
+/*
+ * Set the target to a monster (or nobody)
+ */
+void target_set_monster(int m_idx)
+{
+	/* Acceptable target */
+	if ((m_idx > 0) && target_able(m_idx)) {
+		monster_type *m_ptr = &m_list[m_idx];
+
+		/* Save target info */
+		/*p_ptr->target_set = TRUE;*/
+		p_ptr->target_who = m_idx;
+		p_ptr->target_row = m_ptr->fy;
+		p_ptr->target_col = m_ptr->fx;
+	} else
+
+	/* Clear target */
+	{
+		/* Reset target info */
+		/*p_ptr->target_set = FALSE;*/
+		p_ptr->target_who = 0;
+		p_ptr->target_row = 0;
+		p_ptr->target_col = 0;
+	}
+}
+
+
+/*
+ * Set the target to a location
+ */
+void target_set_location(int x, int y)
+{
+	/* Legal target */
+	if (in_bounds2(x, y)) {
+		/* Save target info */
+		/*p_ptr->target_set = TRUE;*/
+		p_ptr->target_who = -1;
+		p_ptr->target_row = y;
+		p_ptr->target_col = x;
+	} else
+
+	/* Clear target */
+	{
+		/* Reset target info */
+		/*p_ptr->target_set = FALSE;*/
+		p_ptr->target_who = 0;
+		p_ptr->target_row = 0;
+		p_ptr->target_col = 0;
+	}
+}
+
+bool target_set_grid(int x, int y)
+{
+	cave_type *c_ptr = area(x,y);
+	/*pcave_type *pc_ptr = parea(x,y);*/
+	int m_idx = c_ptr->m_idx;
+
+	/* Acceptable target */
+	if ((m_idx > 0) && target_able(m_idx)) {
+		monster_type *m_ptr = &m_list[m_idx];
+
+		/* Save target info */
+		/*p_ptr->target_set = TRUE;*/
+		p_ptr->target_who = m_idx;
+		p_ptr->target_row = m_ptr->fy;
+		p_ptr->target_col = m_ptr->fx;
+
+		/* Set up target information */
+		monster_race_track(m_ptr->r_idx);
+		health_track(m_idx);
+
+		return TRUE;
+	} else
+	/* Legal location */
+	if (in_bounds2(x, y)) {
+		/* Save target info */
+		/*p_ptr->target_set = TRUE;*/
+		p_ptr->target_who = -1;
+		p_ptr->target_row = y;
+		p_ptr->target_col = x;
+
+		/* reset health tracker */
+		health_track(0);
+		if (c_ptr->o_idx) {
+			object_type *o_ptr = &(o_list[c_ptr->o_idx]);
+			if (o_ptr->info & (OB_SEEN)) {
+				if (o_ptr->k_idx) {
+					object_kind_track(o_ptr->k_idx);
+				}
+			}
+		}
+		return TRUE;
+	} else
+	/* Clear target */
+	{
+		/* Reset target info */
+		/*p_ptr->target_set = FALSE;*/
+		p_ptr->target_who = 0;
+		p_ptr->target_row = 0;
+		p_ptr->target_col = 0;
+
+		health_track(0);
+	}
+	return FALSE;
+}
+
+bool target_look_grid(int x, int y, bool recall)
+{
+	cave_type *c_ptr = area(x,y);
+	pcave_type *pc_ptr = parea(x,y);
+	int m_idx = c_ptr->m_idx;
+
+	/* Hack -- hallucination */
+	if (query_timed(TIMED_IMAGE)) {
+		prtf(0,0, "You see something strange");
+		return FALSE;
+	}
+
+	if (m_idx && m_list[m_idx].r_idx && m_list[m_idx].ml) {
+		monster_type *m_ptr = &(m_list[m_idx]);
+		char m_name[80];
+
+		if ((m_ptr->smart & SM_MIMIC) && mimic_desc(m_name, &(r_info[m_ptr->r_idx]))) {
+			health_track(0);
+			prtf(0, 0, "You see a %s", m_name);
+		} else
+		/* show monster info */
+		{
+			/* Set up target information */
+			monster_race_track(m_ptr->r_idx);
+			health_track(m_idx);
+			if (recall) {
+				/* show the recall info */
+				/* Save */
+				screen_save();
+
+				/* Recall on screen */
+				screen_roff_mon(m_ptr->r_idx, 0);
+
+				/* Pause */
+				(void)inkey();
+
+				/* Restore */
+				screen_load();
+			} else {
+				prtf(0, 0, "You see %v", MONSTER_FMT(m_ptr, 0x08));
+			}
+			return TRUE;
+		}
+	} else {
+		health_track(0);
+		/* mention what is in the grid cell */
+		if (c_ptr->o_idx) {
+			object_type *o_ptr = &(o_list[c_ptr->o_idx]);
+			if (o_ptr->info & (OB_SEEN)) {
+				if (o_ptr->k_idx) {
+					object_kind_track(o_ptr->k_idx);
+				}
+				if (recall) {
+					/* show more info if we know of it */
+					prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
+				} else {
+					prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
+				}
+			}
+		} else
+		if (c_ptr->fld_idx) {
+			cptr name = NULL, s3;
+			char fld_name[41];
+			field_type *f_ptr = &(fld_list[c_ptr->fld_idx]);
+			field_thaum *t_ptr = &(t_info[f_ptr->t_idx]);
+
+			if (f_ptr->info & FIELD_INFO_MARK) {
+				/* See if it has a special name */
+				field_script_single(f_ptr, FIELD_ACT_LOOK, ":s", LUA_RETURN(name));
+				if (name) {
+					/* Copy the string into the temp buffer */
+					strncpy(fld_name, name, 40);
+
+					/* Anything there? */
+					if (!fld_name[0]) {
+						/* Default to field name */
+						strncpy(fld_name, t_ptr->name, 40);
+					}
+
+					/* Free string allocated to hold return value */
+					string_free(name);
+				} else {
+					/* Default to field name */
+					strncpy(fld_name, t_ptr->name, 40);
+				}
+				s3 = is_a_vowel(fld_name[0]) ? "an " : "a ";
+
+				/* Describe the field */
+				prtf(0, 0, "You see %s%s", s3, fld_name);
+			}
+		} else
+		if (pc_ptr->feat && (pc_ptr->player & GRID_KNOWN)) {
+			cptr name, s3;
+			name = f_name + f_info[pc_ptr->feat].name;
+			if (f_info[pc_ptr->feat].flags & FF_OBJECT) {
+				/* Pick proper indefinite article */
+				s3 = (is_a_vowel(name[0])) ? "an " : "a ";
+			} else  {
+				s3 = "";
+			}
+			prtf(0, 0, "You see %s%s", s3, name);
+				
+		}
+	}
+	return FALSE;
+}
+
 
 /*
  * Sorting hook -- comp function -- by "distance to player"
@@ -1912,12 +2125,12 @@ static bool target_set_accept(int x, int y)
 
 	/* Interesting memorized features */
 	feat = pc_ptr->feat;
-  feat_ptr = &(f_info[pc_ptr->feat]);
+	feat_ptr = &(f_info[pc_ptr->feat]);
 
-  /* Ignore hidden terrain */
+	/* Ignore hidden terrain */
 	if (feat_ptr->flags & FF_HIDDEN) return (FALSE);
 
-  /* Notice the Pattern */
+	/* Notice the Pattern */
 	if (feat_ptr->flags & FF_PATTERN) return (TRUE);
 
 	/* Notice doors */
@@ -1934,7 +2147,7 @@ static bool target_set_accept(int x, int y)
 	if (feat_ptr->flags & FF_DIG_GOLD) return (TRUE);
 	if (feat_ptr->flags & FF_DIG_CUSTOM) return (TRUE);
 
-  /* Notice the Pattern */
+	/* Notice the Pattern */
 	/*if (cave_pattern_grid(pc_ptr)) return (TRUE);
 
 	/* Notice doors */
@@ -3001,7 +3214,7 @@ static cptr dir_desc[10] =
  */
 bool get_aim_dir(int *dp)
 {
-	int dir;
+	int dir, tx, ty;
 
 	char command;
 
@@ -3033,6 +3246,8 @@ bool get_aim_dir(int *dp)
 		}
 	}
 
+	tx = ty = -1;
+
 	/* Ask until satisfied */
 	while (!dir)
 	{
@@ -3050,7 +3265,7 @@ bool get_aim_dir(int *dp)
 		}
 
 		/* Get a command (or Cancel) */
-		if (!get_com(p, &command)) {
+		if (!get_com_m(p, &command)) {
 			/* restore any previous buttons */
 			button_restore();
 			break;
@@ -3059,9 +3274,55 @@ bool get_aim_dir(int *dp)
 		/* restore any previous buttons */
 		button_restore();
 
-		/* Convert various keys to "standard" keys */
-		switch (command)
-		{
+		if (command & 0x80) {
+			int x,y;
+			char b;
+
+			/* this was a mouse press, get the press (and translate it) */
+			Term_getmousepress(&b,&x,&y);
+			b = b & 0x07;
+			if (b == 1) {
+				y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+				x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+				if ((x == tx) && (y == ty)) {
+					dir = 5;
+				} else {
+					if (target_set_grid(x,y)) {
+						tx = x;
+						ty = y;
+					}
+				}
+			} else
+			if (b == 2) {
+				break;
+			} else
+			if (b == 3) {
+				y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+				x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+				(void) target_look_grid(x,y,TRUE);
+			} else
+			if (b == 4) {
+				dir = 8;
+			} else
+			if (b == 5) {
+				dir = 2;
+			} else
+			if (b == 6) {
+				dir = 4;
+			} else
+			if (b == 7) {
+				dir = 6;
+			} else
+			{
+				dir = 0;
+			}
+
+			/* Verify requested targets */
+			if ((dir == 5) && !target_okay()) dir = 0;
+		} else {
+			/* Convert various keys to "standard" keys */
+			switch (command)
+			{
 			case 'T':
 			case 't':
 			case '.':
@@ -3094,13 +3355,14 @@ bool get_aim_dir(int *dp)
 
 				break;
 			}
+			}
+
+			/* Verify requested targets */
+			if ((dir == 5) && !target_okay()) dir = 0;
+
+			/* Error */
+			if (!dir) bell("Illegal aim direction!");
 		}
-
-		/* Verify requested targets */
-		if ((dir == 5) && !target_okay()) dir = 0;
-
-		/* Error */
-		if (!dir) bell("Illegal aim direction!");
 	}
 
 	/* No direction */

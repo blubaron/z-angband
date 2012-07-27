@@ -120,6 +120,25 @@ static bool enter_borg_mode(void)
 #endif /* ALLOW_BORG */
 
 
+void do_cmd_cast_wrapper(void)
+{
+	/* Cast a spell  - from process_command*/
+	if (FLAG(p_ptr, TR_NO_MAGIC)) {
+		cptr which_power = "magic";
+		if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+			which_power = "psionic powers";
+		else if (mp_ptr->spell_book == TV_LIFE_BOOK)
+			which_power = "prayer";
+
+		msgf("An anti-magic shell disrupts your %s!", which_power);
+		p_ptr->state.energy_use = 0;
+	} else {
+		if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
+			do_cmd_mindcraft();
+		else
+			do_cmd_cast();
+	}
+}
 
 void process_click(char press, int xpos, int ypos)
 {
@@ -134,32 +153,12 @@ void process_click(char press, int xpos, int ypos)
 	x = ((xpos-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
 
 	/* Check for a valid location */
-	//if (!in_bounds_fully(y, x)) return;
+	/*if (!in_bounds2(x, y)) return;*/
 	if ((x == p_ptr->px) && (y == p_ptr->py)) {
 		if (shift) {
 			/* shift-click - cast magic / open inventory */
 			if (button == 1) {
-				/* Cast a spell  - from proces_command*/
-				if (FLAG(p_ptr, TR_NO_MAGIC))
-				{
-					cptr which_power = "magic";
-					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-						which_power = "psionic powers";
-					else if (mp_ptr->spell_book == TV_LIFE_BOOK)
-						which_power = "prayer";
-
-					msgf("An anti-magic shell disrupts your %s!", which_power);
-
-					p_ptr->state.energy_use = 0;
-				}
-				else
-				{
-					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-						do_cmd_mindcraft();
-					else
-						do_cmd_cast();
-				}
-
+				do_cmd_cast_wrapper();
 			} else
 			if (button == 2) {
  				do_cmd_rest();
@@ -199,27 +198,7 @@ void process_click(char press, int xpos, int ypos)
 				do_cmd_use();
 			} else
 			if (button == 5) {
-				/* Cast a spell */
-				if (FLAG(p_ptr, TR_NO_MAGIC))
-				{
-					cptr which_power = "magic";
-					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-						which_power = "psionic powers";
-					else if (mp_ptr->spell_book == TV_LIFE_BOOK)
-						which_power = "prayer";
-
-					msgf("An anti-magic shell disrupts your %s!",
-							   which_power);
-
-					p_ptr->state.energy_use = 0;
-				}
-				else
-				{
-					if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-						do_cmd_mindcraft();
-					else
-						do_cmd_cast();
-				}
+				do_cmd_cast_wrapper();
 			}
 		}
 	} else
@@ -245,8 +224,7 @@ void process_click(char press, int xpos, int ypos)
 			} else
 			if (alt) {
 				/* alt-click - look */
-				//cmd_insert(CMD_RUN);
-				//cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(y,x));
+				do_cmd_locate();
 			} else
 			{
 				/* if the click was adjacent to the player, walk in that direction */
@@ -261,7 +239,6 @@ void process_click(char press, int xpos, int ypos)
 				}
 			}
 		}
-//#endif
 	} else
 	if (button == 2) {
 		cave_type *c_ptr = area(x,y);
@@ -269,146 +246,51 @@ void process_click(char press, int xpos, int ypos)
 		bool doub = FALSE;
 		int m_idx = c_ptr->m_idx;
 
-		/* Hack -- hallucination */
-		if (query_timed(TIMED_IMAGE)) {
-			prtf(0,0, "You see something strange");
-			return;
-		}
-
 		if ((p_ptr->target_row == y) && (p_ptr->target_col == x)) {
 			doub = TRUE;
 		}
-		if (m_idx && m_list[m_idx].r_idx && m_list[m_idx].ml) {
-			monster_type *m_ptr = &(m_list[m_idx]);
-			char m_name[80];
 
-			if ((m_ptr->smart & SM_MIMIC) && mimic_desc(m_name, &(r_info[m_ptr->r_idx]))) {
-				prtf(0, 0, "You see a %s", m_name);
-			} else
-			if (doub) {
-				/* show the recall info */
-				/* Save */
-				screen_save();
+		target_set_grid(x,y);
 
-				/* Recall on screen */
-				screen_roff_mon(m_ptr->r_idx, 0);
-
-				/* Command */
-				(void)inkey();
-
-				/* Restore */
-				screen_load();
-			} else
-			{
-				/* target the monster */
-				monster_race_track(m_ptr->r_idx);
-				health_track(m_idx);
-				p_ptr->target_who = m_idx;
-
-				prtf(0, 0, "You see %v", MONSTER_FMT(m_ptr, 0x08));
-			}
-		} else {
-			/* cancel health tracking */
-			health_track(0);
-			p_ptr->target_who = 0;
-			/* mention what is in the grid cell */
-			if (doub && (y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
-				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
-			{
-				/* if the click was adjacent to the player, alter in that direction */
-				p_ptr->cmd.dir = coords_to_dir(x, y);
-				p_ptr->cmd.arg = 16;
-				p_ptr->cmd.cmd = '+';
-				do_cmd_alter();
-			} else
-			if (c_ptr->o_idx) {
-				object_type *o_ptr = &(o_list[c_ptr->o_idx]);
-				if (o_ptr->info & (OB_SEEN)) {
-					if (o_ptr->k_idx) {
-						object_kind_track(o_ptr->k_idx);
-					}
-					prtf(0, 0, "You see %v", OBJECT_FMT(o_ptr, TRUE, 3));
-				}
-			} else
-			if (c_ptr->fld_idx) {
-				cptr name = NULL, s3;
-				char fld_name[41];
-				field_type *f_ptr = &(fld_list[c_ptr->fld_idx]);
-				field_thaum *t_ptr = &(t_info[f_ptr->t_idx]);
-
-				if (f_ptr->info & FIELD_INFO_MARK) {
-				/* See if it has a special name */
-				field_script_single(f_ptr, FIELD_ACT_LOOK, ":s", LUA_RETURN(name));
-				if (name) {
-					/* Copy the string into the temp buffer */
-					strncpy(fld_name, name, 40);
-
-					/* Anything there? */
-					if (!fld_name[0]) {
-						/* Default to field name */
-						strncpy(fld_name, t_ptr->name, 40);
-					}
-
-					/* Free string allocated to hold return value */
-					string_free(name);
-				} else {
-					/* Default to field name */
-					strncpy(fld_name, t_ptr->name, 40);
-				}
-				s3 = is_a_vowel(fld_name[0]) ? "an " : "a ";
-
-				/* Describe the field */
-				prtf(0, 0, "You see %s%s", s3, fld_name);
-				}
-			} else
-			if (pc_ptr->feat && (pc_ptr->player & GRID_KNOWN)) {
-				cptr name, s3;
-				name = f_name + f_info[pc_ptr->feat].name;
-				if (f_info[pc_ptr->feat].flags & FF_OBJECT) {
-					/* Pick proper indefinite article */
-					s3 = (is_a_vowel(name[0])) ? "an " : "a ";
-				} else  {
-					s3 = "";
-				}
-				prtf(0, 0, "You see %s%s", s3, name);
-				
-			}
-		}
-		p_ptr->target_row = y;
-		p_ptr->target_col = x;
-#if (0)
-		int m_idx = cave->m_idx[y][x];
-		if (m_idx && target_able(m_idx)) {
-			monster_type *m_ptr = cave_monster(cave, m_idx);
-			/* Set up target information */
-			monster_race_track(m_ptr->r_idx);
-			health_track(p_ptr, m_ptr);
-			//health_track(p_ptr, m_idx);
-			target_set_monster(m_idx);
-		} else {
-			target_set_location(y,x);
-		}
-		if (e.mouse.mods & KC_MOD_SHIFT) {
+		if (shift) {
 			/* shift-click - cast spell at target */
+			p_ptr->cmd.dir = 5;
+			do_cmd_cast_wrapper();
 		} else
-		if (e.mouse.mods & KC_MOD_CONTROL) {
+		if (ctrl) {
 			/* control-click - fire at target */
+			p_ptr->cmd.dir = 5;
+			do_cmd_fire();
 		} else
-		if (e.mouse.mods & KC_MOD_ALT) {
+		if (alt) {
 			/* alt-click - throw at target */
 			/* maybe look with projectile path? */
+			do_cmd_locate();
 		} else
 		{
-			//msg("Target set.");
 			/* see if the click was adjacent to the player */
 			if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
-				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1)) {
-				context_menu_cave(cave,y,x,1,e.mouse.x, e.mouse.y);
+				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
+			{
+				/*context_menu_cave(cave,y,x,1,e.mouse.x, e.mouse.y);*/
+				if (doub) {
+					if (m_idx) {
+						target_look_grid(x, y, TRUE);
+					} else {
+						/* if the click was adjacent to the player, alter in that direction */
+						p_ptr->cmd.dir = coords_to_dir(x, y);
+						p_ptr->cmd.arg = 16;
+						p_ptr->cmd.cmd = '+';
+						do_cmd_alter();
+					}
+				} else {
+					target_look_grid(x, y, FALSE);
+				}
 			} else {
-				context_menu_cave(cave,y,x,0,e.mouse.x, e.mouse.y);
+				/*context_menu_cave(cave,y,x,0,e.mouse.x, e.mouse.y);*/
+				target_look_grid(x, y, doub);
 			}
 		}
-#endif
 	}
 
 }
@@ -721,27 +603,7 @@ void process_command(void)
 		case 'm':
 		{
 			/* Cast a spell */
-			if (FLAG(p_ptr, TR_NO_MAGIC))
-			{
-				cptr which_power = "magic";
-				if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-					which_power = "psionic powers";
-				else if (mp_ptr->spell_book == TV_LIFE_BOOK)
-					which_power = "prayer";
-
-				msgf("An anti-magic shell disrupts your %s!",
-						   which_power);
-
-				p_ptr->state.energy_use = 0;
-			}
-			else
-			{
-				if (p_ptr->rp.pclass == CLASS_MINDCRAFTER)
-					do_cmd_mindcraft();
-				else
-					do_cmd_cast();
-			}
-
+			do_cmd_cast_wrapper();
 			break;
 		}
 

@@ -1906,6 +1906,26 @@ bool get_com(cptr prompt, char *command)
 	/* Success */
 	return (TRUE);
 }
+bool get_com_m(cptr prompt, char *command)
+{
+	/* Paranoia XXX XXX XXX */
+	message_flush();
+
+	/* Display a prompt */
+	prtf(0, 0, prompt);
+
+	/* Get a key */
+	*command = inkey_m();
+
+	/* Clear the prompt */
+	clear_msg();
+
+	/* Handle "cancel" */
+	if (*command == ESCAPE) return (FALSE);
+
+	/* Success */
+	return (TRUE);
+}
 
 
 /*

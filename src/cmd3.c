@@ -1044,7 +1044,7 @@ void do_cmd_look(void)
 void do_cmd_locate(void)
 {
 	int dir, y1, x1, y2, x2;
-	int wid, hgt;
+	int wid, hgt, tx, ty;
 	char tmp_val[80];
 	char out_val[160];
 
@@ -1054,6 +1054,7 @@ void do_cmd_locate(void)
 	/* Start at current panel */
 	x2 = x1 = p_ptr->panel_x1;
 	y2 = y1 = p_ptr->panel_y1;
+	tx = ty = -1;
 
 	/* Show panels until done */
 	while (1)
@@ -1085,20 +1086,72 @@ void do_cmd_locate(void)
 			char command;
 
 			/* Get a command (or Cancel) */
-			if (!get_com(out_val, &command)) break;
+			if (!get_com_m(out_val, &command)) break;
 
-			/* Extract the action (if any) */
-			dir = get_keymap_dir(command);
+			if (command & 0x80) {
+				int x,y;
+				char b;
 
-			/* Error */
-			if (!dir) bell("Illegal direction for locate!");
+				/* this was a mouse press, get the press (and translate it) */
+				Term_getmousepress(&b,&x,&y);
+				b = b & 0x07;
+				if (b == 1) {
+					dir = 5;
+					y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+					x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+					if ((x == tx) && (y == ty)) {
+						(void)target_look_grid(x,y, TRUE);
+					} else {
+						(void)target_look_grid(x,y, FALSE);
+						if (panel_center(x,y)) {
+							x2 = p_ptr->panel_x1;
+							y2 = p_ptr->panel_y1;
+						} else {
+							handle_stuff(); /* redraw to handle tracking changes */
+						}
+						tx = x;
+						ty = y;
+					}
+				} else
+				if (b == 2) {
+					break;
+				} else
+				if (b == 3) {
+					dir = 5;
+					y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+					x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+					(void) target_look_grid(x,y,TRUE);
+					handle_stuff(); /* redraw to handle tracking changes */
+				} else
+				if (b == 4) {
+					dir = 8;
+				} else
+				if (b == 5) {
+					dir = 2;
+				} else
+				if (b == 6) {
+					dir = 4;
+				} else
+				if (b == 7) {
+					dir = 6;
+				} else
+				{
+					dir = 0;
+				}
+			} else {
+				/* Extract the action (if any) */
+				dir = get_keymap_dir(command);
+
+				/* Error */
+				if (!dir) bell("Illegal direction for locate!");
+			}
 		}
 
 		/* No direction */
 		if (!dir) break;
 
 		/* Apply the motion */
-		if (change_panel(ddx[dir], ddy[dir]))
+		if ((dir != 5) && (change_panel(ddx[dir], ddy[dir])))
 		{
 			x2 = p_ptr->panel_x1;
 			y2 = p_ptr->panel_y1;
