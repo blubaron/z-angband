@@ -134,6 +134,9 @@ void do_cmd_inven(void)
 	int item;
 	int ret = 3;
 
+	/* see if we have a ui override */
+	if (Term->inven_hook) {(*(Term->inven_hook))(); return;}
+
 	/* Hack -- show empty slots */
 	item_tester_full = TRUE;
 
@@ -190,6 +193,9 @@ void do_cmd_equip(void)
 	char *no;
 	int item;
 	int ret = 3;
+
+	/* see if we have a ui override */
+	if (Term->equip_hook) {(*(Term->equip_hook))(); return;}
 
 	/* Hack -- show empty slots */
 	item_tester_full = TRUE;
@@ -251,6 +257,9 @@ void do_cmd_wield(void)
 	cptr act;
 
 	cptr q, s;
+
+	/* see if we have a ui override */
+	if (Term->inven_hook) {(*(Term->inven_hook))(); return;}
 
 	/* Restrict the choices */
 	item_tester_hook = item_tester_hook_wear;
@@ -410,6 +419,9 @@ void do_cmd_takeoff(void)
 
 	cptr q, s;
 
+	/* see if we have a ui override */
+	if (Term->equip_hook) {(*(Term->equip_hook))(); return;}
+
 	/* Get an item */
 	q = "Take off which item? ";
 	s = "You are not wearing anything to take off.";
@@ -454,6 +466,9 @@ void do_cmd_drop(void)
 
 	cptr q, s;
 
+	/* see if we have a ui override */
+	if (Term->inven_hook) {(*(Term->inven_hook))(); return;}
+
 	/* Get an item */
 	q = "Drop which item? ";
 	s = "You have nothing to drop.";
@@ -481,7 +496,7 @@ void do_cmd_drop(void)
 	if (o_ptr->number > 1)
 	{
 		/* Get a quantity */
-		amt = get_quantity(NULL, o_ptr->number);
+		amt = get_quantity(NULL, o_ptr->number, o_ptr->number);
 
 		/* Allow user abort */
 		if (amt <= 0) return;
@@ -613,6 +628,9 @@ void do_cmd_destroy(void)
 
 	cptr q, s;
 
+	/* see if we have a ui override */
+	if (Term->destroy_hook) {(*(Term->destroy_hook))(); return;}
+
 	/* Hack -- force destruction */
 	if (p_ptr->cmd.arg > 0) force = TRUE;
 
@@ -632,7 +650,7 @@ void do_cmd_destroy(void)
 		/* Use the destroy_batch option */
 		if (!destroy_batch)
 			/* Get a quantity */
-			amt = get_quantity(NULL, o_ptr->number);
+			amt = get_quantity(NULL, o_ptr->number, o_ptr->number);
 
 		else amt = o_ptr->number;
 
@@ -2341,7 +2359,7 @@ static void do_cmd_organize_aux(void)
 		if (o_ptr->number > 1)
 		{
 			/* Get a quantity */
-			amt = get_quantity(NULL, o_ptr->number);
+			amt = get_quantity(NULL, 1, o_ptr->number);
 
 			/* Allow user abort */
 			if (amt <= 0) continue;

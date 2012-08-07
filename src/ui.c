@@ -1775,6 +1775,9 @@ bool get_string(char *buf, int len, cptr str, ...)
 	/* End the Varargs Stuff */
 	va_end(vp);
 
+	/* see if we have a ui override */
+	if (Term->get_string_hook) return (*(Term->get_string_hook))(buf, len, prompt);
+
 	/* Paranoia XXX XXX XXX */
 	message_flush();
 
@@ -1802,6 +1805,9 @@ bool get_string(char *buf, int len, cptr str, ...)
 static bool get_check_base(bool def, bool esc, cptr prompt)
 {
 	int i;
+
+	/* see if we have a ui override */
+	if (Term->get_check_hook) return (*(Term->get_check_hook))(def,esc,prompt);
 
 	/* Do not skip */
 	p_ptr->state.skip_more = FALSE;
@@ -1888,6 +1894,9 @@ bool get_check(cptr prompt, ...)
  */
 bool get_com(cptr prompt, char *command)
 {
+	/* see if we have a ui override */
+	if (Term->get_com_hook) return (*(Term->get_com_hook))(prompt, command);
+
 	/* Paranoia XXX XXX XXX */
 	message_flush();
 
@@ -1908,6 +1917,9 @@ bool get_com(cptr prompt, char *command)
 }
 bool get_com_m(cptr prompt, char *command)
 {
+	/* see if we have a ui override */
+	if (Term->get_com_m_hook) return (*(Term->get_com_m_hook))(prompt, command);
+
 	/* Paranoia XXX XXX XXX */
 	message_flush();
 
@@ -1933,7 +1945,7 @@ bool get_com_m(cptr prompt, char *command)
  *
  * Hack -- allow "command_arg" to specify a quantity
  */
-s32b get_quantity_big(cptr prompt, s32b max)
+s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 {
 	long amt;
 
@@ -1982,8 +1994,11 @@ s32b get_quantity_big(cptr prompt, s32b max)
 	}
 
 
+	/* see if we have a ui override */
+	if (Term->get_quantity_big_hook) return (*(Term->get_quantity_big_hook))(prompt, initial, max);
+
 	/* Default to one */
-	amt = 1;
+	amt = initial;
 
 	/* Build the default */
 	strnfmt(buf, 80, "%d", amt);
@@ -2009,9 +2024,12 @@ s32b get_quantity_big(cptr prompt, s32b max)
 	return ((s32b)amt);
 }
 
-s16b get_quantity(cptr prompt, s16b max)
+s16b get_quantity(cptr prompt, s16b initial, s16b max)
 {
-	return ((s16b)(get_quantity_big)(prompt, max));
+	/* see if we have a ui override */
+	if (Term->get_quantity_hook) return (*(Term->get_quantity_hook))(prompt, initial, max);
+
+	return ((s16b)(get_quantity_big)(prompt, initial, max));
 }
 
 /*
@@ -2034,6 +2052,9 @@ u32b get_number(cptr prompt, u32b initial)
 		/* Use that prompt */
 		prompt = tmp;
 	}
+
+	/* see if we have a ui override */
+	if (Term->get_number_hook) return (*(Term->get_number_hook))(prompt, initial);
 
 
 	/* Default to zero */

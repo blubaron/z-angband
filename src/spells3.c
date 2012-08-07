@@ -381,6 +381,7 @@ void teleport_player(int dis)
 
 
 
+
 			/* No teleporting into vaults and such */
 			if (c_ptr->info & CAVE_ICKY) continue;
 
@@ -1642,6 +1643,7 @@ static int remove_curse_aux(bool all)
 
 	/* Attempt to uncurse inventory */
 	OBJ_ITT_START (p_ptr->inventory, o_ptr)
+
 	{
 		/* Count the uncursings */
 		if (uncurse_item(o_ptr, all)) cnt++;
@@ -1709,7 +1711,7 @@ bool alchemy(void)
 	if (o_ptr->number > 1)
 	{
 		/* Get a quantity */
-		amt = get_quantity(NULL, o_ptr->number);
+		amt = get_quantity(NULL, o_ptr->number, o_ptr->number);
 
 		/* Allow user abort */
 		if (amt <= 0) return FALSE;
@@ -3043,6 +3045,7 @@ bool recharge(int power)
 				if (o_ptr->number > 1)
 					msgf("Wild magic consumes all your %s!", o_name);
 				else
+
 					msgf("Wild magic consumes your %s!", o_name);
 
 
@@ -5881,7 +5884,7 @@ bool earthstride(void)
 	dist = 0;
 	while (dist < 100)
 	{
-		dist = get_quantity("Distance? (0: cancel, 100-3000) ", 3000);
+		dist = get_quantity("Distance? (0: cancel, 100-3000) ", 100, 3000);
 
 		if (!dist) return FALSE;
 

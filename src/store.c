@@ -1515,7 +1515,7 @@ static void store_purchase(void)
 						OBJECT_STORE_FMT(o_ptr, TRUE, 3));
 
 			/* Get a quantity */
-			amt = get_quantity(NULL, o_ptr->number);
+			amt = get_quantity(NULL, 1, o_ptr->number);
 
 			/* Allow user abort */
 			if (amt <= 0) return;
@@ -1806,7 +1806,7 @@ static bool store_sell(void)
 					OBJECT_FMT(o_ptr, TRUE, 3));
 
 		/* Get a quantity */
-		amt = get_quantity(NULL, o_ptr->number);
+		amt = get_quantity(NULL, o_ptr->number, o_ptr->number);
 
 		/* Allow user abort */
 		if (amt <= 0) return (FALSE);
@@ -2183,7 +2183,7 @@ static void store_layaway(void)
 						OBJECT_STORE_FMT(o_ptr, TRUE, 3));
 
 			/* Get a quantity */
-			amt = get_quantity(NULL, o_ptr->number);
+			amt = get_quantity(NULL, 1, o_ptr->number);
 
 			/* Allow user abort */
 			if (amt <= 0) return;
@@ -2930,6 +2930,9 @@ void do_cmd_store(const field_type *f1_ptr)
 		/* Save the visit */
 		st_ptr->last_visit = turn-turn_offset;
 	}
+
+	/* see if we have a ui override */
+	if (Term->store_hook) {(*(Term->store_hook))((void*) f_ptr, (void*) st_ptr); return;}
 
 	/* Forget the view */
 	forget_view();

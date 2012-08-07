@@ -244,15 +244,16 @@ struct term
 
 	/* ui override hooks */
 	bool (*get_aim_dir_hook)(int *dp);
-	bool (*get_check_hook)(cptr prompt, ...);
-	bool (*get_string_hook)(char *buf, int len, cptr str, ...);
+	bool (*get_check_hook)(bool def, bool esc, cptr prompt);
+	bool (*get_string_hook)(char *buf, int len, cptr prompt);
 	bool (*get_com_hook)(cptr prompt, char *command);
-	s32b (*get_quantity_big_hook)(cptr prompt, s32b max);
-	s16b (*get_quantity_hook)(cptr prompt, s16b max);
+	bool (*get_com_m_hook)(cptr prompt, char *command);
+	s32b (*get_quantity_big_hook)(cptr prompt, s32b initial, s32b max);
+	s16b (*get_quantity_hook)(cptr prompt, s16b initial, s16b max);
 	u32b (*get_number_hook)(cptr prompt, u32b initial);
 	void *(*get_item_hook)(cptr pmt, cptr str, int mode); /* return value is actually object_type */
-	void (*store_hook)(const void *f1_ptr); /* f1 is actually a pointer to feild_type */
-	void (*bldg_hook)(const void *f_ptr); /* f is actually a pointer to feild_type */
+	void (*store_hook)(const void *f1_ptr, const void *st_ptr); /* f1 is actually a pointer to feild_type, st_ptr is store_type */
+	void (*bldg_hook)(const void *f_ptr, const void *b_ptr); /* f is actually a pointer to feild_type, b_ptr is store_type */
 	void (*character_hook)(void);
 	void (*destroy_hook)(void);
 	void (*inven_hook)(void);

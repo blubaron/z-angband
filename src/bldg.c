@@ -762,7 +762,7 @@ void gamble_spin_wheel(void)
 		prtf(5, 7, "1  2  3  4  5  6  7  8  9 10");
 		prtf(3, 8, "--------------------------------");
 
-		choice = get_quantity("Pick a number (1-10): ", 10);
+		choice = get_quantity("Pick a number (1-10): ", 1, 10);
 
 		message_flush();
 		roll1 = randint1(10);
@@ -1675,7 +1675,7 @@ void building_recharge(s32b cost)
 		strnfmt(buf, 160, "Add how many charges for %d gold? ", price);
 
 		/* Get the quantity for staves and wands */
-		charges = get_quantity(buf, MIN(p_ptr->au / price, max_charges));
+		charges = get_quantity(buf, 1, MIN(p_ptr->au / price, max_charges));
 
 		/* Do nothing */
 		if (charges < 1) return;
@@ -2033,6 +2033,9 @@ void do_cmd_bldg(const field_type *f_ptr)
 	/* Some quests are finished by finding a building */
 	trigger_quest_complete(QX_FIND_SHOP, (vptr)b_ptr);
 
+	/* see if we have a ui override */
+	if (Term->bldg_hook) {(*(Term->bldg_hook))((void*) f_ptr, (void*) b_ptr); return;}
+
 	/* Forget the view */
 	forget_view();
 
@@ -2313,7 +2316,7 @@ void build_cmd_loan(int factor)
 		if (get_check("We can loan you up to %i gp at %i%%.  Take out loan?", amt, (factor-100)))
 		{
 			/* How much */
-			s32b amt2 = get_quantity_big("How much gold? ", amt);
+			s32b amt2 = get_quantity_big("How much gold? ", amt/2, amt);
 
 			if (amt2 == 0) return;  /* No loan */
 
@@ -2571,7 +2574,7 @@ void build_cmd_bank_deposit(void)
 	u32b amt;
 
 	if (p_ptr->au > 0) {
-		amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au);
+		amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au/4, p_ptr->au);
 		if (amt > p_ptr->au) {
 			amt = p_ptr->au;
 		}
@@ -2596,11 +2599,11 @@ void build_cmd_bank_deposit(void)
  */
 void build_cmd_bank_withdraw(void)
 {
-	store_type * st_ptr = get_current_store();
+	/*store_type * st_ptr = get_current_store();*/
 	u32b amt;
 
 	if (p_ptr->bank_gold > 0) {
-		amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold);
+		amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold, p_ptr->bank_gold);
 		if (amt > p_ptr->bank_gold) {
 			amt = p_ptr->bank_gold;
 		}
@@ -2621,13 +2624,13 @@ void build_cmd_bank_withdraw(void)
  */
 void build_cmd_item_layaway(void)
 {
-	store_type * st_ptr = get_current_store();
-	u32b amt;
+	/*store_type * st_ptr = get_current_store();*/
+	s32b amt;
 	int item_new;
 
 	if (p_ptr->bank_layaway_gold > 0) {
 		if (p_ptr->au > 0) {
-			amt = get_quantity_big("How much would you like to put towards the item?", p_ptr->au);
+			amt = get_quantity_big("How much would you like to put towards the item?", p_ptr->au, p_ptr->au);
 			if (amt > p_ptr->au) {
 				amt = p_ptr->au;
 			}

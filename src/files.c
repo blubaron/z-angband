@@ -2671,6 +2671,9 @@ void do_cmd_character(void)
 
 	char tmp[160];
 
+	/* see if we have a ui override */
+	if (Term->character_hook) {(*(Term->character_hook))(); return;}
+
 	/* Save the screen */
 	screen_save();
 

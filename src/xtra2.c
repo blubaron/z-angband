@@ -3220,6 +3220,9 @@ bool get_aim_dir(int *dp)
 
 	cptr p;
 
+	/* see if we have a ui override */
+	if (Term->get_aim_dir_hook) return (*(Term->get_aim_dir_hook))(dp);
+
 	/* Initialize */
 	*dp = 0;
 
