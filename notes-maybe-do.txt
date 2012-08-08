@@ -77,6 +77,11 @@
       also be able to set dun_gen_type based on level range with/without
        changing habitat.
 
+    use angband lighting style (array[MAX_LIGHTING]) for feature and field
+      lighting.
+
+    change text grid to use and show tile multipliers like angband does.
+
     want set of tiles per dungeon that use floor, wall, door (open, closed,
       broken), stair up, stair down
     add generation (incl. vault spec.) and redirection of fountain,

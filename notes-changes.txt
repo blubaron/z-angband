@@ -396,6 +396,7 @@ enum
     dungeons can skip levels within their range. the dungeon level skip is
       given just after the max dungeon level in the dungeon type info.
       *Tested with sewers, but what happens around dl 99,100 has not been tested.
+      *need to adjust for dungeon guard quests, which test for a specific level.
 
     added functions to load a graphics list from a text file, like I wrote for angband.
 
@@ -408,7 +409,6 @@ enum
      make sure you have space in your pack for it, or you will be charged an
      additional 50 gold. Warning: once you buy an item on lay away, you cannot
      buy another on lay away until the first one has been paid for.
-     *Lay away (item) may corrupt save files.
 
     bounty quest rewards no longer give stat gain.
 
