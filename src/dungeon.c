@@ -2479,6 +2479,8 @@ bool add_main_buttons(void)
 		button_set_fn(NULL);
 	}
 
+	/* messages - done in mouse press func to use reverse messages screen */
+	//button_add_2d(0, 0, 0, Term->wid-1, NULL, KTRL('P'));
 	/* character screen */
 	button_add_2d(ROW_RACE, COL_RACE, ROW_TITLE, COL_MAP, NULL, 'C');
 	/* inventory */
