@@ -13,6 +13,7 @@
 #include "angband.h"
 #include "script.h"
 
+void do_cmd_messages_reverse(void);
 
 
 /*
@@ -148,6 +149,19 @@ void process_click(char press, int xpos, int ypos)
 	bool alt = press & 64;
 	bool meta = press & 8;
 	int x,y;
+
+	if (ypos == 0) {
+		// special behavior for the top line
+		if (button == 1) {
+			// show previous messages
+			do_cmd_messages_reverse();
+		/*} else
+		if (button == 2) {
+			// show 
+		*/
+		}
+		return;
+	}
 
 	y = ((ypos-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
 	x = ((xpos-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;

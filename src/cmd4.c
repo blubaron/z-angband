@@ -360,6 +360,205 @@ void do_cmd_messages(void)
 	screen_load();
 }
 
+void do_cmd_messages_reverse(void)
+{
+	int i, j, k, n;
+	int q;
+
+	char shower[80];
+	char finder[80];
+
+	int wid, hgt;
+
+	/* Wipe finder */
+	finder[0] = 0;
+
+	/* Wipe shower */
+	shower[0] = 0;
+
+	/* Total messages */
+	n = message_num();
+
+	/* Start on first message */
+	i = 0;
+
+	/* Start at leftmost edge */
+	q = 0;
+
+	/* Save the screen */
+	screen_save();
+
+	/* Get size */
+	Term_get_size(&wid, &hgt);
+
+	/* Process requests until done */
+	while (1)
+	{
+		/* Clear screen */
+		Term_clear();
+
+		/* Dump messages */
+		for (j = 0; (j < hgt - 4) && (i + j < n); j++)
+		{
+			cptr msg = message_str((s16b)(i + j));
+			cptr attr = color_seq[message_color((s16b)(i + j))];
+
+			/* Apply horizontal scroll */
+			msg = ((int)strlen(msg) >= q) ? (msg + q) : "";
+
+			/* Dump the messages, top to bottom to */
+			put_fstr(0, j+2, "%s%s", attr, msg);
+
+			/* Hilite "shower" */
+			if (shower[0])
+			{
+				cptr str = msg;
+
+				/* Display matches */
+				while ((str = strstr(str, shower)) != NULL)
+				{
+					int len = strlen(shower);
+
+					/* Display the match */
+					put_fstr(str - msg, hgt - 3 - j, CLR_YELLOW "%s", shower);
+
+					/* Advance */
+					str += len;
+				}
+			}
+		}
+
+		/* Display header XXX XXX XXX */
+		prtf(0, 0, "Message Recall (%d-%d of %d), Offset %d",
+				   i, i + j - 1, n, q);
+
+		/* Display prompt (not very informative) */
+		prtf(0, hgt - 1,
+				"[Press 'p' for older, 'n' for newer, ..., or ESCAPE]");
+
+		/* Get a command */
+		k = inkey();
+
+		/* Exit on Escape */
+		if (k == ESCAPE) break;
+
+		/* Hack -- Save the old index */
+		j = i;
+
+		/* Horizontal scroll */
+		if (k == '4')
+		{
+			/* Scroll left */
+			q = (q >= wid / 2) ? (q - wid / 2) : 0;
+
+			/* Success */
+			continue;
+		}
+
+		/* Horizontal scroll */
+		if (k == '6')
+		{
+			/* Scroll right */
+			q = q + wid / 2;
+
+			/* Success */
+			continue;
+		}
+
+		/* Hack -- handle show */
+		if (k == '=')
+		{
+			/* Prompt */
+			prtf(0, hgt - 1, "Show: ");
+
+			/* Get a "shower" string, or continue */
+			if (!askfor_aux(shower, 80)) continue;
+
+			/* Okay */
+			continue;
+		}
+
+		/* Hack -- handle find */
+		if (k == '/')
+		{
+			s16b z;
+
+			/* Prompt */
+			prtf(0, hgt - 1, "Find: ");
+
+			/* Get a "finder" string, or continue */
+			if (!askfor_aux(finder, 80)) continue;
+
+			/* Show it */
+			strcpy(shower, finder);
+
+			/* Scan messages */
+			for (z = i + 1; z < n; z++)
+			{
+				cptr msg = message_str(z);
+
+				/* Search for it */
+				if (strstr(msg, finder))
+				{
+					/* New location */
+					i = z;
+
+					/* Done */
+					break;
+				}
+			}
+		}
+
+		/* Recall 1 older message */
+		if ((k == '2') || (k == '\n') || (k == '\r'))
+		{
+			/* Go newer if legal */
+			if (i + 1 < n) i += 1;
+		}
+
+		/* Recall 10 older messages */
+		if (k == '+')
+		{
+			/* Go older if legal */
+			if (i + 10 < n) i += 10;
+		}
+
+		/* Recall 20 older messages */
+		if ((k == 'p') || (k == KTRL('P')) || (k == ' '))
+		{
+			/* Go older if legal */
+			if (i + 20 < n) i += 20;
+		}
+
+		/* Recall 20 newer messages */
+		if ((k == 'n') || (k == KTRL('N')))
+		{
+			/* Go newer (if able) */
+			i = (i >= 20) ? (i - 20) : 0;
+		}
+
+		/* Recall 10 newer messages */
+		if (k == '-')
+		{
+			/* Go newer (if able) */
+			i = (i >= 10) ? (i - 10) : 0;
+		}
+
+		/* Recall 1 newer messages */
+		if (k == '8')
+		{
+			/* Go newer (if able) */
+			i = (i >= 1) ? (i - 1) : 0;
+		}
+
+		/* Hack -- Error of some kind */
+		if (i == j) bell(NULL);
+	}
+
+	/* Restore the screen */
+	screen_load();
+}
+
 
 /*
  * Copy the indicated options out from the
