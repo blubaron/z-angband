@@ -1947,16 +1947,17 @@ void cleanup_angband(void)
 	if (mp_c) KILL(mp_c);
 
 	/* Free the towns */
-	for (i = 0; i < z_info->wp_max; i++) {
-		if (place[i].store) {
-			FREE(place[i].store);
+	if (place) {
+		for (i = 0; i < z_info->wp_max; i++) {
+			if (place[i].store) {
+				FREE(place[i].store);
+			}
+			if (place[i].dungeon) {
+				FREE(place[i].dungeon);
+			}
 		}
-		if (place[i].dungeon) {
-			FREE(place[i].dungeon);
-		}
+		ZFREE(place);
 	}
-	ZFREE(place);
-
 	/* Free the stores */
 	ZFREE(store_cache);
 
