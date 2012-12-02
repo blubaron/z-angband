@@ -1453,7 +1453,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	{
 		base = the_floor();
 	}
-
+#if 0
 	/* Must be a wall/door/etc */
 	if (feat->flags & (FF_PWALK|FF_MWALK)) {
 		/* Message */
@@ -1462,22 +1462,41 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		/* Nope */
 		return (FALSE);
 	}
+#endif
 
 	/* Titanium */
 	if (feat->flags & FF_PERM) {
-		msgf("This seems to be permanent rock.");
+		/* Message */
+		if (feat->flags & FF_HALF_LOS) {
+			msgf("You cannot remove the %s.", f_name + feat->name);
+		} else {
+			msgf("You cannot tunnel into the %s.", f_name + feat->name);
+		}
 		return (FALSE);
 	}
 
 	if (!(feat->flags & FF_DIG)) {
-		msgf("You cannot tunnel through that.");
+		/* Message */
+		if (feat->flags & (FF_PWALK|FF_MWALK)) {
+			if (feat->flags & FF_HALF_LOS) {
+				msgf("You see nothing there to remove.");
+			} else {
+				msgf("You see nothing there to tunnel.");
+			}
+		} else {
+			if (feat->flags & FF_HALF_LOS) {
+				msgf("You cannot remove that.");
+			} else {
+				msgf("You cannot tunnel through that.");
+			}
+		}
 		return (FALSE);
 	}
 
 	okay = (dig > feat->dig + randint0(40*feat->dig));
 
 	/* usually Jungle  or trees */
-	if (feat->flags & FF_OBJECT) {
+	if (feat->flags & FF_HALF_LOS) {
 		/* Chop Down */
 		if (okay) {
 			/* Remove the feature */
