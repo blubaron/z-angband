@@ -1422,8 +1422,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	sound(SOUND_DIG);
 
 	/* Must have knowledge */
-	if (!(pc_ptr->feat))
-	{
+	if (!(pc_ptr->feat)) {
 		/* Message */
 		msgf("You see nothing there.");
 
@@ -1431,8 +1430,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 		return (FALSE);
 	}
 
-	if (f_ptr && (action == ACT_TUNNEL))
-	{
+	if (f_ptr && (action == ACT_TUNNEL)) {
 		if (!field_script_single(f_ptr, FIELD_ACT_INTERACT,
 				"i", LUA_VAR_NAMED(dig, "power")))
 		{
@@ -1445,15 +1443,19 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	}
 
 	feat  = &(f_info[c_ptr->feat]);
+	if (feat->flags & (FF_HIDDEN | FF_DOOR | FF_OVERLAY)) {
+		/* Secret doors */
+		base = the_floor();
+	} else
 	if (feat->base_feat) {
 		base = feat->base_feat;
-	} else {
+	} else
+	{
 		base = the_floor();
 	}
 
 	/* Must be a wall/door/etc */
-	if (feat->flags & (FF_PWALK|FF_MWALK))
-	{
+	if (feat->flags & (FF_PWALK|FF_MWALK)) {
 		/* Message */
 		msgf("You see nothing there to tunnel.");
 
@@ -1462,49 +1464,22 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	}
 
 	/* Titanium */
-	if (feat->flags & FF_PERM)
-	{
+	if (feat->flags & FF_PERM) {
 		msgf("This seems to be permanent rock.");
 		return (FALSE);
 	}
 
-	if (!(feat->flags & FF_DIG))
-	{
+	if (!(feat->flags & FF_DIG)) {
 		msgf("You cannot tunnel through that.");
 		return (FALSE);
 	}
 
 	okay = (dig > feat->dig + randint0(40*feat->dig));
 
-	/* Secret doors */
-	if (feat->flags & (FF_HIDDEN | FF_DOOR | FF_OVERLAY))
-	{
-		/* Tunnel */
-		if (okay)
-		{
-			/* Remove the feature */
-			cave_set_feat(x, y, the_floor());
-
-			msgf("You have finished the tunnel.");
-		}
-
-		/* Keep trying */
-		else
-		{
-			/* We may continue tunelling */
-			msgf("You tunnel into the %s.", f_name + feat->name);
-			more = TRUE;
-
-			/* Occasional Search XXX XXX */
-			if (one_in_(4)) search();
-		}
-	}
 	/* usually Jungle  or trees */
-	else if (feat->flags & (FF_HALF_LOS || FF_WILD))
-	{
+	if (feat->flags & FF_OBJECT) {
 		/* Chop Down */
-		if (okay)
-		{
+		if (okay) {
 			/* Remove the feature */
 			cave_set_feat(x, y, base);
 
@@ -1512,26 +1487,27 @@ static bool do_cmd_tunnel_aux(int x, int y)
 
 			chg_virtue(V_DILIGENCE, 1);
 			chg_virtue(V_NATURE, -1);
-		}
+		} else
 
 		/* Keep trying */
-		else
 		{
 			/* We may continue chopping */
-			msgf("You chop away at the %s.", f_name + feat->name);
+			if (dig < feat->dig) {
+				msgf("You chop away at the %s, but you don't see any change.", f_name + feat->name);
+			} else {
+				msgf("You chop away at the %s.", f_name + feat->name);
+			}
 			more = TRUE;
 
 			/* Occasional Search XXX XXX */
 			if (one_in_(4)) search();
 		}
-	}
+	} else
 
 	/* Granite + mountain side */
-	else
 	{
 		/* Tunnel */
-		if (okay)
-		{
+		if (okay) {
 			/* Remove the feature */
 			cave_set_feat(x, y, base);
 
@@ -1539,16 +1515,18 @@ static bool do_cmd_tunnel_aux(int x, int y)
 
 			chg_virtue(V_DILIGENCE, 1);
 			chg_virtue(V_NATURE, -1);
-		}
+		} else
 
 		/* Keep trying */
-		else
 		{
 			/* We may continue tunelling */
-			msgf("You tunnel into the %s.", f_name + feat->name);
+			if (dig < feat->dig) {
+				msgf("You tunnel into the %s, but your tool bounces off.", f_name + feat->name);
+			} else {
+				msgf("You tunnel into the %s.", f_name + feat->name);
+			}
 			more = TRUE;
-			if (feat->flags & FF_HIDDEN)
-			{
+			if (feat->flags & FF_HIDDEN) {
 				/* Occasional Search XXX XXX */
 				if (one_in_(4)) search();
 			}
@@ -1556,8 +1534,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	}
 
 	/* Quartz / Magma */
-	if (okay)
-	{
+	if (okay) {
 		okay = FALSE;
 		if (feat->flags & FF_DIG_GOLD) {
 			/* Place some gold */
@@ -1565,14 +1542,12 @@ static bool do_cmd_tunnel_aux(int x, int y)
 			okay = TRUE;
 		}
 
-		if (feat->flags & FF_DIG_OBJ)
-		{
+		if (feat->flags & FF_DIG_OBJ) {
 			/* Message */
 			//msgf("You have removed the rubble.");
 
 			/* Hack -- place an object */
-			if (p_ptr->depth && one_in_(10))
-			{
+			if (p_ptr->depth && one_in_(10)) {
 				/* Prepare for object memory */
 				current_object_source.type = OM_RUBBLE;
 				current_object_source.place_num = p_ptr->place_num;
@@ -1590,20 +1565,17 @@ static bool do_cmd_tunnel_aux(int x, int y)
 				}
 			}
 		}
-		if (feat->flags & FF_DIG_FOOD)
-		{
+		if (feat->flags & FF_DIG_FOOD) {
 			/* Place some food */
 			place_gold(x, y);
 			okay = TRUE;
 		}
-		if (feat->flags & FF_DIG_CUSTOM)
-		{
+		if (feat->flags & FF_DIG_CUSTOM) {
 			/* lookup this feat, get the object this places and place it */
 			place_gold(x, y);
 			okay = TRUE;
 		}
-		if (okay)
-		{
+		if (okay) {
 			/* Message */
 			msgf("You have found something!");
 		}
