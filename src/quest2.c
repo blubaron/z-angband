@@ -692,9 +692,6 @@ static void display_monster_quest(quest_type *q_ptr)
 				if (place_monster_aux
 					(x, y, r_idx, FALSE, group, FALSE, FALSE, TRUE))
 				{
-					/* give a message, so player knows a bounty is nearby - Brett */
-					/*if (!preserve_mode)*/
-					msgf("Your pulse quickens. You sense a target on this level.");
 					/* Success */
 					break;
 				}
@@ -704,6 +701,13 @@ static void display_monster_quest(quest_type *q_ptr)
 					continue;
 				}
 			}
+		}
+		/* give a message, so player knows a bounty is nearby - Brett */
+		if (number) {
+			if (p_ptr->depth)
+				msgf("Your pulse quickens. You sense a target on this level.");
+			else
+				msgf("Your pulse quickens. You sense a target nearby.");
 		}
 	}
 }
