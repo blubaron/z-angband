@@ -302,8 +302,8 @@ bool is_special_level(int level)
 		if (q_ptr->status > QUEST_STATUS_TAKEN) continue;
 
 		/* Does the level match? */
-		if (q_ptr->data.dun.level <= level)
-      return (TRUE);
+		if (q_ptr->data.dun.level == level)
+			return (TRUE);
 	}
 
 	return (FALSE);
@@ -405,7 +405,15 @@ void activate_quests(int level)
 					SET_FLAG(&r_info[q_ptr->data.dun.r_idx], RF_QUESTOR);
 
 				/* Correct dungeon level? */
-				if (q_ptr->data.dun.level != level) break;
+				/*if (q_ptr->data.dun.level != level) break;*/
+				if (level < q_ptr->data.dun.level)
+					break;
+				if (place[p_ptr->place_num].dungeon
+					&& (level > (q__ptr->data.dun.level +
+					place[p_ptr->place_num].dungeon->level_change_step)))
+				{
+					break;
+				}
 
 				/* Current quest? */
 				if (q_ptr->status != QUEST_STATUS_TAKEN ||
@@ -614,15 +622,15 @@ static void display_monster_quest(quest_type *q_ptr)
 		if (q_ptr->type == QUEST_TYPE_BOUNTY)
 		{
 			/* One at a time */
-      if (q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num > 3) 
-        number = randint1((q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num)/3);
-      else
-  			number = 1;
+			if (q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num > 3) 
+				number = randint1((q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num)/3);
+			else
+				number = 1;
 
-      if (q_ptr->level +25 < p_ptr->depth) {
-			  /* probably getting tired of this quest - All remaining at once */
-			  number = q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num;
-      }
+			if (q_ptr->level +25 < p_ptr->depth) {
+				/* probably getting tired of this quest - All remaining at once */
+				number = q_ptr->data.bnt.max_num - q_ptr->data.bnt.cur_num;
+			}
 
 			/* Which monster? */
 			r_idx = q_ptr->data.bnt.r_idx;
@@ -684,9 +692,9 @@ static void display_monster_quest(quest_type *q_ptr)
 				if (place_monster_aux
 					(x, y, r_idx, FALSE, group, FALSE, FALSE, TRUE))
 				{
-          /* give a message, so player knows a bounty is nearby? - Brett */
-          /*if (!preserve_mode)*/
-            msgf("Your pulse quickens. You sense a target on this level.");
+					/* give a message, so player knows a bounty is nearby - Brett */
+					/*if (!preserve_mode)*/
+					msgf("Your pulse quickens. You sense a target on this level.");
 					/* Success */
 					break;
 				}
@@ -702,7 +710,7 @@ static void display_monster_quest(quest_type *q_ptr)
 
 static void display_artifact_quest(quest_type *q_ptr)
 {
-	int	x = rand_range(p_ptr->min_wid + 1, p_ptr->max_wid - 2);
+	int x = rand_range(p_ptr->min_wid + 1, p_ptr->max_wid - 2);
 	int y = rand_range(p_ptr->min_hgt + 1, p_ptr->max_hgt - 2);
 
 	/* Drop artifact in dungeon */
@@ -760,8 +768,12 @@ void trigger_quest_create(byte c_type, vptr data)
 
 				if (q_ptr->type == QUEST_TYPE_DUNGEON)
 				{
-					if (level == q_ptr->data.dun.level)
+					if ((level >= q_ptr->data.dun.level)
+						&& (level <= (q_ptr->data.dun.level
+						+ place[p_ptr->place_num].dungeon->level_change_step)))
+					{
 						display_monster_quest(q_ptr);
+					}
 				}
 				else if (q_ptr->type == QUEST_TYPE_BOUNTY)
 				{
@@ -1448,10 +1460,10 @@ static void give_reward(store_type * st_ptr, quest_type * q_ptr)
 			break;
 	}
 
-  /* only get stats if this is not a bounty quest */
-  if ((q_ptr->type == QUEST_TYPE_BOUNTY) && (stat != -1)) {
+	/* only get stats if this is not a bounty quest */
+	if ((q_ptr->type == QUEST_TYPE_BOUNTY) && (stat != -1)) {
 		stat = -1;
-  }
+	}
 
 	if (get_gold)
 	{
@@ -2071,75 +2083,76 @@ void request_quest(const store_type *b_ptr, int scale)
 	{
 		/* No quests available */
 		/*msgf ("Sorry, we don't have any errands for you.");*/
-    if (is_member() || (b_ptr->type == BUILD_CASTLE0)
-       || (b_ptr->type == BUILD_CASTLE1)  || (b_ptr->type == BUILD_CASTLE2)) {
-      q_ptr = NULL;
-	    switch(b_ptr->type)
-	    {
-		    case BUILD_CASTLE0:
-		    case BUILD_CASTLE2:
-  		  case BUILD_WARRIOR_GUILD:
-		    case BUILD_CATHEDRAL:
-		      /* Hack: quest difficulty should be random */
-          if (p_ptr->max_lev > 5) {
-			      curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
-          } else {
-			      curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
-          }
-          if (request_bounty(0)) {
-            q_ptr = lookup_quest_building(b_ptr);
-          }
-			    return;
-		    case BUILD_CASTLE1:
-		    case BUILD_MAGE_GUILD:
-		    case BUILD_THIEVES_GUILD:
-			    /* Hack: 10% chance of artifact quest o.w. bounty */
-          if (one_in_(10)) {
-            curr_scale = damroll(10,10)-9;
-            if (request_find_item(0)) {
-              q_ptr = lookup_quest_building(b_ptr);
-            }
-          }
-          if (!q_ptr) {
-            if (p_ptr->max_lev > 5) {
-			        curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
-            } else {
-			        curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
-            }
-            if (request_bounty(0)) {
-              q_ptr = lookup_quest_building(b_ptr);
-            }
-          }
-			    return;
-			  case BUILD_RANGER_GUILD:
-			    /* Hack: 10% chance of find place o.w. bounty */
-          if (one_in_(10)) {
-            curr_scale = damroll(10,10)-9;
-            //request_find_item(0);
-            if (request_find_item(0)) {
-              q_ptr = lookup_quest_building(b_ptr);
-            }
-          }
-          if (!q_ptr) {
-            if (p_ptr->max_lev > 5) {
-			        curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
-            } else {
-			        curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
-            }
-            if (request_bounty(0)) {
-              q_ptr = lookup_quest_building(b_ptr);
-            }
-          }
-			    return;
-	    }
-	    if (!q_ptr)
-	    {
-    		/* No quests available */
-        msgf ("Sorry, we don't have any errands for you.");
-      }
-    } else {
-      msgf ("Sorry, we don't have any errands for you.");
-    }
+		if (is_member() || (b_ptr->type == BUILD_CASTLE0)
+			|| (b_ptr->type == BUILD_CASTLE1)  || (b_ptr->type == BUILD_CASTLE2))
+		{
+			q_ptr = NULL;
+			switch(b_ptr->type)
+			{
+				case BUILD_CASTLE0:
+				case BUILD_CASTLE2:
+				case BUILD_WARRIOR_GUILD:
+				case BUILD_CATHEDRAL:
+					/* Hack: quest difficulty should be random */
+					if (p_ptr->max_lev > 5) {
+						curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+					} else {
+						curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+					}
+					if (request_bounty(0)) {
+						q_ptr = lookup_quest_building(b_ptr);
+					}
+					return;
+				case BUILD_CASTLE1:
+				case BUILD_MAGE_GUILD:
+				case BUILD_THIEVES_GUILD:
+					/* Hack: 10% chance of artifact quest o.w. bounty */
+					if (one_in_(10)) {
+						curr_scale = damroll(10,10)-9;
+						if (request_find_item(0)) {
+							q_ptr = lookup_quest_building(b_ptr);
+						}
+					}
+					if (!q_ptr) {
+						if (p_ptr->max_lev > 5) {
+							curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+						} else {
+							curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+						}
+						if (request_bounty(0)) {
+							q_ptr = lookup_quest_building(b_ptr);
+						}
+					}
+					return;
+				case BUILD_RANGER_GUILD:
+					/* Hack: 10% chance of find place o.w. bounty */
+					if (one_in_(10)) {
+						curr_scale = damroll(10,10)-9;
+						//request_find_item(0);
+						if (request_find_item(0)) {
+							q_ptr = lookup_quest_building(b_ptr);
+						}
+					}
+					if (!q_ptr) {
+						if (p_ptr->max_lev > 5) {
+							curr_scale = rand_range(p_ptr->max_lev-5,p_ptr->max_lev*2 - 10);
+						} else {
+							curr_scale = rand_range(p_ptr->max_lev,p_ptr->max_lev*2);
+						}
+						if (request_bounty(0)) {
+							q_ptr = lookup_quest_building(b_ptr);
+						}
+					}
+					return;
+			}
+			if (!q_ptr)
+			{
+				/* No quests available */
+				msgf ("Sorry, we don't have any errands for you.");
+			}
+		} else {
+			msgf ("Sorry, we don't have any errands for you.");
+		}
 		return;
 	}
 	/* Available quest, but player level not sufficient */
