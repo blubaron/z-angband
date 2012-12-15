@@ -1312,25 +1312,18 @@ static void save_prefs(cptr ini_file)
 	strnfmt(buf, 128, "%d", arg_sound ? 1 : 0);
 	ini_setting_set_string(ini, "Angband", "Sound", buf, 128);
 
-	if (arg_fiddle) {
-		strnfmt(buf, 128, "%d", arg_fiddle ? 1 : 0);
-		ini_setting_set_string(ini, "Angband", "Fiddle", buf, 128);
-	}
+	/* some optional flags */
+	strnfmt(buf, 128, "%d", arg_fiddle ? 1 : 0);
+	ini_setting_set_string(ini, "Angband", "Fiddle", buf, 128, "0");
 
-	if (arg_wizard) {
-		strnfmt(buf, 128, "%d", arg_wizard ? 1 : 0);
-		ini_setting_set_string(ini, "Angband", "Wizard", buf, 128);
-	}
+	strnfmt(buf, 128, "%d", arg_wizard ? 1 : 0);
+	ini_setting_set_string(ini, "Angband", "Wizard", buf, 128, "0");
 
-	if (arg_force_roguelike) {
-		strnfmt(buf, 128, "%d", arg_force_roguelike ? 1 : 0);
-		ini_setting_set_string(ini, "Angband", "force_roguelike", buf, 128);
-	}
+	strnfmt(buf, 128, "%d", arg_force_roguelike ? 1 : 0);
+	ini_setting_set_string(ini, "Angband", "force_roguelike", buf, 128, "0");
 
-	if (arg_force_original) {
-		strnfmt(buf, 128, "%d", arg_force_original ? 1 : 0);
-		ini_setting_set_string(ini, "Angband", "force_original", buf, 128);
-	}
+	strnfmt(buf, 128, "%d", arg_force_original ? 1 : 0);
+	ini_setting_set_string(ini, "Angband", "force_original", buf, 128, "1");
 
 #ifdef SUPPORT_GAMMA
 	if (gamma_correction > 0) {
