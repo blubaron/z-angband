@@ -409,7 +409,7 @@ void activate_quests(int level)
 				if (level < q_ptr->data.dun.level)
 					break;
 				if (place[p_ptr->place_num].dungeon
-					&& (level > (q__ptr->data.dun.level +
+					&& (level > (q_ptr->data.dun.level +
 					place[p_ptr->place_num].dungeon->level_change_step)))
 				{
 					break;

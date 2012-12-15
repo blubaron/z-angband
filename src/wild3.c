@@ -2232,7 +2232,7 @@ void move_dun_level(int direction, bool magic)
 		/* stop on each special level */
 		int i;
 		for (i = 0; i < direction; i++) {
-			if (is_special_level(++(ptr->depth))) {
+			if (is_special_level(++(p_ptr->depth))) {
 				break;
 			}
 		}
