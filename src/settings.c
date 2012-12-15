@@ -483,3 +483,168 @@ int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* k
 	return ini_settings_new_key(ini, sec, section, key, format("%u",value));
 }
 
+int ini_setting_set_string(ini_settings *ini, const char *section, const char* key, const char *value, int size, const char *def)
+{
+	ini_settings_section *sec = NULL;
+	ini_settings_value *val;
+
+	val = ini_settings_find_key(ini, section, key,  &sec);
+	if (val) {
+    if (def && (strcmp(value, def) == 0)) {
+  		/* we already have this key for this section, so remove it */
+      /* since a value the same as the default will not be stored */
+	    ini_settings_value *prev,*test;
+      test = sec->pRoot;
+      prev = NULL;
+      while (test) {
+        if (test == val) {
+          break;
+        }
+        prev = test;
+        test = test->pNext;
+      }
+      if (test) {
+        if (prev) {
+          prev->pNext = test->pNext;
+        }
+        if (test == sec->pRoot) {
+          sec->pRoot = test->pNext;
+        }
+        if (test == sec->pEnd) {
+          sec->pEnd = prev;
+        }
+      }
+		  if (val->key) {
+			  string_free(val->key);
+		  }
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+	  	FREE(val);
+    } else {
+		  /* we already have this key for this section, so just change its value */
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+		  val->value = string_make(value);
+    }
+		return 1;
+	}
+  if (def && (strcmp(value, def) == 0)) {
+    /* a value the same as the default will not be stored */
+    return 0;
+  }
+	/* we need to make a new key */
+	return ini_settings_new_key(ini, sec, section, key, value);
+}
+
+int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* key, int value, int def)
+{
+	ini_settings_section *sec = NULL;
+	ini_settings_value *val;
+
+	val = ini_settings_find_key(ini, section, key,  &sec);
+	if (val) {
+    if (value == def) {
+  		/* we already have this key for this section, so remove it */
+      /* since a value the same as the default will not be stored */
+	    ini_settings_value *prev,*test;
+      test = sec->pRoot;
+      prev = NULL;
+      while (test) {
+        if (test == val) {
+          break;
+        }
+        prev = test;
+        test = test->pNext;
+      }
+      if (test) {
+        if (prev) {
+          prev->pNext = test->pNext;
+        }
+        if (test == sec->pRoot) {
+          sec->pRoot = test->pNext;
+        }
+        if (test == sec->pEnd) {
+          sec->pEnd = prev;
+        }
+      }
+		  if (val->key) {
+			  string_free(val->key);
+		  }
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+	  	FREE(val);
+    } else {
+		  /* we already have this key for this section, so just change its value */
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+		  val->value = string_make(format("%d",value));
+    }
+		return 1;
+	}
+  if (value == def) {
+    /* a value the same as the default will not be stored */
+    return 0;
+  }
+	/* we need to make a new key */
+	return ini_settings_new_key(ini, sec, section, key, format("%d",value));
+}
+
+int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* key, u32b value, u32b def)
+{
+	ini_settings_section *sec = NULL;
+	ini_settings_value *val;
+
+	val = ini_settings_find_key(ini, section, key,  &sec);
+	if (val) {
+    if (value == def) {
+  		/* we already have this key for this section, so remove it */
+      /* since a value the same as the default will not be stored */
+	    ini_settings_value *prev,*test;
+      test = sec->pRoot;
+      prev = NULL;
+      while (test) {
+        if (test == val) {
+          break;
+        }
+        prev = test;
+        test = test->pNext;
+      }
+      if (test) {
+        if (prev) {
+          prev->pNext = test->pNext;
+        }
+        if (test == sec->pRoot) {
+          sec->pRoot = test->pNext;
+        }
+        if (test == sec->pEnd) {
+          sec->pEnd = prev;
+        }
+      }
+		  if (val->key) {
+			  string_free(val->key);
+		  }
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+	  	FREE(val);
+    } else {
+		  /* we already have this key for this section, so just change its value */
+		  if (val->value) {
+			  string_free(val->value);
+		  }
+		  val->value = string_make(format("%u",value));
+    }
+		return 1;
+	}
+  if (value == def) {
+    /* a value the same as the default will not be stored */
+    return 0;
+  }
+	/* we need to make a new key */
+	return ini_settings_new_key(ini, sec, section, key, format("%u",value));
+}
+

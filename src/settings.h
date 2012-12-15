@@ -80,4 +80,8 @@ int ini_setting_set_string(ini_settings *ini, const char *section, const char* k
 int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* key, int value);
 int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* key, u32b value);
 
+int ini_setting_set_string(ini_settings *ini, const char *section, const char* key, const char *value, int size, const char* def);
+int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* key, int value, int def);
+int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* key, u32b value, u32b def);
+
 #endif /* INCLUDED_SETTING_H */
