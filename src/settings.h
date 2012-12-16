@@ -67,7 +67,7 @@ ini_settings_section* ini_settings_find_section(ini_settings *ini, const char* s
 ini_settings_value* ini_settings_find_section_key(ini_settings_section* section, const char* key);
 
 int ini_settings_new_key(ini_settings *ini, ini_settings_section *sec,
-		 const char *section, const char* key, char *value);
+		 const char *section, const char* key, const char *value);
 
 int ini_setting_get_string(ini_settings *ini, const char *section, const char* key, char *buf, int size, const char* def);
 int ini_setting_get_sint32(ini_settings *ini, const char *section, const char* key, int def);
@@ -80,8 +80,8 @@ int ini_setting_set_string(ini_settings *ini, const char *section, const char* k
 int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* key, int value);
 int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* key, u32b value);
 
-int ini_setting_set_string(ini_settings *ini, const char *section, const char* key, const char *value, int size, const char* def);
-int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* key, int value, int def);
-int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* key, u32b value, u32b def);
+int ini_setting_set_string_def(ini_settings *ini, const char *section, const char* key, const char *value, int size, const char* def);
+int ini_setting_set_sint32_def(ini_settings *ini, const char *section, const char* key, int value, int def);
+int ini_setting_set_uint32_def(ini_settings *ini, const char *section, const char* key, u32b value, u32b def);
 
 #endif /* INCLUDED_SETTING_H */

@@ -1314,16 +1314,16 @@ static void save_prefs(cptr ini_file)
 
 	/* some optional flags */
 	strnfmt(buf, 128, "%d", arg_fiddle ? 1 : 0);
-	ini_setting_set_string(ini, "Angband", "Fiddle", buf, 128, "0");
+	ini_setting_set_string_def(ini, "Angband", "Fiddle", buf, 128, "0");
 
 	strnfmt(buf, 128, "%d", arg_wizard ? 1 : 0);
-	ini_setting_set_string(ini, "Angband", "Wizard", buf, 128, "0");
+	ini_setting_set_string_def(ini, "Angband", "Wizard", buf, 128, "0");
 
 	strnfmt(buf, 128, "%d", arg_force_roguelike ? 1 : 0);
-	ini_setting_set_string(ini, "Angband", "force_roguelike", buf, 128, "0");
+	ini_setting_set_string_def(ini, "Angband", "force_roguelike", buf, 128, "0");
 
 	strnfmt(buf, 128, "%d", arg_force_original ? 1 : 0);
-	ini_setting_set_string(ini, "Angband", "force_original", buf, 128, "1");
+	ini_setting_set_string_def(ini, "Angband", "force_original", buf, 128, "0");
 
 #ifdef SUPPORT_GAMMA
 	if (gamma_correction > 0) {
