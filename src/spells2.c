@@ -260,11 +260,11 @@ void self_knowledge(void)
 	if (p_ptr->state.searching == SEARCH_MODE_SEARCH)
 	{
 		info[i++] = "You are looking around very carefully.";
-  } else
+	} else
 	if (p_ptr->state.searching == SEARCH_MODE_SWING)
 	{
 		info[i++] = "You are swinging your weapon around.";
-  } else
+	} else
 	if (p_ptr->state.searching == SEARCH_MODE_STEALTH)
 	{
 		info[i++] = "You are moving around very carefully.";
@@ -773,7 +773,7 @@ void self_knowledge(void)
 	height = MIN(Term->hgt - 3, i + 2);
 
 	/* Erase the screen */
-    clear_region(13, 1, height + 1);
+	clear_region(13, 1, height + 1);
 
 	/* Label the information */
 	prtf(15, 1, "     Your Attributes:");
@@ -1022,7 +1022,7 @@ void report_magics(void)
 	screen_save();
 
 	/* Erase the screen */
-    clear_region(13, 1, 23);
+	clear_region(13, 1, 23);
 
 	/* Label the information */
 	prtf(15, 1, "     Your Current Magic:");
@@ -1194,7 +1194,7 @@ static bool door_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
-  feature_type *feat_ptr  = &(f_info[c_ptr->feat]);
+	feature_type *feat_ptr  = &(f_info[c_ptr->feat]);
 
 	/* Detect secret doors */
 	/*if (c_ptr->feat == FEAT_SECRET)
@@ -1208,16 +1208,23 @@ static bool door_tester(int x, int y)
 	//	(c_ptr->feat == FEAT_BROKEN))
 	if (feat_ptr->flags &  FF_DOOR)
 	{
-	  if (feat_ptr->flags &  FF_HIDDEN)
-	  {
+		if (feat_ptr->flags &  FF_HIDDEN)
+		{
 			/* Pick a door */
-      if (feat_ptr->base_feat) {
-				create_closed_door(x, y, feat_ptr->base_feat);
-      } else {
+			u16b changeto = 0;
+			int i;
+			for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+				if (feat_ptr->effects[i].action == FEATC_SEARCH) {
+					changeto = feat_ptr->effects[i].changeto;
+					break;
+				}
+			}
+			if (changeto) {
+				create_closed_door(x, y, the_feat(changeto));
+			} else {
 				create_closed_door(x, y, the_feat(FEAT_CLOSED));
-      }
-  		//create_closed_door(x, y, feat->base_feat);
-    }
+			}
+		}
 		/* Hack -- Memorize */
 		remember_grid(c_ptr, pc_ptr);
 
@@ -1245,7 +1252,7 @@ static bool stair_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
-  feature_type *feat  = &(f_info[c_ptr->feat]);
+	feature_type *feat  = &(f_info[c_ptr->feat]);
 
 	/* Detect stairs */
 	//if ((c_ptr->feat == FEAT_LESS) || (c_ptr->feat == FEAT_MORE))
@@ -1277,7 +1284,7 @@ static bool treasure_tester(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 	pcave_type *pc_ptr = parea(x, y);
-  feature_type *feat  = &(f_info[c_ptr->feat]);
+	feature_type *feat  = &(f_info[c_ptr->feat]);
 
 	/* Magma/Quartz + Known Gold */
 	//if ((c_ptr->feat == FEAT_MAGMA_K) || (c_ptr->feat == FEAT_QUARTZ_K))
@@ -1423,7 +1430,7 @@ bool detect_objects_normal(void)
 static bool magic_tester(const object_type *o_ptr)
 {
 	/* Examine the tval */
-	int	tv = o_ptr->tval;
+	int tv = o_ptr->tval;
 
 	/* Artifacts, misc magic items, or enchanted wearables */
 	return	(o_ptr->xtra_name ||
@@ -4404,7 +4411,7 @@ bool purge_area(void)
 	if (project_hack2(GF_PURG_CURSE, p_ptr->lev, PROJECT_ITEM))
 		rv = TRUE;
 
-  if (project_hack2(GF_KILL_CURSE, p_ptr->lev, PROJECT_ITEM))
+	if (project_hack2(GF_KILL_CURSE, p_ptr->lev, PROJECT_ITEM))
 		rv = TRUE;
 
 	return (rv);

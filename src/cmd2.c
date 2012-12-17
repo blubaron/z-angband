@@ -77,7 +77,7 @@ void do_cmd_go_down(void)
 
 		/* Prompt before going down quest stairs, so player can tell quests apart */
 		//if (c_ptr->feat == FEAT_QUEST_MORE)
-  	if (feat->flags & FF_QUEST)
+		if (feat->flags & FF_QUEST)
 		{
 			monster_race *r_ptr;
 			quest_type *q_ptr = &quest[place[p_ptr->place_num].quest_num];
@@ -731,14 +731,6 @@ bool do_cmd_open_aux(int x, int y)
 	c_ptr = area(x, y);
 	feat = &(f_info[c_ptr->feat]);
 
-	/* Must be a closed door */
-	//if (c_ptr->feat != FEAT_CLOSED)
-	//if (!(feat->flags & FF_DOOR) || !(feat->flags & FF_CLOSED))
-	//{
-	//	/* Nope */
-	//	return (FALSE);
-	//}
-
 	///* Get fields */
 	//f_ptr = field_is_type(c_ptr, FTYPE_DOOR);
 
@@ -773,15 +765,39 @@ bool do_cmd_open_aux(int x, int y)
 				"i", LUA_VAR_NAMED(i, "power")))
 			 //,LUA_RETURN(did_open_door), LUA_RETURN(did_bash_door)))
 		{
+			u16b changeto = 0;
+			int i;
 			if (c_ptr->feat == FEAT_OPEN) {
-				if (feat->base_feat) {
-					cave_set_feat(x, y, feat->base_feat);
+				for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+					if (feat->effects[i].action == FEATC_OPEN) {
+						//if (randint1(100) < feat_ptr->effects[i].chance) {
+						//  change = &(feat_ptr->effects[i]);
+						//}
+						changeto = feat->effects[i].changeto;
+						break;
+					}
+				}
+				if (changeto) {
+					cave_set_feat(x, y, the_feat(changeto));
 				} else {
 					cave_set_feat(x, y, the_feat(FEAT_OPEN));
 				}
 			} else
 			if (c_ptr->feat == FEAT_BROKEN) {
-				cave_set_feat(x, y, the_feat(FEAT_BROKEN));
+				for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+					if (feat->effects[i].action == FEATC_BASH) {
+						//if (randint1(100) < feat_ptr->effects[i].chance) {
+						//  change = &(feat_ptr->effects[i]);
+						//}
+						changeto = feat->effects[i].changeto;
+						break;
+					}
+				}
+				if (changeto) {
+					cave_set_feat(x, y, the_feat(changeto));
+				} else {
+					cave_set_feat(x, y, the_feat(FEAT_BROKEN));
+				}
 			}
 			/* Sound */
 			sound(SOUND_OPENDOOR);
@@ -804,10 +820,19 @@ bool do_cmd_open_aux(int x, int y)
 	/* Closed door */
 	else
 	{
+		u16b changeto = 0;
+		int i;
 		/* Open the door */
-		//cave_set_feat(x, y, FEAT_OPEN);
-		if (feat->base_feat) {
-			cave_set_feat(x, y, the_feat(feat->base_feat));
+		for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+			if (feat->effects[i].action == FEATC_OPEN) {
+				if (randint1(100) < feat->effects[i].chance) {
+					changeto = feat->effects[i].changeto;
+				}
+				break;
+			}
+		}
+		if (changeto) {
+			cave_set_feat(x, y, the_feat(changeto));
 		} else {
 			cave_set_feat(x, y, the_feat(FEAT_OPEN));
 		}
@@ -975,12 +1000,22 @@ static bool do_cmd_close_aux(int x, int y)
 	else
 	{
 		/* Close the door */
-		//cave_set_feat(x, y, FEAT_CLOSED);
-		if (feat->base_feat) {
-			cave_set_feat(x, y, the_feat(feat->base_feat));
+		u16b changeto = 0;
+		int i;
+		for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+			if (feat->effects[i].action == FEATC_CLOSE) {
+				if (randint1(100) < feat->effects[i].chance) {
+					changeto = feat->effects[i].changeto;
+				}
+				break;
+			}
+		}
+		if (changeto) {
+			cave_set_feat(x, y, the_feat(changeto));
 		} else {
 			cave_set_feat(x, y, the_feat(FEAT_CLOSED));
 		}
+
 
 		/* Sound */
 		sound(SOUND_SHUTDOOR);
@@ -1410,6 +1445,7 @@ static bool do_cmd_tunnel_aux(int x, int y)
 
 	int action;
 	int base;
+	u16b changeto = 0;
 	int dig = p_ptr->skills[SKILL_DIG];
 
 	field_type *f_ptr = field_script_find(c_ptr,
@@ -1443,16 +1479,21 @@ static bool do_cmd_tunnel_aux(int x, int y)
 	}
 
 	feat  = &(f_info[c_ptr->feat]);
-	if (feat->flags & (FF_HIDDEN | FF_DOOR | FF_OVERLAY)) {
-		/* Secret doors */
-		base = the_floor();
-	} else
-	if (feat->base_feat) {
-		base = feat->base_feat;
-	} else
-	{
+	for (base = 0; base < MAX_FEAT_CHANGE; base++) {
+		if (feat->effects[base].action == FEATC_TUNNEL) {
+			/*if (randint1(100) < feat->effects[i].chance) {
+				changeto = feat->effects[i].changeto;
+			}*/
+			changeto = feat->effects[base].changeto;
+			break;
+		}
+	}
+	if (changeto) {
+		base = changeto;
+	} else {
 		base = the_floor();
 	}
+
 #if 0
 	/* Must be a wall/door/etc */
 	if (feat->flags & (FF_PWALK|FF_MWALK)) {

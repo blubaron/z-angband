@@ -61,7 +61,7 @@ static byte spell_color(int type)
 	//	|| (use_graphics == GRAPHICS_HALF_3D)
 	//	|| (use_graphics == GRAPHICS_DAVID_GERVAIS))
 	if (use_graphics > 1)
-  {
+	{
 		/* Analyze */
 		switch (type)
 		{
@@ -210,7 +210,8 @@ static int project_m_y;
 static bool project_f(int who, int r, int x, int y, int dam, int typ)
 {
 	cave_type *c_ptr = area(x, y);
-  feature_type *feat_ptr = &(f_info[c_ptr->feat]);
+	feature_type *feat_ptr = &(f_info[c_ptr->feat]);
+	feature_change  *change = NULL;
 
 	bool obvious = FALSE;
 	bool known = player_can_see_bold(x, y);
@@ -221,10 +222,23 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 	/* Reduce damage by distance */
 	dam = (dam + r) / (r + 1);
 
+	/* see if we have a default feat change */
+	if (feat_ptr->effects[0].action) {
+		int i;
+		for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+			if (feat_ptr->effects[i].action == typ) {
+				if (randint1(100) < feat_ptr->effects[i].chance) {
+					change = &(feat_ptr->effects[i]);
+				}
+				break;
+			}
+		}
+	}
+
 	/* Analyze the type */
 	switch (typ)
 	{
-		case GF_ACID:
+		/*case GF_ACID:
 		case GF_ELEC:
 		case GF_FIRE:
 		case GF_COLD:
@@ -242,9 +256,10 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 		case GF_TELEKINESIS:
 		case GF_DOMINATION:
 		{
-			/* Ignore most effects */
+			*//* use the default block below */
+			/* Ignore most effects *//*
 			break;
-		}
+		}*/
 
 		case GF_DISINTEGRATE:
 		{
@@ -253,8 +268,14 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Destroy everything including rock */
 			//c_ptr = area(x, y);
 
-			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) break;
-			if (!cave_valid_grid(c_ptr)) break;
+			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) {
+				change = NULL;
+				break;
+			}
+			if (!cave_valid_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Determine if effect is visually noticeable */
 			if (known)
@@ -279,13 +300,13 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			//	 c_ptr->feat != FEAT_MORE &&
 			//	 c_ptr->feat != FEAT_QUEST_LESS &&
 			//	 c_ptr->feat != FEAT_QUEST_MORE)
-      if (!(feat_ptr->flags & FF_EXIT_UP) 
-        && !(feat_ptr->flags & FF_EXIT_DOWN)
-        && !(feat_ptr->flags & FF_QUEST)
-        && !(feat_ptr->flags & FF_PERM)
-        //&& !(feat_ptr->flags & FF_LIQUID)
-        && ((feat_ptr->flags & FF_NO_LOS)
-          || !(feat_ptr->flags & FF_HALF_LOS)))
+			if (!(feat_ptr->flags & FF_EXIT_UP) 
+				&& !(feat_ptr->flags & FF_EXIT_DOWN)
+				&& !(feat_ptr->flags & FF_QUEST)
+				&& !(feat_ptr->flags & FF_PERM)
+				//&& !(feat_ptr->flags & FF_LIQUID)
+				&& ((feat_ptr->flags & FF_NO_LOS)
+					|| !(feat_ptr->flags & FF_HALF_LOS)))
 			{
 				/* Can't miss this effect */
 				if (known && f_info[c_ptr->feat].flags != f_info[the_floor()].flags) obvious = TRUE;
@@ -299,12 +320,15 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Destroy Doors (and traps) */
 
 			/* Fields can block destruction */
-			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) break;
+			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) {
+				change = NULL;
+				break;
+			}
 
 			/* Destroy all open doors */
 			//if ((c_ptr->feat == FEAT_OPEN) || (c_ptr->feat == FEAT_BROKEN) ||
 			//	(c_ptr->feat == FEAT_CLOSED))
-      if ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & FF_PERM|FF_HIDDEN))
+			if ((feat_ptr->flags & FF_DOOR) && !(feat_ptr->flags & FF_PERM|FF_HIDDEN))
 			{
 				/* Check line of sight */
 				if (known)
@@ -326,22 +350,32 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Destroy Traps (and Locks) */
 
 			/* Fields can block destruction */
-			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) break;
+			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) {
+				change = NULL;
+				break;
+			}
 
 			/* Reveal secret doors */
 			//if (c_ptr->feat == FEAT_SECRET)
-      if ((feat_ptr->flags & FF_DOOR) && (feat_ptr->flags & FF_HIDDEN))
-			{
-				/* Pick a door */
-        if (feat_ptr->base_feat) {
-				  create_closed_door(x, y, feat_ptr->base_feat);
-        } else {
-				  create_closed_door(x, y, the_feat(FEAT_CLOSED));
-        }
-
+			if (feat_ptr->flags & FF_HIDDEN) {
+				u16b changeto = 0;
+				int i;
+				for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+					if (feat_ptr->effects[i].action == FEATC_SEARCH) {
+						changeto = feat_ptr->effects[i].changeto;
+						break;
+					}
+				}
+				if (changeto) {
+					cave_set_feat(x, y, the_feat(changeto));
+				} else {
+					if (feat_ptr->flags & FF_DOOR) {
+						cave_set_feat(x, y, the_feat(FEAT_CLOSED));
+					}
+				}
+      
 				/* Check line of sight */
-				if (known)
-				{
+				if (known) {
 					obvious = TRUE;
 				}
 			}
@@ -353,7 +387,7 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Jams a door (as if with a spike) */
 
 			//if (c_ptr->feat == FEAT_CLOSED)
-      if ((feat_ptr->flags & FF_DOOR) && (feat_ptr->flags & FF_CLOSED))
+			if ((feat_ptr->flags & FF_DOOR) && (feat_ptr->flags & FF_CLOSED))
 			{
 				make_lockjam_door(x, y, 0xFFFF, 1, TRUE);
 
@@ -373,38 +407,54 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Destroy walls (and doors) */
 
 			/* Non-walls (etc) */
-			if (cave_floor_grid(c_ptr)) break;
+			if (cave_floor_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Permanent walls */
-			if (cave_perma_grid(c_ptr)) break;
+			if (cave_perma_grid(c_ptr)) {
+				change = NULL;
+				break;
+			};
 
 			/* Fields can block destruction */
-			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) break;
+			if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) {
+				change = NULL;
+				break;
+			}
 
-      /* general substitution */
-      if ((feat_ptr->flags & FF_DIG) || (feat_ptr->flags2 & FF_STONE))
-      {
+			/* general substitution */
+			if ((feat_ptr->flags & FF_DIG) || (feat_ptr->flags2 & FF_STONE))
+			{
 				/* Destroy the wall */
-        if (feat_ptr->base_feat) {
-				  cave_set_feat(x, y, feat_ptr->base_feat);
-        } else {
-				  cave_set_feat(x, y, the_floor());
-        }
-
+				u16b changeto = 0;
+				int i;
+				for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+					if (feat_ptr->effects[i].action == FEATC_TUNNEL) {
+						changeto = feat_ptr->effects[i].changeto;
+						break;
+					}
+				}
+				if (changeto) {
+					cave_set_feat(x, y, the_feat(changeto));
+				} else {
+					cave_set_feat(x, y, the_floor());
+				}
+      
 				/* Message */
-				if (known)
-				{
-          if (feat_ptr->flags & FF_HALF_LOS) {
-				  	msgf("The %s disappears!", f_name + feat_ptr->name);
-          } else {
-					  msgf("The %s turns into mud!", f_name + feat_ptr->name);
-          }
+				if (known) {
+					if (feat_ptr->flags & FF_OBJECT) {
+						msgf("The %s disappears!", f_name + feat_ptr->name);
+					} else {
+						msgf("The %s turns into mud!", f_name + feat_ptr->name);
+					}
 					obvious = TRUE;
 				}
-      }
+			}
 			/* Terrain */
 			//if (c_ptr->feat >= FEAT_TREES)
-      else if (feat_ptr->flags & FF_HALF_LOS)
+			else if (feat_ptr->flags & FF_HALF_LOS)
 			{
 				/* Destroy the wall */
 				cave_set_feat(x, y, the_floor());
@@ -423,7 +473,7 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 				}
 			}
 			/* Granite */
-      else if (feat_ptr->flags & FF_NO_LOS)
+			else if (feat_ptr->flags & FF_NO_LOS)
 			{
 				/* Destroy the wall */
 				cave_set_feat(x, y, the_floor());
@@ -486,7 +536,7 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			//else if ((c_ptr->feat == FEAT_OPEN)
 			//		 || (c_ptr->feat == FEAT_SECRET)
 			//		 || (c_ptr->feat == FEAT_CLOSED))
-      else if (feat_ptr->flags & FF_DOOR)
+			else if (feat_ptr->flags & FF_DOOR)
 			{
 				/* Destroy the feature */
 				cave_set_feat(x, y, the_floor());
@@ -514,39 +564,41 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 
 			/* Rubble */
 			//else if (c_ptr->feat == FEAT_RUBBLE)
-      if (feat_ptr->flags & FF_DIG_OBJ)
-			{
-				/* Hack -- place an object */
-				if (randint0(100) < 10)
+			if (!change) {
+				if (feat_ptr->flags & FF_DIG_OBJ)
 				{
-					/* Prepare for object memory */
-					current_object_source.type = OM_RUBBLE;
-					current_object_source.place_num = p_ptr->place_num;
-					current_object_source.depth = p_ptr->depth;
-					current_object_source.data = 0;
-
-					/* Place gold */
-					place_object(x, y, FALSE, FALSE, 0);
-
-					/* Found something */
-					if (known)
+					/* Hack -- place an object */
+					if (randint0(100) < 10)
 					{
-						msgf("There was something buried in the %s!", f_name + feat_ptr->name);
+						/* Prepare for object memory */
+						current_object_source.type = OM_RUBBLE;
+						current_object_source.place_num = p_ptr->place_num;
+						current_object_source.depth = p_ptr->depth;
+						current_object_source.data = 0;
+
+						/* Place gold */
+						place_object(x, y, FALSE, FALSE, 0);
+
+						/* Found something */
+						if (known)
+						{
+							msgf("There was something buried in the %s!", f_name + feat_ptr->name);
+						}
 					}
 				}
-			}
 
-      /* Quartz / Magma with treasure */
-			//else if (c_ptr->feat >= FEAT_MAGMA_K)
-      if (feat_ptr->flags & FF_DIG_GOLD)
-			{
-				/* Place some gold */
-				place_gold(x, y);
-
-				/* Message */
-				if (known)
+				/* Quartz / Magma with treasure */
+				//else if (c_ptr->feat >= FEAT_MAGMA_K)
+				if (feat_ptr->flags & FF_DIG_GOLD)
 				{
-					msgf("You have found something!");
+					/* Place some gold */
+					place_gold(x, y);
+
+					/* Message */
+					if (known)
+					{
+						msgf("You have found something!");
+					}
 				}
 			}
 
@@ -558,10 +610,16 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Make doors */
 
 			/* Require a "naked" floor grid */
-			if (!cave_naked_grid(c_ptr)) break;
+			if (!cave_naked_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Not under the player */
-			if ((x == p_ptr->px) && (y == p_ptr->py)) break;
+			if ((x == p_ptr->px) && (y == p_ptr->py)) {
+				change = NULL;
+				break;
+			}
 
 			/* Create a closed door */
 			cave_set_feat(x, y, the_feat(FEAT_CLOSED));
@@ -580,10 +638,16 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Make lava */
 
 			/* Require a "naked" floor grid */
-			if (!cave_naked_grid(c_ptr)) break;
+			if (!cave_naked_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Not under the player */
-			if ((x == p_ptr->px) && (y == p_ptr->py)) break;
+			if ((x == p_ptr->px) && (y == p_ptr->py)) {
+				change = NULL;
+				break;
+			}
 
 			/* Create lava */
 			cave_set_feat(x, y, (one_in_(3) ? FEAT_SHAL_LAVA : FEAT_DEEP_LAVA));
@@ -601,10 +665,16 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Make water */
 
 			/* Require a "naked" floor grid */
-			if (!cave_naked_grid(c_ptr)) break;
+			if (!cave_naked_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Not under the player */
-			if ((x == p_ptr->px) && (y == p_ptr->py)) break;
+			if ((x == p_ptr->px) && (y == p_ptr->py)) {
+				change = NULL;
+				break;
+			}
 
 			/* Create water */
 			cave_set_feat(x, y, (one_in_(3) ? FEAT_SHAL_WATER : FEAT_DEEP_WATER));
@@ -622,7 +692,10 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Make traps */
 
 			/* Require a "naked" floor grid */
-			if (!cave_naked_grid(c_ptr)) break;
+			if (!cave_naked_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Place a trap */
 			place_trap(x, y);
@@ -635,12 +708,20 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			/* Make a Glyph of Warding */
 
 			/* Require a "naked" floor grid */
-			if ((c_ptr->o_idx != 0) || (c_ptr->m_idx != 0)) break;
+			if ((c_ptr->o_idx != 0) || (c_ptr->m_idx != 0)) {
+				change = NULL;
+				break;
+			}
 
 			/* Require a floor grid */
-			if (cave_wall_grid(c_ptr)) break;
+			if (cave_wall_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Add the glyph here as a field */
+
+
 			(void)place_field(x, y, FT_GLYPH_WARDING);
 
 			/* Notice it */
@@ -652,11 +733,20 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 		case GF_STONE_WALL:
 		{
 			/* Require a "naked" floor grid */
-			if ((c_ptr->o_idx != 0) || (c_ptr->m_idx != 0)) break;
-			if (!cave_floor_grid(c_ptr)) break;
+			if ((c_ptr->o_idx != 0) || (c_ptr->m_idx != 0)) {
+				change = NULL;
+				break;
+			}
+			if (!cave_floor_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Not on permanent grids */
-			if (cave_perma_grid(c_ptr)) break;
+			if (cave_perma_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Place a wall */
 			cave_set_feat(x, y, the_wall());
@@ -713,17 +803,26 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 			/* Not on permanent grids */
-			if (cave_perma_grid(c_ptr)) break;
+			if (cave_perma_grid(c_ptr)) {
+				change = NULL;
+				break;
+			}
 
 			/* Paranoia */
-			if (!current_terrain) break;
+			if (!current_terrain) {
+				change = NULL;
+				break;
+			}
 
 			/* If a monster is there, do a saving throw. */
 			if (!m_ptr->imprisoned &&
 				((FLAG(r_ptr, RF_UNIQUE) && !one_in_(3)) ||
 				(FLAG(r_ptr, RF_NO_CONF)) ||
 				(r_ptr->hdice * 2 > randint1(dam * 4))))
+			{
+				change = NULL;
 				break;
+			}
 
 			/* Set it */
 			cave_set_feat(x,y, current_terrain);
@@ -736,6 +835,110 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 
 			break;
 		}
+		case GF_GROW:
+		{
+			/* Make tree */
+			/* Not under the player */
+			if ((x == p_ptr->px) && (y == p_ptr->py)) {
+				change = NULL;
+				break;
+			}
+
+			/* Create tree */
+			if (c_ptr->feat == the_feat(FEAT_TREES)) {
+				if (known) {
+					obvious = TRUE;
+				}
+				cave_set_feat(x, y, the_feat(FEAT_JUNGLE));
+			} else {
+				/* Require a "naked" floor grid */
+				if (!cave_naked_grid(c_ptr)) {
+					change = NULL;
+					break;
+				}
+
+				if (known) {
+					obvious = TRUE;
+				}
+
+				cave_set_feat(x, y, the_feat(FEAT_TREES));
+			}
+			break;
+		}
+		case GF_WITHER:
+		{
+			/* Kill tree */
+			/* Not under the player */
+			if ((x == p_ptr->px) && (y == p_ptr->py)) {
+				change = NULL;
+				break;
+			}
+
+			if (c_ptr->feat == the_feat(FEAT_JUNGLE)) {
+				if (known) {
+					obvious = TRUE;
+				}
+				cave_set_feat(x, y, the_feat(FEAT_TREES));
+			} else
+			if (c_ptr->feat == the_feat(FEAT_TREES)) {
+				if (known) {
+					obvious = TRUE;
+				}
+				cave_set_feat(x, y, the_floor());
+			}
+			break;
+		}
+		default:
+		{
+			if (change) {
+				/* Fields can block destruction */
+				if (fields_have_flags(c_ptr, FIELD_INFO_PERM)) {
+					change = NULL;
+					break;
+				}
+				if (known) {
+					/*feature_type *feat2_ptr = &(f_info[the_feat(change->changeto)]);
+					msgf("The %s turns into %s!", f_name + feat_ptr->name, f_name + feat2_ptr->name);*/
+					obvious = TRUE;
+				}
+			}
+		}
+	}
+
+	if (change) {
+		/* Rubble */
+		if (feat_ptr->flags & FF_DIG_OBJ) {
+			/* Hack -- place an object */
+			if (randint0(100) < 10) {
+				/* Prepare for object memory */
+				current_object_source.type = OM_RUBBLE;
+				current_object_source.place_num = p_ptr->place_num;
+				current_object_source.depth = p_ptr->depth;
+				current_object_source.data = 0;
+
+				/* Place gold */
+				place_object(x, y, FALSE, FALSE, 0);
+
+				/* Found something */
+				if (known) {
+					msgf("There was something buried in the %s!", f_name + feat_ptr->name);
+				}
+			}
+		}
+
+		/* Quartz / Magma with treasure */
+		if (feat_ptr->flags & FF_DIG_GOLD) {
+			/* Place some gold */
+			place_gold(x, y);
+
+			/* Message */
+			if (known) {
+				msgf("You have found something!");
+			}
+		}
+
+		/* change the feature */
+		cave_set_feat(x, y, the_feat(change->changeto));
 	}
 
 	/* Return "Anything seen?" */
@@ -965,7 +1168,7 @@ static bool project_o(int who, int r, int x, int y, int dam, int typ)
 
 				if (cursed_p(o_ptr))
 				{
-          uncurse_item(o_ptr, FALSE);
+					uncurse_item(o_ptr, FALSE);
 					//do_kill = TRUE;
 					//note_kill = (plural ? " are destroyed!" : " is destroyed!");
 				}
@@ -4318,7 +4521,7 @@ static bool project_p(int who, int r, int x, int y, int dam, int typ, int a_rad)
 
 					msgf("You're not as %s as you used to be...", act);
 
-                    /* Note: this is a change from old behavior -RML */
+					/* Note: this is a change from old behavior -RML */
 					p_ptr->stat[k].cur = (p_ptr->stat[k].cur * 3) / 4;
 					if (p_ptr->stat[k].cur < 3) p_ptr->stat[k].cur = 3;
 					p_ptr->update |= (PU_BONUS);

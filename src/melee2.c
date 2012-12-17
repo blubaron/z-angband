@@ -2349,32 +2349,47 @@ static void take_move(int m_idx, int *mm)
 			 LUA_RETURN(do_turn), LUA_RETURN(did_bash_door));
 
 		/* Open / bash doors */
+		if (did_bash_door) {
+			if (one_in_(2)) {
+				did_open_door = TRUE;
+			}
+		}
 		if (did_open_door)
 		{
-			//cave_set_feat(nx, ny, FEAT_OPEN);
-      if (feat_ptr->base_feat) {
-		    cave_set_feat(nx, ny, feat_ptr->base_feat);
-      } else {
-        cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
-      }
+			u16b changeto = 0;
+			int i;
+			for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+				if (feat_ptr->effects[i].action == FEATC_OPEN) {
+					/*if (randint1(100) < feat_ptr->effects[i].chance) {
+						changeto = feat_ptr->effects[i].changeto;
+					}*/
+					changeto = feat_ptr->effects[i].changeto;
+					break;
+				}
+			}
+			if (changeto) {
+				cave_set_feat(nx, ny, the_feat(changeto));
+			} else {
+				cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+			}
 		}
 		else if (did_bash_door)
 		{
-			if (one_in_(2))
-			{
-				//cave_set_feat(nx, ny, FEAT_BROKEN);
-				cave_set_feat(nx, ny, the_feat(FEAT_BROKEN));
+			u16b changeto = 0;
+			int i;
+			for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+				if (feat_ptr->effects[i].action == FEATC_BASH) {
+					/*if (randint1(100) < feat_ptr->effects[i].chance) {
+						changeto = feat_ptr->effects[i].changeto;
+					}*/
+					changeto = feat_ptr->effects[i].changeto;
+					break;
+				}
 			}
-
-			/* Open the door */
-			else
-			{
-				//cave_set_feat(nx, ny, FEAT_OPEN);
-        if (feat_ptr->base_feat) {
-		      cave_set_feat(nx, ny, feat_ptr->base_feat);
-        } else {
-          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
-        }
+			if (changeto) {
+				cave_set_feat(nx, ny, the_feat(changeto));
+			} else {
+				cave_set_feat(nx, ny, the_feat(FEAT_BROKEN));
 			}
 		}
 
@@ -2395,56 +2410,89 @@ static void take_move(int m_idx, int *mm)
 		//	(FLAG(r_ptr, RF_OPEN_DOOR)) &&
 		//	(!is_pet(m_ptr) || p_ptr->pet_open_doors))
 		if (do_move && (feat_ptr->flags & FF_DOOR)
-      && (feat_ptr->flags & (FF_CLOSED|FF_HIDDEN)))
-    {
+			&& (feat_ptr->flags & (FF_CLOSED|FF_HIDDEN)))
+		{
 			if ((FLAG(r_ptr, RF_OPEN_DOOR)) &&
-			(!is_pet(m_ptr) || p_ptr->pet_open_doors))
-		{
-			/* Open the door */
-			//cave_set_feat(nx, ny, FEAT_OPEN);
-      if (feat_ptr->flags & FF_HIDDEN) {
-        u16b closed_feat, open_feat;
-        if (feat_ptr->base_feat) {
-          closed_feat = feat_ptr->base_feat;
-        } else {
-          closed_feat = the_feat(FEAT_CLOSED);
-        }
-        if (closed_feat) {
-          open_feat = f_info[closed_feat].base_feat;
-        } else {
-          open_feat = 0;
-        }
-        
-        if (open_feat) {
-		      cave_set_feat(nx, ny, open_feat);
-        } else {
-          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
-        }
-      } else {
-        if (feat_ptr->base_feat) {
-		      cave_set_feat(nx, ny, feat_ptr->base_feat);
-        } else {
-          cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
-        }
-      }
+				(!is_pet(m_ptr) || p_ptr->pet_open_doors))
+			{
+				/* Open the door */
+				//cave_set_feat(nx, ny, FEAT_OPEN);
+				if (feat_ptr->flags & FF_HIDDEN) {
+					u16b closed_feat, open_feat;
+					/*if (feat_ptr->base_feat) {
+						closed_feat = feat_ptr->base_feat;
+					} else {
+						closed_feat = the_feat(FEAT_CLOSED);
+					}
+					if (closed_feat) {
+						open_feat = f_info[closed_feat].base_feat;
+					} else {
+						open_feat = 0;
+					}*/
+		
+					int i;
+					closed_feat = 0;
+					for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+						if (feat_ptr->effects[i].action == FEATC_SEARCH) {
+							closed_feat = feat_ptr->effects[i].changeto;
+							break;
+						}
+					}
+					if (closed_feat) {
+						closed_feat = the_feat(closed_feat);
+					} else {
+						closed_feat = the_feat(FEAT_CLOSED);
+					}
+					open_feat = 0;
+					for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+						if (f_info[closed_feat].effects[i].action == FEATC_OPEN) {
+							open_feat = f_info[closed_feat].effects[i].changeto;
+							break;
+						}
+					}
+					if (open_feat) {
+						cave_set_feat(nx, ny, the_feat(open_feat));
+					} else {
+						cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+					}
+				} else {
+					int i;
+					u16b open_feat = 0;
+					for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+						if (feat_ptr->effects[i].action == FEATC_OPEN) {
+							open_feat = feat_ptr->effects[i].changeto;
+							break;
+						}
+					}
+					if (open_feat) {
+						cave_set_feat(nx, ny, the_feat(open_feat));
+					} else {
+						cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+					}
+					/*if (feat_ptr->base_feat) {
+						cave_set_feat(nx, ny, feat_ptr->base_feat);
+					} else {
+						cave_set_feat(nx, ny, the_feat(FEAT_OPEN));
+					}*/
+				}
 
-			/* Take a turn */
-			do_turn = TRUE;
+				/* Take a turn */
+				do_turn = TRUE;
 
-			/* Do not move in any case. */
-			do_move = FALSE;
+				/* Do not move in any case. */
+				do_move = FALSE;
 
-			/* The door was opened */
-			did_open_door = TRUE;
+				/* The door was opened */
+				did_open_door = TRUE;
+			}
+			//else if (((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
+			//		 && !did_pass_wall)
+			else if (!did_pass_wall)
+			{
+				/* Monsters cannot walk through closed doors */
+				do_move = FALSE;
+			}
 		}
-		//else if (((c_ptr->feat == FEAT_CLOSED) || (c_ptr->feat == FEAT_SECRET))
-		//		 && !did_pass_wall)
-		else if (!did_pass_wall)
-		{
-			/* Monsters cannot walk through closed doors */
-			do_move = FALSE;
-		}
-    }
 		/* The player is in the way.  Attack him. */
 		if (do_move && (ny == p_ptr->py) && (nx == p_ptr->px))
 		{

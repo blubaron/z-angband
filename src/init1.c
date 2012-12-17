@@ -87,16 +87,16 @@ static cptr f_info_flags[] =
 	"DIG_FOOD",
 	"ICKY",
 	"HALF_LOS",
-  "OBJECT",
-  "CLOSED",
-  "BROKEN",
-  "WILD",
-  "LIQUID",
-  "DAMAGES",
-  "CLOSEABLE",
-  "DEEP",
-  "NO_FLYING",
-  "PROJECT",
+	"OBJECT",
+	"CLOSED",
+	"BROKEN",
+	"WILD",
+	"LIQUID",
+	"DAMAGES",
+	"CLOSEABLE",
+	"DEEP",
+	"NO_FLYING",
+	"PROJECT",
 
 	"FLOOR",
 	"WALL",
@@ -935,6 +935,382 @@ static cptr dungeon_room_flags[] =
 	"XXX16",
 };
 
+static int grab_effect_id(cptr text)
+{
+	if (strcmp(text, "SEARCH")==0) {
+		return FEATC_SEARCH;
+	} else
+	if (strcmp(text, "TUNNEL")==0) {
+		return FEATC_TUNNEL;
+	} else
+	if (strcmp(text, "OPEN")==0) {
+		return FEATC_OPEN;
+	} else
+	if (strcmp(text, "CLOSE")==0) {
+		return FEATC_CLOSE;
+	} else
+	if (strcmp(text, "DISARM")==0) {
+		return FEATC_DISARM;
+	} else
+	if (strcmp(text, "BASH")==0) {
+		return FEATC_BASH;
+	} else
+	if (strcmp(text, "HIDE")==0) {
+		return FEATC_HIDE;
+	} else
+	if (strcmp(text, "ARM")==0) {
+		return FEATC_ARM;
+	} else
+	if (strcmp(text, "JAM")==0) {
+		return FEATC_JAM;
+	} else
+	if (strcmp(text, "LOCK")==0) {
+		return FEATC_LOCK;
+	} else
+	if (strcmp(text, "ELEC")==0) {
+		return GF_ELEC;
+	} else
+	if (strcmp(text, "POIS")==0) {
+		return GF_POIS;
+	} else
+	if (strcmp(text, "ACID")==0) {
+		return GF_ACID;
+	} else
+	if (strcmp(text, "COLD")==0) {
+		return GF_COLD;
+	} else
+	if (strcmp(text, "FIRE")==0) {
+		return GF_FIRE;
+	} else
+	if (strcmp(text, "MISSILE")==0) {
+		return GF_MISSILE;
+	} else
+	if (strcmp(text, "ARROW")==0) {
+		return GF_ARROW;
+	} else
+	if (strcmp(text, "PLASMA")==0) {
+		return GF_PLASMA;
+	} else
+	/*if (strcmp(text, "HOLY_ORB")==0) {
+		return GF_HOLY_ORB;
+	} else*/
+	if (strcmp(text, "WATER")==0) {
+		return GF_WATER;
+	} else
+	if (strcmp(text, "LITE")==0) {
+		return GF_LITE;
+	} else
+	if (strcmp(text, "DARK")==0) {
+		return GF_DARK;
+	} else
+	if (strcmp(text, "LITE_WEAK")==0) {
+		return GF_LITE_WEAK;
+	} else
+	if (strcmp(text, "DARK_WEAK")==0) {
+		return GF_DARK_WEAK;
+	} else
+	if (strcmp(text, "SHARDS")==0) {
+		return GF_SHARDS;
+	} else
+	if (strcmp(text, "SOUND")==0) {
+		return GF_SOUND;
+	} else
+	if (strcmp(text, "CONFUSION")==0) {
+		return GF_CONFUSION;
+	} else
+	if (strcmp(text, "FORCE")==0) {
+		return GF_FORCE;
+	} else
+	if (strcmp(text, "INERTIA")==0) {
+		return GF_INERTIA;
+	} else
+	if (strcmp(text, "MANA")==0) {
+		return GF_MANA;
+	} else
+	if (strcmp(text, "METEOR")==0) {
+		return GF_METEOR;
+	} else
+	if (strcmp(text, "ICE")==0) {
+		return GF_ICE;
+	} else
+	if (strcmp(text, "CHAOS")==0) {
+		return GF_CHAOS;
+	} else
+	if (strcmp(text, "NETHER")==0) {
+		return GF_NETHER;
+	} else
+	if (strcmp(text, "DISENCHANT")==0) {
+		return GF_DISENCHANT;
+	} else
+	if (strcmp(text, "NEXUS")==0) {
+		return GF_NEXUS;
+	} else
+	if (strcmp(text, "TIME")==0) {
+		return GF_TIME;
+	} else
+	if (strcmp(text, "GRAVITY")==0) {
+		return GF_GRAVITY;
+	} else
+	if (strcmp(text, "KILL_WALL")==0) {
+		return GF_KILL_WALL;
+	} else
+	if (strcmp(text, "KILL_DOOR")==0) {
+		return GF_KILL_DOOR;
+	} else
+	if (strcmp(text, "KILL_TRAP")==0) {
+		return GF_KILL_TRAP;
+	} else
+	if (strcmp(text, "MAKE_WALL")==0) {
+		return GF_MAKE_WALL;
+	} else
+	if (strcmp(text, "MAKE_DOOR")==0) {
+		return GF_MAKE_DOOR;
+	} else
+	if (strcmp(text, "MAKE_TRAP")==0) {
+		return GF_MAKE_TRAP;
+	} else
+	if (strcmp(text, "OLD_CLONE")==0) {
+		return GF_OLD_CLONE;
+	} else
+	if (strcmp(text, "OLD_POLY")==0) {
+		return GF_OLD_POLY;
+	} else
+	if (strcmp(text, "OLD_HEAL")==0) {
+		return GF_OLD_HEAL;
+	} else
+	if (strcmp(text, "OLD_SPEED")==0) {
+		return GF_OLD_SPEED;
+	} else
+	if (strcmp(text, "OLD_SLOW")==0) {
+		return GF_OLD_SLOW;
+	} else
+	if (strcmp(text, "OLD_CONF")==0) {
+		return GF_OLD_CONF;
+	} else
+	if (strcmp(text, "OLD_SLEEP")==0) {
+		return GF_OLD_SLEEP;
+	} else
+	if (strcmp(text, "OLD_DRAIN")==0) {
+		return GF_OLD_DRAIN;
+	} else
+	if (strcmp(text, "NEW_DRAIN")==0) {
+		return GF_NEW_DRAIN;
+	} else
+	if (strcmp(text, "AWAY_UNDEAD")==0) {
+		return GF_AWAY_UNDEAD;
+	} else
+	if (strcmp(text, "AWAY_EVIL")==0) {
+		return GF_AWAY_EVIL;
+	} else
+	if (strcmp(text, "AWAY_ALL")==0) {
+		return GF_AWAY_ALL;
+	} else
+	if (strcmp(text, "TURN_UNDEAD")==0) {
+		return GF_TURN_UNDEAD;
+	} else
+	if (strcmp(text, "TURN_EVIL")==0) {
+		return GF_TURN_EVIL;
+	} else
+	if (strcmp(text, "TURN_ALL")==0) {
+		return GF_TURN_ALL;
+	} else
+	if (strcmp(text, "DISP_UNDEAD")==0) {
+		return GF_DISP_UNDEAD;
+	} else
+	if (strcmp(text, "DISP_EVIL")==0) {
+		return GF_DISP_EVIL;
+	} else
+	if (strcmp(text, "DISP_ALL")==0) {
+		return GF_DISP_ALL;
+	} else
+	if (strcmp(text, "DISP_DEMON")==0) {
+		return GF_DISP_DEMON;
+	} else
+	if (strcmp(text, "DISP_LIVING")==0) {
+		return GF_DISP_LIVING;
+	} else
+	if (strcmp(text, "ROCKET")==0) {
+		return GF_ROCKET;
+	} else
+	if (strcmp(text, "NUKE")==0) {
+		return GF_NUKE;
+	} else
+	if (strcmp(text, "MAKE_GLYPH")==0) {
+		return GF_MAKE_GLYPH;
+	} else
+	if (strcmp(text, "STASIS")==0) {
+		return GF_STASIS;
+	} else
+	if (strcmp(text, "STONE_WALL")==0) {
+		return GF_STONE_WALL;
+	} else
+	if (strcmp(text, "DEATH_RAY")==0) {
+		return GF_DEATH_RAY;
+	} else
+	if (strcmp(text, "STUN")==0) {
+		return GF_STUN;
+	} else
+	if (strcmp(text, "HOLY_FIRE")==0) {
+		return GF_HOLY_FIRE;
+	} else
+	if (strcmp(text, "HELL_FIRE")==0) {
+		return GF_HELL_FIRE;
+	} else
+	if (strcmp(text, "DISINTEGRATE")==0) {
+		return GF_DISINTEGRATE;
+	} else
+	if (strcmp(text, "CHARM")==0) {
+		return GF_CHARM;
+	} else
+	if (strcmp(text, "CONTROL_UNDEAD")==0) {
+		return GF_CONTROL_UNDEAD;
+	} else
+	if (strcmp(text, "CONTROL_ANIMAL")==0) {
+		return GF_CONTROL_ANIMAL;
+	} else
+	if (strcmp(text, "PSI")==0) {
+		return GF_PSI;
+	} else
+	if (strcmp(text, "PSI_DRAIN")==0) {
+		return GF_PSI_DRAIN;
+	} else
+	if (strcmp(text, "TELEKINESIS")==0) {
+		return GF_TELEKINESIS;
+	} else
+	if (strcmp(text, "JAM_DOOR")==0) {
+		return GF_JAM_DOOR;
+	} else
+	if (strcmp(text, "DOMINATION")==0) {
+		return GF_DOMINATION;
+	} else
+	if (strcmp(text, "DISP_GOOD")==0) {
+		return GF_DISP_GOOD;
+	} else
+	if (strcmp(text, "MAKE_LAVA")==0) {
+		return GF_MAKE_LAVA;
+	} else
+	if (strcmp(text, "MAKE_WATER")==0) {
+		return GF_MAKE_WATER;
+	} else
+	if (strcmp(text, "IDENT")==0) {
+		return GF_IDENT;
+	} else
+	if (strcmp(text, "CONTROL_EVIL")==0) {
+		return GF_CONTROL_EVIL;
+	} else
+	if (strcmp(text, "TELE_ATTACK")==0) {
+		return GF_TELE_ATTACK;
+	} else
+	if (strcmp(text, "IMPRISON")==0) {
+		return GF_IMPRISON;
+	} else
+	if (strcmp(text, "CLONE_PET")==0) {
+		return GF_CLONE_PET;
+	} else
+	if (strcmp(text, "KILL_CURSE")==0) {
+		return GF_KILL_CURSE;
+	} else
+	if (strcmp(text, "PETRIFY")==0) {
+		return GF_PETRIFY;
+	} else
+	if (strcmp(text, "SILENCE")==0) {
+		return GF_SILENCE;
+	} else
+	if (strcmp(text, "TERRAFORM")==0) {
+		return GF_TERRAFORM;
+	} else
+	if (strcmp(text, "PURG_CURSE")==0) {
+		return GF_PURG_CURSE;
+	} else
+	if (strcmp(text, "TREE")==0) {
+		return GF_GROW;
+	} else
+	if (strcmp(text, "WITHER")==0) {
+		return GF_WITHER;
+	}/* else*/
+	return -1;
+}
+
+static u32b grab_effect_flag1(int id)
+{
+	if (id == FEATC_SEARCH) {
+		return FF_HIDDEN;
+	} else
+	if (id == FEATC_TUNNEL) {
+		return FF_DIG;
+	} else
+	if (id == FEATC_OPEN) {
+		return FF_CLOSED;
+	} else
+	if (id == FEATC_CLOSE) {
+		return FF_CLOSEABLE;
+	} else
+	if (id == FEATC_DISARM) {
+		return FF_TRAP;
+	} else
+	if (id == FEATC_BASH) {
+		return FF_BASH;
+	} else
+	if (id == FEATC_HIDE) {
+		return 0;
+	} else
+	if (id == FEATC_JAM) {
+		return 0;
+	} else
+	if (id == FEATC_LOCK) {
+		return 0;
+	}
+	return 0;
+}
+static u32b grab_effect_flag2(int id)
+{
+	if (id == FEATC_ARM) {
+		/* "ARM" */
+		return FF_TRAPPABLE;
+	} else
+	if (id == GF_ELEC) {
+		 return FF_CONDUCTS;
+	} else
+	if (id == GF_POIS) {
+		return FF_SMELLS;
+	} else
+	if (id == GF_ACID) {
+		return FF_MELTS;
+	} else
+	if (id == GF_COLD) {
+		return FF_FREEZES;
+	} else
+	if (id == GF_FIRE) {
+		return FF_BURNS;
+	} else
+	/*if (strcmp(text, "MISSILE")==0) {
+		return GF_MISSILE;
+	} else
+	if (strcmp(text, "ARROW")==0) {
+		return GF_ARROW;
+	} else
+	if (strcmp(text, "PLASMA")==0) {
+		return GF_PLASMA;
+	} else
+	if (strcmp(text, "WATER")==0) {
+		return GF_WATER;
+	} else*/
+	if (id == GF_LITE) {
+		return FF_LIGHTSUP;
+	} else
+	if (id == GF_DARK) {
+		return FF_DARKENS;
+	} else
+	if (id == GF_LITE_WEAK) {
+		return FF_LIGHTSUP;
+	} else
+	if (id == GF_DARK_WEAK) {
+		return FF_DARKENS;
+	}
+
+	return 0;
+}
+
 /*** Initialize from ascii template files ***/
 
 
@@ -1080,6 +1456,7 @@ static u32b add_name(header *head, cptr buf)
 errr parse_z_info(char *buf, header *head)
 {
 	/* Unused parameter */
+
 	(void)head;
 
 	/* Hack - Verify 'M:x:' format */
@@ -1401,11 +1778,11 @@ errr parse_v_info(char *buf, header *head)
 
 		/* Point at the "info" */
 		v_ptr = &v_info[i];
-    /*
-    v_ptr = CMAKE(vault_type);
-    v_ptr->next = v_info;
-    v_info = v_ptr;
-    */
+		/*
+		v_ptr = CMAKE(vault_type);
+		v_ptr->next = v_info;
+		v_info = v_ptr;
+		*/
 
 		/* Store the name */
 		if (!(v_ptr->name = add_name(head, s)))
@@ -1484,11 +1861,11 @@ static errr grab_two_feat_flag(u32b *flags, u32b *flags2, cptr names[], cptr wha
 	{
 		if (streq(what, names[i]))
 		{
-      if (i > 31) {
-			  *flags2 |= (1L << (i-32));
-      } else {
-			  *flags |= (1L << i);
-      }
+			if (i > 31) {
+				*flags2 |= (1L << (i-32));
+			} else {
+				*flags |= (1L << i);
+			}
 			return (0);
 		}
 	}
@@ -1535,7 +1912,7 @@ errr parse_f_info(char *buf, header *head)
 
 		/* Save the index */
 		error_idx = i;
-
+    
 		/* Point at the "info" */
 		f_ptr = &f_info[i];
 
@@ -1604,51 +1981,51 @@ errr parse_f_info(char *buf, header *head)
 		/* Paranoia */
 		if (!buf[2]) return (PARSE_ERROR_GENERIC);
 
-    t = NULL;
+		t = NULL;
 		/* Find the colon before the name */
 		s = strchr(buf + 2, ':');
-    if (s)
-    {
-      /* there is more than one parameter */
-		  /* Nuke the colon, advance to the next param */
-		  *s++ = '\0';
-    }
-    /* Get the number of the parameter */
+		if (s)
+		{
+			/* there is more than one parameter */
+			/* Nuke the colon, advance to the next param */
+			*s++ = '\0';
+		}
+		/* Get the number of the parameter */
 		i = atoi(buf + 2);
 		
-    /* Paranoia */
+		/* Paranoia */
 		if (i < 0) return (PARSE_ERROR_GENERIC);
     
-    f_ptr->priority = i;
+		f_ptr->priority = i;
     
-    if (s) {
-      t = strchr(s, ':');
-      if (t)
-      {
-		    /* Nuke the colon, advance to the next param */
-		    *t++ = '\0';
-      }
-      /* Get the number of the parameter */
-		  i = atoi(s);
+		if (s) {
+			t = strchr(s, ':');
+			if (t)
+			{
+				/* Nuke the colon, advance to the next param */
+				*t++ = '\0';
+			}
+			/* Get the number of the parameter */
+			i = atoi(s);
 		  
-      /* Paranoia */
-		  if (i < 0) return (PARSE_ERROR_GENERIC);
+			/* Paranoia */
+			if (i < 0) return (PARSE_ERROR_GENERIC);
       
-      f_ptr->dig = i;
-      /*if (t) use this section if there is a third parameter
-      {
-      }
-      else
-      {
-      }*/
-    }
-    else
-    {
-      f_ptr->dig = 0;
-    }
+			f_ptr->dig = i;
+			/*if (t) use this section if there is a third parameter
+			{
+			}
+			else
+			{
+			}*/
+		}
+		else
+		{
+			f_ptr->dig = 0;
+		}
 	}
-	/* Process 'M' for "Mimic Feature" (one line only) */
-	else if (buf[0] == 'M')
+	/* Process 'B' for "Base Feature" (one line only) */
+	else if (buf[0] == 'B')
 	{
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -1658,19 +2035,83 @@ errr parse_f_info(char *buf, header *head)
 
 		/* Find the colon before the name */
 		s = strchr(buf + 2, ':');
-    if (s)
-    {
-      /* there is more than one parameter */
-		  /* Nuke the colon, advance to the next param */
-		  *s++ = '\0';
-    }
-    /* Get the number of the param */
+		if (s)
+		{
+			/* there is more than one parameter */
+			/* Nuke the colon, advance to the next param */
+			*s++ = '\0';
+		}
+		/* Get the number of the param */
 		i = atoi(buf + 2);
 		
-    /* Paranoia */
+		/* Paranoia */
 		if (i < 0) return (PARSE_ERROR_GENERIC);
 
-    f_ptr->base_feat = i;
+		f_ptr->base_feat = i;
+	}
+	/* Process 'K' for "Feature Change" (four lines) */
+	else if (buf[0] == 'K')
+	{
+		int k;
+
+		/* There better be a current f_ptr */
+		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Paranoia */
+		if (!buf[2]) return (PARSE_ERROR_GENERIC);
+
+		/* get the index of the first unused spot */
+		for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+			if (f_ptr->effects[i].action == 0) {
+				k = i;
+				break;
+			}
+		}
+		if (k > MAX_FEAT_CHANGE) {
+			return (PARSE_ERROR_GENERIC);
+		}
+
+		/* Find the colon before the name */
+		s = strchr(buf + 2, ':');
+		if (s) {
+			/* Nuke the colon, advance to the next param */
+			*s++ = '\0';
+		}
+		/* Get the number of the param */
+		i = grab_effect_id(buf + 2);
+		//i = atoi(buf + 2);
+		/* Paranoia */
+		if (i < 0) return (PARSE_ERROR_GENERIC);
+		f_ptr->effects[k].action = i;
+
+		t = strchr(s, ':');
+		if (t) {
+			/* Nuke the colon, advance to the next param */
+			*t++ = '\0';
+		}
+		/* Get the number of the param */
+		i = atoi(s);
+		/* Paranoia */
+		if (i < 0) return (PARSE_ERROR_GENERIC);
+		f_ptr->effects[k].changeto = i;
+		s = t;
+
+		if (s) {
+			t = strchr(s, ':');
+			if (t) {
+				/* Nuke the colon, advance to the next param */
+				*t++ = '\0';
+			}
+			/* Get the number of the param */
+			i = atoi(s);
+			/* Paranoia */
+			if (i < 0) return (PARSE_ERROR_GENERIC);
+			f_ptr->effects[k].chance = i;
+		} else {
+			f_ptr->effects[k].chance = 100;
+		}
+
+		k++;
 	}
 	else
 	{
@@ -5493,7 +5934,7 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 		/* Add the name */
 		//dun_ptr->text = strcpy(t, s);
 
-    return (0);
+		return (0);
 	}	else
 	{
 		/* Oops */

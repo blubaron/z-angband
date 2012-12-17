@@ -61,9 +61,10 @@ F:PWALK | PPASS | MWALK | MPASS
 
 N:2:invisible trap
 G:.:w
-M:1
+B:1
 P:5
 F:PWALK | PPASS | MWALK | MPASS | TRAP | HIDDEN
+K:DISARM:1:100
 
 # 0x03 --> glyph of warding
 
@@ -77,8 +78,8 @@ F:PWALK | PPASS
 N:4:open door
 G:':U
 P:15
-M:32
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:32:100
 
 # 0x05 --> broken door
 
@@ -141,24 +142,27 @@ F:PWALK | PPASS | MWALK | MPASS
 N:32:door
 G:+:U
 P:17
-M:4
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:4:100
+K:BASH:5:100
 
 # Pillar
 N:33:pillar
 G:#:D
 P:17:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+K:TUNNEL:1:100
 
 
 # 0x30 --> secret door
 
 N:48:granite wall
 G:#:W
-M:146
 P:10:30
 F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
 # 0x31 --> rubble
+K:SEARCH:146:100
+K:TUNNEL:1:100
 
 N:49:pile of rubble
 G:::w
@@ -184,16 +188,16 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 N:52:magma vein
 G:#:s
 P:12:10
-M:54
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD | HIDDEN
+K:SEARCH:54:100
 
 # 0x35 --> quartz vein + treasure
 # This terrain type may not actually be needed...
 N:53:quartz vein
 G:#:s
 P:11:20
-M:55
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_GOLD | HIDDEN
+K:SEARCH:55:100
 
 # 0x36 --> magma vein + known treasure
 
@@ -494,27 +498,28 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK
 N:145:open door
 G:':U
 P:15
-M:146
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:146:100
 
 N:146:door
 G:+:U
 P:17
-M:145
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:145:100
 
 #### gate doors w/ normal walls
 N:147:door
 G:+:U
 P:17
-M:148
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:148:100
+K:BASH:149:100
 
 N:148:open door
 G:':U
 P:15
-M:147
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:147:100
 
 N:149:broken door
 G:':u
@@ -526,6 +531,7 @@ N:150:granite wall
 G:#:W
 P:10:40
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+K:TUNNEL:1:40
 
 N:151:permanent wall
 G:#:w
@@ -536,14 +542,15 @@ F:NO_LOS | ICKY | PERM | OBJECT | MARK
 N:152:door
 G:+:U
 P:17
-M:153
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:153:100
+K:BASH:154:100
 
 N:153:open door
 G:':U
 P:15
-M:152
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:152:100
 
 N:154:broken door
 G:':u
@@ -552,21 +559,22 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 # secret door
 N:155:granite wall
 G:#:W
-M:156
 P:10:30
 F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+K:SEARCH:156:100
+K:TUNNEL:1:30
 
 N:156:door
 G:+:U
 P:17
-M:157
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:157:100
 
 N:157:open door
 G:':U
 P:15
-M:156
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:156:100
 
 # stairs
 N:158:up staircase
@@ -585,6 +593,7 @@ N:160:granite wall
 G:#:W
 P:10:40
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+K:TUNNEL:1:40
 
 N:161:permanent wall
 G:#:w
@@ -595,14 +604,15 @@ F:NO_LOS | ICKY | PERM | OBJECT | MARK
 N:162:door
 G:+:U
 P:17
-M:163
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:163:100
+K:BASH:164:100
 
 N:163:open door
 G:':U
 P:15
-M:162
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:162:100
 
 N:164:broken door
 G:':u
@@ -611,21 +621,22 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 # secret door
 N:165:granite wall
 G:#:W
-M:166
 P:10:30
 F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+K:SEARCH:166:100
+K:TUNNEL:1:30
 
 N:166:door
 G:+:U
 P:17
-M:167
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:167:100
 
 N:167:open door
 G:':U
 P:15
-M:166
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:166:100
 
 # stairs
 N:168:up staircase
@@ -644,6 +655,7 @@ N:170:granite wall
 G:#:W
 P:10:40
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
+K:TUNNEL:1:40
 
 N:171:permanent wall
 G:#:w
@@ -654,14 +666,15 @@ F:NO_LOS | ICKY | PERM | OBJECT | MARK
 N:172:door
 G:+:U
 P:17
-M:173
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:173:100
+K:BASH:174:100
 
 N:173:open door
 G:':U
 P:15
-M:172
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:172:100
 
 N:174:broken door
 G:':u
@@ -670,21 +683,22 @@ F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 # secret door
 N:175:granite wall
 G:#:W
-M:176
 P:10:30
 F:PPASS | MPASS | NO_LOS | DOOR | HIDDEN | ICKY | OBJECT | MARK | DIG
+K:SEARCH:176:100
+K:TUNNEL:1:30
 
 N:176:door
 G:+:U
 P:17
-M:177
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:177:100
 
 N:177:open door
 G:':U
 P:15
-M:176
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:176:100
 
 # stairs
 N:178:up staircase
@@ -759,14 +773,15 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
 N:189:door
 G:+:U
 P:17
-M:190
 F:PPASS | MPASS | NO_LOS | DOOR | ICKY | OBJECT | MARK | CLOSED
+K:OPEN:190:100
+K:BASH:191:100
 
 N:190:open door
 G:':U
 P:15
-M:189
 F:PWALK | PPASS | MWALK | MPASS | DOOR | CLOSEABLE | ICKY | OBJECT | MARK
+K:CLOSE:189:100
 
 N:191:broken door
 G:':u

@@ -112,6 +112,15 @@ struct project_type
  */
 
 typedef struct feature_type feature_type;
+typedef struct feature_change feature_change;
+
+struct feature_change
+{
+	/*feature_change *next;*/
+	byte action;
+	byte chance;
+	u16b changeto;
+};
 
 struct feature_type
 {
@@ -141,8 +150,9 @@ struct feature_type
 
 	/*byte name_len;*/	/* length of name string */
 	/*byte text_len;*/	/* length of feature description string */
+	/*feature_change *effects;*/
+	feature_change effects[MAX_FEAT_CHANGE]; /* use an array to store in raw file */
 };
-
 
 /*
  * Hack - a type for 'object flags'
@@ -1358,6 +1368,7 @@ struct player_sex
 /*
  * Player racial info
  */
+
 
 typedef struct player_race player_race;
 

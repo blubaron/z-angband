@@ -1263,7 +1263,7 @@ enum
 	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature */
 	FF_MARK         = 0x00002000, /* memorized on map when seen*/
 	/*FF_INTERESTING  = 0x00002000, *//* allow stopping here when looking around  */
-	FF_OVERLAY      = 0x00004000, /* draw on top of base feature */
+	FF_BASH         = 0x00004000, /* Terrain can be bashed */
 	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path */
 	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold */
 	FF_DIG_OBJ      = 0x00020000, /* If dug through w/DIG or searched w/HIDDEN place object */
@@ -1319,7 +1319,7 @@ enum
 };
 
 #define FF_MASK_INTERESTING FF_QUEST | FF_TRAP | FF_CLOSED | FF_CLOSEABLE | \
-                            FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | \
+                            FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | FF_BASH | \
                             FF_EXIT_UP | FF_EXIT_DOWN | FF_PATTERN | FF_BROKEN |\
                             FF_DIG_CUSTOM | FF_DIG_FOOD
 #define FF_MASK_INTERESTING2 FF_FOUNTAIN | FF_STATUE | FF_TEXT
@@ -2455,11 +2455,29 @@ enum
 #define GF_SILENCE		100
 #define GF_TERRAFORM	101
 #define GF_PURG_CURSE	102
+#define GF_GROW     	  103		/* New types for Z- begin here... */
+#define GF_WITHER   	  104
 
-#define MAX_GF			102
+#define MAX_GF			104
 
 #define GF_ILLUSION		128   /* Illusion _offset_.  Illusionary fire, e.g. is GF_FIRE + GF_ILLUSION. */
 #define GF_STRONG_ILLUSION	256  /* Double-strength illusion. */
+
+/*
+ * Feature change transitions in addition to regular spell effects
+ */
+#define MAX_FEAT_CHANGE 8
+#define FEATC_SEARCH         255
+#define FEATC_TUNNEL         254
+#define FEATC_OPEN           253
+#define FEATC_CLOSE          252
+#define FEATC_DISARM         251
+#define FEATC_BASH           250
+#define FEATC_HIDE           249
+#define FEATC_ARM            248
+#define FEATC_JAM            247
+#define FEATC_UNLOCK         246
+#define FEATC_LOCK           245
 
 /*
  * Some things which induce learning

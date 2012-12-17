@@ -559,20 +559,23 @@ void search(void)
 				feat  = &(f_info[c_ptr->feat]);
 				/* Secret door */
 				//if (c_ptr->feat == FEAT_SECRET)
-				if (feat->flags & FF_HIDDEN)
-				{
-
+				if (feat->flags & FF_HIDDEN) {
+					u16b changeto = 0;
+					int i;
+					for (i = 0; i < MAX_FEAT_CHANGE; i++) {
+						if (feat->effects[i].action == FEATC_SEARCH) {
+							//if (randint1(100) < feat_ptr->effects[i].chance) {
+							//  change = &(feat_ptr->effects[i]);
+							//}
+							changeto = feat->effects[i].changeto;
+							break;
+						}
+					}
 					/* Pick a door */
-					if (feat->base_feat) {
-					  /* Message */
-					  msgf("You have found a secret %s.", f_name + f_info[feat->base_feat].name);
-					  create_closed_door(x, y, feat->base_feat);
-					} else {
-					  /* Message */
-					  if (feat->flags & FF_DOOR) {
-					    msgf("You have found a secret door.");
-					    create_closed_door(x, y, the_feat(FEAT_CLOSED));
-					  }
+					if (changeto) {
+						/* Message */
+						msgf("You have found a secret %s.", f_name + f_info[changeto].name);
+						create_closed_door(x, y, changeto);
 					}
 
 					/* Disturb */
