@@ -46,7 +46,7 @@ magic scrolls and general backpacks.
 
     Map makers will reveal the whole wilderness map, if you pay them 30 times
       their normal amount, or 150,000 gold, whichever is greater. Cheap stores
-      may only charge 100,000 gold. (for zpa, changed in t_info.txt) all the
+      may only charge 100,000 gold. (for zpa, changed in t_info.txt) *all the
       map makers are charging 100,000 gold?
 
     You can now access knowledge menu from wilderness map using '~' or '|'.
@@ -178,8 +178,8 @@ magic scrolls and general backpacks.
       chance of offering find place quests (if not everything has been found),
       mage and thief guilds have a 10% chance of offering find artifact quests,
       as does the large castle. Bounties are offered only if the building does
-      not have any other quest available. If on a appropiate level twice as
-      deep as quest level, all remaining creatures for bounty are generated.
+      not have any other quest available. If on an appropiate level 25 levels
+      deeper than the quest level, all remaining creatures for bounty are generated.
       rewards only gold and xp, no items. maybe add to alchemists as well? (rare
       potion ingredients)
 
@@ -396,7 +396,6 @@ enum
     dungeons can skip levels within their range. the dungeon level skip is
       given just after the max dungeon level in the dungeon type info.
       *Tested with sewers, but what happens around dl 99,100 has not been tested.
-      *need to adjust for dungeon guard quests, which test for a specific level.
 
     added functions to load a graphics list from a text file, like I wrote for angband.
 
@@ -427,8 +426,8 @@ enum
       to use, press the toggle search button (shift-s) within 2 seconds of the
        previous press of the toggle search button. After two seconds, pressing
        it turns any mode off.
-      the additional modes use the same speed penalty as search mode. (half
-       with no speed bonus)
+      the additional modes use the same speed penalty as search mode. (speed-10)
+       (half with no speed bonus)
 
     Added items to resurrect the player when s/he dies.
      *still need to remove gold/items from the player and put in a "death
@@ -492,6 +491,13 @@ enum
       just arcane/unique flether. *potions and scrolls too?
 
     Allow for smaller levels and slower breeders in clearout quests.
+
+    Started adding basic feature change support, sort of like from Un/NPP Angband.
+      *have only recreated basic transions so far.
+
+    Added magic effects to grow/kill basic trees. *Not used anywhere.
+
+
 
   Stuff I did for zAngband, but are not needed for z+Angband
     *Changed do_cmd_knowledge_objects() and print_monster_string() to use the

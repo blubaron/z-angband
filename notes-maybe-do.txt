@@ -77,6 +77,10 @@
       also be able to set dun_gen_type based on level range with/without
        changing habitat.
 
+    make a stairs generate in the capital, to be the palace dungeon, and
+     make it the angband dungeon type, with a level step of 10, min level
+     10, and max level 120
+      
     use angband lighting style (array[MAX_LIGHTING]) for feature and field
       lighting.
 
@@ -153,7 +157,19 @@
 # if ego < 0 make artifact from -ego?
 # if r_idx, k_idx, or trap start with '*', then the number means out of depth rather than index 
 # M: Message that replaces the normal level feeling?
+# N:y:x:notefeat:note - message that comes up when steping on the spot (bumping into if wall)
 FA/DaJangband have extra vault types/chars incorporate, modify above?
+
+add vault symbol like line that makes a specific item/creature spawn elsewhere
+on the level (next to entry point if nowhere else possible). the idea is to make
+an item generate that would get the player through a feature of the vault by a
+feature change, but the item would not be nearby. (R for remote?)
+
+add easier depth level symbols, so alot can be used.
+  i - monster up to 15 levels over depth?
+  j - monster up to 15 levels over depth, object up to 20 levels over depth?
+ just use v lines and r_idx is *-overdepth, ie V:i:1:0:*-15
+
 
 
   Stuff I decided not to do:
