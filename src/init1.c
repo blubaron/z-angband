@@ -2052,7 +2052,7 @@ errr parse_f_info(char *buf, header *head)
 	/* Process 'K' for "Feature Change" (four lines) */
 	else if (buf[0] == 'K')
 	{
-		int k;
+		int k = MAX_FEAT_CHANGE+1;
 
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);

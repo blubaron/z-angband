@@ -711,12 +711,12 @@ static void apply_symmetry(dun_type * d_ptr, bool horiz)
 				if (c_ptr->feat == FEAT_LESS) stairs_up = TRUE;
 
 				/* Determine coords of symmetric grid */
-				if (horiz && d_ptr->flags & DF_SYM_2)
+				if (horiz && (d_ptr->flags & DF_SYM_2))
 				{
 					x2 = p_ptr->max_wid - x - 1;
 					y2 = y;
 				}
-				else if (!horiz & d_ptr->flags & DF_SYM_2)
+				else if (!horiz && (d_ptr->flags & DF_SYM_2))
 				{
 					x2 = x;
 					y2 = p_ptr->max_hgt - y - 1;
@@ -1546,10 +1546,10 @@ static bool cave_gen(dun_type *d_ptr)
 	/* Add some streamers */
 	for (i = 0; i < 2; i++)
 	{
-		//treasure_chance = (d_ptr->vein[i].rarity == FEAT_MAGMA ? DUN_STR_MC :
-		//	(d_ptr->vein[i].deep == FEAT_QUARTZ ? DUN_STR_QC : 0));
-    treasure_chance = d_ptr->vein[i].rarity;
-    treasure_chance *= (d_ptr->freq_treasure / 100);
+		/*treasure_chance = (d_ptr->vein[i].rarity == FEAT_MAGMA ? DUN_STR_MC :
+			(d_ptr->vein[i].deep == FEAT_QUARTZ ? DUN_STR_QC : 0));*/
+		treasure_chance = d_ptr->vein[i].rarity;
+		treasure_chance *= (d_ptr->freq_treasure / 100);
 		for (j = 0; j < d_ptr->vein[i].number; j++)
 		{
 			build_streamer(d_ptr->vein[i].shal,d_ptr->vein[i].deep, treasure_chance, d_ptr->vein[i].size);

@@ -1246,77 +1246,76 @@
 /*#define FF_PATTERN		0x40	*//* The pattern */
 /*#define FF_MARK			0x80	*//* Remember tile if seen */
 /* from angband 3.2.0*/
-enum
-{
-	FF_PWALK        = 0x00000001, /* Player can walk through */
-	FF_PPASS        = 0x00000002, /* Player can pass in wraith/ghost form */
-	FF_MWALK        = 0x00000004, /* monster can walk through */
-	FF_MPASS        = 0x00000008, /* wraith/ghost can pass through */
-	FF_NO_LOS       = 0x00000010, /* LOS blocked */
-	FF_HIDDEN       = 0x00000020, /* if search successful, switch to base feature */
-	FF_DOOR         = 0x00000040, /* this is a door of some type, open or close switch to base */
-	FF_EXIT_UP      = 0x00000080, /* can go to the previous level here */
-	FF_EXIT_DOWN    = 0x00000100, /* can go to the next level here */
-	FF_PERM         = 0x00000200, /* permanent terrain */
-	FF_TRAP         = 0x00000400, /* there is a field action here */
-	FF_QUEST        = 0x00000800, /* player can enter a quest level here */
-	FF_DIG          = 0x00001000, /* p/m can tunnel through here, switch to base feature */
-	FF_MARK         = 0x00002000, /* memorized on map when seen*/
-	/*FF_INTERESTING  = 0x00002000, *//* allow stopping here when looking around  */
-	FF_BASH         = 0x00004000, /* Terrain can be bashed */
-	FF_PATTERN      = 0x00008000, /* tile of some sort for Pattern path */
-	FF_DIG_GOLD     = 0x00010000, /* If dug through w/DIG or searched w/HIDDEN place gold */
-	FF_DIG_OBJ      = 0x00020000, /* If dug through w/DIG or searched w/HIDDEN place object */
-	FF_DIG_CUSTOM   = 0x00040000, /* If dug through w/DIG or searched w/HIDDEN place object from lookup table of feature index */
-	FF_DIG_FOOD     = 0x00080000, /* If dug through w/DIG or searched w/HIDDEN place food object */
-	FF_ICKY         = 0x00100000, /* Terrain can not have objects */
-	FF_HALF_LOS     = 0x00200000, /* Half-blocks los */
-	FF_OBJECT       = 0x00400000, /* Terrain is described like an object */
-	FF_CLOSED       = 0x00800000, /* Terrain (usually door) is closed */
-	FF_BROKEN       = 0x01000000, /* Terrain (usually door) is broken */
-	FF_WILD         = 0x02000000, /* Terrain takes additional time to cross */
-	FF_LIQUID       = 0x04000000, /* Terrain is water, lava, or acid */
-	FF_DAMAGING     = 0x08000000, /* Terrain damages player like deep lava or acid, uses dig for damage amount */
-	FF_CLOSEABLE    = 0x10000000, /* Terrain (usually door) is open (from FA) */
-	FF_DEEP         = 0x20000000, /* Terrain does double damage or damage to flyers */
-	FF_NO_FLYING    = 0x40000000, /* Terrain prohibits levitation,flying monsters cannot pass */
-	FF_PROJECT      = 0x80000000  /* projections (bolt,beam,ball,breath) can pass through here (from FA) */
-};
-enum
-{
-	FF_FLOOR        = 0x00000001, /* Terrain is some type of floor (from FA) */
-	FF_WALL         = 0x00000002, /* Terrain is some type of wall (from FA) */
-	FF_TREE         = 0x00000004, /* Terrain is some type of tree (from FA) */
-	FF_ROCKY        = 0x00000008, /* Terrain is some type of rock (from FA) */
-	FF_WATERY       = 0x00000010, /* Terrain is water based (from FA) */
-	FF_FIERY        = 0x00000020, /* Terrain is fire based (from FA) */
-	FF_ICY          = 0x00000040, /* Terrain is cold based (from FA) */
-	FF_ACID         = 0x00000080, /* Terrain is acid based */
-	FF_ELEC         = 0x00000100, /* Terrain is electricity based */
-	FF_POISON       = 0x00000200, /* Terrain is poisonous */
-	FF_FALL         = 0x00000400, /* Terrain has a sharp height difference (from FA) */
-	FF_TRAPPABLE    = 0x00000800, /* Traps can be put on the terrain (from FA) */
-	FF_NO_SCENT     = 0x00001000, /* terrain blocks monster discovery by scent (from FA) */
-	FF_NO_NOISE     = 0x00002000, /* terrain blocks monster discovery by noise (from FA) */
-	FF_PROTECT      = 0x00004000, /* terrain protects occupant from others' melee/arrows (from FA) */
-	FF_EXPOSE       = 0x00008000, /* terrain makes occupant take more damage from melee/arrows (from FA) */
-	FF_HIDES_OBJ    = 0x00010000, /* no objects are shown on this terrain (but can be still picked up) (from FA) */
-	FF_BURNS        = 0x00020000, /* switches to base when attacked with fire */
-	FF_FREEZES      = 0x00040000, /* switches to base when attacked with frost */
-	FF_MELTS        = 0x00080000, /* switches to base when attacked with acid */
-	FF_CONDUCTS     = 0x00100000, /* switches to base when attacked with electricity */
-	FF_SMELLS       = 0x00200000, /* switches to base when attacked with poison */
-	FF_LIGHTSUP     = 0x00400000, /* switches to base when attacked with light */
-	FF_DARKENS      = 0x00800000, /* switches to base when attacked with darkness */
-	FF_STONE        = 0x01000000, /* switches to base when attacked with stone to mud */
-	FF_GLOW         = 0x02000000, /* terrain lights itself */
-	FF_LIGHT        = 0x04000000, /* terrain lights up surrounding terrain */
-	FF_FOUNTAIN     = 0x08000000, /* if terrain is a fountain */
-	FF_STATUE       = 0x10000000, /* if terrain is a statue of some sort */
-	FF_SUPPORT      = 0x20000000, /* if terrain is a wall support of some sort */
-	FF_TEXT         = 0x40000000, /* if terrain displays custom text of some sort */
-	FF_ORGANIC      = 0x80000000 /* from FA, nothing expected of it, here to fill out bits */
-};
+
+/* primary set of feature flags */
+#define FF_PWALK         0x00000001 /* Player can walk through */
+#define FF_PPASS         0x00000002 /* Player can pass in wraith/ghost form */
+#define FF_MWALK         0x00000004 /* monster can walk through */
+#define FF_MPASS         0x00000008 /* wraith/ghost can pass through */
+#define FF_NO_LOS        0x00000010 /* LOS blocked */
+#define FF_HIDDEN        0x00000020 /* if search successful, switch to base feature */
+#define FF_DOOR          0x00000040 /* this is a door of some type, open or close switch to base */
+#define FF_EXIT_UP       0x00000080 /* can go to the previous level here */
+#define FF_EXIT_DOWN     0x00000100 /* can go to the next level here */
+#define FF_PERM          0x00000200 /* permanent terrain */
+#define FF_TRAP          0x00000400 /* there is a field action here */
+#define FF_QUEST         0x00000800 /* player can enter a quest level here */
+#define FF_DIG           0x00001000 /* p/m can tunnel through here, switch to base feature */
+#define FF_MARK          0x00002000 /* memorized on map when seen*/
+/*#define FF_INTERESTING   0x00002000 *//* allow stopping here when looking around  */
+#define FF_BASH          0x00004000 /* Terrain can be bashed */
+#define FF_PATTERN       0x00008000 /* tile of some sort for Pattern path */
+#define FF_DIG_GOLD      0x00010000 /* If dug through w/DIG or searched w/HIDDEN place gold */
+#define FF_DIG_OBJ       0x00020000 /* If dug through w/DIG or searched w/HIDDEN place object */
+#define FF_DIG_CUSTOM    0x00040000 /* If dug through w/DIG or searched w/HIDDEN place object from lookup table of feature index */
+#define FF_DIG_FOOD      0x00080000 /* If dug through w/DIG or searched w/HIDDEN place food object */
+#define FF_ICKY          0x00100000 /* Terrain can not have objects */
+#define FF_HALF_LOS      0x00200000 /* Half-blocks los */
+#define FF_OBJECT        0x00400000 /* Terrain is described like an object */
+#define FF_CLOSED        0x00800000 /* Terrain (usually door) is closed */
+#define FF_BROKEN        0x01000000 /* Terrain (usually door) is broken */
+#define FF_WILD          0x02000000 /* Terrain takes additional time to cross */
+#define FF_LIQUID        0x04000000 /* Terrain is water, lava, or acid */
+#define FF_DAMAGING      0x08000000 /* Terrain damages player like deep lava or acid, uses dig for damage amount */
+#define FF_CLOSEABLE     0x10000000 /* Terrain (usually door) is open (from FA) */
+#define FF_DEEP          0x20000000 /* Terrain does double damage or damage to flyers */
+#define FF_NO_FLYING     0x40000000 /* Terrain prohibits levitation,flying monsters cannot pass */
+#define FF_PROJECT       0x80000000  /* projections (bolt,beam,ball,breath) can pass through here (from FA) */
+
+/* secondary set of feature flags */
+#define FF_FLOOR         0x00000001 /* Terrain is some type of floor (from FA) */
+#define FF_WALL          0x00000002 /* Terrain is some type of wall (from FA) */
+#define FF_TREE          0x00000004 /* Terrain is some type of tree (from FA) */
+#define FF_ROCKY         0x00000008 /* Terrain is some type of rock (from FA) */
+#define FF_WATERY        0x00000010 /* Terrain is water based (from FA) */
+#define FF_FIERY         0x00000020 /* Terrain is fire based (from FA) */
+#define FF_ICY           0x00000040 /* Terrain is cold based (from FA) */
+#define FF_ACID          0x00000080 /* Terrain is acid based */
+#define FF_ELEC          0x00000100 /* Terrain is electricity based */
+#define FF_POISON        0x00000200 /* Terrain is poisonous */
+#define FF_FALL          0x00000400 /* Terrain has a sharp height difference (from FA) */
+#define FF_TRAPPABLE     0x00000800 /* Traps can be put on the terrain (from FA) */
+#define FF_NO_SCENT      0x00001000 /* terrain blocks monster discovery by scent (from FA) */
+#define FF_NO_NOISE      0x00002000 /* terrain blocks monster discovery by noise (from FA) */
+#define FF_PROTECT       0x00004000 /* terrain protects occupant from others' melee/arrows (from FA) */
+#define FF_EXPOSE        0x00008000 /* terrain makes occupant take more damage from melee/arrows (from FA) */
+#define FF_HIDES_OBJ     0x00010000 /* no objects are shown on this terrain (but can be still picked up) (from FA) */
+#define FF_BURNS         0x00020000 /* switches to base when attacked with fire */
+#define FF_FREEZES       0x00040000 /* switches to base when attacked with frost */
+#define FF_MELTS         0x00080000 /* switches to base when attacked with acid */
+#define FF_CONDUCTS      0x00100000 /* switches to base when attacked with electricity */
+#define FF_SMELLS        0x00200000 /* switches to base when attacked with poison */
+#define FF_LIGHTSUP      0x00400000 /* switches to base when attacked with light */
+#define FF_DARKENS       0x00800000 /* switches to base when attacked with darkness */
+#define FF_STONE         0x01000000 /* switches to base when attacked with stone to mud */
+#define FF_GLOW          0x02000000 /* terrain lights itself */
+#define FF_LIGHT         0x04000000 /* terrain lights up surrounding terrain */
+#define FF_FOUNTAIN      0x08000000 /* if terrain is a fountain */
+#define FF_STATUE        0x10000000 /* if terrain is a statue of some sort */
+#define FF_SUPPORT       0x20000000 /* if terrain is a wall support of some sort */
+#define FF_TEXT          0x40000000 /* if terrain displays custom text of some sort */
+#define FF_ORGANIC       0x80000000 /* from FA, nothing expected of it, here to fill out bits */
+
 
 #define FF_MASK_INTERESTING FF_QUEST | FF_TRAP | FF_CLOSED | FF_CLOSEABLE | \
                             FF_PATTERN | FF_DIG_GOLD | FF_DIG_OBJ | FF_BASH | \
@@ -2013,12 +2012,12 @@ enum
 #define CAVE_MNLT       0x20	/* Illuminated by monster */
 #define CAVE_TEMP       0x40	/* temp flag */
 #define CAVE_XTRA       0x80	/* misc flag */
-//from vanilla:
-//#define CAVE_MARK		0x01 	/* memorized feature */
-//#define CAVE_SEEN		0x10 	/* seen flag */
-//#define CAVE_VIEW		0x20 	/* view flag */
-//#define CAVE_TEMP		0x40 	/* temp flag */
-//#define CAVE_WALL		0x80 	/* wall flag */
+/*from vanilla:*/
+/*#define CAVE_MARK		0x01 */	/* memorized feature */
+/*#define CAVE_SEEN		0x10 */	/* seen flag */
+/*#define CAVE_VIEW		0x20 */	/* view flag */
+/*#define CAVE_TEMP		0x40 */	/* temp flag */
+/*#define CAVE_WALL		0x80 */	/* wall flag */
 
 /*
  * Cave grid flags that are player-specific
@@ -4641,8 +4640,6 @@ extern int PlayerUID;
 #define DUN_TYPE_HOUSE				0x40000000
 #define DUN_TYPE_FLOOD_CAVE			0x80000000
 
-//#define NUM_DUN_TYPES 32
-//#define NUM_DUN_TYPES_BASIC 12
 
 /*
  * Monster group theme flags

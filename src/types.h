@@ -1844,12 +1844,12 @@ struct player_type
 	byte ob_count; /* the number of owned buildings */
 	byte dc_count; /* the number of outstanding death chests */
 	u16b used_ankhs; /* the number of ankhs used with this character */
-	//byte qb_count;
+	/*//byte qb_count;
 	//byte ql_count;
 	//struct quest_building_info *quest_buildings;
 	//struct quest_building_info *owned_buildings;
 	//struct quest_level_info *quest_levels;
-	//struct quest_level_info *death_chests;
+	//struct quest_level_info *death_chests;*/
 
 	u32b bank_gold;
 	u32b bank_layaway_gold;
@@ -2304,8 +2304,8 @@ typedef struct monster_group_type monster_group_type;
 
 struct monster_group_type
 {
-	//monster_group_type *next;
-	//u16b idx;
+	/*monster_group_type *next;
+	u16b idx;*/
 
 	u16b flags;
 	char name[32];
