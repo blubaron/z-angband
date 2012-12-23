@@ -727,7 +727,7 @@ static void init_stuff(void)
 	strcpy(path, "XXX XXX XXX");
 
 	/* Prepare the filepaths */
-	init_file_paths(path);
+	init_file_paths(path,path,path);
 }
 
 

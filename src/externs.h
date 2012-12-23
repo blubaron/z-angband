@@ -488,21 +488,10 @@ extern void hero_death(s16b hero_idx);
 extern bool hero_okay(s16b r_idx);
 extern void wipe_all_heroes(void);
 
-/* init1.c */
-extern errr init_w_info_txt(FILE *fp, char *buf);
-extern errr init_t_info_txt(FILE *fp, char *buf);
-extern errr init_mg_info_txt(FILE *fp, char *buf);
-extern errr init_dun_info_txt(FILE *fp, char *buf);
-extern void clear_dun_info(void);
-s32b monster_auto_experience(monster_race *r_ptr, bool verbose);
-
 /* init2.c */
-extern errr init_w_info(void);
-extern errr init_t_info(void);
-extern void init_file_paths(char *path);
+#include "init.h"
 extern void init_angband(void);
 extern void cleanup_angband(void);
-extern errr check_modification_date(int fd, cptr template_file);
 extern void reinit_alloc(void);
 extern void re_init_some_things(void);
 

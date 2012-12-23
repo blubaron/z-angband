@@ -4863,7 +4863,7 @@ int main(int argc, char *argv[])
 	initialise_terms();
 	load_choices();
 	read_alarm_choices();
-	init_file_paths(unixify_name(resource_path));
+	init_file_paths(unixify_name(resource_path),unixify_name(resource_path),unixify_name(resource_path));
 
 	Start_Hourglass;			/* Paranoia */
 

@@ -5902,7 +5902,7 @@ static void init_paths( void )
 	}
 	
 	/* Prepare the paths */
-	init_file_paths(basepath);
+	init_file_paths(basepath,basepath,basepath);
 }
 
 /*

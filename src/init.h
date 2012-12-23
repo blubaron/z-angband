@@ -129,4 +129,19 @@ extern header a_head;
 extern header e_head;
 extern header r_head;
 
+/* init1.c */
+extern errr init_w_info_txt(FILE *fp, char *buf);
+extern errr init_t_info_txt(FILE *fp, char *buf);
+extern errr init_mg_info_txt(FILE *fp, char *buf);
+extern errr init_dun_info_txt(FILE *fp, char *buf);
+extern void clear_dun_info(void);
+s32b monster_auto_experience(monster_race *r_ptr, bool verbose);
+
+/* init2.c */
+extern errr init_w_info(void);
+extern errr init_t_info(void);
+/*extern void init_file_paths(char *path);*/
+extern void init_file_paths(const char *config, const char *lib, const char *data);
+extern errr check_modification_date(int fd, cptr template_file);
+
 #endif /* INCLUDED_INIT_H */

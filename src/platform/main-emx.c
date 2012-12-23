@@ -1148,7 +1148,7 @@ static void init_stuff(void)
 	if (!suffix(path, PATH_SEP)) strcat(path, PATH_SEP);
 
 	/* Initialize */
-	init_file_paths(path);
+	init_file_paths(path,path,path);
 }
 
 static void quit_hook(cptr s)

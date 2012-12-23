@@ -6276,7 +6276,7 @@ static void init_stuff(void)
 		create_user_dirs();
 
 		/* Prepare the paths */
-		init_file_paths(path);
+		init_file_paths(path,path,path);
 
 		/* Build the filename */
 		path_build(path, sizeof(path), ANGBAND_DIR_FILE, "news.txt");

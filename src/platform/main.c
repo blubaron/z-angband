@@ -247,7 +247,7 @@ static void init_stuff(void)
 #endif /* HAVE_CONFIG_H */
 
 	/* Initialize */
-	init_file_paths(path);
+	init_file_paths(path,path,path);
 }
 
 
