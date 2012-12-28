@@ -379,9 +379,6 @@ void teleport_player(int dis)
 				continue;
 			}
 
-
-
-
 			/* No teleporting into vaults and such */
 			if (c_ptr->info & CAVE_ICKY) continue;
 
@@ -1643,19 +1640,18 @@ static int remove_curse_aux(bool all)
 
 	/* Attempt to uncurse inventory */
 	OBJ_ITT_START (p_ptr->inventory, o_ptr)
-
 	{
 		/* Count the uncursings */
 		if (uncurse_item(o_ptr, all)) cnt++;
-    /* HACK only sense one layer of pack contents - Brett */
-    if (o_ptr->tval == TV_CONTAINER) {
-      object_type *o2_ptr;
-	    OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
-	    {
-    		if (uncurse_item(o2_ptr, all)) cnt++;
-	    }
-	    OBJ_ITT_END;
-    }
+		/* HACK only sense one layer of pack contents - Brett */
+		if (o_ptr->tval == TV_CONTAINER) {
+			object_type *o2_ptr;
+			OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
+			{
+				if (uncurse_item(o2_ptr, all)) cnt++;
+			}
+			OBJ_ITT_END;
+		}
 	}
 	OBJ_ITT_END;
 
@@ -3045,9 +3041,7 @@ bool recharge(int power)
 				if (o_ptr->number > 1)
 					msgf("Wild magic consumes all your %s!", o_name);
 				else
-
 					msgf("Wild magic consumes your %s!", o_name);
-
 
 				/* Reduce and describe */
 				item_increase(o_ptr, -o_ptr->number);

@@ -720,8 +720,6 @@ static bool project_f(int who, int r, int x, int y, int dam, int typ)
 			}
 
 			/* Add the glyph here as a field */
-
-
 			(void)place_field(x, y, FT_GLYPH_WARDING);
 
 			/* Notice it */
