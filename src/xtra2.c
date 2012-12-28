@@ -1383,11 +1383,6 @@ void map_panel_size(void)
 	/* Get size */
 	get_map_size(&wid, &hgt);
 
-	/* Set bigreion if required */
-	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
-		Term_bigregion(COL_MAP, ROW_MAP, ROW_MAP + hgt - 1);
-	}
-
 	/* Kill previous size of line */
 
 	/* String of terrain characters along one row of the map */

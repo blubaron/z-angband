@@ -398,12 +398,6 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 /* Code for smooth icon rescaling from Uwe Siems, Jan 2000 */
 /* ========================================================*/
 
-/*
- * to save ourselves some labour, define a maximum expected icon width here:
- */
-#define MAX_ICON_WIDTH 32
-
-
 /* some static variables for composing and decomposing pixel values into
  * red, green and blue values
  */
@@ -592,26 +586,40 @@ static void PutRGBScan(XImage *Im, int x, int y, int w, int div,
  * them the same way as pixels are handled in GetScaledScan.
  * This even allows icons to be scaled differently in horizontal and
  * vertical directions (eg. shrink horizontal, grow vertical).
+ *
+ * rowbuffer MUST be at least 9 * ox *sizeof(u32b) bytes
  */
 static void ScaleIcon(XImage *ImIn, XImage *ImOut,
 					  int x1, int y1, int x2, int y2,
-					  int ix, int iy, int ox, int oy)
+					  int ix, int iy, int ox, int oy,
+					  u32b *rowbuffer)
 {
 	int div;
 	int xi, yi, si, sifrac, ci, cifrac, addWhole, addFrac;
 
 	/* buffers for pixel rows: */
-	unsigned long prevRed[MAX_ICON_WIDTH];
-	unsigned long prevGreen[MAX_ICON_WIDTH];
-	unsigned long prevBlue[MAX_ICON_WIDTH];
-	unsigned long nextRed[MAX_ICON_WIDTH];
-	unsigned long nextGreen[MAX_ICON_WIDTH];
-	unsigned long nextBlue[MAX_ICON_WIDTH];
-	unsigned long tempRed[MAX_ICON_WIDTH];
-	unsigned long tempGreen[MAX_ICON_WIDTH];
-	unsigned long tempBlue[MAX_ICON_WIDTH];
+	u32b *prevRed;
+	u32b *prevGreen;
+	u32b *prevBlue;
+	u32b *nextRed;
+	u32b *nextGreen;
+	u32b *nextBlue;
+	u32b *tempRed;
+	u32b *tempGreen;
+	u32b *tempBlue;
 
 	bool getNextRow;
+
+	/* use a previously allocated buffer for pixel rows: */
+	prevRed = rowbuffer+(0*ox);
+	prevGreen = rowbuffer+(1*ox);
+	prevBlue = rowbuffer+(2*ox);
+	nextRed = rowbuffer+(3*ox);
+	nextGreen = rowbuffer+(4*ox);
+	nextBlue = rowbuffer+(5*ox);
+	tempRed = rowbuffer+(6*ox);
+	tempGreen = rowbuffer+(7*ox);
+	tempBlue = rowbuffer+(8*ox);
 
 	/* get divider value for the horizontal scaling: */
 	if (ix == ox)
@@ -638,6 +646,7 @@ static void ScaleIcon(XImage *ImIn, XImage *ImOut,
 		iy--;
 		oy--;
 		div *= oy;
+
 		/* get first row: */
 		GetScaledRow(ImIn, x1, y1, ix, ox, nextRed, nextGreen, nextBlue);
 		/* si and sifrac give the subsampling position: */
@@ -771,6 +780,7 @@ static XImage *ResizeImageSmooth(Display *dpy, XImage *Im,
 	XImage *Tmp;
 
 	char *Data;
+	u32b *tmpbuffer;
 
 	width1 = Im->width;
 	height1 = Im->height;
@@ -806,15 +816,16 @@ static XImage *ResizeImageSmooth(Display *dpy, XImage *Im,
 		blueMask >>= 1;
 	}
 
+	tmpbuffer = C_RNEW(ox*9,u32b);
 	/* scale each icon: */
 	for (y1 = 0, y2 = 0; (y1 < height1) && (y2 < height2); y1 += iy, y2 += oy)
 	{
 		for (x1 = 0, x2 = 0; (x1 < width1) && (x2 < width2); x1 += ix, x2 += ox)
 		{
-			ScaleIcon(Im, Tmp, x1, y1, x2, y2, ix, iy, ox, oy);
+			ScaleIcon(Im, Tmp, x1, y1, x2, y2, ix, iy, ox, oy, tmpbuffer);
 		}
 	}
-
+	FREE(tmpbuffer);
 	return Tmp;
 }
 

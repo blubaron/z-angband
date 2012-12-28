@@ -2099,7 +2099,16 @@ static void square_to_pixel(int *x, int *y, int ox, int oy)
 	if (td->map_active) {
 		(*x) = ox * td->map_tile_wid + td->size_ow1;
 		(*y) = oy * td->map_tile_hgt + td->size_oh1;
-	} else {
+	} else
+	if (is_bigtiled(ox, oy)) {
+		(*x) = ox * td->tile_wid * tile_width_mult + td->size_ow1;
+		(*y) = oy * td->tile_hgt * tile_height_mult + td->size_oh1;
+	} else 
+	{
+		(*x) = ox * td->tile_wid + td->size_ow1;
+		(*y) = oy * td->tile_hgt + td->size_oh1;
+	}
+	/*{
 		if ((tile_width_mult > 1)
 				&& (oy >= Term->scr->big_y1)
 				&& (oy <= Term->scr->big_y2)
@@ -2122,7 +2131,7 @@ static void square_to_pixel(int *x, int *y, int ox, int oy)
 		} else {
 			(*y) = oy * td->tile_hgt + td->size_oh1;
 		}
-	}
+	}*/
 }
 
 /*
@@ -2137,69 +2146,26 @@ static errr Term_curs_win(int x, int y)
 	RECT rc;
 	HDC hdc;
 
-	int x1, y1;
-	
-	/* Top left hand corner */
-	square_to_pixel(&x1, &y1, x, y);
-
-	/* Frame the grid */
-	rc.left = x1;
-	rc.top = y1;
-	
-	if (td->map_active)
-	{
-		rc.right = rc.left + td->map_tile_wid;
-		rc.bottom = rc.top + td->map_tile_hgt;
-	} else {
-		if (is_bigtiled(x, y)) {
-			rc.right = rc.left + td->tile_wid * tile_width_mult;
-			rc.bottom = rc.top + td->tile_hgt * tile_height_mult;
-		} else {
-			rc.right = rc.left + td->tile_wid;
-			rc.bottom = rc.top + td->tile_hgt;
-		}
-	}
-
-	/* Cursor is done as a yellow "box" */
-	hdc = GetDC(td->w);
-	FrameRect(hdc, &rc, hbrYellow);
-	ReleaseDC(td->w, hdc);
-
-	/* Success */
-	return 0;
-}
-
-/*
- * Low level graphics (Assumes valid input).
- *
- * Draw a "cursor" at (x,y), using a "yellow box".
- */
-static errr Term_bigcurs_win(int x, int y)
-{
-	term_data *td = (term_data*)(Term->data);
-
-	RECT rc;
-	HDC hdc;
-
 	int tile_wid, tile_hgt;
-
-	if (td->map_active)
-	{
-		/* Normal cursor in map window */
-		Term_curs_win(x, y);
-		return 0;
-	}
-	else
-	{
+	
+	if (td->map_active) {
+		tile_wid = td->map_tile_wid;
+		tile_hgt = td->map_tile_hgt;
+	} else {
 		tile_wid = td->tile_wid;
 		tile_hgt = td->tile_hgt;
 	}
 
 	/* Frame the grid */
 	rc.left = x * tile_wid + td->size_ow1;
-        rc.right = rc.left + tile_width_mult * tile_wid;
 	rc.top = y * tile_hgt + td->size_oh1;
-        rc.bottom = rc.top + tile_height_mult * tile_hgt;
+	if (is_bigtiled(x, y)) {
+		rc.right = rc.left + tile_wid * tile_width_mult;
+		rc.bottom = rc.top + tile_hgt * tile_height_mult;
+	} else {
+		rc.right = rc.left + tile_wid;
+		rc.bottom = rc.top + tile_hgt;
+	}
 
 	/* Cursor is done as a yellow "box" */
 	hdc = GetDC(td->w);
@@ -2222,8 +2188,10 @@ static errr Term_wipe_win(int x, int y, int n)
 	RECT rc;
 	
 	/* Find the dimensions of the rectangle to erase in client coords */
-	square_to_pixel(&(rc.left), &(rc.top), x, y);
-	square_to_pixel(&(rc.right), &(rc.bottom), x + n, y+1);
+	rc.left = x * td->tile_wid + td->size_ow1;
+	rc.top = y * td->tile_hgt + td->size_oh1;
+	rc.right = (x+n) * td->tile_wid + td->size_ow1;
+	rc.bottom = (y+1) * td->tile_hgt + td->size_oh1;
 
 	if ((rc.right > rc.left) && (rc.bottom > rc.top)) {
 	hdc = GetDC(td->w);
@@ -2282,7 +2250,9 @@ static errr Term_text_win(int cx, int cy, int n, byte a, cptr s)
 	Term_wipe_win(cx, cy, n);
 	
 	/* Get top left corner */
-	square_to_pixel(&x, &y, cx, cy);
+	//square_to_pixel(&x, &y, cx, cy);
+	x = cx * td->tile_wid + td->size_ow1;
+	y = cy * td->tile_hgt + td->size_oh1;
 
 	rc.top = y + ((td->tile_hgt - td->font_hgt) / 2);
 	rc.bottom = rc.top + td->font_hgt;
@@ -2380,7 +2350,10 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	}
 
 	/* Starting point */
-	square_to_pixel(&x2, &y2, x, y);
+	//square_to_pixel(&x2, &y2, x, y);
+	/* Location of window cell */
+	x2 = x * w2 + td->size_ow1;
+	y2 = y * h2 + td->size_oh1;
 
 	/* Info */
 	hdc = GetDC(td->w);
@@ -5624,8 +5597,6 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 		//cleanup_angband();
 
-		// clear the region used for big tiles
-		Term_bigregion(-1, -1, -1);
 		/* Hack - redraw everything + recalc bigtile regions */
 		angband_term[0]->resize_hook();
     

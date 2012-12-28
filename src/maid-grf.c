@@ -282,7 +282,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 	use_graphics = GRAPHICS_NONE;
 	use_transparency = FALSE;
 
-	current_graphics_mode = get_graphics_mode(graphics);
+	current_graphics_mode = get_graphics_mode((byte)graphics);
 	if (current_graphics_mode && current_graphics_mode->file) {
 		/* Try the file */
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",current_graphics_mode->file));
@@ -324,12 +324,32 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
  */
 bool is_bigtiled(int x, int y)
 {
-	if (((tile_width_mult > 1) || (tile_height_mult > 1))
+	/*if (((tile_width_mult > 1) || (tile_height_mult > 1))
 		&& (y >= Term->scr->big_y1)
 		&& (y <= Term->scr->big_y2)
 		&& (x >= Term->scr->big_x1))
 	{
 		return (TRUE);
+	}*/
+	if (Term->scr->a[y][x]==TERM_SKIPA) {
+		return (TRUE);
+	}
+	if (tile_width_mult > 1) {
+		if ((x < Term->wid-1) && (Term->scr->a[y][x+1]==TERM_SKIPA)) {
+			return (TRUE);
+		}
+		if ((x == Term->wid-1) && (Term->scr->a[y][x-1]==TERM_SKIPA)) {
+			return (TRUE);
+		}
+	}
+	if ((tile_height_mult > 1) && (y > 0)) {
+		/* top and bottom rows can never be bigtiled */
+		if ((y < Term->hgt-2) && (Term->scr->a[y+1][x]==255)) {
+			return (TRUE);
+		}
+		if ((y == Term->hgt-2) && (Term->scr->a[y-1][x]==255)) {
+			return (TRUE);
+		}
 	}
 
 	return (FALSE);
@@ -339,9 +359,6 @@ void toggle_bigtile(void)
 {
 	if ((tile_width_mult > 1) || (tile_height_mult > 1))
 	{
-		/* Hack - disable bigtile mode */
-		Term_bigregion(-1, -1, -1);
-
 		tile_width_mult = 1;
 		tile_height_mult = 1;
 	}
@@ -2573,6 +2590,7 @@ void prt_map(void)
 {
 	int x, y;
 	int v;
+	int vx,vy;
 
 	/* map bounds */
 	s16b xmin, xmax, ymin, ymax;
@@ -2608,6 +2626,7 @@ void prt_map(void)
 	ptc = mp_tc;
 
 	/* Dump the map */
+	vy = ROW_MAP;
 	for (y = ymin; y <= ymax; y++)
 	{
 		/* Clear the arrays in case panel doesn't fill screen */
@@ -2642,9 +2661,18 @@ void prt_map(void)
 		pta = mp_ta;
 		ptc = mp_tc;
 
-		/* Efficiency -- Redraw that row of the map */
-		Term_queue_line(COL_MAP, y - p_ptr->panel_y1 + ROW_MAP,
+		if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
+			vx = COL_MAP;
+			for (x = 0; x < wid; x++) {
+				Term_big_queue_char(vx, vy, mp_a[x], mp_c[x], mp_ta[x], mp_tc[x]);
+				vx += tile_width_mult;
+			}
+		} else {
+			/* Efficiency -- Redraw that row of the map */
+			Term_queue_line(COL_MAP, y - p_ptr->panel_y1 + ROW_MAP,
 						wid, pa, pc, pta, ptc);
+		}
+		vy += tile_height_mult;
 	}
 
 	/* Restore the cursor */
@@ -2827,11 +2855,6 @@ void display_map(int *cx, int *cy)
 
 	place_type *pl_ptr;
 
-
-	/* Hack - disable bigtile mode */
-	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
-		Term_bigregion(-1, -1, -1);
-	}
 
 	/* Get size */
 	Term_get_size(&wid, &hgt);
@@ -3222,11 +3245,18 @@ void lite_spot(int x, int y)
 		if (panel_contains(x, y))
 		{
 			/* Real coordinates convert to screen positions */
-			x -= p_ptr->panel_x1 - COL_MAP;
-			y -= p_ptr->panel_y1 - ROW_MAP;
+			x -= p_ptr->panel_x1;
+			y -= p_ptr->panel_y1;
+
+			if (tile_width_mult > 1) {
+				 x += (tile_width_mult - 1) * x;
+			}
+			if (tile_height_mult > 1) {
+				y += (tile_height_mult - 1) * y;
+			}
 
 			/* Hack -- Queue it */
-			Term_queue_char(x, y, a, c, ta, tc);
+			Term_big_queue_char(x+COL_MAP, y+ROW_MAP, a, c, ta, tc);
 		}
 	}
 }
@@ -3237,11 +3267,17 @@ void lite_spot(int x, int y)
 void move_cursor_relative(int x, int y)
 {
 	/* Real coordinates convert to screen positions */
-	x -= p_ptr->panel_x1 - COL_MAP;
-	y -= p_ptr->panel_y1 - ROW_MAP;
+	x -= p_ptr->panel_x1;
+	y -= p_ptr->panel_y1;
 
+	if (tile_width_mult > 1) {
+		x += (tile_width_mult - 1) * x;
+	}
+	if (tile_height_mult > 1) {
+	  y += (tile_height_mult - 1) * y;
+	}
 	/* Go there */
-	Term_gotoxy(x, y);
+	Term_gotoxy(x+COL_MAP, y+ROW_MAP);
 }
 
 
@@ -3261,11 +3297,17 @@ void print_rel(char c, byte a, int x, int y)
 		}
 
 		/* Real coordinates convert to screen positions */
-		x -= p_ptr->panel_x1 - COL_MAP;
-		y -= p_ptr->panel_y1 - ROW_MAP;
+		x -= p_ptr->panel_x1;
+		y -= p_ptr->panel_y1;
 
+		if (tile_width_mult > 1) {
+			x += (tile_width_mult - 1) * x;
+		}
+		if (tile_height_mult > 1) {
+			y += (tile_height_mult - 1) * y;
+		}
 		/* Draw the char using the attr */
-		Term_queue_char(x, y, a, c, a, c);
+		Term_big_queue_char(x+COL_MAP, y+ROW_MAP, a, c, a, c);
 	}
 }
 
@@ -3728,11 +3770,6 @@ void display_law_map(int *cx, int *cy)
 
 	place_type *pl_ptr;
 
-
-	/* Hack - disable bigtile mode */
-	if ((tile_width_mult > 1) || (tile_height_mult > 1)) {
-		Term_bigregion(-1, -1, -1);
-	}
 
 	/* Get size */
 	Term_get_size(&wid, &hgt);

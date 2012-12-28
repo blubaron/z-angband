@@ -1074,7 +1074,15 @@ static void square_to_pixel(int *x, int *y, int ox, int oy)
 {
 	term_data *td = (term_data*)(Term->data);
 	
-	if ((tile_width_mult > 1)
+	if (is_bigtiled(ox, oy)) {
+		(*x) = ox * td->tile_wid * tile_width_mult + Infowin->ox;
+		(*y) = oy * td->tile_hgt * tile_height_mult + Infowin->oy;
+	} else 
+	{
+		(*x) = ox * td->tile_wid + Infowin->ox;
+		(*y) = oy * td->tile_hgt + Infowin->oy;
+	}
+	/*if ((tile_width_mult > 1)
 			&& (oy >= Term->scr->big_y1)
 			&& (oy <= Term->scr->big_y2)
 			&& (ox > Term->scr->big_x1))
@@ -1093,11 +1101,11 @@ static void square_to_pixel(int *x, int *y, int ox, int oy)
 				Term->scr->big_y1 * td->tile_hgt * (tile_height_mult-1);
 	} else {
 		(*y) = oy * td->tile_hgt + Infowin->oy;
-	}
+	}*/
 }
 
 
-
+#if 0
 /*
  * Painting where text would be
  */
@@ -1106,21 +1114,26 @@ static errr Infofnt_text_non(int x, int y, int len)
 	int x1, y1, x2, y2;
 
 	/*** Find the dimensions ***/
-	square_to_pixel(&x1, &y1, x, y);
-	square_to_pixel(&x2, &y2, x + len, y);
+	/*square_to_pixel(&x1, &y1, x, y);
+	square_to_pixel(&x2, &y2, x + len, y);*/
+	x1 = x * td->tile_wid + Infowin->ox;
+	y1 = y * td->tile_hgt + Infowin->oy;
+	x2 = (x+n) * td->tile_wid + Infowin->ox;
+	y2 = (y+1) * td->tile_hgt + Infowin->oy;
 	
 	/*** Actually 'paint' the area ***/
 	
 	/* Just do a Fill Rectangle */
 	XFillRectangle(Metadpy->dpy, Infowin->win, Infoclr->gc,
 					x1, y1,
-					x2 - x1, Infofnt->hgt);
+					x2 - x1, y2 - y1);
+					/*x2 - x1, Infofnt->hgt);*/
 
 	/* Success */
 	return (0);
 }
 
-
+#endif
 /*
  * Standard Text
  */
@@ -1142,7 +1155,9 @@ static errr Infofnt_text_std(int cx, int cy, cptr str, int len)
 
 	/*** Decide where to place the string, vertically ***/
 
-	square_to_pixel(&x, &y, cx, cy);
+	/*square_to_pixel(&x, &y, cx, cy);*/
+	x = cx * td->tile_wid + Infowin->ox;
+	y = cy * td->tile_hgt + Infowin->oy;
 	
 	/* Ignore Vertical Justifications */
 	y += Infofnt->asc;
@@ -1170,7 +1185,7 @@ static errr Infofnt_text_std(int cx, int cy, cptr str, int len)
 				/* Note that the Infoclr is set up to contain the Infofnt */
 				XDrawImageString(Metadpy->dpy, Infowin->win, Infoclr->gc,
 								x, y, str + i, 1);
-				x += td->tile_wid;
+				x += td->tile_wid * tile_width_mult;
 			}
 			else
 			{
@@ -2550,20 +2565,25 @@ static errr Term_xtra_x11(int n, int v)
  */
 static errr Term_curs_x11(int x, int y)
 {
+	term_data *td = (term_data*)(Term->data);
+
 	int x1, y1;
-	square_to_pixel(&x1, &y1, x, y);
+
+	/*square_to_pixel(&x1, &y1, x, y);*/
+	x1 = x * td->tile_wid + Infowin->ox;
+	y1 = y * td->tile_hgt + Infowin->oy;
 	
 	if (is_bigtiled(x, y))
 	{
 		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
 			 x1, y1,
-			 Infofnt->wid * tile_width_mult - 1, Infofnt->hgt * tile_height_mult - 1);
+			 td->tile_wid * tile_width_mult - 1, td->tile_hgt * tile_height_mult - 1);
 	}
 	else
 	{
 		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
 			 x1, y1,
-			 Infofnt->wid - 1, Infofnt->hgt - 1);
+			 td->tile_wid - 1, td->tile_hgt - 1);
 	}
 	
 	/* Success */
@@ -2576,11 +2596,27 @@ static errr Term_curs_x11(int x, int y)
  */
 static errr Term_wipe_x11(int x, int y, int n)
 {
+	int x1, y1, x2, y2;
+	term_data *td = (term_data*)(Term->data);
+
 	/* Erase (use black) */
 	Infoclr_set(clr[TERM_DARK]);
 
 	/* Erase some space */
-	Infofnt_text_non(x, y, n);
+
+	/*** Find the dimensions ***/
+	x1 = x * td->tile_wid + Infowin->ox;
+	y1 = y * td->tile_hgt + Infowin->oy;
+	x2 = (x+n) * td->tile_wid + Infowin->ox;
+	y2 = (y+1) * td->tile_hgt + Infowin->oy;
+	
+	/*** Actually 'paint' the area ***/
+	
+	/* Just do a Fill Rectangle */
+	XFillRectangle(Metadpy->dpy, Infowin->win, Infoclr->gc,
+					x1, y1,
+					x2 - x1, y2 - y1);
+					/*x2 - x1, Infofnt->hgt);*/
 	
 	/* Redraw the selection if any, as it may have been obscured. (later) */
 	/*x11_selection->drawn = FALSE;*/
@@ -2644,7 +2680,9 @@ errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const 
 	XImage *mask;
 
 	/* Starting point */
-	square_to_pixel(&x, &y, ox, oy);
+	/*square_to_pixel(&x, &y, ox, oy);*/
+	x = ox * td->tile_wid + Infowin->ox;
+	y = oy * td->tile_hgt + Infowin->oy;
 	
 	for (i = 0; i < n; ++i)
 	{
