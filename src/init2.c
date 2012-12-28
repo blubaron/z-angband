@@ -1065,7 +1065,6 @@ static errr init_mg_info(void)
 /*
  * Initialize the "dungeons" array
  */
-extern dun_gen_type *dungeons_n;
 errr init_dun_info_txt(FILE *fp, char *buf);
 
 static errr init_dun_info(void)
@@ -1077,33 +1076,8 @@ static errr init_dun_info(void)
 	char buf[1024];
 
 	int i;
-	/*int max  = z_info->dun_max-1;
-	for (i = 0 ;i < max; ++i) {
-		dungeons[i].next = &(dungeons[i+1]);
-	}
-	dungeons[max].next = NULL;
-	return (0);*/
-	/* still using hardcoded dungeons */
-#if (0)
-	/* Init the header */
-	init_header(&dun_head, z_info->dun_max, sizeof(dun_gen_type));
-
-#ifdef ALLOW_TEMPLATES
-
-	/* Save a pointer to the parsing function */
-	dun_head.parse_info_txt = parse_dun_info;
-
-#endif /* ALLOW_TEMPLATES */
-
-	return init_info("dungeons", &dun_head,
-					 (void *)&dun_info, (void *)&dun_name, (void *)&dun_text);
-#endif
-
-//#if (0)
 
 	/* Later must add in python support. */
-	//C_MAKE(dungeons_n, z_info->dun_max, dun_gen_type);
-
 
 	/*** Load the ascii template file ***/
 
@@ -1143,8 +1117,6 @@ static errr init_dun_info(void)
 
 	/* Success */
 	return (0);
-
-//#endif
 }
 
 /*

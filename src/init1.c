@@ -5414,8 +5414,6 @@ errr parse_s_info(char *buf, header *head)
 /*
  * Initialize the "dungeons" array, by parsing an ascii "template" file
  */
-extern dun_gen_type *dungeons_n;
-
 errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 {
 	int i;
@@ -5469,40 +5467,10 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 		if (i > z_info->dun_max) {
 			z_info->dun_max = i;
 		}
-#if 0
-		/* Check to see if there is room in array */
-		if (i > z_info->dun_max - 1) return (PARSE_ERROR_OUT_OF_MEMORY);
-
-		/* Save the index */
-		error_idx = i;
-
-		/* extend the linked list */
-		if (dun_ptr) {
-			dun_ptr->next = &(dungeons_n[i]);
-		}
-
-		/* Point at the "info" */
-		dun_ptr = &(dungeons_n[i]);
-		dun_ptr->didx = i;
-		if (pdun_ptr) *pdun_ptr = dun_ptr;
-#endif
 
 		/* Store the name */
 		dun_ptr->name = string_make(s);
-		//if (!(dun_ptr->name = add_name(head, s)))
-		//	return (PARSE_ERROR_OUT_OF_MEMORY);
-#if 0
-		/* Name + /0 on the end */
-		length = strlen(s) + 1;
 
-		/* Make some room */
-		C_MAKE(t, length, char);
-
-		if (!t) return (PARSE_ERROR_OUT_OF_MEMORY);	/* Out of memory */
-
-		/* Add the name */
-		dun_ptr->name = strcpy(t, s);
-#endif
 		return (0);
 	} else
 
@@ -6003,12 +5971,6 @@ errr init_dun_info_txt(FILE *fp, char *buf)
 void clear_dun_info()
 {
 	int i;
-	/* still using hardcoded dungeons */
-	if (dun_name)
-		ZFREE(dun_name);
-
-	if (dun_text)
-		ZFREE(dun_text);
 
  	if (dungeons) {
 		for (i=0; i < z_info->dun_max; i++) {
