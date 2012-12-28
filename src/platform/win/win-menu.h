@@ -1,5 +1,5 @@
 /*
- * File: main-win.c
+ * File: win-menu.h
  * Purpose: Menu constants -- see "ANGBAND.RC".
  *
  * Copyright (c) 1997 Ben Harrison, Skirmantas Kligys, Robert Ruehlmann,
@@ -119,6 +119,9 @@
 #define IDM_OPTIONS_TILE_3x2        460
 #define IDM_OPTIONS_TILE_4x3        461
 
+#define IDM_OPTIONS_TILE_MIN        IDM_OPTIONS_TILE_1x1
+#define IDM_OPTIONS_TILE_MAX        IDM_OPTIONS_TILE_4x3
+
 #define IDM_TILE_FONT 		190
 #define IDM_TILE_08X08		191
 #define IDM_TILE_16X16		192
@@ -131,6 +134,9 @@
 #define IDM_TILE_12X13		199
 #define IDM_TILE_12X20		188
 #define IDM_TILE_16X25		189
+
+#define IDM_OPTIONS_FONT_MIN        IDM_TILE_12X20
+#define IDM_OPTIONS_FONT_MAX        IDM_TILE_12X13
 
 #define IDM_HELP_GENERAL		901
 #define IDM_HELP_SPOILERS		902

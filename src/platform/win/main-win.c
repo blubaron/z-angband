@@ -2886,6 +2886,7 @@ static void stop_screensaver(void)
 static void setup_menus(void)
 {
 	int i;
+	u32b u;
 
 	HMENU hm = GetMenu(data[0].w);
 	graphics_mode *mode;
@@ -3020,6 +3021,9 @@ static void setup_menus(void)
 		}
 	}
 
+	EnableMenuItem(hm, IDM_WINDOW_OPT, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	EnableMenuItem(hm, IDM_WINDOW_RESET, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+
 	/* Menu "Options", disable all */
 	mode = graphics_modes;
 	while (mode) {
@@ -3027,22 +3031,17 @@ static void setup_menus(void)
 					   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 		mode = mode->pNext;
 	} 
-	/*EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NONE,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_OLD,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_ADAM,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_6,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_7,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_DAVID_8,
-	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);*/
+	//EnableMenuItem(hm, IDM_OPTIONS_GRAPHICS_NICE,
 	EnableMenuItem(hm, IDM_OPTIONS_BIGTILE,
-				   MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+
+	for (i = IDM_OPTIONS_TILE_MIN; i <= IDM_OPTIONS_TILE_MAX; i++) {
+		EnableMenuItem(hm, i, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	}
+	for (i = IDM_OPTIONS_FONT_MIN; i <= IDM_OPTIONS_FONT_MAX; i++) {
+		EnableMenuItem(hm, i, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	}
+
 	EnableMenuItem(hm, IDM_OPTIONS_SOUND,
 	               MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	EnableMenuItem(hm, IDM_OPTIONS_SAVER,
@@ -3070,6 +3069,135 @@ static void setup_menus(void)
 	              (((tile_width_mult > 1) || (tile_height_mult > 1)) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(hm, IDM_OPTIONS_SOUND,
 	              (arg_sound ? MF_CHECKED : MF_UNCHECKED));
+
+	/* see which tile sizes should be checked */
+	if ((tile_width_mult == 1) && (tile_height_mult == 1))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_1x1, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_1x1, MF_UNCHECKED);
+
+	if ((tile_width_mult == 2) && (tile_height_mult == 1))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_2x1, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_2x1, MF_UNCHECKED);
+
+	if ((tile_width_mult == 2) && (tile_height_mult == 2))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_2x2, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_2x2, MF_UNCHECKED);
+
+	if ((tile_width_mult == 3) && (tile_height_mult == 1))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_3x1, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_3x1, MF_UNCHECKED);
+
+	if ((tile_width_mult == 3) && (tile_height_mult == 3))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_3x3, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_3x3, MF_UNCHECKED);
+
+	if ((tile_width_mult == 4) && (tile_height_mult == 2))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_4x2, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_4x2, MF_UNCHECKED);
+
+	if ((tile_width_mult == 4) && (tile_height_mult == 4))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_4x4, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_4x4, MF_UNCHECKED);
+
+	if ((tile_width_mult == 6) && (tile_height_mult == 3))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_6x3, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_6x3, MF_UNCHECKED);
+
+	if ((tile_width_mult == 6) && (tile_height_mult == 6))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_6x6, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_6x6, MF_UNCHECKED);
+
+	if ((tile_width_mult == 8) && (tile_height_mult == 4))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_8x4, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_8x4, MF_UNCHECKED);
+
+	if ((tile_width_mult == 8) && (tile_height_mult == 8))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_8x8, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_8x8, MF_UNCHECKED);
+
+	if ((tile_width_mult == 16) && (tile_height_mult == 8))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_16x8, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_16x8, MF_UNCHECKED);
+
+	if ((tile_width_mult == 16) && (tile_height_mult == 16))
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_16x16, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_OPTIONS_TILE_16x16, MF_UNCHECKED);
+
+	/* see which font sizes should be checked */
+	u = data[0].tile_hgt;
+	if ((data[0].tile_wid == data[0].font_wid) && (u == data[0].font_hgt))
+		CheckMenuItem(hm, IDM_TILE_FONT, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_FONT, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 8) && (u == 16))
+		CheckMenuItem(hm, IDM_TILE_08X16, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_08X16, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 8) && (u == 13))
+		CheckMenuItem(hm, IDM_TILE_08X13, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_08X13, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 8) && (u == 8))
+		CheckMenuItem(hm, IDM_TILE_08X08, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_08X08, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 16) && (u == 16))
+		CheckMenuItem(hm, IDM_TILE_16X16, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_16X16, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 32) && (u == 32))
+		CheckMenuItem(hm, IDM_TILE_32X32, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_32X32, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 10) && (u == 20))
+		CheckMenuItem(hm, IDM_TILE_10X20, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_10X20, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 16) && (u == 32))
+		CheckMenuItem(hm, IDM_TILE_16X32, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_16X32, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 10) && (u == 17))
+		CheckMenuItem(hm, IDM_TILE_10X17, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_10X17, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 12) && (u == 13))
+		CheckMenuItem(hm, IDM_TILE_12X13, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_12X13, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 12) && (u == 20))
+		CheckMenuItem(hm, IDM_TILE_12X20, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_12X20, MF_UNCHECKED);
+
+	if ((data[0].tile_wid == 16) && (u == 25))
+		CheckMenuItem(hm, IDM_TILE_16X25, MF_CHECKED);
+	else
+		CheckMenuItem(hm, IDM_TILE_16X25, MF_UNCHECKED);
+
 #ifdef USE_SAVER
 	CheckMenuItem(hm, IDM_OPTIONS_SAVER,
 	              (hwndSaver ? MF_CHECKED : MF_UNCHECKED));
@@ -3098,6 +3226,19 @@ static void setup_menus(void)
 		EnableMenuItem(hm, IDM_OPTIONS_BIGTILE, MF_ENABLED);
 	}
 #endif /* USE_GRAPHICS */
+
+	if (initialized && p_ptr->cmd.inkey_flag)
+	{
+		EnableMenuItem(hm, IDM_WINDOW_OPT, MF_ENABLED);
+		EnableMenuItem(hm, IDM_WINDOW_RESET, MF_ENABLED);
+
+		for (i = IDM_OPTIONS_TILE_MIN; i <= IDM_OPTIONS_TILE_MAX; i++) {
+			EnableMenuItem(hm, i, MF_ENABLED);
+		}
+		for (i = IDM_OPTIONS_FONT_MIN; i <= IDM_OPTIONS_FONT_MAX; i++) {
+			EnableMenuItem(hm, i, MF_ENABLED);
+		}
+	}
 
 #ifdef USE_SOUND
 	if (initialized && p_ptr->cmd.inkey_flag)
