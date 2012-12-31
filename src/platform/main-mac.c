@@ -4336,7 +4336,12 @@ static void init_stuff(void)
 	while (1)
 	{
 		/* Prepare the paths */
+#ifdef PRIVATE_USER_PATH
+		init_file_paths(path,path,PRIVATE_USER_PATH);
+		create_user_dirs();
+#else /* PRIVATE_USER_PATH */
 		init_file_paths(path,path,path);
+#endif /* PRIVATE_USER_PATH */
 
 		/* Build the filename */
 		path_make(path, ANGBAND_DIR_FILE, "news.txt");

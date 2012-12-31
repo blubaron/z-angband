@@ -8,64 +8,6 @@
 
 #ifdef SET_UID
 
-#ifdef PRIVATE_USER_PATH
-
-/*
- * Create an ".angband/" directory in the users home directory.
- *
- * ToDo: Add error handling.
- * ToDo: Only create the directories when actually writing files.
- */
-void create_user_dirs(void)
-{
-	char dirpath[1024];
-	char subdirpath[1024];
-
-
-	/* Get an absolute path from the filename */
-	path_parse(dirpath, 1024, PRIVATE_USER_PATH);
-
-	/* Create the ~/.angband/ directory */
-	mkdir(dirpath, 0700);
-
-	/* Build the path to the variant-specific sub-directory */
-	path_make(subdirpath, dirpath, VERSION_NAME);
-
-	/* Create the directory */
-	mkdir(subdirpath, 0700);
-
-#ifdef USE_PRIVATE_PATHS
-
-	/* Build the path to the scores sub-directory */
-	path_build(dirpath, sizeof(dirpath), subdirpath, "scores");
-
-	/* Create the directory */
-	mkdir(dirpath, 0700);
-
-	/* Build the path to the savefile sub-directory */
-	path_build(dirpath, sizeof(dirpath), subdirpath, "bone");
-
-	/* Create the directory */
-	mkdir(dirpath, 0700);
-
-	/* Build the path to the savefile sub-directory */
-	path_build(dirpath, sizeof(dirpath), subdirpath, "data");
-
-	/* Create the directory */
-	mkdir(dirpath, 0700);
-
-	/* Build the path to the savefile sub-directory */
-	path_build(dirpath, sizeof(dirpath), subdirpath, "save");
-
-	/* Create the directory */
-	mkdir(dirpath, 0700);
-
-#endif /* USE_PRIVATE_PATHS */
-
-}
-
-#endif /* PRIVATE_USER_PATH */
-
 
 /*
  * Hack -- drop permissions
@@ -199,13 +141,6 @@ void init_setuid(void)
 
 	/* Get the "user name" as a default player name */
 	user_name(player_name, player_uid);
-
-#ifdef PRIVATE_USER_PATH
-
-	/* Create a directory for the users files. */
-	create_user_dirs();
-
-#endif /* PRIVATE_USER_PATH */
 }
 
 

@@ -5192,7 +5192,14 @@ static void init_stuff(void)
 	validate_dir(path);
 
 	/* Init the file paths */
+#ifdef PRIVATE_USER_PATH
+	init_file_paths(path,path,PRIVATE_USER_PATH);
+#else /* PRIVATE_USER_PATH */
 	init_file_paths(path,path,path);
+#endif /* PRIVATE_USER_PATH */
+
+	/* make sure that the user directories exist */
+	create_user_dirs();
 
 	/* Hack -- Validate the paths */
 	validate_dir(ANGBAND_DIR_APEX);

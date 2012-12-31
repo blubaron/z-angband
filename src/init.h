@@ -143,5 +143,6 @@ extern errr init_t_info(void);
 /*extern void init_file_paths(char *path);*/
 extern void init_file_paths(const char *config, const char *lib, const char *data);
 extern errr check_modification_date(int fd, cptr template_file);
+extern void create_user_dirs(void);
 
 #endif /* INCLUDED_INIT_H */

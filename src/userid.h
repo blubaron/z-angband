@@ -9,10 +9,6 @@ extern void safe_setuid_drop(void);
 extern void safe_setuid_grab(void);
 extern void init_setuid(void);
 
-#ifdef PRIVATE_USER_PATH
-extern void create_user_dirs(void);
-#endif /* PRIVATE_USER_PATH */
-
 
 /*
  * Hack -- conditional (or "bizarre") externs

@@ -6272,11 +6272,16 @@ static void init_stuff(void)
 	/* Check until done */
 	while (1)
 	{
+		/* Prepare the paths */
+#ifdef PRIVATE_USER_PATH
+		init_file_paths(path,path,PRIVATE_USER_PATH);
+		create_user_dirs();
+#else /* PRIVATE_USER_PATH */
+		init_file_paths(path,path,path);
+#endif /* PRIVATE_USER_PATH */
+
 		/* Create directories for the users files */
 		create_user_dirs();
-
-		/* Prepare the paths */
-		init_file_paths(path,path,path);
 
 		/* Build the filename */
 		path_build(path, sizeof(path), ANGBAND_DIR_FILE, "news.txt");

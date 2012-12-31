@@ -247,7 +247,14 @@ static void init_stuff(void)
 #endif /* HAVE_CONFIG_H */
 
 	/* Initialize */
+#ifdef PRIVATE_USER_PATH
+	init_file_paths(path,path,PRIVATE_USER_PATH);
+#else /* PRIVATE_USER_PATH */
 	init_file_paths(path,path,path);
+#endif /* PRIVATE_USER_PATH */
+
+	/* make sure that the user directories exist */
+	create_user_dirs();
 }
 
 

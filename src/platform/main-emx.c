@@ -1148,7 +1148,12 @@ static void init_stuff(void)
 	if (!suffix(path, PATH_SEP)) strcat(path, PATH_SEP);
 
 	/* Initialize */
+#ifdef PRIVATE_USER_PATH
+	init_file_paths(path,path,PRIVATE_USER_PATH);
+	create_user_dirs();
+#else /* PRIVATE_USER_PATH */
 	init_file_paths(path,path,path);
+#endif /* PRIVATE_USER_PATH */
 }
 
 static void quit_hook(cptr s)

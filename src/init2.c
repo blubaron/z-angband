@@ -159,52 +159,7 @@ void init_file_paths(const char *configpath, const char *libpath, const char *da
 	ANGBAND_DIR_HELP = string_make(format("%shelp", libpath));
 	ANGBAND_DIR_INFO = string_make(format("%sinfo", libpath));
 	ANGBAND_DIR_PREF = string_make(format("%spref", configpath));
-
-#ifdef USE_PRIVATE_PATHS
-
-#ifdef PRIVATE_USER_PATH
-
-	/* Build the path to the user specific directory */
-	path_make(buf, PRIVATE_USER_PATH, VERSION_NAME);
-
-	/* Build a relative path name */
-	ANGBAND_DIR_USER = string_make(buf);
-
-#else  /* PRIVATE_USER_PATH */
-
-	/* Build user path name */
-	ANGBAND_DIR_USER = string_make(format("%suser", datapath));
-
-#endif /* PRIVATE_USER_PATH */
-
-	/* Build a path name */
-	path_make(buf, ANGBAND_DIR_USER, "scores");
-	ANGBAND_DIR_APEX = string_make(buf);
-
-	/* Build a path name */
-	path_make(buf, ANGBAND_DIR_USER, "bone");
-	ANGBAND_DIR_BONE = string_make(buf);
-
-	/* Build a path name */
-	path_make(buf, ANGBAND_DIR_USER, "data");
-	ANGBAND_DIR_DATA = string_make(buf);
-
-	/* Build a path name */
-	path_make(buf, ANGBAND_DIR_USER, "save");
-	ANGBAND_DIR_SAVE = string_make(buf);
-
-#else /* USE_PRIVATE_PATHS */
-
-	/* Build user path name */
-	ANGBAND_DIR_USER = string_make(format("%suser", datapath));
-	/* Build data path names */
-	ANGBAND_DIR_APEX = string_make(format("%sapex", datapath));
-	ANGBAND_DIR_BONE = string_make(format("%sbone", datapath));
-	ANGBAND_DIR_DATA = string_make(format("%sdata", datapath));
-	ANGBAND_DIR_SAVE = string_make(format("%ssave", datapath));
-
-#endif /* USE_PRIVATE_PATHS */
-
+	
 	/* Build xtra/ path names */
 	ANGBAND_DIR_XTRA = string_make(format("%sxtra", libpath));
 
@@ -217,6 +172,65 @@ void init_file_paths(const char *configpath, const char *libpath, const char *da
 	path_make(buf, ANGBAND_DIR_XTRA, "sound");
 	ANGBAND_DIR_XTRA_SOUND = string_make(buf);
 
+	/* Get an absolute path from the filename */
+	path_parse(buf, 1024, datapath);
+
+	/* Build user/ path names */
+	if (datapath != libpath) {
+		/* Build user path name */
+		ANGBAND_DIR_USER = string_make(format("%s%s", buf,VERSION_NAME));
+	} else {
+		/* Build user path name */
+		ANGBAND_DIR_USER = string_make(format("%suser", buf));
+	}
+
+	/* Build user sub path names */
+	path_make(buf, ANGBAND_DIR_USER, "scores");
+	ANGBAND_DIR_APEX = string_make(buf);
+
+	path_make(buf, ANGBAND_DIR_USER, "bone");
+	ANGBAND_DIR_BONE = string_make(buf);
+
+	path_make(buf, ANGBAND_DIR_USER, "data");
+	ANGBAND_DIR_DATA = string_make(buf);
+
+	path_make(buf, ANGBAND_DIR_USER, "save");
+	ANGBAND_DIR_SAVE = string_make(buf);
+
+#endif /* VM */
+}
+
+/*
+ * Create an ".angband/" directory in the users home directory.
+ *
+ * ToDo: Add error handling.
+ * ToDo: Only create the directories when actually writing files.
+ */
+#ifdef WINDOWS
+# define my_mkdir(path, perms) mkdir(path)
+#elif defined(HAVE_MKDIR) || defined(MACH_O_CARBON)
+# define my_mkdir(path, perms) mkdir(path, perms)
+#else
+# define my_mkdir(path, perms) FALSE
+#endif
+
+void create_user_dirs(void)
+{
+#ifndef VM
+	/* Build the path to the variant-specific user directory */
+	my_mkdir(ANGBAND_DIR_USER, 0700);
+
+	/* Create the scores sub-directory */
+	my_mkdir(ANGBAND_DIR_APEX, 0700);
+
+	/* Create the bone sub-directory */
+	my_mkdir(ANGBAND_DIR_BONE, 0700);
+
+	/* Create the data sub-directory */
+	my_mkdir(ANGBAND_DIR_DATA, 0700);
+
+	/* Create the savefile sub-directory */
+	my_mkdir(ANGBAND_DIR_SAVE, 0700);
 #endif /* VM */
 }
 
