@@ -980,6 +980,18 @@ void screen_load(void)
 
 	/* Decrease "icky" depth */
 	character_icky--;
+
+	/* Mega hack to clear the screen on the last screen load
+	 * from Angband */
+	/* TODO: should really be a scan to check for changed cells and if
+	 * the change is the skip attr/char pair, then make sure that the parent 
+	 * cell is in the refresh queue as well (with different old data).
+	 */
+	if ((character_icky == 0)
+		&& ((tile_width_mult > 1) || (tile_height_mult > 1)))
+	{
+		Term->total_erase = (TRUE);
+	}
 }
 
 /*
