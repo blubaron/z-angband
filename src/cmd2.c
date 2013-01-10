@@ -1044,7 +1044,7 @@ void do_cmd_close(void)
 	bool more = FALSE;
 
 	/* Option: Pick a direction */
-	if (easy_open)
+	if (easy_open && !p_ptr->cmd.dir)
 	{
 		/* Count open doors */
 		if (count_doors(&x, &y, is_open, FALSE) == 1)
@@ -1926,7 +1926,7 @@ void do_cmd_disarm(void)
 	bool more = FALSE;
 
 	/* Option: Pick a direction */
-	if (easy_disarm)
+	if (easy_disarm && !p_ptr->cmd.dir)
 	{
 		int num_traps, num_chests;
 
