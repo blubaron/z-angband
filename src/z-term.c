@@ -1716,6 +1716,7 @@ void Term_big_putch(int x, int y, byte a, char c)
 void Term_addstr(int n, byte a, char *s)
 {
 	int w = Term->wid;
+	int k;
 
 	/* Handle "unusable" cursor */
 	if (Term->scr->cu) return;
@@ -1724,7 +1725,10 @@ void Term_addstr(int n, byte a, char *s)
 	if (!s) return;
 
 	/* Obtain maximal length */
-	if (n < 0) n = strlen(s);
+	k = (n < 0) ? (w + 1) : n;
+
+	/* Obtain the usable string length */
+	for (n = 0; (n < k) && s[n]; n++) /* loop */;
 
 	/* React to reaching the edge of the screen */
 	if (Term->scr->cx + n >= w)
