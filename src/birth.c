@@ -797,7 +797,7 @@ static void player_outfit(void)
 static bool get_player_sex(void)
 {
 	int i;
-	cptr genders[MAX_SEXES];
+	cptr genders[MAX_SEXES+2];
 
 	/* Extra info */
 	put_fstr(QUESTION_COL, QUESTION_ROW,
@@ -809,8 +809,20 @@ static bool get_player_sex(void)
 		genders[i] = sex_info[i].title;
 	}
 
-	p_ptr->rp.psex = get_player_choice(genders, MAX_SEXES, SEX_COL, 15,
+	genders[i++] = "Random";
+	genders[i++] = "All Rndm";
+
+	p_ptr->rp.psex = get_player_choice(genders, MAX_SEXES+2, SEX_COL, 15,
 									"charattr.txt#TheSexes", NULL);
+
+	if (p_ptr->rp.psex == MAX_SEXES) {
+		/* we want a random sex */
+		p_ptr->rp.psex = (unsigned char) randint0(MAX_SEXES);
+	} else
+	if (p_ptr->rp.psex == MAX_SEXES + 1) {
+		/* we want a completely random character */
+		return (TRUE);
+	}
 
 	/* No selection? */
 	if (p_ptr->rp.psex == INVALID_CHOICE)
@@ -1119,6 +1131,12 @@ static bool player_birth_aux_1(void)
 		return (FALSE);
 	}
 
+	if (p_ptr->rp.psex == MAX_SEXES + 1) {
+		/* we want a completely random character */
+		button_restore();
+		return (TRUE);
+	}
+
 	/* Clean up */
 	clear_region(0, QUESTION_ROW, TABLE_ROW - 1);
 
@@ -1359,7 +1377,7 @@ static bool player_birth_aux_2(void)
 		int bonus = rp_ptr->r_adj[i] + cp_ptr->c_adj[i];
 
 		/* Apply some randomness */
-        p_ptr->stat[i].cur = adjust_stat(i, stats[i] * 10, bonus);
+		p_ptr->stat[i].cur = adjust_stat(i, stats[i] * 10, bonus);
 		p_ptr->stat[i].max = p_ptr->stat[i].cur;
 	}
 
@@ -1422,10 +1440,10 @@ static bool player_birth_aux_3(void)
 		clear_from(10);
 
 		/* Extra info */
-		//put_fstr(5, 10,
-		//			"The auto-roller will generate 500 characters and try to pick\n"
-		//			"the one with the best stats, according to the weightings you\n"
-		//			"choose below. Enter a value from 1-100 for each stat.");
+		/*put_fstr(5, 10,
+					"The auto-roller will generate 500 characters and try to pick\n"
+					"the one with the best stats, according to the weightings you\n"
+					"choose below. Enter a value from 1-100 for each stat.");*/
 		put_fstr(5, 9,
 					"The auto-roller will generate 500 characters and try to pick\n"
 					"the one with the best stats, according to the weightings you\n"
@@ -1733,6 +1751,270 @@ static bool player_birth_aux_3(void)
 /*
  * Helper function for 'player_birth()'.
  *
+ * This function returns FALSE if a completely random character is not
+ * generated or if the player doesn't want it.
+ * 
+ * Otherwise, we create the character randomly from available options
+ */
+static bool player_birth_random(void)
+{
+	s32b count, pick, i, ch;
+
+	s16b stat_weight[A_MAX];
+	s16b stat_save[A_MAX];
+	s32b best_score;
+	s32b cur_score;
+
+	char tmp_name[16];
+
+	/*** pick a random sex ***/
+	p_ptr->rp.psex = (unsigned char) randint0(MAX_SEXES);
+
+	/* Save the sex pointer */
+	sp_ptr = &sex_info[p_ptr->rp.psex];
+
+	/* Rebirth */
+	rebirth_ptr->rp.psex = p_ptr->rp.psex;
+
+
+	/*** pick a random race ***/
+	p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);
+
+	/* Give beastman a mutation at character birth */
+	if (p_ptr->rp.prace == RACE_BEASTMAN) {
+		p_ptr->change |= (PC_MUTATE);
+	}
+
+	/* Rebirth */
+	rebirth_ptr->rp.prace = p_ptr->rp.prace;
+
+	/* Save the race pointer */
+	rp_ptr = &race_info[p_ptr->rp.prace];
+
+	/*** pick a random class ***/
+	p_ptr->rp.pclass = (unsigned char) randint0(MAX_CLASS);
+
+	/* Save for rebirth */
+	rebirth_ptr->rp.pclass = p_ptr->rp.pclass;
+
+	/* Set class */
+	cp_ptr = &class_info[p_ptr->rp.pclass];
+	mp_ptr = &magic_info[p_ptr->rp.pclass];
+
+	/*** pick random spell realms ***/
+	/* Starting spell slots */
+	for (i = 0; i < SPELL_LAYERS; i++) {
+		p_ptr->spell_slots[i] = magic_info[p_ptr->rp.pclass].max_spells[i];
+	}
+
+	/* Get number of possible realms */
+	count = 0;
+	for (i = 1; i < MAX_REALM; i++) {
+		/* Can we use this realm? */
+		if (realm_choices1[p_ptr->rp.pclass] & (1 << (i - 1))) {
+			count++;
+		}
+	}
+	if (count) {
+		pick = randint0(count)+1;
+		for (i = 1; i < MAX_REALM; i++) {
+			/* Can we use this realm? */
+			if (realm_choices1[p_ptr->rp.pclass] & (1 << (i - 1))) {
+				if (--pick == 0) {
+					/* we want to use this realm */
+					p_ptr->spell.realm[0] = (unsigned char) i;
+					rebirth_ptr->realm[0] = (unsigned char) i;
+					break;
+				}
+			}
+		}
+	} else {
+		/* Save the choice */
+		p_ptr->spell.realm[0] = REALM_NONE;
+		rebirth_ptr->realm[0] = REALM_NONE;
+	}
+
+	/* Get number of possible realms */
+	count = 0;
+	for (i = 1; i < MAX_REALM; i++) {
+		/* Can we use this realm? */
+		if (realm_choices2[p_ptr->rp.pclass] & (1 << (i - 1))) {
+			count++;
+		}
+	}
+	if (count) {
+		pick = randint0(count)+1;
+		for (i = 1; i < MAX_REALM; i++) {
+			/* Can we use this realm? */
+			if (realm_choices2[p_ptr->rp.pclass] & (1 << (i - 1))) {
+				if (--pick == 0) {
+					/* we want to use this realm */
+					p_ptr->spell.realm[1] = (unsigned char) i;
+					rebirth_ptr->realm[1] = (unsigned char) i;
+					break;
+				}
+			}
+		}
+	} else {
+		/* Save the choice */
+		p_ptr->spell.realm[1] = REALM_NONE;
+		rebirth_ptr->realm[1] = REALM_NONE;
+	}
+
+	/* Initialize player quests */
+	init_player_quests();
+
+	/*** roll stats ***/
+	for (i = 0; i < A_MAX; i++) {
+		/* In the Antiband version this is dependent on class & stat */
+		stat_weight[i] = 50 + 5*cp_ptr->c_adj[i];
+		/* soften the extremes */
+		if (cp_ptr->c_adj[i] > 4) stat_weight[i] -= 5;
+		if (cp_ptr->c_adj[i] < -4) stat_weight[i] += 5;
+		/* Apply some randomness in the stat weights */
+		stat_weight[i] += randint0(20) - 10;
+	}
+	best_score = 0;
+	while (count++ < 500) {
+		get_stats();
+		cur_score = 0;
+		for (i = 0; i < A_MAX; i++) {
+			cur_score += stat_weight[i] + p_ptr->stat[i].cur;
+		}
+		if (cur_score > best_score) {
+			best_score = cur_score;
+			for (i = 0; i < A_MAX; i++) {
+				stat_save[i] = p_ptr->stat[i].cur;
+			}
+		}
+	}
+	/* use the best roll */
+	for (i = 0; i < A_MAX; i++) {
+		/* Start fully healed */
+		p_ptr->stat[i].cur = p_ptr->stat[i].max = stat_save[i];
+	}
+
+
+	/* Roll for base hitpoints */
+	get_extra();
+
+	/* Roll for age/height/weight */
+	get_ahw();
+
+	/* Dodgy "social class" */
+	p_ptr->rp.sc = randint1(100);
+
+	/* Roll for gold */
+	get_money();
+
+	/* Hack -- get a chaos patron even if you are not a chaos warrior */
+	p_ptr->chaos_patron = (s16b)randint0(MAX_PATRON);
+
+	p_ptr->muta1 = 0;
+	p_ptr->muta2 = 0;
+	p_ptr->muta3 = 0;
+
+	/* Calculate the bonuses and hitpoints */
+	p_ptr->update |= (PU_BONUS | PU_HP);
+
+	/* Update stuff */
+	update_stuff();
+
+	/* Fully healed */
+	p_ptr->chp = p_ptr->mhp;
+
+	/* Fully rested */
+	p_ptr->csp = p_ptr->msp;
+
+	/* Save stuff for rebirth */
+	rebirth_ptr->rp.sc = p_ptr->rp.sc;
+	rebirth_ptr->chaos_patron = p_ptr->chaos_patron;
+	for (i = 0; i < A_MAX; i++) {
+		rebirth_ptr->stat[i] = p_ptr->stat[i].cur;
+	}
+	rebirth_ptr->au = p_ptr->au;
+
+	/* Apply some randomness */
+	for (i = 0; i < A_MAX; i++) {
+		p_ptr->stat[i].cur += (s16b) randint0(10);
+		p_ptr->stat[i].max = p_ptr->stat[i].cur;
+	}
+
+	/* Calculate the bonuses and hitpoints */
+	p_ptr->update |= (PU_BONUS | PU_HP);
+
+	/* Update stuff */
+	update_stuff();
+
+	/* Get a name, prepare savefile */
+	if ((player_name[0] < 33) || (savefile[0] < 33)) {
+		get_table_name(tmp_name, FALSE);
+		/* Use the name */
+		strcpy(player_name, tmp_name);
+	}
+	/* Process the player name */
+	process_player_name(FALSE);
+
+	/* Initialize the virtues */
+	get_virtues();
+
+	/* Store any previous buttons */
+	button_backup_all(TRUE);
+
+	/* Display the player */
+	display_player(DISPLAY_PLAYER_STANDARD);
+
+	/* Prompt for it */
+	prtf(2, 23,
+		"[$U'Ctrl-X' to quit$Y%c$V, $U'c' for name$Yn$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]",
+		KTRL('X'), KTRL('H'));
+
+	while ((ch != '\n') && (ch != ' ')) {
+		/* Get a key */
+		ch = inkey();
+
+		/* Change name */
+		if ((ch == 'c') || (ch == 'C')) {
+			get_character_name();
+
+			/* Display the player */
+			display_player(DISPLAY_PLAYER_STANDARD);
+
+			/* Prompt for it */
+			prtf(2, 23,
+				"[$U'Ctrl-X' to quit$Y%c$V, $U'n' for name$Yn$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]",
+				KTRL('X'), KTRL('H'));
+		}
+
+		/* Quit */
+		if (ch == KTRL('X')) {
+			/* restore any previous buttons */
+			button_restore();
+
+			quit(NULL);
+		}
+
+		/* Start over */
+		if ((ch == 0x7F) || (ch == '.') || (ch == KTRL('H'))) {
+			/* restore any previous buttons */
+			button_restore();
+
+			return (FALSE);
+		}
+	}
+	/* Accepted */
+
+	/* restore any previous buttons */
+	button_restore();
+
+	/* Done */
+	return (TRUE);
+}
+
+
+/*
+ * Helper function for 'player_birth()'.
+ *
  * This function returns FALSE if rebirth is impossible or if the player
  * doesn't want rebirth.
  * 
@@ -1742,7 +2024,6 @@ static bool player_birth_aux_3(void)
 static bool player_rebirth(void)
 {
 	int i;
-	int mode = DISPLAY_PLAYER_STANDARD;
 
 	/* Can't rebirth if there's no info to rebirth from. */
 	if (!rebirth_ptr->can_rebirth)
@@ -1862,14 +2143,19 @@ static bool player_rebirth(void)
 
 static bool player_birth_aux(void)
 {
-    char ch;
-    int i;
+	char ch;
+	int i;
 
-    /* Try to rebirth.  If that fails, proceed to normal methods. */
-    if (player_rebirth()) return TRUE;
+	/* Try to rebirth.  If that fails, proceed to normal methods. */
+	if (player_rebirth()) return TRUE;
     
-    /* Ask questions */
+	/* Ask questions */
 	if (!player_birth_aux_1()) return FALSE;
+
+	if (p_ptr->rp.psex == MAX_SEXES + 1) {
+		/* we want a completely random character */
+		return player_birth_random();
+	}
 
 	/* Point based */
 	if (point_based) {
