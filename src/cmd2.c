@@ -3329,3 +3329,100 @@ void do_cmd_use_terrain(void)
 	}
 }
 
+#if 0
+void do_cmd_repeat_ranged(void)
+{
+  if (!target_okay()) {
+    /* if no target, return */
+    return;
+  }
+  if (last_ranged && (last_ranged->type)) {
+    switch (last_ranged->type) {
+  //if (p_ptr->last_attack->type)) {
+  //  switch (p_ptr->last_attack->type) {
+    case 2:
+      {
+        /* cast a spell */
+    		p_ptr->cmd.dir = 5;
+    		p_ptr->cmd.cmd = 'm';
+        /* verify the object */
+        /* save the spell index so it will be picked in get_spell
+         * (after the object choice below) */
+        repeat_push(last_ranged->index);
+        /* save the object so that it will be picked in get_item */
+        //save_object_choice(last_ranged->obj, last_ranged->obj_loc);
+      } break;
+    case 3:
+      {
+        /* throw the object */
+    		p_ptr->cmd.dir = 5;
+    		p_ptr->cmd.cmd = 'v';
+        if (last_ranged->index) {
+				  bool was_inven;
+				  bool was_container = FALSE;
+          int command_wrk;
+          object_type *o_ptr = NULL;
+				  /* Look up the tag */
+				  //o_ptr = get_tag(&was_inven, &was_container, which);
+				  if (!o_ptr) {
+            return;
+          }
+          if (was_container) {
+            command_wrk = (USE_CONTAINER);
+          } else
+          if (was_inven) {
+            command_wrk = (USE_INVEN);
+          } else {
+            command_wrk = (USE_FLOOR);
+          }
+          /* save the object so that it will be picked in get_item */
+          //save_object_choice(o_ptr, command_wrk);
+          do_cmd_throw();
+        } else {
+          if (last_ranged->obj) {
+            /* verify the object */
+            /* save the object so that it will be picked in get_item */
+            //save_object_choice(last_ranged->obj, last_ranged->obj_loc);
+            do_cmd_throw();
+          }
+        }
+      } break;
+    case 4:
+      {
+        /* melee, just move toward the target */
+    		p_ptr->cmd.dir = coords_to_dir(p_ptr->target_col, p_ptr->target_row);
+    		p_ptr->cmd.cmd = ';';
+    		do_cmd_walk(always_pickup);
+      } break;
+    case 5:
+      {
+        /* use an item */
+    		p_ptr->cmd.dir = 5;
+    		p_ptr->cmd.cmd = 'u';
+          if (last_ranged->obj) {
+            /* verify the object */
+            /* save the object so that it will be picked in get_item */
+            //save_object_choice(last_ranged->obj, last_ranged->obj_loc);
+            do_cmd_throw();
+          }
+      } break;
+    default:
+      {
+        /* fire from launcher */
+    		p_ptr->cmd.dir = 5;
+    		p_ptr->cmd.cmd = 'f';
+        if (last_ranged->index) {
+        } else {
+          if (last_ranged->obj) {
+            /* verify the object */
+            /* save the object so that it will be picked in get_item */
+            //save_object_choice(last_ranged->obj, last_ranged->obj_loc);
+            do_cmd_fire();
+          }
+        }
+      }
+    }
+  }
+}
+#endif
+
