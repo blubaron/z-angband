@@ -864,7 +864,7 @@ void process_command(void)
 			break;
 		}
 
-		case KTRL('Q'):
+		case 'Q':
 		{
 			/* Show quest status -KMW- */
 			do_cmd_checkquest();
@@ -899,7 +899,7 @@ void process_command(void)
 			break;
 		}
 
-		case 'Q':
+		case KTRL('Q'):
 		{
 			/* Quit (commit suicide) */
 			do_cmd_suicide();
