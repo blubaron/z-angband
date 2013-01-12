@@ -1362,6 +1362,34 @@ bool panel_center(int x, int y)
 	return (FALSE);
 }
 
+/*
+ * Force the dungeon display to center around the player
+ */
+bool do_cmd_center_map(void)
+{
+	int wid, hgt;
+	int x, y;
+
+	get_map_size(&wid, &hgt);
+
+	x = p_ptr->px - wid / 2;
+	y = p_ptr->py - hgt / 2;
+	/* Get new bounds */
+	if (panel_bounds(x, y, wid, hgt)) {
+		/* Hack -- optional disturb on "panel change" */
+		if (disturb_panel && !center_player) disturb(FALSE);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_DUNGEON);
+
+		/* Handle stuff */
+		handle_stuff();
+		return (TRUE);
+	}
+
+	return (FALSE);
+}
+
 
 static int map_wid_old = 66;
 
@@ -1932,6 +1960,93 @@ bool target_look_grid(int x, int y, bool recall)
 				s3 = "";
 			}
 			prtf(0, 0, "You see %s%s", s3, name);
+				
+		}
+	}
+	return FALSE;
+}
+
+bool target_look_grid_prompt(int col, int row, int x, int y, char* pmt)
+{
+	cave_type *c_ptr = area(x,y);
+	pcave_type *pc_ptr = parea(x,y);
+	int m_idx = c_ptr->m_idx;
+
+	/* Hack -- hallucination */
+	if (query_timed(TIMED_IMAGE)) {
+		prtf(col,row, "%s something strange:", pmt);
+		return FALSE;
+	}
+
+	if (m_idx && m_list[m_idx].r_idx && m_list[m_idx].ml) {
+		monster_type *m_ptr = &(m_list[m_idx]);
+		char m_name[80];
+
+		if ((m_ptr->smart & SM_MIMIC) && mimic_desc(m_name, &(r_info[m_ptr->r_idx]))) {
+			health_track(0);
+			prtf(col,row, "%s a %s:", pmt, m_name);
+		} else
+		/* show monster info */
+		{
+			/* Set up target information */
+			monster_race_track(m_ptr->r_idx);
+			health_track(m_idx);
+			prtf(0, 0, "%s %v:", pmt, MONSTER_FMT(m_ptr, 0x08));
+			return TRUE;
+		}
+	} else {
+		health_track(0);
+		/* mention what is in the grid cell */
+		if (c_ptr->o_idx) {
+			object_type *o_ptr = &(o_list[c_ptr->o_idx]);
+			if (o_ptr->info & (OB_SEEN)) {
+				if (o_ptr->k_idx) {
+					object_kind_track(o_ptr->k_idx);
+				}
+				prtf(col,row, "%s %v:", pmt, OBJECT_FMT(o_ptr, TRUE, 3));
+			}
+		} else
+		if (c_ptr->fld_idx) {
+			cptr name = NULL, s3;
+			char fld_name[41];
+			field_type *f_ptr = &(fld_list[c_ptr->fld_idx]);
+			field_thaum *t_ptr = &(t_info[f_ptr->t_idx]);
+
+			if (f_ptr->info & FIELD_INFO_MARK) {
+				/* See if it has a special name */
+				field_script_single(f_ptr, FIELD_ACT_LOOK, ":s", LUA_RETURN(name));
+				if (name) {
+					/* Copy the string into the temp buffer */
+					strncpy(fld_name, name, 40);
+
+					/* Anything there? */
+					if (!fld_name[0]) {
+						/* Default to field name */
+						strncpy(fld_name, t_ptr->name, 40);
+					}
+
+					/* Free string allocated to hold return value */
+					string_free(name);
+				} else {
+					/* Default to field name */
+					strncpy(fld_name, t_ptr->name, 40);
+				}
+				s3 = is_a_vowel(fld_name[0]) ? "an " : "a ";
+
+				/* Describe the field */
+				prtf(0, 0, "%s %s%s:", pmt, s3, fld_name);
+			}
+		} else
+		if (pc_ptr->feat && (pc_ptr->player & GRID_KNOWN)) {
+			cptr name, s3;
+			name = f_name + f_info[pc_ptr->feat].name;
+			if (f_info[pc_ptr->feat].flags & FF_OBJECT) {
+				/* Pick proper indefinite article */
+				s3 = (is_a_vowel(name[0])) ? "an " : "a ";
+			} else  {
+				s3 = "";
+			}
+			prtf(col,row, "%s %s%s:", pmt, s3, name);
 				
 		}
 	}
@@ -2796,13 +2911,13 @@ static int target_set_aux(int x, int y, int mode, cptr info)
  * grid description (forever).
  *
  * This command will cancel any old target, even if used from
- * inside the "look" command.
+ * inside the "look" command. This has been changed, this only happens
+ * with target_set(), not target_set_interactive(). Also, if possible,
+ * the cursor starts on the current target with target_set_interactive().
  */
-bool target_set(int mode)
+bool target_set_interactive(int mode, int x, int y)
 {
 	int i, d, m, t, bd;
-	int y = p_ptr->py;
-	int x = p_ptr->px;
 
 	bool done = FALSE;
 
@@ -2816,18 +2931,55 @@ bool target_set(int mode)
 
 	int wid, hgt;
 
-	/* Cancel target */
-	p_ptr->target_who = 0;
-
-	/* Cancel tracking */
-	/* health_track(0); */
-
 
 	/* Prepare the "temp" array */
 	target_set_prepare(mode);
 
-	/* Start near the player */
-	m = 0;
+	if (p_ptr->target_who < 0) {
+		/* we have a targeted spot, so start on that spot */
+		flag = FALSE;
+		y = p_ptr->target_row;
+		x = p_ptr->target_col;
+	} else
+	if (temp_n && (p_ptr->target_who > 0)
+		&& target_able(p_ptr->target_who))
+	{
+		/* check if the current target is in the list */
+		for (m = 0; m < temp_n; m++) {
+			y = temp_y[m];
+			x = temp_x[m];
+
+			/* Access */
+			c_ptr = area(x, y);
+			if (c_ptr->m_idx && (c_ptr->m_idx == p_ptr->target_who)) {
+				/* if so, start with it selected */
+				break;
+			}
+		}
+		if (m >= temp_n) {
+			/* Current target not in list start near the player */
+			m = 0;
+			y = p_ptr->py;
+			x = p_ptr->px;
+
+			/* Cancel target */
+			p_ptr->target_who = 0;
+
+			/* Cancel tracking */
+			/* health_track(0); */
+		}
+	} else
+	{
+		/* see if the desired point is on an interesting grid */
+		for (m = 0; m < temp_n; m++) {
+			if ((temp_y[m] == y) &&(temp_x[m] == x)) {
+				break;
+			}
+		}
+		if (m >= temp_n) {
+			flag = FALSE;
+		}
+	}
 
 	/* Interact */
 	while (!done)
@@ -3157,6 +3309,14 @@ bool target_set(int mode)
 
 	/* Success */
 	return (TRUE);
+}
+
+bool target_set(int mode)
+{
+	/* Cancel target */
+	p_ptr->target_who = 0;
+
+	return target_set_interactive(mode, p_ptr->px, p_ptr->py);
 }
 
 /*

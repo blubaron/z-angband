@@ -364,6 +364,7 @@ extern void do_cmd_use_terrain(void);
 /* cmd3.c */
 extern void do_cmd_inven(void);
 extern void do_cmd_equip(void);
+extern void do_cmd_inven_floor(void);
 extern void do_cmd_wield(void);
 extern void do_cmd_takeoff(void);
 extern void do_cmd_drop(void);
@@ -976,6 +977,7 @@ extern bool check_mortgage(void);
 /* xtra1.c */
 extern s16b modify_stat_value(int value, int amount);
 extern void stat_format(char *buf, uint max, cptr fmt, va_list *vp);
+extern void health_redraw(void);
 extern void notice_stuff(void);
 extern void update_stuff(void);
 extern void redraw_stuff(void);
@@ -1096,6 +1098,8 @@ extern void target_set_monster(int m_idx);
 extern void target_set_location(int x, int y);
 extern bool target_set_grid(int x, int y);
 extern bool target_look_grid(int x, int y, bool recall);
+extern bool target_look_grid_prompt(int col, int row, int x, int y, char* pmt);
+extern bool target_set_interactive(int mode, int x, int y);
 extern bool target_set(int mode);
 extern bool get_aim_dir(int *dp);
 extern bool get_hack_dir(int *dp);

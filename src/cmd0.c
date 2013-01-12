@@ -14,6 +14,8 @@
 #include "script.h"
 
 void do_cmd_messages_reverse(void);
+int context_menu_player(int mx, int my);
+int context_menu_cave(int cy, int cx, int adjacent, int mx, int my);
 
 
 /*
@@ -202,7 +204,8 @@ void process_click(char press, int xpos, int ypos)
  				do_cmd_stay(TRUE);
 			} else
 			if (button == 2) {
-				do_cmd_inven();
+				context_menu_player(xpos, ypos);
+				//do_cmd_inven();
 			} else
 			/* temporary commands until context menus are implemented */
 			if (button == 3) {
@@ -257,12 +260,12 @@ void process_click(char press, int xpos, int ypos)
 	if (button == 2) {
 		cave_type *c_ptr = area(x,y);
 		pcave_type *pc_ptr = parea(x,y);
-		bool doub = FALSE;
+		/*bool doub = FALSE;*/
 		int m_idx = c_ptr->m_idx;
 
-		if ((p_ptr->target_row == y) && (p_ptr->target_col == x)) {
+		/*if ((p_ptr->target_row == y) && (p_ptr->target_col == x)) {
 			doub = TRUE;
-		}
+		}*/
 
 		target_set_grid(x,y);
 
@@ -286,23 +289,23 @@ void process_click(char press, int xpos, int ypos)
 			if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
 				&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
 			{
-				/*context_menu_cave(cave,y,x,1,e.mouse.x, e.mouse.y);*/
-				if (doub) {
+				context_menu_cave(y,x, 1, xpos, ypos);
+				/*if (doub) {
 					if (m_idx) {
 						target_look_grid(x, y, TRUE);
 					} else {
-						/* if the click was adjacent to the player, alter in that direction */
-						p_ptr->cmd.dir = coords_to_dir(x, y);
+						*//* if the click was adjacent to the player, alter in that direction */
+						/*p_ptr->cmd.dir = coords_to_dir(x, y);
 						p_ptr->cmd.arg = 16;
 						p_ptr->cmd.cmd = '+';
 						do_cmd_alter();
 					}
 				} else {
 					target_look_grid(x, y, FALSE);
-				}
+				}*/
 			} else {
-				/*context_menu_cave(cave,y,x,0,e.mouse.x, e.mouse.y);*/
-				target_look_grid(x, y, doub);
+				context_menu_cave(y,x, 0, xpos, ypos);
+				/*target_look_grid(x, y, doub);*/
 			}
 		}
 	}

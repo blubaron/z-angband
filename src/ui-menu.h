@@ -9,11 +9,11 @@ typedef keycode_t ui_event;
 /* as long as the menu code strips / stops the "natural" advanced
  * mouse presses, we can use the higher bits to mark selection and moves */
 #define EVT_ESCAPE    ESCAPE
-#define EVT_SELECT    128|64|32|16
-#define EVT_MOVE      128|64|32|8
-#define EVT_RESIZE    128|64|32|16|8
-#define EVT_NONE      0
-#define EVENT_EMPTY   0
+#define EVT_SELECT    (keycode_t)(128|64|32|16)
+#define EVT_MOVE      (keycode_t)(128|64|32|8)
+#define EVT_RESIZE    (keycode_t)(128|64|32|16|8)
+#define EVT_NONE      (keycode_t)0
+#define EVENT_EMPTY   (keycode_t)0
 
 /*** Constants ***/
 
@@ -75,7 +75,7 @@ typedef struct
 {
 	int flags;
 	char tag;
-	const char *name;
+	char *name;
 	void (*action)(const char *title, int row);
 } menu_action;
 
@@ -177,9 +177,9 @@ enum
 struct menu_type_a
 {
 	/** Public variables **/
-	const char *header;
-	const char *title;
-	const char *prompt;
+	char *header;
+	char *title;
+	char *prompt;
 
 	/* Keyboard shortcuts for menu selection-- shouldn't overlap cmd_keys */
 	const char *selections; 

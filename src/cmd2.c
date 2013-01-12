@@ -201,7 +201,7 @@ void do_cmd_toggle_search(void)
 /*
  * Determine if a grid contains a chest
  */
-static object_type *chest_check(int x, int y)
+object_type *chest_check(int x, int y)
 {
 	cave_type *c_ptr = area(x, y);
 

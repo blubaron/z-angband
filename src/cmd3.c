@@ -242,6 +242,64 @@ void do_cmd_equip(void)
 	item_tester_full = FALSE;
 }
 
+/*
+ * Display floor items
+ */
+void do_cmd_inven_floor(void)
+{
+	object_type *o_ptr;
+	char prompt[256];
+	char *no;
+	int item;
+	int ret = 3;
+
+	/* see if we have a ui override */
+	if (Term->inven_hook) {(*(Term->inven_hook))(); return;}
+
+	/* Hack -- show empty slots */
+	item_tester_full = TRUE;
+
+	/* Loop this menu until an object context menu says differently */
+	while (ret == 3) {
+		/* Save screen */
+		screen_save();
+
+		/* Prompt for a command */
+		strnfmt(prompt, 255, "carrying %d.%d pounds (%d%% of capacity). Item: ",
+				p_ptr->total_weight / 10, p_ptr->total_weight % 10,
+				(p_ptr->total_weight * 100) /
+				((adj_str_wgt[p_ptr->stat[A_STR].ind] * 100) / 2));
+		no = "You have no items.";
+
+		/* Get an item to use a context command on (Start in "equipment" mode) */
+		o_ptr = get_item(prompt, no, (USE_EQUIP|USE_INVEN|USE_FLOOR), (USE_FLOOR));
+		if (o_ptr) {
+
+			/* Load screen */
+			screen_load();
+			ret = -1;
+
+			/* show the context menu */
+			if (o_ptr->k_idx) {
+				/* Track the object kind */
+				object_kind_track(o_ptr->k_idx);
+
+				/* for now just inspect it */
+				identify_fully_aux(o_ptr);
+
+				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+			}
+		} else {
+			/* Load screen */
+			screen_load();
+
+			ret = -1;
+		}
+	}
+
+	/* Hack -- hide empty slots */
+	item_tester_full = FALSE;
+}
 
 /*
  * Wield or wear a single item from the pack or floor

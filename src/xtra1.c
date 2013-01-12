@@ -1185,7 +1185,8 @@ static void prt_stun(void)
  * Auto-track current target monster when bored.  Note that the
  * health-bar stops tracking any monster that "disappears".
  */
-static void health_redraw(void)
+/*static void health_redraw(void) - not static because need this in a context menu*/
+void health_redraw(void)
 {
 	Term_erase(COL_TARGET_NAME, ROW_TARGET_NAME, 12);
 

@@ -38,45 +38,6 @@ static void display_menu_row(menu_type_a *menu, int pos, int top,
 static bool menu_calc_size(menu_type_a *menu);
 static bool is_valid_row(menu_type_a *menu, int cursor);
 
-#if 0
-errr Term_addstr(int n, byte a, const char *buf)
-{
-	int k;
-
-	int w = Term->wid;
-
-	errr res = 0;
-
-	wchar_t s[1024];
-
-	/* Copy to a rewriteable string */
- 	Term_mbstowcs(s, buf, 1024);
-
-	/* Handle "unusable" cursor */
-	if (Term->scr->cu) return (-1);
-
-	/* Obtain maximal length */
-	k = (n < 0) ? (w + 1) : n;
-
-	/* Obtain the usable string length */
-	for (n = 0; (n < k) && s[n]; n++) /* loop */;
-
-	/* React to reaching the edge of the screen */
-	if (Term->scr->cx + n >= w) res = n = w - Term->scr->cx;
-
-	/* Queue the first "n" characters for display */
-	Term_queue_chars(Term->scr->cx, Term->scr->cy, n, a, s);
-
-	/* Advance the cursor */
-	Term->scr->cx += n;
-
-	/* Hack -- Notice "Useless" cursor */
-	if (res) Term->scr->cu = 1;
-
-	/* Success (usually) */
-	return (res);
-}
-#endif
 
 /* Display an event, with possible preference overrides */
 static void display_action_aux(menu_action *act, byte color, int row, int col, int wid)
@@ -158,7 +119,7 @@ static const menu_iter menu_iter_actions =
 static void display_string(menu_type_a *m, int oid, bool cursor,
 		int row, int col, int width)
 {
-	const char **items = menu_priv(m);
+	char **items = menu_priv(m);
 	byte color = curs_attrs[CURS_KNOWN][0 != cursor];
 	Term_putstr(col, row, width, color, items[oid]);
 }
@@ -527,12 +488,33 @@ bool menu_handle_mouse(menu_type_a *menu, const ui_event *in,
 {
 	int new_cursor;
 	int x,y;
-	char b;
-	Term_getmousepress(&b, &x, &y);
+	char b,p;
+	int dir = 0;
+	Term_getmousepress(&p, &x, &y);
+	b = p&0x7;
 	//if (in->mouse.button == 2) {
 	//	out->type = EVT_ESCAPE;
-	if (b&0x7 == 2) {
+	if (b == 2) {
 		*out = EVT_ESCAPE;
+	} else
+	if (b == 3) {
+		*out = EVT_SELECT;
+	} else
+	if (b == 4) {
+		*out = EVT_MOVE;
+		dir = 8;
+	} else
+	if (b == 5) {
+		*out = EVT_MOVE;
+		dir = 2;
+	} else
+	if (b == 6) {
+		*out = EVT_MOVE;
+		dir = 4;
+	} else
+	if (b == 7) {
+		*out = EVT_MOVE;
+		dir = 6;
 	} else
 	//if (!region_inside(&menu->active, in)) {
 	//	/* A click to the left of the active region is 'back' */
@@ -566,7 +548,27 @@ bool menu_handle_mouse(menu_type_a *menu, const ui_event *in,
 		}
 	}
 
-	//return out->type != EVT_NONE;
+	if (dir && (*out == EVT_MOVE)) {
+		int count = menu->filter_list ? menu->filter_count : menu->count;
+		*out = menu->skin->process_dir(menu, dir);
+
+		/*if (out->type == EVT_MOVE) {*/
+		if (*out == EVT_MOVE) {
+			while (!is_valid_row(menu, menu->cursor)) {
+				/* Loop around */
+				if (menu->cursor > count - 1)
+					menu->cursor = 0;
+				else if (menu->cursor < 0)
+					menu->cursor = count - 1;
+				else
+					menu->cursor += ddy[dir];
+			}
+		
+			assert(menu->cursor >= 0);
+			assert(menu->cursor < count);
+		}
+	}
+	/*return out->type != EVT_NONE;*/
 	return (*out) != (EVT_NONE);
 }
 
@@ -668,7 +670,7 @@ bool menu_handle_keypress(menu_type_a *menu, const ui_event *in,
 			*out = menu->skin->process_dir(menu, dir);
 
 			//if (out->type == EVT_MOVE)
-			if (*out == (EVT_MOVE))
+			if (*out == EVT_MOVE)
 			{
 				while (!is_valid_row(menu, menu->cursor))
 				{
@@ -701,6 +703,7 @@ bool menu_handle_keypress(menu_type_a *menu, const ui_event *in,
 ui_event menu_select(menu_type_a *menu, int notify, bool popup)
 {
 	ui_event in = EVENT_EMPTY;
+	ui_event out = EVENT_EMPTY;
 	bool no_act = (menu->flags & MN_NO_ACTION) ? TRUE : FALSE;
 
 	assert(menu->active.width != 0 && menu->active.page_rows != 0);
@@ -711,9 +714,10 @@ ui_event menu_select(menu_type_a *menu, int notify, bool popup)
 
 	/* Stop on first unhandled event */
 	//while (!(in.type & notify))
-	while (!(in & notify))
+	//while (!(in & notify))
+	while (!(in == EVT_SELECT) && !(in == EVT_ESCAPE))
 	{
-		ui_event out = EVENT_EMPTY;
+		out = EVENT_EMPTY;
 
 		menu_refresh(menu, popup);
 		//in = inkey_ex();
@@ -726,7 +730,7 @@ ui_event menu_select(menu_type_a *menu, int notify, bool popup)
 			//	continue;
 			//}
 			//menu_handle_mouse(menu, &in, &out);
-			if (in == (EVT_RESIZE)) {
+			if (in == EVT_RESIZE) {
 				menu_calc_size(menu);
 				if (menu->row_funcs->resize)
 					menu->row_funcs->resize(menu);
@@ -755,12 +759,16 @@ ui_event menu_select(menu_type_a *menu, int notify, bool popup)
 
 		/* If we've selected an item, then send that event out */
 		//if (out.type == EVT_SELECT && !no_act && menu_handle_action(menu, &out))
-		if (out == (EVT_SELECT) && !no_act && menu_handle_action(menu, &out))
+		if ((out == EVT_SELECT) && !no_act && menu_handle_action(menu, &out))
 			continue;
 
+		/* needed because EVT_* types are composed of multiple flags where in
+		 * angband they are one flag of an int, so the (notify & out) and
+		 * (!(in & notify)) is only true for particular EVT_* values */
 		/* Notify about the outgoing type */
 		//if (notify & out.type) {
-		if (notify & out) {
+		//if (notify & out) {
+		if ((out == EVT_SELECT) || (out == EVT_ESCAPE)) {
 			if (popup)
 				screen_load();
 			return out;
@@ -949,7 +957,19 @@ static void dynamic_display(menu_type_a *m, int oid, bool cursor,
 		assert(entry);
 	}
 
-	Term_putstr(col, row, width, color, entry->text);
+	/*if ((entry->text[0] == '$')
+		&& (entry->text[1] >= 'A') && (entry->text[1] < 'P'))
+	{*/
+		/* if the entry starts with a custom color, use it */
+		/*Term_putstr(col, row, width, entry->text[1]-'A', entry->text+2);*/
+	if (entry->text[0] == '$') {
+		if (entry->text[1] != '$') {
+			color = curs_attrs[CURS_UNKNOWN][0 != cursor];
+		}
+		Term_putstr(col, row, width, color, entry->text+1);
+	} else {
+		Term_putstr(col, row, width, color, entry->text);
+	}
 }
 
 static const menu_iter dynamic_iter = {

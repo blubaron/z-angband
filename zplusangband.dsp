@@ -116,6 +116,10 @@ SOURCE=.\src\cave.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\cmd-context.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\cmd0.c
 # End Source File
 # Begin Source File
@@ -357,11 +361,18 @@ SOURCE=.\src\tables.c
 # Begin Source File
 
 SOURCE=.\src\ui.c
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\ui-inkey.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui-menu.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui-region.c
 # End Source File
 # Begin Source File
 
@@ -554,6 +565,14 @@ SOURCE=".\src\ui.h"
 # Begin Source File
 
 SOURCE=".\src\ui-inkey.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\ui-menu.h"
+# End Source File
+# Begin Source File
+
+SOURCE=".\src\ui-region.h"
 # End Source File
 # Begin Source File
 

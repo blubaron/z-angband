@@ -121,6 +121,7 @@ OBJ = \
 	fields.obj \
 	effects.obj \
 	dungeon.obj \
+	cmd-context.obj \
 	cmd7.obj \
 	cmd6.obj \
 	cmd5.obj \
@@ -137,6 +138,8 @@ OBJ = \
 	artifact.obj \
 	script.obj \
 	ui.obj \
+	ui-region.obj \
+	ui-menu.obj \
 	run.obj \
 	l-monst.obj l-object.obj l-player.obj l-random.obj l-ui.obj \
 	l-misc.obj l-spell.obj l-field.obj\
