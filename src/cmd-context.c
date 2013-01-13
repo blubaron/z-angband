@@ -20,6 +20,7 @@
 #include "ui-region.h"
 #include "ui-menu.h"
 #include "tvalsval.h"
+#include "button.h"
 /*#include "cave.h"
 #include "cmds.h"
 #include "files.h"
@@ -232,7 +233,9 @@ int context_menu_player_2(int mx, int my)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	menu_layout(m, &r);
 	rect_region_erase_bordered(&r);
@@ -243,6 +246,7 @@ int context_menu_player_2(int mx, int my)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
 
 	if (selected == 1) {
@@ -381,7 +385,9 @@ int context_menu_player(int mx, int my)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	menu_layout(m, &r);
 	rect_region_erase_bordered(&r);
@@ -392,6 +398,7 @@ int context_menu_player(int mx, int my)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
 
 	switch(selected) {
@@ -593,7 +600,9 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	menu_layout(m, &r);
 	rect_region_erase_bordered(&r);
@@ -611,6 +620,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
 
 	if (selected == 1) {
@@ -766,6 +776,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 
 			/* Save screen */
 			screen_save();
+			button_backup_all(TRUE);
 
 			/* Recall on screen */
 			screen_roff_mon(m_ptr->r_idx, 0);
@@ -774,6 +785,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 			inkey();
 
 			/* Load screen */
+			button_restore();
 			screen_load();
 		}
 	}
@@ -907,7 +919,9 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	/* Display info */
 	tb = object_info(o_ptr, OINFO_NONE);
@@ -925,7 +939,9 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
+
 	if (selected == 1) {
 		/* copied from textui_obj_examine */
 		/* Display info */
@@ -1096,7 +1112,9 @@ int context_menu_store(struct store *store, const int oid, int mx, int my)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	menu_layout(m, &r);
 	region_erase_bordered(&r);
@@ -1107,7 +1125,9 @@ int context_menu_store(struct store *store, const int oid, int mx, int my)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
+
 	if (selected == 1) {
 		Term_keypress('I', 0);
 	} else
@@ -1204,7 +1224,9 @@ int context_menu_store_item(struct store *store, const int oid, int mx, int my)
 
 	/* Hack -- no flush needed */
 	msg_flag = FALSE;
+
 	screen_save();
+	button_backup_all(TRUE);
 
 	menu_layout(m, &r);
 	region_erase_bordered(&r);
@@ -1215,7 +1237,9 @@ int context_menu_store_item(struct store *store, const int oid, int mx, int my)
 	menu_dynamic_free(m);
 	string_free(labels);
 
+	button_restore();
 	screen_load();
+
 	if (selected == 4) {
 		Term_keypress('x', 0);
 	} else
