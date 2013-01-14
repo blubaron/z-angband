@@ -3442,8 +3442,8 @@ static void display_help(cptr filename)
 #endif /* HTML_HELP */
 
 	} else {
-		plog_fmt("Cannot find help file: %s", tmp);
-		plog("Use the online help files instead.");
+		/*plog_fmt("Cannot find help file: %s", tmp);
+		plog("Use the online help files instead.");*/
 		Term_keypress('?');
 	}
 }
