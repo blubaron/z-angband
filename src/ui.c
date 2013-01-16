@@ -1963,8 +1963,11 @@ s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 
 	char tmp[80];
 
-	char buf[80];
+	int y, x, i;
+	s32b scale;
+	keycode_t k = 0;
 
+	bool done = FALSE;
 
 	/* Use "command_arg" */
 	if (p_ptr->cmd.arg)
@@ -2012,17 +2015,117 @@ s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 	/* Default to one */
 	amt = initial;
 
-	/* Build the default */
-	strnfmt(buf, 80, "%d", amt);
+	/* Paranoia XXX XXX XXX */
+	message_flush();
 
-	/* Ask for a quantity */
-	if (!get_string(buf, 7, prompt)) return (0);
+	/* Display prompt */
+	prtf(0, 0, prompt);
 
-	/* Extract a number */
-	sscanf(buf, "%ld", &amt);
+	scale = max / 100;
+	if (scale < 1) scale = 1;
 
-	/* A letter means "all" */
-	if (isalpha(buf[0])) amt = max;
+	/* Locate the cursor */
+	(void)Term_locate(&x, &y);
+
+	/* Paranoia -- check column, allow 10 spaces for the number */
+	if ((x < 0) || (x >= 70)) x = 0;
+
+	/* Display the default answer */
+	Term_erase(x, y, 10);
+	put_fstr(x, y, CLR_YELLOW "%d", amt);
+
+	/* Process input */
+	while (!done) {
+		/* Get a key */
+		k = inkey_m();
+
+		if (k & 0x80) {
+			/* translate a mouse press */
+			char mb, mods;
+			int mx, my;
+			Term_getmousepress(&mb, &mx, &my);
+			mods = mb & 0x78;
+			mb = mb & 0x07;
+			k = 0;
+			if (mb == 1) {
+				/* accept the number */
+				done = TRUE;
+			} else
+			if (mb == 2) {
+				/* cancel the transaction */
+				amt = 0;
+				done = TRUE;
+			} else
+			if (mb == 4) {
+				amt += scale;
+			} else
+			if (mb == 5) {
+				amt -= scale;
+			}
+		} else
+		if (isdigit(k)) {
+			amt = amt*10 + (k-'0');
+			if (amt > max) amt = max;
+		} else
+		/* Analyze the key */
+		switch (k)
+		{
+			case ESCAPE:
+				amt = 0;
+				done = TRUE;
+				break;
+
+			case '\n':
+			case '\r':
+				done = TRUE;
+				break;
+
+			case 0x7F:
+			case '\010':
+				amt = amt / 10;
+				if (amt < 0) amt = 0;
+				break;
+
+			default:
+				/* A letter means "all" */
+				i = get_keymap_dir(k);
+				if (i) {
+					if (i == 8) {
+						amt += scale;
+					} else
+					if (i == 2) {
+						amt -= scale;
+					} else
+					if (i == 4) {
+						amt -= scale*10;
+					} else
+					if (i == 6) {
+						amt += scale*10;
+					} else
+					if ((i == 7) || (i == 9)) {
+						amt = max;
+					} else
+					if ((i == 1) || (i == 3)) {
+						amt = 1;
+					}
+				}
+				if (isprint(k)) {
+					amt = max;
+				} else {
+					bell("Illegal edit key!");
+				}
+				break;
+		}
+
+		/* Update the entry */
+		Term_erase(x, y, 10);
+		put_fstr(x, y, "%d", amt);
+	}
+
+	/* Clear prompt */
+	clear_msg();
+
+	if (amt == 0) return (0);
 
 	/* Enforce the maximum */
 	if (amt > max) amt = max;
