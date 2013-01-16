@@ -3659,7 +3659,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			} else
 			if (mb == 1) {
 				/* if a menu, select the option, otherwise do nothing */
-				if (menu && (my > 2) && (my < hgt-2)) {
+				if (menu && (my > 1) && (my < hgt-2)) {
 					fpos_t pos;
 					/* move the file pointer to the beginning of the file */
 					/* TODO: this is not portable */
@@ -3678,9 +3678,9 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						/* Count the lines */
 						next++;
 					}
-					next = 0;
+					mx = 0;
 					/* get the desired line */
-					while (next == 0) {
+					while (mx == 0) {
 						/* Get a line */
 						if (my_raw_fgets(fff, buf, 1024)) break;
 
@@ -3688,40 +3688,58 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						if (prefix(buf, "***** ")) continue;
 
 						/* Count the lines */
+						mx++;
 						next++;
 					}
 					/* see if the line is a menu item */
-					if (buf[0]) {
+					if (buf[0] && hook[0][0]) {
 						for (i = 0; i < 62; i++) {
-							if (strstr(buf, hook[i])) {
-								char *c = strchr(buf, '(');
-								k = *(c+1);
+							if (!(hook[i][0])) {
+								/*line += my-2-((hgt-4)>>1);*/
 								break;
 							}
+							if (strstr(buf, hook[i])) {
+								char *c = strchr(buf, '(');
+								if (c) k = *(c+1);
+								break;
+							}
+						}
+					} else {
+						/* move the page up or down */
+						if (size > hgt - 4) {
+							line += my-2-((hgt-4)>>1);
 						}
 					}
 
 					fsetpos(fff, &pos);
 				//k = ESCAPE;
+				} else
+				if (size > hgt - 4) {
+					/* move the page up or down */
+					if ((my > 1) && (my < hgt-2)) {
+						line += my - 2 - ((hgt-4)>>1);
+					}
 				}
 			} else
 			if (mb == 4) {
 				/* scroll up */
-				if (mods & 32) {
-					line -= (hgt - 4) / 2;
-				} else
-				{
-					line -= 1;
+ 				if (size > hgt - 4) {
+					if (mods & 32) {
+						line -= (hgt - 4) / 2;
+					} else {
+						line -= 1;
+					}
 				}
 				if (line < 0) line = 0;
 			} else
 			if (mb == 5) {
 				/* scroll down */
-				if (mods & 32) {
-					line += (hgt - 4) / 2;
-				} else
-				{
-					line += 1;
+ 				if (size > hgt - 4) {
+					if (mods & 32) {
+						line += (hgt - 4) / 2;
+					} else {
+						line += 1;
+					}
 				}
 			}
 			/* otherwise do nothing */
