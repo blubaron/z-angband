@@ -46,7 +46,7 @@ void do_cmd_redraw(void)
 	p_ptr->update |= (PU_MONSTERS);
 
 	/* Redraw everything */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME | PR_BUTTONS);
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_SPELL | PW_PLAYER);
@@ -73,6 +73,11 @@ void do_cmd_redraw(void)
 
 		/* Refresh */
 		/* term_fresh is in term_redraw Term_fresh(); */
+
+		if (j == 0) {
+			/* Place the cursor on the player */
+			if (!character_icky) move_cursor_relative(p_ptr->px, p_ptr->py);
+		}
 	}
 
 	/* Restore */
@@ -104,7 +109,7 @@ void resize_map(void)
 	p_ptr->update |= (PU_MONSTERS);
 
 	/* Redraw everything */
-	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME);
+	p_ptr->redraw |= (PR_WIPE | PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIPPY | PR_TIME | PR_BUTTONS);
 
 	/* Hack -- update */
 	handle_stuff();

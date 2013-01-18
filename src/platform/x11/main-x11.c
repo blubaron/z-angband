@@ -122,11 +122,12 @@ static term_data data[MAX_TERM_DATA];
  */
 static const char *x11_settings = "x11-settings.txt";
 static char *ini_file = NULL;
+int default_layout_x11(term_data *data, int maxterms, metadpy *dpy);
 
 #ifdef USE_GRAPHICS
-static XTilesheet tiles; /* tiles loaded from disk */
-static XTilesheet viewtiles; /* tiles that are displayed on screen */
-static XTilesheet maptiles; /* tiles same size as font */
+XTilesheet tiles; /* tiles loaded from disk */
+XTilesheet viewtiles; /* tiles that are displayed on screen */
+XTilesheet maptiles; /* tiles same size as font */
 #endif /* USE_GRAPHICS */
 
 #ifdef SUPPORT_GAMMA
@@ -1212,11 +1213,21 @@ static errr Infofnt_text_std(int cx, int cy, cptr str, int len)
 
 
 extern bool SaveWindow(infowin *win, char*filename);
+extern int main_menu_x11(metadpy *mdpy, term_data *data, int data_count, int mx, int my);
 
 extern bool use_main_menu; /* whether a port is using the textui menu bar */
 extern int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
 int menu_bar_x11(keycode_t buttonid)
 {
+	if (buttonid == '~') {
+		/* show the main context menu */
+		int ret;
+		bool ikf = p_ptr->cmd.inkey_flag;
+		while ((ret = main_menu_x11(Metadpy, data, MAX_TERM_DATA, (COL_MAP>>1), 1)) == 3);
+		p_ptr->cmd.inkey_flag = ikf;
+		if (ret <= 1)
+			Term_redraw();
+	}
 	return 1;
 }
 
@@ -1480,7 +1491,7 @@ static void load_prefs(cptr ini_file)
 	ini_settings_close(&ini);
 
 	if (first_start) {
-	/*	default_layout_x11(data, MAX_TERM_DATA);*/
+		default_layout_x11(data, MAX_TERM_DATA, Metadpy);
 	}
 
 	/* Paranoia */
@@ -2413,11 +2424,26 @@ static errr Term_xtra_x11_level(int v)
 	return (0);
 }
 
+errr Term_xtra_x11_clear(void)
+{
+	term_data *td = (term_data*)(Term->data);
+
+	/* Erase (use black) */
+	Infoclr_set(clr[TERM_DARK]);
+
+	/* Just do a Fill Rectangle */
+	XFillRectangle(Metadpy->dpy, Infowin->win, Infoclr->gc,
+					0, 0,
+					Infowin->w, Infowin->h);
+
+	/* Success */
+	return (0);
+}
 
 /*
  * React to changes
  */
-static errr Term_xtra_x11_react(void)
+errr Term_xtra_x11_react(void)
 {
 	int i;
 
@@ -2451,7 +2477,7 @@ static errr Term_xtra_x11_react(void)
 			}
 		}
 	}
-#if 0
+
 #ifdef USE_GRAPHICS
 
 	/* Handle "arg_graphics" */
@@ -2466,7 +2492,7 @@ static errr Term_xtra_x11_react(void)
 		FreeTiles(&maptiles);
 
 		/* Initialize (if needed) */
-		if (arg_graphics && (init_graphics() < 0))
+		if (arg_graphics && (init_graphics_x11() < 0))
 		{
 			/* Warning */
 			plog("Cannot initialize graphics!");
@@ -2475,6 +2501,7 @@ static errr Term_xtra_x11_react(void)
 			arg_graphics = GRAPHICS_NONE;
 			tile_width_mult = 1;
 			tile_height_mult = 1;
+			close_graphics_x11();
 		}
     
 		/* Change setting */
@@ -2491,7 +2518,7 @@ static errr Term_xtra_x11_react(void)
 
 #endif /* USE_GRAPHICS */
 
-
+#if 0
 	/* Clean up windows */
 	for (i = 0; i < MAX_TERM_DATA; i++)
 	{
