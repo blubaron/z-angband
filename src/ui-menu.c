@@ -1026,6 +1026,12 @@ void menu_dynamic_add_label(menu_type_a *m, const char *text, const char label, 
 	menu_dynamic_add(m,text,value);
 }
 
+void menu_dynamic_set_select(menu_type_a *m)
+{
+	if (m->count > 0)
+		m->cursor = m->count-1;
+}
+
 size_t menu_dynamic_longest_entry(menu_type_a *m)
 {
 	size_t biggest = 0;
