@@ -84,7 +84,34 @@
     use angband lighting style (array[MAX_LIGHTING]) for feature and field
       lighting.
 
-    change text grid to use and show tile multipliers like angband does.
+    possible start:
+     You are from out of town. You heard that a fried/familty member was
+      missing, so you came to town to find him/her. You get to town, find
+      the house locked. while looking around town for information, you go
+      town hall and the mayor tells you that the person has been missing
+      for a while, and asks you to look for itb (get quest), and gives you
+      the key. when you get to the house, you search around, then enter the
+      cellar. There you find non-breeding vermin (probably snakes/lizards),
+      and notes on gameplay (tutorial). You then find a note that says that
+      the person heard of an artifact in the sewers and went to look for
+      it. you can then either enter the sewers, or return to the mayor who
+      will tell you to enter the sewers. Halfway down, level 10-15ish, you
+      will find the persons body, a monster hero/unique, a good ego item, and a
+      note talking about a more powerful item/hero at the bottom. Returning
+      to the mayor (turning in the quest) after finding the body, the mayor
+      expresses condolances and gives you the house. At this point, gameplay
+      is normal.
+     Or: You are from town (street urchin like?), and the mayor asks you to
+      find a missing prominent resident, and gives you the key to their
+      house. Then as above.
+     Or if a night creature/monster: You bought a house in town. It was 
+      cheap because the previous resident disappeared and everyone is afraid
+      of the house, but you barely bought it. looking around the house, you
+      find the cellar, then the note, then decide to find the artifact...
+      No town hall quest, but start able to use the house, after finding the
+      note, rather than after finding the body and turning in the quest.
+
+    Add ability to draw a cave grid, rather than a couple attr/char pairs.
 
     want set of tiles per dungeon that use floor, wall, door (open, closed,
       broken), stair up, stair down

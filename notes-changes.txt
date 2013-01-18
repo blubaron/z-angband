@@ -445,19 +445,17 @@ enum
     *added ability to play repeated games without exiting on Windows (from Sil)
      includes use of keyboard presses for the options. *not quite working yet.
 
-    *Added support for tile multipliers larger than 2x1. Mostly working. Screen
-     just to the right of the map is not being cleared though.
-     *some messages have blank spots in them. the messages in the message 
-      sub window are ok though. *need to change screen setup to be similar 
-      to angband, for context menus in the middle of the screen and the screen
-      not changing when a few of the map lines are overwriten with text.
-     *X11 crashes when the tile height multiplier is > 1
+    Added support for tile multipliers larger than 2x1. Changed text grid to
+     use and show tile multipliers like Angband does. (Though keeping the big
+     tile test so graphics can be shown in text lines, in a text grid space.)
 
     Added time of day text on the status bar. It is displayed to the right of
      the dungeon level / place name, if the screen is large enough (>90 chars).
 
-    *Added basic mouse support. 
-     *need to implement context menus.
+    Added basic mouse support. 
+     Implemented context menus, using code from Angband.
+     *some old spots are not being over written when switching from one context
+     menu to another.
 
     Added a pathfinding run mode.
     *Started adding additional run modes to follow roads and waterways
@@ -480,7 +478,8 @@ enum
 
     Got the X11 console/graphics working again. Added png and tile mask file
       support. Added ability to load/save a settings file.
-      *need to add a system menu.
+     Added a system context menu to X11 port.
+     *Font picking and changing tile size is not working yet.
 
     Allow mouse wheel to scroll some menus, ie it can change the character
       screen. added to X11 and Windows.
