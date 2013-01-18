@@ -529,28 +529,30 @@ int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, in
 		} break;
 	}
 
-	if ((i==0) &&((tw != td->tile_wid) || (th != td->tile_hgt))) {
-		int res;
-		Display *dpy = mdpy->dpy;
+	td->tile_wid = tw;
+	td->tile_hgt = th;
+	if ((tw != td->tile_wid) || (th != td->tile_hgt)) {
+		if (i==0) {
+			int res;
+			Display *dpy = mdpy->dpy;
 
-		/* resize the tiles used for viewing */
-		FreeTiles(&viewtiles);
-		viewtiles.CellWidth = td->tile_wid * tile_width_mult;
-		viewtiles.CellHeight = td->tile_hgt * tile_height_mult;
-		res = ResizeTiles(dpy, &viewtiles, &tiles);
+			/* resize the tiles used for viewing */
+			FreeTiles(&viewtiles);
+			viewtiles.CellWidth = td->tile_wid * tile_width_mult;
+			viewtiles.CellHeight = td->tile_hgt * tile_height_mult;
+			res = ResizeTiles(dpy, &viewtiles, &tiles);
 
-		FreeTiles(&maptiles);
-		viewtiles.CellWidth = td->tile_wid;
-		viewtiles.CellHeight = td->tile_hgt;
-		res = ResizeTiles(dpy, &maptiles, &tiles);
-
+			FreeTiles(&maptiles);
+			viewtiles.CellWidth = td->tile_wid;
+			viewtiles.CellHeight = td->tile_hgt;
+			res = ResizeTiles(dpy, &maptiles, &tiles);
+		}
 		/* Clear screen */
 		Term_xtra_x11_clear();
-printf("d\n");
+
 		/* Hack - redraw everything */
 		if (Term->resize_hook)
 			Term->resize_hook();
-printf("e\n");
 	}
 	return 1;
 }
