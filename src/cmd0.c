@@ -312,6 +312,8 @@ void process_click(char press, int xpos, int ypos)
 
 }
  
+extern bool use_main_menu; /* whether a port is using the textui menu bar */
+extern int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
 
 /*
  * Parse and execute the current command
@@ -328,6 +330,13 @@ void process_command(void)
 	switch (p_ptr->cmd.cmd)
 	{
 		case ESCAPE:
+		{
+			/* Show the system menu, if it is being used */
+			if (use_main_menu && main_menu_bar_fn) {
+				(*main_menu_bar_fn)(ESCAPE);
+			}
+			break;
+		}
 		case ' ':
 		{
 			/* Ignore */

@@ -1219,7 +1219,7 @@ extern bool use_main_menu; /* whether a port is using the textui menu bar */
 extern int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
 int menu_bar_x11(keycode_t buttonid)
 {
-	if (buttonid == '~') {
+	if (buttonid == ESCAPE) {
 		/* show the main context menu */
 		int ret;
 		bool ikf = p_ptr->cmd.inkey_flag;
