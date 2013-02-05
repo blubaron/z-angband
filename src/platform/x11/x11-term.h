@@ -1,8 +1,7 @@
 /*
- * File: x11-png.h
- * Purpose: support to load/save png files.
+ * File: x11-term.h
  *
- * Copyright (c) 2012 Brett Reid
+ * Copyright (c) 1997 Ben Harrison, and others
  *
  * This work is free software; you can redistribute it and/or modify it
  * under the terms of either:
