@@ -1636,270 +1636,7 @@ static void react_mousepress(XButtonEvent *ev)
 	Term_mousepress(ev->button, mods, x, y);
 }
 
-#if 0
-/*
- * Convert co-ordinates from starting corner/opposite corner to minimum/maximum.
- */
-static void sort_co_ord(co_ord *min, co_ord *max,
-                        const co_ord *b, const co_ord *a)
-{
-	min->x = MIN(a->x, b->x);
-	min->y = MIN(a->y, b->y);
-	max->x = MAX(a->x, b->x);
-	max->y = MAX(a->y, b->y);
-	
-	/* Prevent bigtile wierdness */
-	if (is_bigtiled(min->x, min->y) != is_bigtiled(max->x, max->y))
-	{
-		if (min->y < Term->scr->big_y1) min->y = Term->scr->big_y1;
-		if (max->y > Term->scr->big_y2) max->y = Term->scr->big_y2;
-	}
-}
 
-
-/*
- * Select an area by drawing a grey box around it.
- * Since we use XOR, we can undraw the box by using this
- * routine again. (The XOR method also works best for things like snow)
- */
-static void mark_selection_mark(int x1, int y1, int x2, int y2)
-{
-	square_to_pixel(&x1, &y1, x1, y1);
-	if (is_bigtiled(x2, y2))
-	{
-		square_to_pixel(&x2, &y2, x2, y2);
-		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc, x1, y1,
-			x2-x1+Infofnt->twid - 1, y2-y1+Infofnt->hgt - 1);
-	}
-	else
-	{
-		square_to_pixel(&x2, &y2, x2, y2);
-		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc, x1, y1,
-			x2-x1+Infofnt->wid - 1, y2-y1+Infofnt->hgt - 1);
-	}
-}
-
-
-/*
- * Mark a selection by drawing boxes around it (for now).
- */
-static void mark_selection(void)
-{
-	co_ord min, max;
-	term *old = Term;
-	bool draw = x11_selection->select;
-	bool clear = x11_selection->drawn;
-
-	/* Open the correct term if necessary. */
-	if (x11_selection->t != old) Term_activate(x11_selection->t);
-
-	if (clear)
-	{
-		sort_co_ord(&min, &max, &x11_selection->init, &x11_selection->old);
-		mark_selection_mark(min.x, min.y, max.x, max.y);
-	}
-
-	if (draw)
-	{
-		sort_co_ord(&min, &max, &x11_selection->init, &x11_selection->cur);
-		mark_selection_mark(min.x, min.y, max.x, max.y);
-	}
-
-	/* Finish on the current term. */
-	if (x11_selection->t != old) Term_activate(old);
-
-	x11_selection->old.x = x11_selection->cur.x;
-	x11_selection->old.y = x11_selection->cur.y;
-	x11_selection->drawn = x11_selection->select;
-}
-
-
-/*
- * Forget a selection for one reason or another.
- */
-static void copy_x11_release(void)
-{
-	/* Deselect the current selection. */
-	x11_selection->select = FALSE;
-
-	/* Remove its graphical represesntation. */
-	mark_selection();
-}
-
-
-/*
- * Start to select some text on the screen.
- */
-static void copy_x11_start(int x, int y)
-{
-	if (x11_selection->select) copy_x11_release();
-
-	/* Remember where the selection started. */
-	x11_selection->t = Term;
-	x11_selection->init.x = x11_selection->cur.x = x11_selection->old.x = x;
-	x11_selection->init.y = x11_selection->cur.y = x11_selection->old.y = y;
-}
-
-
-/*
- * Respond to movement of the mouse when selecting text.
- */
-static void copy_x11_cont(int x, int y, unsigned int buttons)
-{
-	/* Use the nearest square within bounds if the mouse is outside. */
-	x = MIN(MAX(x, 0), Term->wid-1);
-	y = MIN(MAX(y, 0), Term->hgt-1);
-
-	/* The left mouse button isn't pressed. */
-	if (~buttons & Button1Mask) return;
-
-	/* Not a selection in this window. */
-	if (x11_selection->t != Term) return;
-
-	/* Not enough movement. */
-	if ((x == x11_selection->old.x) && (y == x11_selection->old.y) && x11_selection->select) return;
-
-	/* Something is being selected. */
-	x11_selection->select = TRUE;
-
-	/* Track the selection. */
-	x11_selection->cur.x = x;
-	x11_selection->cur.y = y;
-
-	/* Hack - display it inefficiently. */
-	mark_selection();
-}
-
-
-/*
- * Respond to release of the left mouse button by putting the selected text in
- * the primary buffer.
- */
-static void copy_x11_end(const Time time)
-{
-	/* No selection. */
-	if (!x11_selection->select) return;
-
-	/* Not a selection in this window. */
-	if (x11_selection->t != Term) return;
-
-	/* Remember when the selection was finalised. */
-	x11_selection->time = time;
-
-	/* Acquire the primary selection. */
-	XSetSelectionOwner(Metadpy->dpy, XA_PRIMARY, Infowin->win, time);
-
-	if (XGetSelectionOwner(Metadpy->dpy, XA_PRIMARY) != Infowin->win)
-	{
-		/* Failed to acquire the selection, so forget it. */
-		bell("Failed to acquire primary buffer.");
-		x11_selection->select = FALSE;
-		mark_selection();
-	}
-}
-
-
-/*
- * Send some text requested by another X client
- */
-static void paste_x11_send(XSelectionRequestEvent *rq)
-{
-	XEvent event;
-	XSelectionEvent *ptr = &(event.xselection);
-
-	static Atom xa_targets = None;
-
-	if (xa_targets == None)
-		xa_targets = XInternAtom(DPY, "TARGETS", False);
-
-	/* Set the event parameters */
-	ptr->type = SelectionNotify;
-	ptr->property = rq->property;
-	ptr->display = rq->display;
-	ptr->requestor = rq->requestor;
-	ptr->selection = rq->selection;
-	ptr->target = rq->target;
-	ptr->time = rq->time;
-
-	if (rq->target == xa_targets)
-	{
-		Atom target_list[2];
-		target_list[0] = xa_targets;
-		target_list[1] = XA_STRING;
-
-		XChangeProperty(DPY, rq->requestor, rq->property, rq->target,
-		                (8 * sizeof(target_list[0])), PropModeReplace,
-		                (unsigned char *)target_list,
-		                (sizeof(target_list) / sizeof(target_list[0])));
-
-		event.xselection.property = rq->property;
-	}
-	else if (rq->target == XA_STRING)
-	{
-		/* Reply to a known target received recently with data */
-		byte buf[1024];
-		co_ord max, min;
-		int x, y, i;
-		byte a;
-		char c;
-
-		/* Work out which way around to paste */
-		sort_co_ord(&min, &max, &x11_selection->init, &x11_selection->cur);
-
-		/* Delete the old value of the property */
-		XDeleteProperty(DPY, rq->requestor, rq->property);
-
-		for (y = 0; y < Term->hgt; y++)
-		{
-			if (y < min.y) continue;
-			if (y > max.y) break;
-
-			for (x = i = 0; x < Term->wid; x++)
-			{
-				if (x < min.x) continue;
-				if (x > max.x) break;
-
-				/* Protect the buffer boundary */
-				if (i >= (int)(sizeof(buf) - 2)) break;
-
-				/* Find the character */
-				Term_what(x, y, &a, &c);
-
-				/* Add it */
-				buf[i++] = c;
-			}
-
-			/* Terminate all but the last line in an appropriate way */
-			if (y != max.y) buf[i++] = '\n';
-
-			/* Send the (non-empty) string */
-			XChangeProperty(DPY, rq->requestor, rq->property, rq->target, 8,
-			                PropModeAppend, buf, i);
-		}
-	}
-	else
-	{
-		/* Respond to all bad requests with property None */
-		ptr->property = None;
-	}
-
-	/* Send whatever event we're left with */
-	XSendEvent(DPY, rq->requestor, FALSE, NoEventMask, &event);
-}
-
-
-/*
- * Handle various events conditional on presses of a mouse button.
- */
-static void handle_button(Time time, int x, int y, int button, bool press)
-{
-	/* The co-ordinates are only used in Angband format. */
-	pixel_to_square(&x, &y, x, y);
-
-	if (press && button == 1) copy_x11_start(x, y);
-	if (!press && button == 1) copy_x11_end(time);
-}
-#endif /* if 0 */
 errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const byte *tap, const char *tcp);
 int init_graphics_x11()
 {
@@ -2125,13 +1862,6 @@ static errr CheckEvent(bool wait)
 		if (!wait) return (1);
 	}
 	
-	/*
-	 * Hack - redraw the selection, if needed.
-	 * This doesn't actually check that one of its squares was drawn to,
-	 * only that this may have happened.
-	 */
-	/*if (x11_selection->select && !x11_selection->drawn) mark_selection();*/
-
 	/* Load the Event */
 	XNextEvent(Metadpy->dpy, xev);
 
@@ -2189,61 +1919,12 @@ static errr CheckEvent(bool wait)
 			}
 			break;
 		}
-#if 0
-		case ButtonPress:
-		case ButtonRelease:
-		{
-			bool press = (xev->type == ButtonPress);
-
-			/* Where is the mouse */
-			int x = xev->xbutton.x;
-			int y = xev->xbutton.y;
-
-			int z;
-
-			/* Which button is involved */
-			if (xev->xbutton.button == Button1) z = 1;
-			else if (xev->xbutton.button == Button2) z = 2;
-			else if (xev->xbutton.button == Button3) z = 3;
-			else if (xev->xbutton.button == Button4) z = 4;
-			else if (xev->xbutton.button == Button5) z = 5;
-			else z = 0;
-
-			/* XXX Handle */
-			handle_button(xev->xbutton.time, x, y, z, press);
-
-			break;
-		}
-
 		case MotionNotify:
 		{
-			/* Where is the mouse */
-			int x = xev->xmotion.x;
-			int y = xev->xmotion.y;
-			unsigned int z = xev->xmotion.state;
-
-			/* Convert to co-ordinates Angband understands. */
-			pixel_to_square(&x, &y, x, y);
-
-			/* Alter the selection if appropriate. */
-			copy_x11_cont(x, y, z);
-
+			/* Nothing */
 			break;
 		}
 
-		case SelectionRequest:
-		{
-			paste_x11_send(&(xev->xselectionrequest));
-			break;
-		}
-
-		case SelectionClear:
-		{
-			x11_selection->select = FALSE;
-			mark_selection();
-			break;
-		}
-#endif
 
 		case KeyRelease:
 		{
@@ -2645,9 +2326,6 @@ static errr Term_wipe_x11(int x, int y, int n)
 					x2 - x1, y2 - y1);
 					/*x2 - x1, Infofnt->hgt);*/
 	
-	/* Redraw the selection if any, as it may have been obscured. (later) */
-	/*x11_selection->drawn = FALSE;*/
-		
 	/* Success */
 	return (0);
 }
@@ -2666,9 +2344,6 @@ static errr Term_text_x11(int x, int y, int n, byte a, cptr s)
 
 	/* Draw the text */
 	Infofnt_text_std(x, y, s, n);
-	
-	/* Redraw the selection if any, as it may have been obscured. (later) */
-	/*x11_selection->drawn = FALSE;*/
 	
 	/* Success */
 	return (0);
@@ -2815,9 +2490,6 @@ errr Term_pict_x11(int ox, int oy, int n, const byte *ap, const char *cp, const 
 			
 		x += wid;
 	}
-
-	/* Redraw the selection if any, as it may have been obscured. (later) */
-	/*x11_selection->drawn = FALSE;*/
 
 	/* Success */
 	return (0);
