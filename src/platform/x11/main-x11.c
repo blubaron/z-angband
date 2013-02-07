@@ -1305,7 +1305,7 @@ static void save_prefs_aux(term_data *td, ini_settings *ini, cptr sec_name)
  *
  * We assume that the windows have all been initialized
  */
-static void save_prefs(cptr ini_file)
+static bool save_prefs(cptr ini_file)
 {
 	int i;
 	ini_settings *ini = NULL;
@@ -1373,6 +1373,9 @@ static void save_prefs(cptr ini_file)
 
 	/* cleanup the ini memory */
 	ini_settings_close(&ini);
+
+	/* Success */
+	return TRUE;
 }
 
 
@@ -1416,22 +1419,13 @@ static void load_prefs_aux(term_data *td, ini_settings *ini, cptr sec_name)
 /*
  * Load the "prefs"
  */
-static void load_prefs(cptr ini_file)
+static bool load_prefs(cptr ini_file)
 {
 	int i;
 
 	char buf[256];
 	bool first_start;
 	ini_settings *ini = NULL;
-	/*FILE *exists;
-
-	exists = my_fopen(ini_file, "r");
-	if (exists) {
-		my_fclose(exists);
-		first_start = FALSE;
-	} else {
-		first_start = TRUE;
-	}*/
 
 	i = ini_settings_load(ini_file, &ini);
 	first_start = FALSE;
@@ -1439,7 +1433,7 @@ static void load_prefs(cptr ini_file)
 		if (i == -4) {
 			first_start = TRUE;
 		} else {
-			return;
+			return FALSE;
 		}
 	}
 
@@ -1498,6 +1492,13 @@ static void load_prefs(cptr ini_file)
 	if (data[0].cols < 80) data[0].cols = 80;
 	if (data[0].rows < 24) data[0].rows = 24;
 	data[0].visible = 1;
+
+	/* Success */
+	if (first_start) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}
 }
 
 
