@@ -5570,6 +5570,30 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 					game_in_progress = TRUE;
 					new_game = FALSE;
 				} else*/
+				if ((key == 's') || (key == 'S')) {		
+					/* Show the top scores */
+					/* HACK - make sure that there is a resize hook, to prevent
+					 * a crash after displaying the scores */
+					if (!angband_term[0]->resize_hook) {
+						angband_term[0]->resize_hook = resize_map;
+					}
+					/* show scores */
+					top_twenty();
+
+					/* Show the initial screen again */
+					display_introduction();
+
+					/* Prompt the user */
+					if (savefile[0] != 0) {
+						prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+						prtf(10, 23, "  [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
+					} else {
+						prtf(10, 23, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+					}
+
+					/* Flush it */
+					Term_fresh();
+				} else
 				if ((key == 'x') || (key == 'X')) {
 					/* Quit */
 					quit(NULL);

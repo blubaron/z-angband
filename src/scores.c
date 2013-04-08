@@ -318,6 +318,26 @@ static bool display_scores_aux2(int from, int to, int note,
 	/* Forget about the last entries */
 	if (i > to) i = to;
 
+	/* if we do not have any entries, just show the title */
+	if (i == 0) {
+		/* Clear screen */
+		Term_clear();
+
+		/* Title */
+		put_fstr(0, 0, "                %s Hall of Fame", VERSION_NAME);
+
+		/* No keystrokes needed during resizing */
+		if (no_wait) return (TRUE);
+
+		/* wait for a key press */
+		j = inkey();
+
+		/* Hack -- notice Escape */
+		if (j == ESCAPE) return (FALSE);
+
+		return (TRUE);
+	}
+
 	/* Show 'entries' per page, until "done" */
 	for (k = from, place = k + 1; k < i; k += entries)
 	{
@@ -714,19 +734,19 @@ void top_twenty(void)
 {
 	int from, to;
 	bool cont;
-  bool opened = FALSE;
+	bool opened = FALSE;
 
 	/* Clear screen */
 	Term_clear();
 
 	if (highscore_fd < 0)
 	{
-	  char buf[1024];
+		char buf[1024];
 
-	  /* Build the filename */
-	  path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
-  	highscore_fd = fd_open(buf, O_RDONLY);
-    opened = TRUE;
+		/* Build the filename */
+		path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
+		highscore_fd = fd_open(buf, O_RDONLY);
+		opened = TRUE;
 	}
 
 	/* No score file */
@@ -750,10 +770,10 @@ void top_twenty(void)
 		(void)display_scores_aux(from, to, score_idx, NULL);
 	}
 
-  if (opened) {
- 	  (void)fd_close(highscore_fd);
-	  highscore_fd = -1;
-  }
+	if (opened) {
+ 		(void)fd_close(highscore_fd);
+		highscore_fd = -1;
+	}
 
 	/* Success */
 	return;
