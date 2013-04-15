@@ -135,10 +135,18 @@ typedef unsigned long u32b;
 # endif	/* __STDC__ && __STDC_VERSION__ */
 
 /* Define this for Microsoft Dev Studio C++ 6.0 */
+# ifndef ANG_U64B
+# ifdef WIN32
+#  define ANG_U64B unsigned __int64
+#  define ANG_S64B __int64
+# endif	/* WIN32 */
+# endif	/* ANG_U64B */
+# ifndef ANG_U64B
 # ifdef MSDEV
 #  define ANG_U64B unsigned __int64
 #  define ANG_S64B __int64
-# endif	/* MSDEV */
+# endif	/* WIN32 */
+# endif	/* ANG_U64B */
 
 /* Define this if you have <sys/types.h> with an old compiler */
 # if defined HAS_SYS_TYPES && !defined ANG_U64B

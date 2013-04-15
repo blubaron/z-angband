@@ -10,7 +10,13 @@
  * included in all such copies.
  */
 
+#ifndef USE_64B
+#define USE_64B 1
 #include "angband.h"
+#undef USE_64B
+#else
+#include "angband.h"
+#endif
 #include "script.h"
 
 /*
@@ -182,48 +188,51 @@ static int see_interesting(int x, int y)
  * Since there are 36, we can use (64-bit) bit fields to simplify the tables.
  */
 
+#ifndef UINT64_C
+#define UINT64_C(x) x ## L
+#endif
 
-#define RUN_N_NW  0x0000000000000001L
-#define RUN_N_N   0x0000000000000002L
-#define RUN_N_NE  0x0000000000000004L
-#define RUN_NE_NW 0x0000000000000008L
-#define RUN_NE_N  0x0000000000000010L
-#define RUN_NE_NE 0x0000000000000020L
-#define RUN_NE_E  0x0000000000000040L
-#define RUN_NE_SE 0x0000000000000080L
-#define RUN_E_NE  0x0000000000000100L
-#define RUN_E_E   0x0000000000000200L
-#define RUN_E_SE  0x0000000000000400L
-#define RUN_SE_NE 0x0000000000000800L
-#define RUN_SE_E  0x0000000000001000L
-#define RUN_SE_SE 0x0000000000002000L
-#define RUN_SE_S  0x0000000000004000L
-#define RUN_SE_SW 0x0000000000008000L
-#define RUN_S_SE  0x0000000000010000L
-#define RUN_S_S   0x0000000000020000L
-#define RUN_S_SW  0x0000000000040000L
-#define RUN_SW_SE 0x0000000000080000L
-#define RUN_SW_S  0x0000000000100000L
-#define RUN_SW_SW 0x0000000000200000L
-#define RUN_SW_W  0x0000000000400000L
-#define RUN_SW_NW 0x0000000000800000L
-#define RUN_W_SW  0x0000000001000000L
-#define RUN_W_W   0x0000000002000000L
-#define RUN_W_NW  0x0000000004000000L
-#define RUN_NW_SW 0x0000000008000000L
-#define RUN_NW_W  0x0000000010000000L
-#define RUN_NW_NW 0x0000000020000000L
-#define RUN_NW_N  0x0000000040000000L
-#define RUN_NW_NE 0x0000000080000000L
-#define RUN_N_E   0x0000000100000000L
-#define RUN_N_W   0x0000000200000000L
-#define RUN_E_N   0x0000000400000000L
-#define RUN_E_S   0x0000000800000000L
-#define RUN_S_E   0x0000001000000000L
-#define RUN_S_W   0x0000002000000000L
-#define RUN_W_N   0x0000004000000000L
-#define RUN_W_S   0x0000008000000000L
-#define RUN_IMPOSSIBLE   0xFFFFFF0000000000L
+#define RUN_N_NW  UINT64_C(0x0000000000000001)
+#define RUN_N_N   UINT64_C(0x0000000000000002)
+#define RUN_N_NE  UINT64_C(0x0000000000000004)
+#define RUN_NE_NW UINT64_C(0x0000000000000008)
+#define RUN_NE_N  UINT64_C(0x0000000000000010)
+#define RUN_NE_NE UINT64_C(0x0000000000000020)
+#define RUN_NE_E  UINT64_C(0x0000000000000040)
+#define RUN_NE_SE UINT64_C(0x0000000000000080)
+#define RUN_E_NE  UINT64_C(0x0000000000000100)
+#define RUN_E_E   UINT64_C(0x0000000000000200)
+#define RUN_E_SE  UINT64_C(0x0000000000000400)
+#define RUN_SE_NE UINT64_C(0x0000000000000800)
+#define RUN_SE_E  UINT64_C(0x0000000000001000)
+#define RUN_SE_SE UINT64_C(0x0000000000002000)
+#define RUN_SE_S  UINT64_C(0x0000000000004000)
+#define RUN_SE_SW UINT64_C(0x0000000000008000)
+#define RUN_S_SE  UINT64_C(0x0000000000010000)
+#define RUN_S_S   UINT64_C(0x0000000000020000)
+#define RUN_S_SW  UINT64_C(0x0000000000040000)
+#define RUN_SW_SE UINT64_C(0x0000000000080000)
+#define RUN_SW_S  UINT64_C(0x0000000000100000)
+#define RUN_SW_SW UINT64_C(0x0000000000200000)
+#define RUN_SW_W  UINT64_C(0x0000000000400000)
+#define RUN_SW_NW UINT64_C(0x0000000000800000)
+#define RUN_W_SW  UINT64_C(0x0000000001000000)
+#define RUN_W_W   UINT64_C(0x0000000002000000)
+#define RUN_W_NW  UINT64_C(0x0000000004000000)
+#define RUN_NW_SW UINT64_C(0x0000000008000000)
+#define RUN_NW_W  UINT64_C(0x0000000010000000)
+#define RUN_NW_NW UINT64_C(0x0000000020000000)
+#define RUN_NW_N  UINT64_C(0x0000000040000000)
+#define RUN_NW_NE UINT64_C(0x0000000080000000)
+#define RUN_N_E   UINT64_C(0x0000000100000000)
+#define RUN_N_W   UINT64_C(0x0000000200000000)
+#define RUN_E_N   UINT64_C(0x0000000400000000)
+#define RUN_E_S   UINT64_C(0x0000000800000000)
+#define RUN_S_E   UINT64_C(0x0000001000000000)
+#define RUN_S_W   UINT64_C(0x0000002000000000)
+#define RUN_W_N   UINT64_C(0x0000004000000000)
+#define RUN_W_S   UINT64_C(0x0000008000000000)
+#define RUN_IMPOSSIBLE   UINT64_C(0xFFFFFF0000000000)
 
 
 /* All the moves that start with each direction */
@@ -265,18 +274,13 @@ static int see_interesting(int x, int y)
  *   What moves to remove from consideration if both the
  *   checks listed pass.
  */
-#ifdef WIN32
-typedef unsigned _int64 _u64b;
-#else
-typedef long long _u64b;
-#endif
 
 static const struct
 {
 	int test;
 	int dx, dy;
-	_u64b test_mask;
-	_u64b remove_mask;
+	u64b test_mask;
+	u64b remove_mask;
 } run_checks[] = {
 /*
  * 0: Paranoia: Eliminate all never-used cases.
@@ -453,7 +457,7 @@ static const struct
 {TEST_NONE,  0,  0, RUN_SW_W, RUN_W_SW},
 };
 
-static const _u64b valid_dir_mask[10] = {
+static const u64b valid_dir_mask[10] = {
 /* 0 */ 0,
 /* 1 */ RUN_NW | RUN_W | RUN_SW | RUN_S | RUN_SE,
 /* 2 */ RUN_SW | RUN_S | RUN_SE | RUN_E | RUN_W,
@@ -466,7 +470,7 @@ static const _u64b valid_dir_mask[10] = {
 /* 9 */ RUN_SE | RUN_E | RUN_NE | RUN_N | RUN_NW
 };
 
-static const _u64b basic_dir_mask[10] = {
+static const u64b basic_dir_mask[10] = {
 /* 0 */ 0,
 /* 1 */ RUN_SW,
 /* 2 */ RUN_S,
@@ -488,7 +492,7 @@ static const _u64b basic_dir_mask[10] = {
  * and the two opposite corners, or all four
  * corners.
  */
-static const _u64b corridor_test_mask[] = {
+static const u64b corridor_test_mask[] = {
 RUN_N | RUN_S,
 RUN_E | RUN_W,
 RUN_N | RUN_SE | RUN_SW,
@@ -508,7 +512,7 @@ RUN_NW | RUN_NE | RUN_SE | RUN_SW
  *
  * ToDo: support diagonal walls
  */
-static const _u64b wall_test_mask[10][6] =
+static const u64b wall_test_mask[10][6] =
 {
 /* 0 */ {0, 0, 0, 0, 0, 0},
 /* 1 */ {0, 0, 0, 0, 0, 0},
@@ -568,7 +572,7 @@ static void run_choose_mode(void)
 	int px = p_ptr->px;
 	int py = p_ptr->py;
 	unsigned int i;
-	_u64b wall_dirs = 0;
+	u64b wall_dirs = 0;
 
 	/* if we have a path, use it */
 	if (p_ptr->run.path) {
@@ -677,7 +681,7 @@ static void run_corridor(int starting)
 	int px = p_ptr->px;
 	int py = p_ptr->py;
 
-	_u64b valid_dirs = 0;
+	u64b valid_dirs = 0;
 	unsigned int i;
 
 	/* Check if we're next to something interesting. If we are, stop. */
@@ -702,7 +706,7 @@ static void run_corridor(int starting)
 			int dx = run_checks[i].dx;
 			int dy = run_checks[i].dy;
 
-			u32b test_mask = run_checks[i].test_mask;
+			u64b test_mask = run_checks[i].test_mask;
 
 			/* Check mask if present */
 			if (test_mask)
