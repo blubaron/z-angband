@@ -2288,42 +2288,42 @@ L:BUILD1:          "A) Buy Ankh (".. (factor * 15000) .."gp)")
 L:BUILD1:end
 L:BUILD2:local cost
 L:BUILD2:if (command == 'B') then
-L:BUILD2:if (is_member()) then cost = factor / 3
-L:BUILD2:else	cost = factor * 2 end
-L:BUILD2:	if (test_gold(cost) == TRUE) then
-L:BUILD2:		player.au = player.au - cost
-L:BUILD2:		hp_player(player.mhp)
-L:BUILD2:         if (is_member()) then inc_blessed(1500)
-L:BUILD2:         else inc_blessed(500) end
-L:BUILD2:		message_flush()
-L:BUILD2:	end
-L:BUILD2:	done = TRUE
+L:BUILD2:  if (is_member()) then cost = factor / 3
+L:BUILD2:  else	cost = factor * 2 end
+L:BUILD2:  if (test_gold(cost) == TRUE) then
+L:BUILD2:    player.au = player.au - cost
+L:BUILD2:    hp_player(player.mhp)
+L:BUILD2:    if (is_member()) then inc_blessed(1500)
+L:BUILD2:    else inc_blessed(500) end
+L:BUILD2:    message_flush()
+L:BUILD2:  end
+L:BUILD2:  done = TRUE
 L:BUILD2:end
 L:BUILD2:if (command == 'A') then
-L:BUILD2:	build_cmd_ankh(factor*15000)
-L:BUILD2:       done = TRUE
+L:BUILD2:  build_cmd_ankh(factor*15000)
+L:BUILD2:  done = TRUE
 L:BUILD2:end
 L:BUILD2:if (command == 'Q') then
-L:BUILD2:       if (is_member() == TRUE) then cost = 5 else cost = 0 end
-L:BUILD2:	build_cmd_quest(cost, field)
-L:BUILD2:	done = TRUE end
+L:BUILD2:  if (is_member() == TRUE) then cost = 5 else cost = 0 end
+L:BUILD2:  build_cmd_quest(cost, field)
+L:BUILD2:  done = TRUE end
 L:BUILD2:if (command == 'C' and is_member() == TRUE) then
-L:BUILD2:       if remove_all_curse() then
-L:BUILD2:          msgf("You feel as if someone is watching over you.") end
-L:BUILD2:       message_flush()
-L:BUILD2:       done = TRUE end
+L:BUILD2:  if remove_all_curse() then
+L:BUILD2:  msgf("You feel as if someone is watching over you.") end
+L:BUILD2:  message_flush()
+L:BUILD2:  done = TRUE end
 L:BUILD2:if (command == 'R') then
-L:BUILD2:if (is_member() == TRUE) then cost = (factor*15)/2
-L:BUILD2:else	cost = factor * 30  end
-L:BUILD2:	if (test_gold(cost) == TRUE) then
-L:BUILD2:		if (building_healer() == TRUE) then
-L:BUILD2:			player.au = player.au - cost
-#L:BUILD2:		else
-#L:BUILD2:			msgf("You are in fine health already.")
-L:BUILD2:		end
-L:BUILD2:         message_flush()
-L:BUILD2:	end
-L:BUILD2:	done = TRUE  end
+L:BUILD2:  if (is_member() == TRUE) then cost = (factor*15)/2
+L:BUILD2:  else cost = factor * 30  end
+L:BUILD2:  if (test_gold(cost) == TRUE) then
+L:BUILD2:    if (building_healer() == TRUE) then
+L:BUILD2:      player.au = player.au - cost
+#L:BUILD2:    else
+#L:BUILD2:      msgf("You are in fine health already.")
+L:BUILD2:    end
+L:BUILD2:    message_flush()
+L:BUILD2:  end
+L:BUILD2:  done = TRUE  end
 
 N:150:Thieves' Guild
 G:8:u
