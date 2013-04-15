@@ -31,13 +31,13 @@ NORMOBJS := $(addprefix src/,\
 	mspells1.o mspells2.o scores.o mind.o wild4.o \
 	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o)
 
-ANGOBJS := $(addprefix src/, maid-grf.o grafmode.o settings.o) \
+ANGOBJS := $(addprefix src/, maid-grf.o) \
 	$(addprefix src/platform/x11/, maid-x11.o main-x11.o x11-menu.o \
 	x11-png.o x11-tiles.o x11-layout.o main-xaw.o main-xpj.o) \
 	$(addprefix src/platform/, main-cap.o main-gcu.o \
 	main-lsl.o main-vcs.o main-gtk.o main.o \
 	main-dos.o main-ibm.o main-emx.o \
-	main-ami.o main-tnb.o)
+	main-ami.o main-tnb.o grafmode.o settings.o)
 
 WINOBJS := $(addprefix src/platform/win,\
 	main-win.o readdib.o \

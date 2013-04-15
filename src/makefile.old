@@ -83,10 +83,11 @@ ANGOBJS := $(LUAWOBJS) \
         wizard1.obj wizard2.obj grid.obj streams.obj rooms.obj \
         generate.obj dungeon.obj init1.obj init2.obj \
         effects.obj quest1.obj quest2.obj racial.obj run.obj script.obj \
-        artifact.obj mutation.obj flavor.obj spells3.obj wild4.obj grafmode.obj \
-        mspells1.obj mspells2.obj scores.obj mind.obj platform/maid-x11.obj \
+        artifact.obj mutation.obj flavor.obj spells3.obj wild4.obj \
+	platform/grafmode.obj platform/settings.o \
+        mspells1.obj mspells2.obj scores.obj mind.obj platform/x11/maid-x11.obj \
         bldg.obj obj_kind.obj wild1.obj wild2.obj wild3.obj avatar.obj notes.obj \
-        platform/main-cap.obj platform/main-gcu.obj platform/main-x11.obj platform/main-xaw.obj platform/main-xpj.obj \
+        platform/main-cap.obj platform/main-gcu.obj platform/x11/main-x11.obj platform/x11/main-xaw.obj platform/x11/main-xpj.obj \
         platform/main-lsl.obj platform/main-vcs.obj platform/main-gtk.obj platform/main-win.obj platform/main.obj \
         maid-grf.obj platform/main-dos.obj platform/main-ibm.obj platform/main-emx.obj \
         platform/main-ami.obj platform/main-tnb.obj

@@ -61,7 +61,8 @@ TOLUAOBJS = \
 
 OBJ = \
 	wild4.obj \
-	grafmode.obj \
+	platform/grafmode.obj \
+	platform/settings.obj \
 	z-virt.obj \
 	z-util.obj \
 	z-term.obj \

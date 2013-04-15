@@ -180,7 +180,7 @@ SOURCE=.\src\generate.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\grafmode.c
+SOURCE=.\src\platform\grafmode.c
 # End Source File
 # Begin Source File
 
@@ -329,6 +329,10 @@ SOURCE=.\src\scores.c
 # Begin Source File
 
 SOURCE=.\src\script.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\platform\settings.c
 # End Source File
 # Begin Source File
 
@@ -488,7 +492,7 @@ SOURCE=.\src\generate.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\grafmode.h
+SOURCE=.\src\platform\grafmode.h
 # End Source File
 # Begin Source File
 
@@ -541,6 +545,10 @@ SOURCE=.\src\rooms.h
 # Begin Source File
 
 SOURCE=.\src\script.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\platform\settings.h
 # End Source File
 # Begin Source File
 
