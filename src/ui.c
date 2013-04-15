@@ -1523,7 +1523,7 @@ void roff(cptr str, ...)
  * froff() is smarter than fprintf() though.
  * It will also understand the '%v' format control sequence.
  */
-void froff(FILE *fff, cptr str, ...)
+void froff(ang_file *fff, cptr str, ...)
 {
 	va_list vp;
 
@@ -1539,7 +1539,7 @@ void froff(FILE *fff, cptr str, ...)
 	va_end(vp);
 
 	/* Output it to the file */
-	fprintf(fff, "%s", buf);
+	file_putf(fff, "%s", buf);
 }
 
 /*
@@ -1548,7 +1548,7 @@ void froff(FILE *fff, cptr str, ...)
  * margin: amount to indent each line
  * rowmax: max string characters to put on each line.
  */
-void wrap_froff(FILE *fff, char *buf, int margin, int rowmax)
+void wrap_froff(ang_file *fff, char *buf, int margin, int rowmax)
 {
 	int len = strlen(buf);
 	int i = 0;

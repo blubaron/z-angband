@@ -35,7 +35,7 @@ cptr list_description[8] =
 		"List of visible tiles"
 };
 
-static void dump_wild_tile_summary(FILE *fff, int x, int y, int setting)
+static void dump_wild_tile_summary(ang_file *fff, int x, int y, int setting)
 {
 	char pos[30];
 	
@@ -95,7 +95,7 @@ static void dump_wild_tile_summary(FILE *fff, int x, int y, int setting)
 	}
 }
 
-static void dump_tile_summary(FILE *fff, int x, int y, int setting)
+static void dump_tile_summary(ang_file *fff, int x, int y, int setting)
 {
   /* declatations moved here because in ansi c, declarations have to
      be at the beginning of the scope - Brett */
@@ -567,7 +567,7 @@ static void do_cmd_list_aux (int setting)
 	char com;
   /* declatations moved here because in ansi c, declarations have to
      be at the beginning of the scope - Brett */
-	FILE *fff;
+	ang_file *fff;
 	char file_name[1024];
 	//int place_order[place_count];
 
@@ -586,7 +586,7 @@ static void do_cmd_list_aux (int setting)
 	
 	
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return;
@@ -651,7 +651,7 @@ static void do_cmd_list_aux (int setting)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, list_description[setting], 0, 0);
@@ -736,12 +736,12 @@ static bool do_cmd_list_wilderness_tiles(int setting)
 	char com;
 	int dir;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 	
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -801,7 +801,7 @@ static bool do_cmd_list_wilderness_tiles(int setting)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	if (setting == LIST_UNEXPLORED)
@@ -828,7 +828,7 @@ static bool do_cmd_list_wilderness_terrain(int dummy)
 /*
  * Dump info about a town to the given file
  */
-void dump_place_summary(FILE *fff, int pl)
+void dump_place_summary(ang_file *fff, int pl)
 {
 	int j, x, y;
 	int px, py;
@@ -911,7 +911,7 @@ static bool do_cmd_list_places(int dummy)
 {
 	int k, x, y;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 	//int place_order[place_count];
@@ -920,7 +920,7 @@ static bool do_cmd_list_places(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -947,7 +947,7 @@ static bool do_cmd_list_places(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Known wilderness places", 0, 0);

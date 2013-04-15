@@ -205,24 +205,26 @@ RGBQUAD;
 
 /*** Helper functions for system independent file loading. ***/
 
-static byte get_byte(FILE *fff)
+static byte get_byte(ang_file *fff)
 {
 	/* Get a character, and return it */
-	return (getc(fff) & 0xFF);
+	byte c;
+	file_readc(fff, &c);
+	return c;
 }
 
-static void rd_byte(FILE *fff, byte *ip)
+static void rd_byte(ang_file *fff, byte *ip)
 {
 	*ip = get_byte(fff);
 }
 
-static void rd_u16b(FILE *fff, u16b *ip)
+static void rd_u16b(ang_file *fff, u16b *ip)
 {
 	(*ip) = get_byte(fff);
 	(*ip) |= ((u16b) (get_byte(fff)) << 8);
 }
 
-static void rd_u32b(FILE *fff, u32b *ip)
+static void rd_u32b(ang_file *fff, u32b *ip)
 {
 	(*ip) = get_byte(fff);
 	(*ip) |= ((u32b) (get_byte(fff)) << 8);
@@ -245,7 +247,7 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 
 	int depth = DefaultDepth(dpy, DefaultScreen(dpy));
 
-	FILE *f;
+	ang_file *f;
 
 	BITMAPFILEHEADER fileheader;
 	BITMAPINFOHEADER infoheader;
@@ -266,7 +268,7 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 
 
 	/* Open the BMP file */
-	f = fopen(Name, "r");
+	f = file_open(Name, MODE_READ, FTYPE_RAW);
 
 	/* No such file */
 	if (f == NULL)
@@ -295,7 +297,7 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 	rd_u32b(f, &(infoheader.biClrImportand));
 
 	/* Verify the header */
-	if (feof(f) || (fileheader.bfType != 19778) || (infoheader.biSize != 40))
+	if (file_eof(f) || (fileheader.bfType != 19778) || (infoheader.biSize != 40))
 	{
 		quit_fmt("Incorrect BMP file format %s", Name);
 	}
@@ -337,7 +339,7 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 	if (Res == NULL)
 	{
 		KILL(Data);
-		fclose(f);
+		file_close(f);
 		return (NULL);
 	}
 
@@ -347,22 +349,24 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 
 		for (x = 0; x < infoheader.biWidth; x++)
 		{
-			int ch = getc(f);
+			byte ch;
+			file_readc(f,&ch);
 
 			/* Verify not at end of file XXX XXX */
-			if (feof(f)) quit_fmt("Unexpected end of file in %s", Name);
+			if (file_eof(f)) quit_fmt("Unexpected end of file in %s", Name);
 
 			if (infoheader.biBitCount == 24)
 			{
-				int c3, c2 = getc(f);
+				byte c3, c2;
+				file_readc(f,&c2);
 
 				/* Verify not at end of file XXX XXX */
-				if (feof(f)) quit_fmt("Unexpected end of file in %s", Name);
+				if (file_eof(f)) quit_fmt("Unexpected end of file in %s", Name);
 
-				c3 = getc(f);
+				file_readc(f,&c3);
 
 				/* Verify not at end of file XXX XXX */
-				if (feof(f)) quit_fmt("Unexpected end of file in %s", Name);
+				if (file_eof(f)) quit_fmt("Unexpected end of file in %s", Name);
 
 				XPutPixel(Res, x, y2, create_pixel(dpy, ch, c2, c3));
 			}
@@ -385,7 +389,7 @@ XImage *ReadBMP(Display *dpy, char *Name, int *ret_wid, int *ret_hgt)
 		}
 	}
 
-	fclose(f);
+	file_close(f);
 
 	if (ret_wid) *ret_wid = infoheader.biWidth;
 	if (ret_hgt) *ret_hgt =  infoheader.biHeight;

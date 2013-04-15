@@ -1120,7 +1120,7 @@ static void print_tomb(void)
 	{
 		char buf[1024];
 
-		FILE *fp;
+		ang_file *fp;
 
 		time_t ct = time((time_t) 0);
 
@@ -1131,22 +1131,21 @@ static void print_tomb(void)
 		path_make(buf, ANGBAND_DIR_FILE, "dead.txt");
 
 		/* Open the News file */
-		fp = my_fopen(buf, "r");
+		fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 		/* Dump */
-		if (fp)
-		{
+		if (fp) {
 			int i = 0;
 
 			/* Dump the file to the screen */
-			while (0 == my_fgets(fp, buf, 1024))
+			while (0 <= file_getl(fp, buf, 1024))
 			{
 				/* Display and advance */
 				put_fstr(0, i++, buf);
 			}
 
 			/* Close */
-			my_fclose(fp);
+			file_close(fp);
 		}
 
 

@@ -785,7 +785,7 @@ bool lose_mutation(int choose_mut)
 /*
  * Print out a description of the current mutations
  */
-void dump_mutations(FILE *fff)
+void dump_mutations(ang_file *fff)
 {
 	const mutation_type *mut_ptr;
 
@@ -811,14 +811,14 @@ void dump_mutations(FILE *fff)
  */
 bool do_cmd_knowledge_mutations(int dummy)
 {
-	FILE *fff;
+	ang_file *fff;
 	char file_name[1024];
 
 	/* Hack - ignore parameter */
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, sizeof(file_name));
+	fff = file_open_temp(file_name, sizeof(file_name));
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -827,7 +827,7 @@ bool do_cmd_knowledge_mutations(int dummy)
 	if (fff) dump_mutations(fff);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Mutations", 0, 0);

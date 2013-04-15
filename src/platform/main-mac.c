@@ -1940,7 +1940,7 @@ static void SetupAppDir(void)
 /*
  * Global "preference" file pointer
  */
-static FILE *fff;
+static ang_file *fff;
 
 /*
  * Read a "short" from the file
@@ -1949,7 +1949,7 @@ static int getshort(void)
 {
 	int x = 0;
 	char buf[256];
-	if (0 == my_fgets(fff, buf, 256)) x = atoi(buf);
+	if (0 <= file_getl(fff, buf, 256)) x = atoi(buf);
 	return (x);
 }
 
@@ -1958,7 +1958,7 @@ static int getshort(void)
  */
 static void putshort(int x)
 {
-	fprintf(fff, "%d\n", x);
+	file_putf(fff, "%d\n", x);
 }
 
 
@@ -2064,7 +2064,7 @@ static void load_prefs(void)
 		td->r.top = getshort();
 
 		/* Done */
-		if (feof(fff)) break;
+		if (file_eof(fff)) break;
 	}
 }
 
@@ -2211,7 +2211,7 @@ static void init_windows(void)
 			strcat(foo, "zAngband 2.5 Preferences");
 
 			/* Open the preference file */
-			fff = fopen(foo, "r");
+			fff = file_open(foo, MODE_READ, FTYPE_TEXT);
 
 			/* Success */
 			oops = FALSE;
@@ -2231,8 +2231,8 @@ static void init_windows(void)
 		SetVol(0, env.sysVRefNum);
 
 		/* Open the file */
-		fff = fopen(":Preferences:zAngband 2.5 Preferences", "r");
-		if (!fff) fff = fopen(":zAngband 2.5 Preferences", "r");
+		fff = file_open(":Preferences:zAngband 2.5 Preferences", MODE_READ, FTYPE_TEXT);
+		if (!fff) fff = file_open(":zAngband 2.5 Preferences", MODE_READ, FTYPE_TEXT);
 
 		/* Restore */
 		HSetVol(0, savev, saved);
@@ -2245,7 +2245,7 @@ static void init_windows(void)
 		load_prefs();
 
 		/* Close the file */
-		my_fclose(fff);
+		file_close(fff);
 	}
 
 
@@ -2325,7 +2325,7 @@ static void save_pref_file(void)
 			strcat(foo, "zAngband 2.5 Preferences");
 
 			/* Open the preference file */
-			fff = fopen(foo, "w");
+			fff = file_open(foo, MODE_WRITE, FTYPE_TEXT);
 
 			/* Success */
 			oops = FALSE;
@@ -2345,8 +2345,8 @@ static void save_pref_file(void)
 		SetVol(0, env.sysVRefNum);
 
 		/* Open the preference file */
-		fff = fopen(":Preferences:zAngband 2.5 Preferences", "w");
-		if (!fff) fff = fopen(":zAngband 2.5 Preferences", "w");
+		fff = file_open(":Preferences:zAngband 2.5 Preferences", MODE_WRITE, FTYPE_TEXT);
+		if (!fff) fff = file_open(":zAngband 2.5 Preferences", MODE_WRITE, FTYPE_TEXT);
 
 		/* Restore */
 		HSetVol(0, savev, saved);
@@ -2359,7 +2359,7 @@ static void save_pref_file(void)
 		save_prefs();
 
 		/* Close it */
-		my_fclose(fff);
+		file_close(fff);
 	}
 }
 

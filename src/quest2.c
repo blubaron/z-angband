@@ -2313,7 +2313,7 @@ static cptr quest_status_string(quest_type *q_ptr)
 /*
  * Print quest status of all active quests
  */
-bool do_cmd_knowledge_quests_aux(int place_num, FILE *fff)
+bool do_cmd_knowledge_quests_aux(int place_num, ang_file *fff)
 {
 	char tmp_str[256];
 
@@ -2514,10 +2514,10 @@ bool do_cmd_knowledge_quests_aux(int place_num, FILE *fff)
 bool do_cmd_knowledge_quests(int dummy)
 {
 	char file_name[1024];
-	FILE *fff;
+	ang_file *fff;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -2528,7 +2528,7 @@ bool do_cmd_knowledge_quests(int dummy)
 	do_cmd_knowledge_quests_aux(0, fff);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Quest status", 0, 0);
@@ -2542,7 +2542,7 @@ bool do_cmd_knowledge_quests(int dummy)
 
 
 /* Dump the quests related to this town into fff, only when display is set */
-void dump_castle_info(FILE *fff, int town)
+void dump_castle_info(ang_file *fff, int town)
 {
 	int i;
 	bool quest_in_town = FALSE;

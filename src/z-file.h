@@ -86,6 +86,10 @@ ang_file *file_open(const char *buf, file_mode mode, file_type ftype);
  */
 extern void (*file_open_hook)(const char *path, file_type ftype);
 
+/**
+ * Open a temporary file and return the name of the file
+ */
+ang_file *file_open_temp(char *buf, int max);
 
 /**
  * Attempt to close the file handle `f`.
@@ -118,7 +122,10 @@ void file_unlock(ang_file *f);
  *
  * Returns TRUE when data is returned; FALSE otherwise.
  */
-bool file_getl(ang_file *f, char *buf, size_t n);
+errr file_getl(ang_file *f, char *buf, size_t n);
+
+/** this raw version does not replace non-printables **/
+errr file_getl_raw(ang_file *f, char *buf, size_t n);
 
 /**
  * Write the string pointed to by `buf` to the file represented by `f`.
@@ -149,6 +156,13 @@ bool x_file_putf(ang_file *f, const char *fmt, ...);
 bool file_seek(ang_file *f, u32b pos);
 
 /**
+ * get the current position in the file represented by `f`.
+ *
+ * Returns TRUE if successful, FALSE otherwise.
+ */
+bool file_getpos(ang_file *f, u32b *pos);
+
+/**
  * Reads n bytes from file 'f' into buffer 'buf'.
  * \returns Number of bytes read; -1 on error
  */
@@ -177,6 +191,26 @@ bool file_readc(ang_file *f, byte *b);
  */
 bool file_writec(ang_file *f, byte b);
 
+/**
+ * flush the file represented by `f`.
+ *
+ * Returns TRUE if at end, FALSE otherwise.
+ */
+int file_flush(ang_file *f);
+
+/**
+ * test if the file represented by `f`is at its end.
+ *
+ * Returns TRUE if at end, FALSE otherwise.
+ */
+bool file_eof(ang_file *f);
+
+/**
+ * See if there was an error writing to the file represented by `f`.
+ *
+ * Returns 0 if no error, error code otherwise.
+ */
+int file_error(ang_file *f);
 
 
 /*** Directory code ***/
@@ -191,7 +225,7 @@ bool dir_exists(const char *dirname);
  * needed and possible. Returns whether or not the directory was created
  * successfully.
  */
-bool dir_create(const char *dirname);
+bool dir_create(const char *dirname, u16b permissions);
 
 /**
  * An opaque file handle for Angband directory handling.
@@ -223,6 +257,10 @@ bool dir_read(ang_dir *dir, char *fname, size_t len);
  * Close a directory handle.
  */
 void dir_close(ang_dir *dir);
+
+/**
+ * Original file handling routines.
+ */
 
 /* z-file.c */
 extern errr path_parse(char *buf, int max, cptr file);

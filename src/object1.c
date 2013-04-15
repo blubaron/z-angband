@@ -3933,7 +3933,7 @@ object_type *player_has_idx(int kidx)
 /*
  * Print out full description to the given file.
  */
-static void dump_full_item_aux(FILE *fff, object_type *o_ptr, int indent)
+static void dump_full_item_aux(ang_file *fff, object_type *o_ptr, int indent)
 {
 	object_kind *k_ptr;
 	bonuses_type b;
@@ -4843,7 +4843,7 @@ static void dump_full_item_aux(FILE *fff, object_type *o_ptr, int indent)
  * Display full info about an item,
  * Dumping container contents if necessary.
  */
-void dump_full_item(FILE *fff, object_type *o_ptr)
+void dump_full_item(ang_file *fff, object_type *o_ptr)
 {
 	dump_full_item_aux(fff, o_ptr, 3);
 }

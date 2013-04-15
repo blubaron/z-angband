@@ -426,7 +426,7 @@ static errr rd_savefile(void)
  * Some "local" parameters, used to help write savefiles
  */
 
-static FILE *fff;	/* Current save "file" */
+static ang_file *fff;	/* Current save "file" */
 
 static byte xor_byte;	/* Simple encryption */
 
@@ -446,7 +446,8 @@ static void sf_put(byte v)
 {
 	/* Encode the value, write a character */
 	xor_byte ^= v;
-	(void)putc((int)xor_byte, fff);
+	/*(void)putc((int)xor_byte, fff);*/
+	(void)file_writec(fff, xor_byte);
 
 	/* Maintain the checksum info */
 	v_stamp += v;
@@ -497,10 +498,10 @@ static void wr_string(cptr str)
 static void wr_checksum(void)
 {
 	/* Write it */
-	(void)putc((int)(checksum & 0xFF), fff);
-	(void)putc((int)((checksum >> 8)& 0xFF), fff);
-	(void)putc((int)((checksum >> 16)& 0xFF), fff);
-	(void)putc((int)((checksum >> 24)& 0xFF), fff);
+	(void)file_writec(fff, (int)(checksum & 0xFF));
+	(void)file_writec(fff, (int)((checksum >> 8)& 0xFF));
+	(void)file_writec(fff, (int)((checksum >> 16)& 0xFF));
+	(void)file_writec(fff, (int)((checksum >> 24)& 0xFF));
 
 	/* Reset the checksum */
 	checksum = checksum_base;
@@ -1818,15 +1819,15 @@ static bool wr_savefile_new(void)
 
 			dun_ptr = pl_ptr->dungeon;
       
-      /* write dungeon index (to skip most of the stuff that was here) */
+			/* write dungeon index (to skip most of the stuff that was here) */
 			wr_byte(dun_ptr->didx);
 
-      /* write the stuff that can be overwritten for specific dungeon */
-      /* Levels in dungeon */
+			/* write the stuff that can be overwritten for specific dungeon */
+			/* Levels in dungeon */
 			wr_byte(dun_ptr->min_level);
 			wr_byte(dun_ptr->max_level);
 			wr_byte(dun_ptr->level_change_step);
-      /* dungeon flags */
+			/* dungeon flags */
 			wr_u32b(dun_ptr->flags);
 			/* Rating + feeling */
 			wr_s16b(dun_ptr->rating);
@@ -1864,7 +1865,7 @@ static bool wr_savefile_new(void)
 			wr_u16b(dun_ptr->stairs_down);
 			wr_u16b(dun_ptr->stairs_closed);
 			wr_u16b(dun_ptr->pillar);
-      /* write some bytes for feature types that are not implemented yet */
+			/* write some bytes for basic feature types that are not implemented yet */
 			wr_u16b(0); /* tree */
 			wr_u16b(0); /* fountain */
 			wr_u16b(0); /* statue */
@@ -1951,7 +1952,7 @@ static bool wr_savefile_new(void)
 
 
 	/* Error in save */
-	if (ferror(fff) || (fflush(fff) == EOF)) return FALSE;
+	if (file_error(fff) || (file_flush(fff) == EOF)) return FALSE;
 
 	/* Successful save */
 	return TRUE;
@@ -1996,7 +1997,7 @@ static bool save_player_aux(char *name)
 		safe_setuid_grab();
 
 		/* Open the savefile */
-		fff = my_fopen(name, "wb");
+		fff = file_open(name, MODE_WRITE, FTYPE_SAVE);
 
 		/* Drop permissions */
 		safe_setuid_drop();
@@ -2007,7 +2008,7 @@ static bool save_player_aux(char *name)
 			if (wr_savefile_new()) ok = TRUE;
 
 			/* Attempt to close it */
-			my_fclose(fff);
+			file_close(fff);
 		}
 
 		/* Grab permissions */
@@ -2222,7 +2223,7 @@ bool load_player(void)
 
 	/* Okay */
 	if (!err) {
-    char *ext;
+		char *ext;
 		/* Give a conversion warning */
 		if ((VER_MAJOR != z_major) ||
 			(VER_MINOR != z_minor) || (VER_PATCH != z_patch))

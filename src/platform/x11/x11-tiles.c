@@ -44,11 +44,8 @@ int ReadTiles(Display *dpy, char* filename, XTilesheet *tiles)
 		/* Load the graphical tiles */
 		tiles_raw = ReadBMP(dpy, filename, &wid, &hgt);
 		if (filelen < 1019) {
-			FILE *exists;
 			my_strcpy(ext, "msk.bmp",1024-filelen-4);
-			exists = my_fopen(filename, "r");
-			if (exists) {
-				my_fclose(exists);
+			if (file_exists(filename)) {
 				mask_raw = ReadBMP(dpy, filename, NULL, NULL);
 				if (!mask_raw) {
 					if (tiles_raw)
@@ -89,13 +86,10 @@ int ReadTiles(Display *dpy, char* filename, XTilesheet *tiles)
 
 				my_strcpy(modname, filename, 1024);
 				if (filelen < 1018) {
-					FILE *exists;
 					ext2 = strrchr(modname, '.');
 					my_strcpy(ext2, "_pre.png", 1024-filelen-4);					
-					exists = my_fopen(modname, "r");
-					if (exists) {
-						my_fclose(exists);
-						if (filenewer(filename, modname)) {
+					if (file_exists(modname)) {
+						if (file_newer(filename, modname)) {
 							/* base file is newer so we want to recreate 
 							 * premultiplied file */
 							ext2 = NULL;

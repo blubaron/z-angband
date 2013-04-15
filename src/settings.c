@@ -89,7 +89,7 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 	int line = 0;
 	char buf[1024];
 	char *sep;
-	FILE *fp;
+	ang_file *fp;
 	ini_settings *ini;
 	ini_settings_section *sec, *temps;
 	ini_settings_value *val;
@@ -107,13 +107,13 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 		*ret = ini;
 	}
 
-	fp = my_fopen(filename, "r");
+	fp = file_open(filename, MODE_READ, FTYPE_TEXT);
 	if (!fp) {
 		return -4;
 	}
 
 	sec = NULL;
-	while (0 == my_fgets(fp, buf, 1024)) {
+	while (0 <= file_getl(fp, buf, 1024)) {
 		/* Count lines */
 		line++;
 
@@ -147,6 +147,7 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 				ini->pEnd->pNext = sec;
 			}
 			ini->pEnd = sec;
+			ini->count++;
 			continue;
 		}
     
@@ -169,36 +170,36 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 			res = ini_settings_new_key(ini, sec, NULL, &(buf[0]), (sep+1));
 		}
 	}
-	my_fclose(fp);
+	file_close(fp);
 	return 0;
 }
 
 int ini_settings_save(const char *filename, ini_settings *ini)
 {
-	FILE *fp;
+	ang_file *fp;
 	ini_settings_section *sec;
 	ini_settings_value *val;
 
 	if (!ini) 
 		return -1;
 
-	fp = my_fopen(filename, "w");
+	fp = file_open(filename, MODE_WRITE, FTYPE_TEXT);
 	if (!fp) {
 		return -4;
 	}
 
 	sec = ini->pRoot;
 	while (sec) {
-		fprintf(fp, "[%s]\n", sec->name);
+		file_putf(fp, "[%s]\n", sec->name);
 		val = sec->pRoot;
 		while (val) {
-			fprintf(fp, "%s=%s\n", val->key,val->value);
+			file_putf(fp, "%s=%s\n", val->key,val->value);
 			val = val->pNext;
 		}
-		fprintf(fp, "\n");
+		file_putf(fp, "\n");
 		sec = sec->pNext;
 	}
-	my_fclose(fp);
+	file_close(fp);
 	return 0;
 }
 

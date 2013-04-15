@@ -1320,7 +1320,7 @@ static bool do_cmd_options_hitpoint(int dummy)
 static bool do_cmd_options_dump(int dummy)
 {
 	int i;
-	FILE *fff;
+	ang_file *fff;
 	char buf[1024];
 
 	/* Hack - ignore parameter */
@@ -1332,7 +1332,7 @@ static bool do_cmd_options_dump(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, "pref-opt.prf");
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Failed */
 	if (!fff) return (FALSE);
@@ -1354,7 +1354,7 @@ static bool do_cmd_options_dump(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Clear top row */
 	clear_msg();
@@ -1443,7 +1443,7 @@ errr macro_dump(cptr fname)
 {
 	int i;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char buf[1024];
 
@@ -1455,7 +1455,7 @@ errr macro_dump(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff) return (-1);
@@ -1494,7 +1494,7 @@ errr macro_dump(cptr fname)
 
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Success */
 	return (0);
@@ -1592,7 +1592,7 @@ errr keymap_dump(cptr fname)
 {
 	int i;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char key[1024];
 	char buf[1024];
@@ -1620,7 +1620,7 @@ errr keymap_dump(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff) return (-1);
@@ -1661,7 +1661,7 @@ errr keymap_dump(cptr fname)
 
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Success */
 	return (0);
@@ -2196,7 +2196,7 @@ static bool do_cmd_pref_vis_load(int dummy)
 static bool do_cmd_dump_monster(int dummy)
 {
 	char tmp[1024], buf[1024];
-	FILE *fff;
+	ang_file *fff;
 
 	int i;
 
@@ -2223,7 +2223,7 @@ static bool do_cmd_dump_monster(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -2256,7 +2256,7 @@ static bool do_cmd_dump_monster(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped monster attr/chars.");
@@ -2270,7 +2270,7 @@ static bool do_cmd_dump_monster(int dummy)
 static bool do_cmd_dump_object(int dummy)
 {
 	char tmp[1024], buf[1024];
-	FILE *fff;
+	ang_file *fff;
 
 	int i;
 
@@ -2297,7 +2297,7 @@ static bool do_cmd_dump_object(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -2330,7 +2330,7 @@ static bool do_cmd_dump_object(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped object attr/chars.");
@@ -2345,7 +2345,7 @@ static bool do_cmd_dump_object(int dummy)
 static bool do_cmd_dump_feature(int dummy)
 {
 	char tmp[1024], buf[1024];
-	FILE *fff;
+	ang_file *fff;
 
 	int i;
 
@@ -2372,7 +2372,7 @@ static bool do_cmd_dump_feature(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -2405,7 +2405,7 @@ static bool do_cmd_dump_feature(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped feature attr/chars.");
@@ -2420,7 +2420,7 @@ static bool do_cmd_dump_feature(int dummy)
 static bool do_cmd_dump_field(int dummy)
 {
 	char tmp[1024], buf[1024];
-	FILE *fff;
+	ang_file *fff;
 
 	int i;
 
@@ -2447,7 +2447,7 @@ static bool do_cmd_dump_field(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -2480,7 +2480,7 @@ static bool do_cmd_dump_field(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped field attr/chars.");
@@ -2854,7 +2854,7 @@ static bool do_cmd_dump_colour(int dummy)
 {
 	int i;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char tmp[1024], buf[1024];
 
@@ -2881,7 +2881,7 @@ static bool do_cmd_dump_colour(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -2922,7 +2922,7 @@ static bool do_cmd_dump_colour(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped color redefinitions.");
@@ -2939,7 +2939,7 @@ static bool do_cmd_dump_message(int dummy)
 {
 	byte i;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char tmp[1024], buf[1024];
 
@@ -2966,7 +2966,7 @@ static bool do_cmd_dump_message(int dummy)
 	path_make(buf, ANGBAND_DIR_USER, tmp);
 
 	/* Append to the file */
-	fff = my_fopen(buf, "a");
+	fff = file_open(buf, MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff)
@@ -3000,7 +3000,7 @@ static bool do_cmd_dump_message(int dummy)
 	froff(fff, "\n\n\n\n");
 
 	/* Close */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Dumped message color definitions.");
@@ -3336,7 +3336,7 @@ void do_cmd_load_screen(void)
 
 	bool okay = TRUE;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char buf[1024];
 
@@ -3345,7 +3345,7 @@ void do_cmd_load_screen(void)
 	path_make(buf, ANGBAND_DIR_USER, "dump.txt");
 
 	/* Append to the file */
-	fff = my_fopen(buf, "r");
+	fff = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff) return;
@@ -3362,7 +3362,7 @@ void do_cmd_load_screen(void)
 	for (y = 0; okay && (y < 24); y++)
 	{
 		/* Get a line of data */
-		if (my_fgets(fff, buf, 1024)) okay = FALSE;
+		if (file_getl(fff, buf, 1024) < 0) okay = FALSE;
 
 		/* Show each row */
 		for (x = 0; x < 79; x++)
@@ -3373,14 +3373,14 @@ void do_cmd_load_screen(void)
 	}
 
 	/* Get the blank line */
-	if (my_fgets(fff, buf, 1024)) okay = FALSE;
+	if (file_getl(fff, buf, 1024) < 0) okay = FALSE;
 
 
 	/* Dump the screen */
 	for (y = 0; okay && (y < 24); y++)
 	{
 		/* Get a line of data */
-		if (my_fgets(fff, buf, 1024)) okay = FALSE;
+		if (file_getl(fff, buf, 1024) < 0) okay = FALSE;
 
 		/* Dump each row */
 		for (x = 0; x < 79; x++)
@@ -3406,11 +3406,11 @@ void do_cmd_load_screen(void)
 
 
 	/* Get the blank line */
-	if (my_fgets(fff, buf, 1024)) okay = FALSE;
+	if (file_getl(fff, buf, 1024) < 0) okay = FALSE;
 
 
 	/* Close it */
-	my_fclose(fff);
+	file_close(fff);
 
 
 	/* Message */
@@ -3446,7 +3446,7 @@ void do_cmd_save_screen(void)
 		byte a = 0;
 		char c = ' ';
 
-		FILE *fff;
+		ang_file *fff;
 
 		char buf[1024];
 
@@ -3457,8 +3457,8 @@ void do_cmd_save_screen(void)
 		/* File type is "TEXT" */
 		FILE_TYPE(FILE_TYPE_TEXT);
 
-		/* Append to the file */
-		fff = my_fopen(buf, "w");
+		/* Open the file for writing */
+		fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 		/* Oops */
 		if (!fff) return;
@@ -3517,7 +3517,7 @@ void do_cmd_save_screen(void)
 
 
 		/* Close it */
-		my_fclose(fff);
+		file_close(fff);
 
 
 		/* Message */
@@ -3534,7 +3534,7 @@ void do_cmd_save_screen(void)
  * formatting of the '$' and '#' characters, as well as
  * doing colour correctly.
  */
-static void print_monster_string(FILE *fff, byte a, char c, cptr name, int num)
+static void print_monster_string(ang_file *fff, byte a, char c, cptr name, int num)
 {
 	if (c == '$')
 	{
@@ -3560,7 +3560,7 @@ static void print_monster_string(FILE *fff, byte a, char c, cptr name, int num)
  */
 static bool do_cmd_knowledge_uniques(int dummy)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -3613,7 +3613,7 @@ static bool do_cmd_knowledge_uniques(int dummy)
 	ang_sort(who, &why, n);
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff)
@@ -3653,7 +3653,7 @@ static bool do_cmd_knowledge_uniques(int dummy)
 	KILL(who);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name,
@@ -3759,7 +3759,7 @@ void plural_aux(char *name)
 bool do_cmd_knowledge_pets(int dummy)
 {
 	int i;
-	FILE *fff;
+	ang_file *fff;
 	monster_type *m_ptr;
 	int t_friends = 0;
 	int t_levels = 0;
@@ -3770,7 +3770,7 @@ bool do_cmd_knowledge_pets(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -3809,7 +3809,7 @@ bool do_cmd_knowledge_pets(int dummy)
 
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Current Pets", 0, 0);
@@ -3826,7 +3826,7 @@ bool do_cmd_knowledge_pets(int dummy)
  */
 static bool do_cmd_knowledge_kill_count(int dummy)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -3878,7 +3878,7 @@ static bool do_cmd_knowledge_kill_count(int dummy)
 	ang_sort(who, &why, n);
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff)
@@ -3986,7 +3986,7 @@ static bool do_cmd_knowledge_kill_count(int dummy)
 	KILL(who);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Kill Count", 0, 0);
@@ -3997,7 +3997,7 @@ static bool do_cmd_knowledge_kill_count(int dummy)
 	return (FALSE);
 }
 
-void do_cmd_knowledge_spells_aux(FILE *fff, int realm, bool color)
+void do_cmd_knowledge_spells_aux(ang_file *fff, int realm, bool color)
 {
 	int sval, lev;
 	bool found;
@@ -4097,7 +4097,7 @@ void do_cmd_knowledge_spells_aux(FILE *fff, int realm, bool color)
  */
 static bool do_cmd_knowledge_spells(int dummy)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -4114,7 +4114,7 @@ static bool do_cmd_knowledge_spells(int dummy)
 	}
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff)
@@ -4149,7 +4149,7 @@ static bool do_cmd_knowledge_spells(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Spell knowledge", 0, 0);
@@ -4169,7 +4169,7 @@ static bool do_cmd_knowledge_objects(int dummy)
 	int k;
 	int tval, lvl;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -4181,7 +4181,7 @@ static bool do_cmd_knowledge_objects(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -4259,7 +4259,7 @@ static bool do_cmd_knowledge_objects(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Known Objects", 0, 0);
@@ -4276,7 +4276,7 @@ static bool do_cmd_knowledge_objects(int dummy)
  */
 static bool do_cmd_knowledge_virtues(int dummy)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -4284,7 +4284,7 @@ static bool do_cmd_knowledge_virtues(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -4292,7 +4292,7 @@ static bool do_cmd_knowledge_virtues(int dummy)
 	dump_virtues(fff);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Virtues", 0, 0);
@@ -4325,7 +4325,7 @@ static bool do_cmd_knowledge_notes(int dummy)
 /*
  * Dump info about a town to the given file
  */
-void dump_town_info(FILE *fff, int town, bool ignore)
+void dump_town_info(ang_file *fff, int town, bool ignore)
 {
 	int j;
 
@@ -4409,7 +4409,7 @@ void dump_town_info(FILE *fff, int town, bool ignore)
 /*
  * Dump info about a place if is has a dungeon to the given file
  */
-static void dump_dungeon_info(FILE *fff, int town)
+static void dump_dungeon_info(ang_file *fff, int town)
 {
 	int i;
 
@@ -4552,7 +4552,7 @@ static bool do_cmd_knowledge_wild(int dummy)
 {
 	int k;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -4560,7 +4560,7 @@ static bool do_cmd_knowledge_wild(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -4572,7 +4572,7 @@ static bool do_cmd_knowledge_wild(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Towns", 0, 0);
@@ -4591,7 +4591,7 @@ static bool do_cmd_knowledge_dungeon(int dummy)
 {
 	int k;
 
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -4599,7 +4599,7 @@ static bool do_cmd_knowledge_dungeon(int dummy)
 	(void) dummy;
 
 	/* Open a temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -4621,7 +4621,7 @@ static bool do_cmd_knowledge_dungeon(int dummy)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, "Dungeons", 0, 0);
@@ -4763,7 +4763,7 @@ void do_cmd_time(void)
 
 	char buf[1024];
 
-	FILE *fff;
+	ang_file *fff;
 
 	strcpy(desc, "It is a strange time.");
 
@@ -4784,13 +4784,13 @@ void do_cmd_time(void)
 	}
 
 	/* Open this file */
-	fff = my_fopen(buf, "rt");
+	fff = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff) return;
 
 	/* Find this time */
-	while (!my_fgets(fff, buf, 1024))
+	while (file_getl(fff, buf, 1024) >= 0)
 	{
 		/* Ignore comments */
 		if (!buf[0] || (buf[0] == '#')) continue;
@@ -4841,5 +4841,5 @@ void do_cmd_time(void)
 	msgf(desc);
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 }

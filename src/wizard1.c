@@ -15,7 +15,7 @@
 /*
  * The spoiler file being created
  */
-static FILE *fff = NULL;
+static ang_file *fff = NULL;
 
 /*
  * Extract a textual representation of an attribute
@@ -239,7 +239,7 @@ static void spoil_obj_desc(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -334,13 +334,13 @@ static void spoil_obj_desc(cptr fname)
 
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Successfully created a spoiler file.");
@@ -686,7 +686,7 @@ obj_desc_list;
  */
 static void spoiler_out_n_chars(int n, char c)
 {
-	while (--n >= 0) fputc(c, fff);
+	while (--n >= 0) file_writec(fff,c);
 }
 
 
@@ -1262,7 +1262,7 @@ static void spoil_artifact(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -1307,13 +1307,13 @@ static void spoil_artifact(cptr fname)
 	}
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Successfully created a spoiler file.");
@@ -1352,7 +1352,7 @@ static void spoil_mon_desc(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -1461,13 +1461,13 @@ static void spoil_mon_desc(cptr fname)
 	froff(fff, "\n");
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Worked */
 	msgf("Successfully created a spoiler file.");
@@ -1603,7 +1603,7 @@ static void spoil_mon_info(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -2453,13 +2453,13 @@ static void spoil_mon_info(cptr fname)
 	KILL(who);
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	msgf("Successfully created a spoiler file.");
 }
@@ -2496,7 +2496,7 @@ static void spoil_mutation(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -2563,13 +2563,13 @@ static void spoil_mutation(cptr fname)
 	}
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Successfully created a spoiler file.");
@@ -2593,7 +2593,7 @@ static void spoil_rac_pow(cptr fname)
 	FILE_TYPE(FILE_TYPE_TEXT);
 
 	/* Open the file */
-	fff = my_fopen(buf, "w");
+	fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Oops */
 	if (!fff)
@@ -2634,13 +2634,13 @@ static void spoil_rac_pow(cptr fname)
 	}
 
 	/* Check for errors */
-	if (ferror(fff))
+	if (file_error(fff))
 	{
 		msgf("Cannot close spoiler file.");
 		return;
 	}
 
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Message */
 	msgf("Successfully created a spoiler file.");

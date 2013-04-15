@@ -1317,7 +1317,7 @@ static u32b grab_effect_flag2(int id)
 /*
  * Initialize an "*_info" array, by parsing an ascii "template" file
  */
-errr init_info_txt(FILE *fp, char *buf, header *head,
+errr init_info_txt(ang_file *fp, char *buf, header *head,
                    parse_info_txt_func parse_info_txt_line)
 {
 	errr err;
@@ -1337,7 +1337,7 @@ errr init_info_txt(FILE *fp, char *buf, header *head,
 	head->text_size = 0;
 
 	/* Parse */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -3300,7 +3300,7 @@ static errr grab_one_wild_flag(wild_gen_data_type *w_ptr, cptr what)
  * Initialize the "wild_choice_tree" and "wild_gen_data" arrays,
  *  by parsing an ascii "template" file
  */
-errr init_w_info_txt(FILE *fp, char *buf)
+errr init_w_info_txt(ang_file *fp, char *buf)
 {
 	char *s, *t;
 
@@ -3319,7 +3319,7 @@ errr init_w_info_txt(FILE *fp, char *buf)
 	error_idx = -1;
 
 	/* Parse */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -3518,7 +3518,7 @@ static errr grab_one_info_flag(field_thaum *t_ptr, cptr what)
  * Initialize the field "thaumatergical" arrays,
  *  by parsing an ascii "template" file
  */
-errr init_t_info_txt(FILE *fp, char *buf)
+errr init_t_info_txt(ang_file *fp, char *buf)
 {
 	char *s, *t;
 
@@ -3536,7 +3536,7 @@ errr init_t_info_txt(FILE *fp, char *buf)
 
 
 	/* Parse */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -3847,7 +3847,7 @@ static errr grab_one_dungeon_flag(monster_group_type *mg_ptr, cptr what)
  * Initialize the monster group arrays,
  *  by parsing an ascii "template" file
  */
-errr init_mg_info_txt(FILE *fp, char *buf)
+errr init_mg_info_txt(ang_file *fp, char *buf)
 {
 	char *s, *t;
 
@@ -3867,7 +3867,7 @@ errr init_mg_info_txt(FILE *fp, char *buf)
 
 
 	/* Parse */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -5913,7 +5913,7 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 	return (0);
 }
 
-errr init_dun_info_txt(FILE *fp, char *buf)
+errr init_dun_info_txt(ang_file *fp, char *buf)
 {
 	u16b i = 0;
 	errr errorr;
@@ -5930,7 +5930,7 @@ errr init_dun_info_txt(FILE *fp, char *buf)
 
 
 	/* Parse */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;

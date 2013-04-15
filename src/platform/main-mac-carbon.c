@@ -852,7 +852,7 @@ static OSErr ChooseFile( StringPtr filename, OSType *typelist, long typeCount )
 
 static errr process_sound_config_file( const char *name, const char *section )
 {
-	FILE *fp;
+	ang_file *fp;
 
 	char buf[1024];
 
@@ -872,14 +872,14 @@ static errr process_sound_config_file( const char *name, const char *section )
 	path_make(buf, soundpath, name);
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* No such file */
 	if (!fp) return (-1);
 
 
 	/* Process the file */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Count lines */
 		num++;
@@ -981,7 +981,7 @@ static errr process_sound_config_file( const char *name, const char *section )
 	}
 
 	/* Close the file */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Result */
 	return (err);
@@ -989,7 +989,7 @@ static errr process_sound_config_file( const char *name, const char *section )
 
 static errr process_music_config_file( const char *name, const char *section )
 {
-	FILE *fp;
+	ang_file *fp;
 	
 	char musicpath[1024];
 	char buf[1024];
@@ -1008,14 +1008,14 @@ static errr process_music_config_file( const char *name, const char *section )
 	path_make(buf, musicpath, name);
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* No such file */
 	if (!fp) return (-1);
 
 
 	/* Process the file */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		char *pbuf = &(buf[0]);
 		
@@ -1196,7 +1196,7 @@ static errr process_music_config_file( const char *name, const char *section )
 	}
 
 	/* Close the file */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Result */
 	return (err);
@@ -3023,7 +3023,7 @@ static void SetupAppDir(void)
 /*
  * Global "preference" file pointer
  */
-static FILE *fff;
+static ang_file *fff;
 
 /*
  * Read a "short" from the file
@@ -3032,7 +3032,7 @@ static int getshort(void)
 {
 	int x = 0;
 	char buf[256];
-	if (0 == my_fgets(fff, buf, 256)) x = atoi(buf);
+	if (0 <= file_getl(fff, buf, 256)) x = atoi(buf);
 	return (x);
 }
 
@@ -3043,7 +3043,7 @@ static int getbyte(void)
 {
 	byte x = 0;
 	unsigned char buf[256];
-	if (0 == my_fgets(fff, (char*)buf, 256)) x = buf[0];
+	if (0 <= file_getl(fff, (char*)buf, 256)) x = buf[0];
 	return (x);
 }
 
@@ -3052,7 +3052,7 @@ static int getbyte(void)
  */
 static void putshort(int x)
 {
-	fprintf(fff, "%d\n", x);
+	file_putf(fff, "%d\n", x);
 }
 
 /*
@@ -3060,7 +3060,7 @@ static void putshort(int x)
  */
 static void putbyte(byte x)
 {
-	fprintf(fff, "%c\n", x);
+	file_writec(fff, x);
 }
 
 
@@ -3159,7 +3159,7 @@ static void load_prefs(void)
 		td->r.top = getshort();
 
 		/* Done */
-		if (feof(fff)) break;
+		if (file_eof(fff)) break;
 	}
 	
 	arg_graphics = getshort();
@@ -3612,7 +3612,7 @@ static void save_pref_file(void)
 			strcat(foo, "Angband Preferences");
 
 			/* Open the preference file */
-			fff = fopen(foo, "w");
+			fff = file_open(foo, MODE_WRITE, FTYPE_TEXT);
 
 			/* Success */
 			oops = FALSE;
@@ -3630,7 +3630,7 @@ static void save_pref_file(void)
 		save_prefs();
 
 		/* Close it */
-		my_fclose(fff);
+		file_close(fff);
 	}
 #endif /* TARGET_CARBON */
 }
@@ -3673,7 +3673,7 @@ static void load_pref_file(void)
 			strcat(foo, "Angband Preferences");
 
 			/* Open the preference file */
-			fff = fopen(foo, "r");
+			fff = file_open(foo, MODE_READ, FTYPE_TEXT);
 
 			if( fff )
 			{
@@ -3698,7 +3698,7 @@ static void load_pref_file(void)
 		load_prefs();
 
 		/* Close the file */
-		my_fclose(fff);
+		file_close(fff);
 	}
 #endif	/* TARGET_CARBON */
 }

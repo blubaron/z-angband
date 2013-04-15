@@ -90,11 +90,16 @@
 # include <unistd.h>
 
 # include <sys/stat.h>
+# define HAVE_STAT
 
 # ifdef SOLARIS
 #  include <netdb.h>
 # endif
-
+#else  /* SET_UID */
+# if defined(WINDOWS)
+#  include <sys/stat.h>
+#  define HAVE_STAT
+# endif /* WINDOWS */
 #endif /* SET_UID */
 
 #ifdef __DJGPP__

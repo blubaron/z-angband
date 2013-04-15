@@ -966,7 +966,7 @@ static void display_banner(wild_done_type *w_ptr)
 
 
 /* Display info about the home in one town */
-static bool dump_home_info(FILE *fff, int town)
+static bool dump_home_info(ang_file *fff, int town)
 {
 	int i, k;
 	bool visited_town = FALSE;
@@ -1104,7 +1104,7 @@ static bool dump_info_test(char c, int town)
 /* Show the knowledge the player has about a town */
 static bool do_cmd_view_map_aux(char c, int town)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	char file_name[1024];
 
@@ -1117,7 +1117,7 @@ static bool do_cmd_view_map_aux(char c, int town)
 	if (!dump_info_test(c, town)) return (FALSE);
 
 	/* Open temporary file */
-	fff = my_fopen_temp(file_name, 1024);
+	fff = file_open_temp(file_name, 1024);
 
 	/* Failure */
 	if (!fff) return (FALSE);
@@ -1155,7 +1155,7 @@ static bool do_cmd_view_map_aux(char c, int town)
 	}
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Display the file contents */
 	(void)show_file(file_name, title, 0, 0);

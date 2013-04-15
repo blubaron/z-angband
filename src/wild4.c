@@ -333,17 +333,17 @@ bool count_wilderness(int option)
     }
 	}
 
-  // count wilderness block terrain types?
+	// count wilderness block terrain types?
 
-  // we have the count, now display the information onscreen
-  {
-	  FILE *fff;
-	  char file_name[1024];
-	  char tmp_str[256];
-    cptr store_name;
+	// we have the count, now display the information onscreen
+	{
+		ang_file *fff;
+		char file_name[1024];
+		char tmp_str[256];
+		cptr store_name;
 
-    // Open a temporary file
-	  fff = my_fopen_temp(file_name, 1024);
+		// Open a temporary file
+	  fff = file_open_temp(file_name, 1024);
 
 	  // Failure
 	  if (!fff) return 0;
@@ -415,7 +415,7 @@ bool count_wilderness(int option)
 		  froff(fff, "%s", tmp_str);
     }
 	  // Close the file
-	  my_fclose(fff);
+	  file_close(fff);
 
 	  // Display the file contents
 	  (void)show_file(file_name, "Building types", 0, 0);

@@ -154,7 +154,7 @@ static bool sound_sdl_init(bool no_cache)
 
 	/* Parse the file */
 	/* Lines are always of the form "name = sample [sample ...]" */
-	while (file_getl(fff, buffer, sizeof(buffer)))
+	while (0 <= file_getl(fff, buffer, sizeof(buffer)))
 	{
 		char *msg_name;
 		char *sample_list;

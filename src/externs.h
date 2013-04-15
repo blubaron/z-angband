@@ -7,6 +7,10 @@
  * (z-virt.h, z-util.h, z-form.h, term.h, random.h)
  */
 
+/**
+ * An opaque file handle for Angband file handling.
+ */
+#include "z-file.h"
 
 /*
  * Automatically generated "variable" declarations
@@ -406,8 +410,8 @@ extern void do_cmd_feeling(void);
 extern void do_cmd_load_screen(void);
 extern void do_cmd_save_screen(void);
 extern bool do_cmd_knowledge_pets(int dummy);
-extern void do_cmd_knowledge_spells_aux(FILE *fff, int realm, bool color);
-extern void dump_town_info(FILE *fff, int town, bool ignore);
+extern void do_cmd_knowledge_spells_aux(ang_file *fff, int realm, bool color);
+extern void dump_town_info(ang_file *fff, int town, bool ignore);
 extern void do_cmd_knowledge(void);
 extern void plural_aux(char *Name);
 extern void do_cmd_checkquest(void);
@@ -699,7 +703,7 @@ extern object_type *test_floor(int *num, cave_type *c_ptr, int mode);
 extern void show_floor(int x, int y);
 extern bool object_average(object_type *o_ptr);
 extern bool object_good(object_type *o_ptr);
-extern void dump_full_item(FILE *fff, object_type *o_ptr);
+extern void dump_full_item(ang_file *fff, object_type *o_ptr);
 extern int object_weight(object_type *o_ptr);
 extern void strip_name(char *buf, int k_idx);
 
@@ -1153,7 +1157,7 @@ extern void do_cmd_mindcraft(void);
 extern bool player_has_mut(int mutation);
 extern bool gain_mutation(int choose_mut);
 extern bool lose_mutation(int choose_mut);
-extern void dump_mutations(FILE *OutFile);
+extern void dump_mutations(ang_file *OutFile);
 extern bool do_cmd_knowledge_mutations(int dummy);
 extern int count_mutations(void);
 extern void mutation_power_aux(const mutation_type *mut_ptr);
@@ -1209,7 +1213,7 @@ extern void refresh_quest_stair(place_type *pl_ptr);
 extern cptr virtue[MAX_VIRTUE];
 extern void get_virtues(void);
 extern void chg_virtue(int virtue, int amount);
-extern void dump_virtues(FILE *OutFile);
+extern void dump_virtues(ang_file *OutFile);
 
 /* notes.c */
 extern cptr notes_file(void);
@@ -1270,7 +1274,7 @@ extern bool monster_quest_guild_theme(const monster_race *r_ptr);
 extern void set_quest_giver(quest_type *q_ptr);
 extern void discover_wild_quest(int q_num);
 extern cptr describe_quest_location(cptr * dirn, int x, int y, bool known);
-extern void dump_castle_info(FILE *fff, int place);
+extern void dump_castle_info(ang_file *fff, int place);
 extern errr init_quests(void);
 extern void init_player_quests(void);
 extern void init_build_quests(void);
@@ -1284,7 +1288,7 @@ extern void trigger_quest_fail(u16b num);
 extern quest_type *lookup_quest_building(const store_type *b_ptr);
 extern int lookup_quest_building_next(const store_type *b_ptr);
 extern void reward_quest(quest_type *q_ptr);
-extern bool do_cmd_knowledge_quests_aux(int place_num, FILE *fff);
+extern bool do_cmd_knowledge_quests_aux(int place_num, ang_file *fff);
 extern void request_quest(const store_type *b_ptr, int scale);
 extern bool do_cmd_knowledge_quests(int dummy);
 extern store_type *get_loaner(void);

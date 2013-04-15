@@ -27,6 +27,23 @@
 #endif /* __MAKEDEPEND__ */
 #include "png.h"
 
+/* file io routines for the png library */
+static void png_read_ang_file(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	ang_file *fff = (ang_file*) png_get_io_ptr(png_ptr);
+	(void) file_read(fff, (char*)data, length);
+}
+static void png_write_ang_file(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	ang_file *fff = (ang_file*) png_get_io_ptr(png_ptr);
+	(void) file_write(fff, (const char*)data, length);
+}
+static void png_write_flush_ang_file(png_structp png_ptr)
+{
+	ang_file *fff = (ang_file*) png_get_io_ptr(png_ptr);
+	(void)file_flush(fff);
+}
+
 int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	int *ret_width, int *ret_height, bool premultiply)
 {
@@ -51,17 +68,17 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	int scr_depth = DefaultDepth(dpy, DefaultScreen(dpy));
 	
 	/* open the file and test it for being a png */
-	FILE *fp = my_fopen(filename, "rb");
+	ang_file *fp = file_open(filename, MODE_READ, FTYPE_RAW);
 	if (!fp)
 	{
 		/*plog_fmt("Unable to open PNG file.");*/
 		return -4;
 	}
 
-	fread(header, 1, 8, fp);
+	file_read(fp, (char*)header, 8);
 	if (png_sig_cmp(header, 0, 8)) {
 		plog_fmt("Unable to open PNG file - not a PNG file. %s", filename);
-		my_fclose(fp);
+		file_close(fp);
 		return -2;
 	}
 	
@@ -70,7 +87,7 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	if(!png_ptr)
 	{
 		plog("Unable to initialize PNG library");
-		my_fclose(fp);
+		file_close(fp);
 		return -3;
 	}
 	
@@ -84,7 +101,7 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	}
 	
 	/* setup error handling for init */
-	png_init_io(png_ptr, fp);
+	png_set_read_fn(png_ptr, fp, png_read_ang_file);
 	png_set_sig_bytes(png_ptr, 8);
 	
 	png_read_info(png_ptr, info_ptr);
@@ -182,7 +199,7 @@ int LoadPNG(Display *dpy, char *filename, XImage **ret_color, XImage **ret_mask,
 	png_read_image(png_ptr, row_pointers);
 
 	/* we are done with the file pointer, so close it */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* release the row_pointer memory */
 	if (row_pointers) {
@@ -333,7 +350,7 @@ int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
   }
 
   // open the file and test it for being a png
-  FILE *fp = fopen(filename, "wb");
+  ang_file *fp = file_open(filename, MODE_WRITE, FTYPE_RAW);
   if (!fp)
   {
     //plog_fmt("Unable to open PNG file.");
@@ -344,7 +361,7 @@ int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if(!png_ptr) {
     //plog_fmt("Unable to initialize PNG library");
-    fclose(fp);
+    file_close(fp);
     return E_FAIL;
   }
 
@@ -362,7 +379,7 @@ int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
 
   if (noerror) {
     // setup error handling for init
-    png_init_io(png_ptr, fp);
+    png_set_write_fn(png_ptr, fp, png_write_ang_file, png_write_flush_ang_file);
 
     png_set_IHDR(png_ptr, info_ptr, width, height,
       bit_depth, color_type, PNG_INTERLACE_NONE,
@@ -506,7 +523,7 @@ int SavePNG(Display *dpy, char *filename, XImage *color, XImage *mask,
   
   // we are done with the file pointer, so close it
   if (fp) {
-    fclose(fp);
+    file_close(fp);
     fp = NULL;
   }
   if (row_pointers) {

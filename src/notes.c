@@ -41,7 +41,7 @@ cptr notes_file(void)
  */
 void output_note(cptr final_note, ...)
 {
-	FILE *fff;
+	ang_file *fff;
 
 	va_list vp;
 
@@ -57,7 +57,7 @@ void output_note(cptr final_note, ...)
 	va_end(vp);
 
 	/* Open notes file */
-	fff = my_fopen(notes_file(), "a");
+	fff = file_open(notes_file(), MODE_APPEND, FTYPE_TEXT);
 
 	/* Failure */
 	if (!fff) return;
@@ -65,7 +65,7 @@ void output_note(cptr final_note, ...)
 	/* Add note, and close note file */
 	froff(fff, "%s", buf);
 
-	my_fclose(fff);
+	file_close(fff);
 }
 
 

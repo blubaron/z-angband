@@ -96,7 +96,7 @@ struct header
 	parse_info_txt_func parse_info_txt;
 };
 
-extern errr init_info_txt(FILE *fp, char *buf, header *head,
+extern errr init_info_txt(ang_file *fp, char *buf, header *head,
 						  parse_info_txt_func parse_info_txt_line);
 
 #ifdef ALLOW_TEMPLATES
@@ -130,10 +130,10 @@ extern header e_head;
 extern header r_head;
 
 /* init1.c */
-extern errr init_w_info_txt(FILE *fp, char *buf);
-extern errr init_t_info_txt(FILE *fp, char *buf);
-extern errr init_mg_info_txt(FILE *fp, char *buf);
-extern errr init_dun_info_txt(FILE *fp, char *buf);
+extern errr init_w_info_txt(ang_file *fp, char *buf);
+extern errr init_t_info_txt(ang_file *fp, char *buf);
+extern errr init_mg_info_txt(ang_file *fp, char *buf);
+extern errr init_dun_info_txt(ang_file *fp, char *buf);
 extern void clear_dun_info(void);
 s32b monster_auto_experience(monster_race *r_ptr, bool verbose);
 

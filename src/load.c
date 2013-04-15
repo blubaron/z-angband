@@ -48,7 +48,7 @@
 /*
  * Local "savefile" pointer
  */
-static FILE *fff;
+static ang_file *fff;
 
 /*
  * Hack -- old "encryption" byte
@@ -182,7 +182,8 @@ static byte sf_get(void)
 	byte c, v;
 
 	/* Get a character, decode the value */
-	c = getc(fff) & 0xFF;
+	/*c = file_getc(fff) & 0xFF;*/
+	file_readc(fff, &c);
 	v = c ^ xor_byte;
 	xor_byte = c;
 
@@ -229,12 +230,17 @@ static void rd_s32b(s32b *ip)
 static void rd_checksum(cptr msg)
 {
 	u32b test;
+	byte c;
 
 	/* Read the checksum out of the file */
-	test = (getc(fff) & 0xFF);
-	test |= ((u32b)((getc(fff) & 0xFF)) << 8);
-	test |= ((u32b)((getc(fff) & 0xFF)) << 16);
-	test |= ((u32b)((getc(fff) & 0xFF)) << 24);
+	file_readc(fff, &c);
+	test = c;
+	file_readc(fff, &c);
+	test |= ((u32b)c << 8);
+	file_readc(fff, &c);
+	test |= ((u32b)c << 16);
+	file_readc(fff, &c);
+	test |= ((u32b)c << 24);
 
 	/* Check it */
 	if (test != checksum && SAVEFILE_VERSION != sf_version)
@@ -3318,7 +3324,7 @@ static errr rd_savefile_new_aux(void)
 						dun_ptr->min_level = 1;
 						dun_ptr->max_level = MAX_DEPTH - 1;
 					}
-          dun_ptr->level_change_step = 1;
+					dun_ptr->level_change_step = 1;
 					/* Rating */
 					rd_s16b(&dun_ptr->rating);
 
@@ -3327,15 +3333,15 @@ static errr rd_savefile_new_aux(void)
 					{
 						rd_u16b(&dun_ptr->rooms);
 						rd_byte(&tmp8u);
-            dun_ptr->floor = tmp8u;
+						dun_ptr->floor = tmp8u;
 						rd_byte(&tmp8u);
-            dun_ptr->wall = tmp8u;
+						dun_ptr->wall = tmp8u;
 						rd_byte(&tmp8u);
-            dun_ptr->perm_wall = tmp8u;
+						dun_ptr->perm_wall = tmp8u;
 
-            for (j = 0; j < 2; j++) {
+						for (j = 0; j < 2; j++) {
 							rd_byte(&dun_ptr->vein[j].shal);
-              dun_ptr->vein[j].deep = dun_ptr->vein[j].shal+4;
+							dun_ptr->vein[j].deep = dun_ptr->vein[j].shal+4;
 							rd_byte(&dun_ptr->vein[j].size);
 							rd_byte(&dun_ptr->vein[j].number);
 						}
@@ -3463,26 +3469,26 @@ static errr rd_savefile_new_aux(void)
 		}
 	}
 
-  /* make sure we have a home place set */
-  if ((p_ptr->home_place_num == 0) && p_ptr->place_num) {
-    /* check the place the player is in */
-    place_type *pl_ptr;
-  	s16b tmp16s;
+	/* make sure we have a home place set */
+	if ((p_ptr->home_place_num == 0) && p_ptr->place_num) {
+		/* check the place the player is in */
+		place_type *pl_ptr;
+		s16b tmp16s;
 
-    pl_ptr = &place[p_ptr->place_num];
-    if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-    {
-	    for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
-	    {
-        if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
-        {
-          p_ptr->home_place_num = i;
-          p_ptr->home_store_num = tmp16s;
-          break;
-        }
-      }
-    }
-  }
+		pl_ptr = &place[p_ptr->place_num];
+		if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
+		{
+			for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
+			{
+				if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
+				{
+					p_ptr->home_place_num = i;
+					p_ptr->home_store_num = tmp16s;
+					break;
+				}
+			}
+		}
+	}
   if (p_ptr->home_place_num == 0) {
     place_type *pl_ptr;
   	s16b tmp16s;
@@ -3685,7 +3691,7 @@ errr rd_savefile_new(void)
 	safe_setuid_grab();
 
 	/* The savefile is a binary file */
-	fff = my_fopen(savefile, "rb");
+	fff = file_open(savefile, MODE_READ, FTYPE_RAW);
 
 	/* Drop permissions */
 	safe_setuid_drop();
@@ -3697,10 +3703,10 @@ errr rd_savefile_new(void)
 	err = rd_savefile_new_aux();
 
 	/* Check for errors */
-	if (ferror(fff)) err = -1;
+	if (file_error(fff)) err = -1;
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Result */
 	return (err);

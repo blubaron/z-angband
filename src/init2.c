@@ -218,19 +218,19 @@ void create_user_dirs(void)
 {
 #ifndef VM
 	/* Build the path to the variant-specific user directory */
-	my_mkdir(ANGBAND_DIR_USER, 0700);
+	dir_create(ANGBAND_DIR_USER, 0700);
 
 	/* Create the scores sub-directory */
-	my_mkdir(ANGBAND_DIR_APEX, 0700);
+	dir_create(ANGBAND_DIR_APEX, 0700);
 
 	/* Create the bone sub-directory */
-	my_mkdir(ANGBAND_DIR_BONE, 0700);
+	dir_create(ANGBAND_DIR_BONE, 0700);
 
 	/* Create the data sub-directory */
-	my_mkdir(ANGBAND_DIR_DATA, 0700);
+	dir_create(ANGBAND_DIR_DATA, 0700);
 
 	/* Create the savefile sub-directory */
-	my_mkdir(ANGBAND_DIR_SAVE, 0700);
+	dir_create(ANGBAND_DIR_SAVE, 0700);
 #endif /* VM */
 }
 
@@ -480,7 +480,7 @@ static errr init_info(cptr filename, header *head,
 
 	errr err = 1;
 
-	FILE *fp;
+	ang_file *fp;
 
 	/* General buffer */
 	char buf[1024];
@@ -537,7 +537,7 @@ static errr init_info(cptr filename, header *head,
 		path_make(buf, ANGBAND_DIR_EDIT, format("%s.txt", filename));
 
 		/* Open the file */
-		fp = my_fopen(buf, "r");
+		fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 		/* Parse it */
 		if (!fp) quit_fmt("Cannot open '%s.txt' file.", filename);
@@ -546,7 +546,7 @@ static errr init_info(cptr filename, header *head,
 		err = init_info_txt(fp, buf, head, head->parse_info_txt);
 
 		/* Close it */
-		my_fclose(fp);
+		file_close(fp);
 
 		/* Errors */
 		if (err) display_parse_error(filename, err, buf);
@@ -912,7 +912,7 @@ errr init_w_info(void)
 {
 	errr err;
 
-	FILE *fp;
+	ang_file *fp;
 
 	/* General buffer */
 	char buf[1024];
@@ -928,7 +928,7 @@ errr init_w_info(void)
 	path_make(buf, ANGBAND_DIR_EDIT, "wilderns.txt");
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Parse it */
 	if (!fp) quit("Cannot open 'wilderns.txt' file.");
@@ -937,7 +937,7 @@ errr init_w_info(void)
 	err = init_w_info_txt(fp, buf);
 
 	/* Close it */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Errors */
 	if (err)
@@ -969,7 +969,7 @@ errr init_t_info(void)
 {
 	errr err;
 
-	FILE *fp;
+	ang_file *fp;
 
 	/* General buffer */
 	char buf[1024];
@@ -985,7 +985,7 @@ errr init_t_info(void)
 	path_make(buf, ANGBAND_DIR_EDIT, "t_info.txt");
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Parse it */
 	if (!fp) quit("Cannot open 't_info.txt' file.");
@@ -994,7 +994,7 @@ errr init_t_info(void)
 	err = init_t_info_txt(fp, buf);
 
 	/* Close it */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Errors */
 	if (err)
@@ -1026,7 +1026,7 @@ static errr init_mg_info(void)
 {
 	errr err;
 
-	FILE *fp;
+	ang_file *fp;
 
 	/* General buffer */
 	char buf[1024];
@@ -1039,7 +1039,7 @@ static errr init_mg_info(void)
 	path_make(buf, ANGBAND_DIR_EDIT, "mon_grp.txt");
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Parse it */
 	if (!fp) quit("Cannot open 'mon_grp.txt' file.");
@@ -1050,7 +1050,7 @@ static errr init_mg_info(void)
 	err = init_mg_info_txt(fp, buf);
 
 	/* Close it */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Errors */
 	if (err)
@@ -1077,12 +1077,12 @@ static errr init_mg_info(void)
 /*
  * Initialize the "dungeons" array
  */
-errr init_dun_info_txt(FILE *fp, char *buf);
+errr init_dun_info_txt(ang_file *fp, char *buf);
 
 static errr init_dun_info(void)
 {
 	errr err;
-	FILE *fp;
+	ang_file *fp;
 
 	/* General buffer */
 	char buf[1024];
@@ -1097,7 +1097,7 @@ static errr init_dun_info(void)
 	path_make(buf, ANGBAND_DIR_EDIT, "dungeons.txt");
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Parse it */
 	if (!fp) quit("Cannot open 'dungeons.txt' file.");
@@ -1106,7 +1106,7 @@ static errr init_dun_info(void)
 	err = init_dun_info_txt(fp, buf);
 
 	/* Close it */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Errors */
 	if (err)
@@ -1571,7 +1571,7 @@ void display_introduction()
 
 	int mode = 0644;
 
-	FILE *fp;
+	ang_file *fp;
 
 	char buf[1024];
 
@@ -1584,6 +1584,7 @@ void display_introduction()
 	fd = fd_open(buf, O_RDONLY);
 
 	/* Failure */
+	/*if (!file_exists(buf)) {*/
 	if (fd < 0)
 	{
 		/* Message */
@@ -1606,7 +1607,7 @@ void display_introduction()
 	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
 
 	/* Open the News file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Dump */
 	if (fp)
@@ -1614,14 +1615,14 @@ void display_introduction()
 		int i = 0;
 
 		/* Dump the file to the screen */
-		while (0 == my_fgets(fp, buf, 1024))
+		while (0 <= file_getl(fp, buf, 1024))
 		{
 			/* Display and advance */
 			put_fstr(0, i++, buf);
 		}
 
 		/* Close */
-		my_fclose(fp);
+		file_close(fp);
 	}
 
 	/* Display version number */

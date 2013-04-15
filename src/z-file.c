@@ -173,7 +173,7 @@ static errr path_temp(char *buf, int max)
 	return (0);
 }
 
-#endif /* HAVE_MKSTEMP */
+#endif /* !HAVE_MKSTEMP */
 
 
 /*
@@ -748,7 +748,7 @@ errr fd_close(int fd)
 #elif defined(HAVE_MKDIR) || defined(MACH_O_CARBON)
 # define my_mkdir(path, perms) mkdir(path, perms)
 #else
-# define my_mkdir(path, perms) FALSE
+# define my_mkdir(path, perms) -1
 #endif
 #if  0
 /*
@@ -1082,7 +1082,8 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 	path_parse(buf, sizeof(buf), fname);
 
 	switch (mode) {
-		case MODE_WRITE: { 
+		case MODE_WRITE: {
+#if 0
 			if (ftype == FTYPE_SAVE) {
 				/* open only if the file does not exist */
 				int fd;
@@ -1093,13 +1094,26 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 				} else {
 					f->fh = fdopen(fd, "wb");
 				}
-			} else {
+			} else
+#endif
+			if ((ftype == FTYPE_TEXT) || (ftype == FTYPE_HTML)) {
+				f->fh = fopen(buf, "w");
+			} else
+			{
 				f->fh = fopen(buf, "wb");
 			}
 			break;
 		}
 
-		case MODE_READ: f->fh = fopen(buf, "rb"); break;
+		case MODE_READ: {
+			if ((ftype == FTYPE_TEXT) || (ftype == FTYPE_HTML)) {
+				f->fh = fopen(buf, "r");
+			} else
+			{
+				f->fh = fopen(buf, "rb");
+			}
+			break;
+		}
 
 		case MODE_APPEND: f->fh = fopen(buf, "a+"); break;
 
@@ -1112,7 +1126,7 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 		return NULL;
 	}
 
-	f->fname = string_make(buf);
+	f->fname = (char*)string_make(buf);
 	f->mode = mode;
 
 	if (mode != MODE_READ && file_open_hook)
@@ -1121,6 +1135,46 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 	return f;
 }
 
+#ifdef HAVE_MKSTEMP
+
+ang_file *file_open_temp(char *buf, int max)
+{
+	int fd;
+	ang_file *f = ZNEW(ang_file);
+
+	/* Prepare the buffer for mkstemp */
+	strncpy(buf, "/tmp/anXXXXXX", max);
+
+	/* Secure creation of a temporary file */
+	fd = mkstemp(buf);
+
+	/* Check the file-descriptor */
+	if (fd < 0) {
+		FREE(f);
+		return (NULL);
+	}
+	f->fh = fdopen(fd, "w");
+	if (f->fh == NULL)
+	{
+		FREE(f);
+		return NULL;
+	}
+
+	/* Return a file stream */
+	return (f);
+}
+
+#else  /* HAVE_MKSTEMP */
+ang_file *file_open_temp(char *buf, int max)
+{
+	/* Generate a temporary filename */
+	if (path_temp(buf, max)) return (NULL);
+
+	/* Open the file */
+	return (file_open(buf, MODE_WRITE, FTYPE_TEXT));
+}
+
+#endif /* HAVE_MKSTEMP */
 
 /*
  * Close file handle 'f'.
@@ -1136,6 +1190,27 @@ bool file_close(ang_file *f)
 	return TRUE;
 }
 
+int file_flush(ang_file *f)
+{
+	return fflush(f->fh);
+}
+bool file_eof(ang_file *f)
+{
+	return feof(f->fh);
+}
+int file_error(ang_file *f)
+{
+	return ferror(f->fh);
+}
+
+bool file_getpos(ang_file *f, u32b *retpos)
+{
+	if (retpos) {
+		*retpos = ftell(f->fh);
+		return TRUE;
+	}
+	return FALSE;
+}
 
 
 /** Locking functions **/
@@ -1236,7 +1311,7 @@ bool file_write(ang_file *f, const char *buf, size_t n)
  */
 #define TAB_COLUMNS 4
 
-bool file_getl(ang_file *f, char *buf, size_t len)
+errr file_getl(ang_file *f, char *buf, size_t len)
 {
 	bool seen_cr = FALSE;
 	byte b;
@@ -1252,7 +1327,69 @@ bool file_getl(ang_file *f, char *buf, size_t len)
 		if (!file_readc(f, &b))
 		{
 			buf[i] = '\0';
-			return (i == 0) ? FALSE : TRUE;
+			return (i == 0) ? (-1) : i;
+		}
+
+		c = (char) b;
+
+		if (c == '\r')
+		{
+			seen_cr = TRUE;
+			continue;
+		}
+
+		if (seen_cr && c != '\n')
+		{
+			fseek(f->fh, -1, SEEK_CUR);
+			buf[i] = '\0';
+			return TRUE;
+		}
+
+		if (c == '\n')
+		{
+			buf[i] = '\0';
+			return TRUE;
+		}
+
+		/* Expand tabs */
+		if (c == '\t')
+		{
+			/* Next tab stop */
+			size_t tabstop = ((i + TAB_COLUMNS) / TAB_COLUMNS) * TAB_COLUMNS;
+			if (tabstop >= len) break;
+
+			/* Convert to spaces */
+			while (i < tabstop)
+				buf[i++] = ' ';
+
+			continue;
+		}
+		if (isprint(c)) {
+			buf[i++] = c;
+		}
+	}
+
+	buf[i] = '\0';
+	return i;
+}
+
+errr file_getl_raw(ang_file *f, char *buf, size_t len)
+{
+	bool seen_cr = FALSE;
+	byte b;
+	size_t i = 0;
+
+	/* Leave a byte for the terminating 0 */
+	size_t max_len = len - 1;
+
+	while (i < max_len)
+	{
+		char c;
+
+		if (!file_readc(f, &b))
+		{
+			buf[i] = '\0';
+			return (i == 0) ? (-1) : i;
 		}
 
 		c = (char) b;
@@ -1294,9 +1431,8 @@ bool file_getl(ang_file *f, char *buf, size_t len)
 	}
 
 	buf[i] = '\0';
-	return TRUE;
+	return i;
 }
-
 /*
  * Append a line of text 'buf' to the end of file 'f', using system-dependent
  * line ending.
@@ -1326,7 +1462,8 @@ bool file_putf(ang_file *f, const char *fmt, ...)
 	if (!f) return FALSE;
 
 	va_start(vp, fmt);
-	status = file_vputf(f, fmt, vp);
+	vfprintf(f->fh, fmt, vp);
+	status = TRUE;/*file_vputf(f, fmt, &vp);*/
 	va_end(vp);
 
 	return status;
@@ -1344,7 +1481,7 @@ bool file_vputf(ang_file *f, const char *fmt, va_list vp)
 
 	if (!f) return FALSE;
 
-	(void)vstrnfmt(buf, sizeof(buf), fmt, vp);
+	(void)vstrnfmt(buf, sizeof(buf), fmt, &vp);
 	return file_put(f, buf);
 }
 
@@ -1361,7 +1498,7 @@ bool x_file_putf(ang_file *f, const char *fmt, ...)
  	va_start(vp, fmt);
 
  	/* Format the args, save the length */
- 	(void)vstrnfmt(buf, sizeof(buf), fmt, vp);
+ 	(void)vstrnfmt(buf, sizeof(buf), fmt, &vp);
 
  	/* End the Varargs Stuff */
  	va_end(vp);
@@ -1386,13 +1523,17 @@ bool dir_exists(const char *path)
 }
 
 #ifdef HAVE_STAT
-bool dir_create(const char *path)
+bool dir_create(const char *path, u16b permissions)
 {
 	const char *ptr;
 	char buf[512];
 
 	/* If the directory already exists then we're done */
 	if (dir_exists(path)) return TRUE;
+
+	if (permissions == 0) {
+		permissions = 0755;
+	}
 
 	#ifdef WINDOWS
 	/* If we're on windows, we need to skip past the "C:" part. */
@@ -1403,8 +1544,8 @@ bool dir_create(const char *path)
 	 * create the path segment if it doesn't already exist. */
 	for (ptr = path; *ptr; ptr++)
 	{
-		if (*ptr == PATH_SEPC)
-		{
+		/*if (*ptr == PATH_SEP)*/
+		if (strcmp(ptr, PATH_SEP) == 0) {
 			/* Find the length of the parent path string */
 			size_t len = (size_t)(ptr - path);
 
@@ -1412,7 +1553,8 @@ bool dir_create(const char *path)
 			if (len == 0) continue;
 
 			/* If this is a duplicate path separator, continue */
-			if (*(ptr - 1) == PATH_SEPC) continue;
+			if (*(ptr - 1) == PATH_SEP) continue;
+			if (strcmp((ptr-1), PATH_SEP) == 0) continue;
 
 			/* We can't handle really big filenames */
 			if (len - 1 > 512) return FALSE;
@@ -1424,14 +1566,17 @@ bool dir_create(const char *path)
 			if (dir_exists(buf)) continue;
 
 			/* The parent doesn't exist, so create it or fail */
-			if (my_mkdir(buf, 0755) != 0) return FALSE;
+			if (my_mkdir(buf, permissions) != 0) return FALSE;
 		}
 	}
-	return my_mkdir(path, 0755) == 0 ? TRUE : FALSE;
+	return my_mkdir(path, permissions) == 0 ? TRUE : FALSE;
 }
 
 #else /* HAVE_STAT */
-bool dir_create(const char *path) { return FALSE; }
+bool dir_create(const char *path, u16b permissions)
+{
+	return my_mkdir(path, permissions) == 0 ? TRUE : FALSE;
+}
 #endif /* !HAVE_STAT */
 
 /*** Directory scanning API ***/

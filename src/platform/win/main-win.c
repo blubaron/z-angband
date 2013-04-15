@@ -975,11 +975,8 @@ static void load_prefs(void)
 
 	char buf[1024];
 	bool first_start;
-	FILE *exists;
 
-	exists = my_fopen(ini_file, "r");
-	if (exists) {
-		my_fclose(exists);
+	if (file_exists(ini_file)) {
 		first_start = FALSE;
 	} else {
 		first_start = TRUE;

@@ -895,7 +895,7 @@ static cptr process_pref_file_expr(char **sp, char *fp)
  */
 static errr process_pref_file_aux(cptr name)
 {
-	FILE *fp;
+	ang_file *fp;
 
 	char buf[1024];
 
@@ -909,14 +909,14 @@ static errr process_pref_file_aux(cptr name)
 
 
 	/* Open the file */
-	fp = my_fopen(name, "r");
+	fp = file_open(name, MODE_READ, FTYPE_TEXT);
 
 	/* No such file */
 	if (!fp) return (-1);
 
 
 	/* Process the file */
-	while (0 == my_fgets(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, 1024))
 	{
 		/* Count lines */
 		line++;
@@ -990,7 +990,7 @@ static errr process_pref_file_aux(cptr name)
 	}
 
 	/* Close the file */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Result */
 	return (err);
@@ -2769,7 +2769,7 @@ errr file_character(cptr name, bool full)
 	char c;
 	cptr paren = ")";
 	int fd = -1;
-	FILE *fff = NULL;
+	ang_file *fff = NULL;
 	store_type *st_ptr;
 	char buf[1024];
 
@@ -2797,7 +2797,7 @@ errr file_character(cptr name, bool full)
 	}
 
 	/* Open the non-existing file */
-	if (fd < 0) fff = my_fopen(buf, "w");
+	if (fd < 0) fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Invalid file */
 	if (!fff)
@@ -3219,7 +3219,7 @@ errr file_character(cptr name, bool full)
 	froff(fff, "\n\n");
 
 	/* Close it */
-	my_fclose(fff);
+	file_close(fff);
 
 
 	/* Message */
@@ -3286,7 +3286,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	bool menu = FALSE;
 
 	/* Current help file */
-	FILE *fff = NULL;
+	ang_file *fff = NULL;
 
 	/* Find this string (if any) */
 	cptr find = NULL;
@@ -3371,7 +3371,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		strcpy(path, name);
 
 		/* Open */
-		fff = my_fopen(path, "r");
+		fff = file_open(path, MODE_READ, FTYPE_TEXT);
 	}
 
 	/* Look in "help" */
@@ -3384,7 +3384,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		path_make(path, ANGBAND_DIR_HELP, name);
 
 		/* Open the file */
-		fff = my_fopen(path, "r");
+		fff = file_open(path, MODE_READ, FTYPE_TEXT);
 	}
 
 	/* Look in "info" */
@@ -3397,7 +3397,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		path_make(path, ANGBAND_DIR_INFO, name);
 
 		/* Open the file */
-		fff = my_fopen(path, "r");
+		fff = file_open(path, MODE_READ, FTYPE_TEXT);
 	}
 
 	/* Oops */
@@ -3427,7 +3427,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	while (TRUE)
 	{
 		/* Read a line or stop */
-		if (my_raw_fgets(fff, buf, 1024)) break;
+		if (file_getl_raw(fff, buf, 1024) < 0) break;
 
 		/* XXX Parse "menu" items */
 		if (prefix(buf, "***** "))
@@ -3498,10 +3498,10 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		if (next > line)
 		{
 			/* Close it */
-			my_fclose(fff);
+			file_close(fff);
 
 			/* Hack -- Re-Open the file */
-			fff = my_fopen(path, "r");
+			fff = file_open(path, MODE_READ, FTYPE_TEXT);
 
 			/* Oops */
 			if (!fff)
@@ -3518,7 +3518,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		while (next < line)
 		{
 			/* Get a line */
-			if (my_raw_fgets(fff, buf, 1024)) break;
+			if (file_getl_raw(fff, buf, 1024) < 0) break;
 
 			/* Skip tags/links */
 			if (prefix(buf, "***** ")) continue;
@@ -3534,7 +3534,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			if (!i) line = next;
 
 			/* Get a line of the file or stop */
-			if (my_raw_fgets(fff, buf, 1024)) break;
+			if (file_getl_raw(fff, buf, 1024) < 0) break;
 
 			/* Hack -- skip "special" lines */
 			if (prefix(buf, "***** ")) continue;
@@ -3660,17 +3660,17 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			if (mb == 1) {
 				/* if a menu, select the option, otherwise do nothing */
 				if (menu && (my > 1) && (my < hgt-2)) {
-					fpos_t pos;
+					u32b pos;
 					/* move the file pointer to the beginning of the file */
 					/* TODO: this is not portable */
-					fgetpos(fff, &pos);
-					fseek(fff, 0, SEEK_SET);
+					file_getpos(fff, &pos);
+					file_seek(fff, 0);
 
 					next = 0;
 					/* Goto the selected line */
 					while (next < line + my-2) {
 						/* Get a line */
-						if (my_raw_fgets(fff, buf, 1024)) break;
+						if (file_getl_raw(fff, buf, 1024) < 0) break;
 
 						/* Skip tags/links */
 						if (prefix(buf, "***** ")) continue;
@@ -3682,7 +3682,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 					/* get the desired line */
 					while (mx == 0) {
 						/* Get a line */
-						if (my_raw_fgets(fff, buf, 1024)) break;
+						if (file_getl_raw(fff, buf, 1024) < 0) break;
 
 						/* Skip tags/links */
 						if (prefix(buf, "***** ")) continue;
@@ -3711,8 +3711,8 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						}
 					}
 
-					fsetpos(fff, &pos);
-				//k = ESCAPE;
+					file_seek(fff, pos);
+				/*k = ESCAPE;*/
 				} else
 				if (size > hgt - 4) {
 					/* move the page up or down */
@@ -3889,7 +3889,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		/* Dump to file */
 		if (k == '|')
 		{
-			FILE *ffp;
+			ang_file *ffp;
 			char outfile[1024];
 			char xtmp[82];
 
@@ -3906,13 +3906,13 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			path_make(outfile, ANGBAND_DIR_USER, xtmp);
 
 			/* Close the input file */
-			my_fclose(fff);
+			file_close(fff);
 
 			/* Hack -- Re-Open the input file */
-			fff = my_fopen(path, "r");
+			fff = file_open(path, MODE_READ, FTYPE_TEXT);
 
 			/* Open the output file */
-			ffp = my_fopen(outfile, "w");
+			ffp = file_open(outfile, MODE_WRITE, FTYPE_TEXT);
 
 			/* Oops */
 			if (!(fff && ffp))
@@ -3923,17 +3923,17 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			}
 
 			/* Write the file line by line */
-			while (!my_raw_fgets(fff, xtmp, 80))
+			while (0 <= file_getl_raw(fff, xtmp, 80))
 			{
 				froff(ffp, "%s\n", xtmp);
 			}
 
 			/* Close the files */
-			my_fclose(fff);
-			my_fclose(ffp);
+			file_close(fff);
+			file_close(ffp);
 
 			/* Hack -- Re-Open the input file */
-			fff = my_fopen(path, "r");
+			fff = file_open(path, MODE_READ, FTYPE_TEXT);
 		}
 
 		/* Exit on escape */
@@ -3947,7 +3947,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 	button_restore();
 
 	/* Close the file */
-	my_fclose(fff);
+	file_close(fff);
 
 	/* Hack - change the redraw hook so bigscreen works */
 	angband_term[0]->resize_hook = old_hook;
@@ -4292,15 +4292,15 @@ void do_cmd_save_game(int is_autosave)
 
 		strnfmt(oldsf, 1024, "%s", savefile);
 		/*strnfmt(newsf, 1024, "%s.auto", savefile);
-     * add a second autosave slot, for additional protection */
-    //if (autosave_freq & 1) {
-    if (sf_saves & 1) {
-  		strnfmt(newsf, 1024, "%s.auto1", savefile);
-      //autosave_freq -= 1;
-    } else {
-  		strnfmt(newsf, 1024, "%s.auto", savefile);
-      //autosave_freq += 1;
-    }
+		 * add a second autosave slot, for additional protection */
+		//if (autosave_freq & 1) {
+		if (sf_saves & 1) {
+			strnfmt(newsf, 1024, "%s.auto1", savefile);
+			//autosave_freq -= 1;
+		} else {
+			strnfmt(newsf, 1024, "%s.auto", savefile);
+			//autosave_freq += 1;
+		}
 
 		/* Grab permissions */
 		safe_setuid_grab();
@@ -4321,10 +4321,10 @@ void do_cmd_save_game(int is_autosave)
 			safe_setuid_grab();
 			(void)fd_kill(oldsf);
 			(void)fd_move(newsf,oldsf);
-    } else {
-      /* do not include this in save count */
-      sf_saves--;
-    }
+		} else {
+			/* do not include this in save count */
+			sf_saves--;
+		}
 	}
 }
 
@@ -4347,7 +4347,7 @@ void do_cmd_save_and_exit(void)
  */
 errr get_rnd_line(cptr file_name, int entry, char *output)
 {
-	FILE *fp;
+	ang_file *fp;
 	char buf[1024];
 	int line, counter, test, numentries;
 
@@ -4355,7 +4355,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 	path_make(buf, ANGBAND_DIR_FILE, file_name);
 
 	/* Open the file */
-	fp = my_fopen(buf, "r");
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Failed */
 	if (!fp) return (-1);
@@ -4364,7 +4364,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 	while (TRUE)
 	{
 		/* Get a line from the file */
-		if (my_fgets(fp, buf, 1024) == 0)
+		if (file_getl(fp, buf, 1024) >= 0)
 		{
 			/* Look for lines starting with 'N:' */
 			if ((buf[0] == 'N') && (buf[1] == ':'))
@@ -4383,7 +4383,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 					/* Error while converting the monster number */
 					msgf("Error - end of file.");
 
-					my_fclose(fp);
+					file_close(fp);
 					return (-1);
 				}
 			}
@@ -4391,7 +4391,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 		else
 		{
 			/* Reached end of file */
-			my_fclose(fp);
+			file_close(fp);
 			return (-1);
 		}
 
@@ -4401,7 +4401,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 	while (TRUE)
 	{
 		/* Get the line */
-		if (my_fgets(fp, buf, 1024) == 0)
+		if (file_getl(fp, buf, 1024) >= 0)
 		{
 			/* Look for the number of entries */
 			if (isdigit(buf[0]))
@@ -4416,7 +4416,7 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 			/* Reached end of file without finding the number */
 			msgf("Error - end of file.");
 
-			my_fclose(fp);
+			file_close(fp);
 			return (-1);
 		}
 	}
@@ -4432,16 +4432,16 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 			/* Try to read the line, skipping comments */
 			while (TRUE)
 			{
-				test = my_fgets(fp, buf, 1024);
-				if (test != 0 || buf[0] != '#') break;
+				test = file_getl(fp, buf, 1024);
+				if (test < 0 || buf[0] != '#') break;
 			}
 
-			if (test != 0)
+			if (test < 0)
 			{
 				/* Error - End of file */
 				msgf("Error - end of file.");
 
-				my_fclose(fp);
+				file_close(fp);
 				return (-1);
 			}
 		}
@@ -4452,13 +4452,13 @@ errr get_rnd_line(cptr file_name, int entry, char *output)
 	else
 	{
 		/* Close the file */
-		my_fclose(fp);
+		file_close(fp);
 
 		return (-1);
 	}
 
 	/* Close the file */
-	my_fclose(fp);
+	file_close(fp);
 
 	/* Success */
 	return (0);
