@@ -1960,146 +1960,98 @@ static bool wr_savefile_new(void)
 
 
 /*
- * Medium level player saver
- *
- * XXX XXX XXX Angband 2.8.0 will use "fd" instead of "fff" if possible
- */
-static bool save_player_aux(char *name)
-{
-	bool ok = FALSE;
-	int fd;
-	int mode = 0644;
-
-
-	/* No file yet */
-	fff = NULL;
-
-
-	/* File type is "SAVE" */
-	FILE_TYPE(FILE_TYPE_SAVE);
-
-
-	/* Grab permissions */
-	safe_setuid_grab();
-
-	/* Create the savefile */
-	fd = fd_make(name, mode);
-
-	/* Drop permissions */
-	safe_setuid_drop();
-
-	/* File is okay */
-	if (fd >= 0) {
-		/* Close the "fd" */
-		(void)fd_close(fd);
-
-		/* Grab permissions */
-		safe_setuid_grab();
-
-		/* Open the savefile */
-		fff = file_open(name, MODE_WRITE, FTYPE_SAVE);
-
-		/* Drop permissions */
-		safe_setuid_drop();
-
-		/* Successful open */
-		if (fff) {
-			/* Write the savefile */
-			if (wr_savefile_new()) ok = TRUE;
-
-			/* Attempt to close it */
-			file_close(fff);
-		}
-
-		/* Grab permissions */
-		safe_setuid_grab();
-
-		/* Remove "broken" files */
-		if (!ok) (void)fd_kill(name);
-
-		/* Drop permissions */
-		safe_setuid_drop();
-	}
-
-
-	/* Failure */
-	if (!ok) return (FALSE);
-
-	/* Successful save */
-	character_saved = TRUE;
-
-	/* Success */
-	return (TRUE);
-}
-
-
-
-/*
  * Attempt to save the player in a savefile
  */
 bool save_player(void)
 {
+	int count = 0;
 	int result = FALSE;
+	char new_savefile[1024];
+	char old_savefile[1024];
 
-	char safe[1024];
-
-	/* New savefile */
-	strnfmt(safe, 1024, "%s.new", savefile);
+  /* Temp filename for old savefile */
+#ifdef VM
+	/* Hack -- support "flat directory" usage on VM/ESA */
+	strnfmt(old_savefile, sizeof(old_savefile), "%so", path);
+	if (file_exists(old_savefile)) {
+		file_delete(old_savefile);
+	}
+#else /* VM */
+	strnfmt(old_savefile, sizeof(old_savefile), "%s%u.old", savefile,Rand_simple(1000000));
+	while (file_exists(old_savefile) && (count++ < 100)) {
+		strnfmt(old_savefile, sizeof(old_savefile), "%s%u%u.old", savefile,Rand_simple(1000000),count);
+	}
+#endif /* VM */
 
 #ifdef VM
 	/* Hack -- support "flat directory" usage on VM/ESA */
-	strnfmt(safe, 1024, "%sn", savefile);
+	strnfmt(new_savefile, sizeof(new_savefile), "%sn", path);
+	if (file_exists(new_savefile)) {
+		file_delete(new_savefile);
+	}
+#else /* VM */
+	count = 0;
+	strnfmt(new_savefile, sizeof(new_savefile), "%s%u.new", savefile,Rand_simple(1000000));
+	while (file_exists(new_savefile) && (count++ < 100)) {
+		strnfmt(new_savefile, sizeof(new_savefile), "%s%u%u.new", savefile,Rand_simple(1000000),count);
+	}
 #endif /* VM */
 
-	/* Grab permissions */
+	/* No file yet */
+	fff = NULL;
+
+	/* File type is "SAVE" */
+	FILE_TYPE(FILE_TYPE_SAVE);
+
+	/* Open the savefile */
 	safe_setuid_grab();
-
-	/* Remove it */
-	(void)fd_kill(safe);
-
-	/* Drop permissions */
+	fff = file_open(new_savefile, MODE_WRITE, FTYPE_SAVE);
 	safe_setuid_drop();
 
 	/* Attempt to save the player */
-	if (save_player_aux(safe)) {
-		char temp[1024];
+	if (fff) {
+		/* Write the savefile */
+		result = wr_savefile_new();
 
-		/* Old savefile */
-		strnfmt(temp, 1024, "%s.old", savefile);
+		/* Attempt to close it */
+		file_close(fff);
+	} else {
+		return (FALSE);
+	}
 
-#ifdef VM
-		/* Hack -- support "flat directory" usage on VM/ESA */
-		strnfmt(temp, 1024, "%so", savefile);
-#endif /* VM */
+	/* check the result */
+	if (result) {
+		/* Successful save */
+		character_saved = TRUE;
 
-		/* Grab permissions */
 		safe_setuid_grab();
 
-		/* Remove it */
-		(void)fd_kill(temp);
+		if (file_exists(savefile))
+			result = file_move(savefile, old_savefile);
 
-		/* Preserve old savefile */
-		(void)fd_move(savefile, temp);
+		if (result) {
+			result = file_move(new_savefile, savefile);
 
-		/* Activate new savefile */
-		(void)fd_move(safe, savefile);
+			if (result)
+				file_delete(old_savefile);
+			else
+				file_move(old_savefile, savefile);
+		} 
 
-		/* Remove preserved savefile */
-		(void)fd_kill(temp);
-
-		/* Drop permissions */
 		safe_setuid_drop();
 
 		/* Hack -- Pretend the character was loaded */
 		character_loaded = TRUE;
 
-		/* Success */
-		result = TRUE;
+		return (result);
 	}
 
+	/* Failure */
+	safe_setuid_grab();
+	file_delete(new_savefile);
+	safe_setuid_drop();
 
-	/* Return the result */
-	return (result);
+  return (FALSE);
 }
 
 
@@ -2235,17 +2187,18 @@ bool load_player(void)
 			message_flush();
 		}
 
-    /* strip autosave extension from filename so further saves use
-     * the typical filename */
-    ext = strstr(savefile,".auto");
-    if (ext && *ext) {
-      *ext = 0;
-    }
-    /* stop immediate saves when loading an autosave */
-    if (autosave_t && autosave_freq
-      && !(turn % ((s32b)autosave_freq * 10))) {
-      turn++;
-    }
+		/* strip autosave extension from filename so further saves use
+		 * the typical filename */
+		ext = strstr(savefile,".auto");
+		if (ext && *ext) {
+			*ext = 0;
+		}
+		/* stop immediate saves when loading an autosave */
+		if (autosave_t && autosave_freq
+		 && !(turn % ((s32b)autosave_freq * 10)))
+		{
+			turn++;
+		}
 
 		/* Player is dead */
 		if (p_ptr->state.is_dead) {
