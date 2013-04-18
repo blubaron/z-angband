@@ -2000,9 +2000,6 @@ bool save_player(void)
 	/* No file yet */
 	fff = NULL;
 
-	/* File type is "SAVE" */
-	FILE_TYPE(FILE_TYPE_SAVE);
-
 	/* Open the savefile */
 	safe_setuid_grab();
 	fff = file_open(new_savefile, MODE_WRITE, FTYPE_SAVE);

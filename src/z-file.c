@@ -1083,11 +1083,19 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 
 	switch (mode) {
 		case MODE_WRITE: {
-#if 0
 			if (ftype == FTYPE_SAVE) {
-				/* open only if the file does not exist */
 				int fd;
+
+				/* File type is "SAVE" */
+				FILE_TYPE(FILE_TYPE_SAVE);
+
+				/* open only if the file does not exist */
+				/* Create the file, fail if exists, write-only, binary */
+#if defined(MACINTOSH)
+				fd = open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY);
+#else
 				fd = open(buf, O_CREAT | O_EXCL | O_WRONLY | O_BINARY, S_IRUSR | S_IWUSR);
+#endif
 				if (fd < 0) {
 					/* there was some error */
 					f->fh = NULL;
@@ -1095,11 +1103,14 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 					f->fh = fdopen(fd, "wb");
 				}
 			} else
-#endif
 			if ((ftype == FTYPE_TEXT) || (ftype == FTYPE_HTML)) {
+				/* File type is "TEXT" */
+				FILE_TYPE(FILE_TYPE_TEXT);
 				f->fh = fopen(buf, "w");
 			} else
 			{
+				/* File type is "DATA" */
+				FILE_TYPE(FILE_TYPE_DATA);
 				f->fh = fopen(buf, "wb");
 			}
 			break;
@@ -1129,8 +1140,16 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 	f->fname = (char*)string_make(buf);
 	f->mode = mode;
 
-	if (mode != MODE_READ && file_open_hook)
-		file_open_hook(buf, ftype);
+	if (mode != MODE_READ) {
+		if (file_open_hook) {
+			file_open_hook(buf, ftype);
+#if defined(MAC_MPW) || defined(MACH_O_CARBON)
+		} else {
+			/* Set file creator and type */
+			if (fd >= 0) fsetfileinfo(buf, _fcreator, _ftype);
+#endif
+		}
+	}
 
 	return f;
 }
