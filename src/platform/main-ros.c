@@ -4864,10 +4864,10 @@ int main(int argc, char *argv[])
 	load_choices();
 	read_alarm_choices();
 #ifdef PRIVATE_USER_PATH
-	init_file_paths(unixify_name(resource_path),unixify_name(resource_path),unixify_name(PRIVATE_USER_PATH));
+	init_file_paths(unixify_name(resource_path),NULL,unixify_name(PRIVATE_USER_PATH));
 	create_user_dirs();
 #else /* PRIVATE_USER_PATH */
-	init_file_paths(unixify_name(resource_path),unixify_name(resource_path),unixify_name(resource_path));
+	init_file_paths(unixify_name(resource_path),NULL,NULL,NULL);
 #endif /* PRIVATE_USER_PATH */
 
 	Start_Hourglass;			/* Paranoia */

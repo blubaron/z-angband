@@ -1149,10 +1149,10 @@ static void init_stuff(void)
 
 	/* Initialize */
 #ifdef PRIVATE_USER_PATH
-	init_file_paths(path,path,PRIVATE_USER_PATH);
+	init_file_paths(path,path,PRIVATE_USER_PATH,NULL);
 	create_user_dirs();
 #else /* PRIVATE_USER_PATH */
-	init_file_paths(path,path,path);
+	init_file_paths(path,path,path,path);
 #endif /* PRIVATE_USER_PATH */
 }
 

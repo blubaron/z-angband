@@ -5903,10 +5903,10 @@ static void init_paths( void )
 	
 	/* Prepare the paths */
 #ifdef PRIVATE_USER_PATH
-	init_file_paths(basepath,basepath,PRIVATE_USER_PATH);
+	init_file_paths(basepath,basepath,PRIVATE_USER_PATH,NULL);
 	create_user_dirs();
 #else /* PRIVATE_USER_PATH */
-	init_file_paths(basepath,basepath,basepath);
+	init_file_paths(basepath,basepath,basepath,NULL);
 #endif /* PRIVATE_USER_PATH */
 }
 

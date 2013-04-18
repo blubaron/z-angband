@@ -5235,9 +5235,9 @@ static void init_stuff(void)
 
 	/* Init the file paths */
 #ifdef PRIVATE_USER_PATH
-	init_file_paths(path,path,PRIVATE_USER_PATH);
+	init_file_paths(path,path,PRIVATE_USER_PATH,NULL);
 #else /* PRIVATE_USER_PATH */
-	init_file_paths(path,path,path);
+	init_file_paths(path,path,path,path);
 #endif /* PRIVATE_USER_PATH */
 
 	/* make sure that the user directories exist */
