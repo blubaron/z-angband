@@ -126,12 +126,13 @@ static int tval_to_idx(u16b x)
 /*
  * Display inventory
  */
+int context_menu_object(const object_type *o_ptr);
+
 void do_cmd_inven(void)
 {
 	object_type *o_ptr;
 	char prompt[256];
 	char *no;
-	int item;
 	int ret = 3;
 
 	/* see if we have a ui override */
@@ -165,10 +166,7 @@ void do_cmd_inven(void)
 				/* Track the object kind */
 				object_kind_track(o_ptr->k_idx);
 
-				/* for now just inspect it */
-				identify_fully_aux(o_ptr);
-
-				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+				while ((ret = context_menu_object(o_ptr)) == 2);
 			}
 		} else {
 			/* Load screen */
@@ -191,7 +189,6 @@ void do_cmd_equip(void)
 	object_type *o_ptr;
 	char prompt[256];
 	char *no;
-	int item;
 	int ret = 3;
 
 	/* see if we have a ui override */
@@ -225,10 +222,7 @@ void do_cmd_equip(void)
 				/* Track the object kind */
 				object_kind_track(o_ptr->k_idx);
 
-				/* for now just inspect it */
-				identify_fully_aux(o_ptr);
-
-				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+				while ((ret = context_menu_object(o_ptr)) == 2);
 			}
 		} else {
 			/* Load screen */
@@ -250,7 +244,6 @@ void do_cmd_inven_floor(void)
 	object_type *o_ptr;
 	char prompt[256];
 	char *no;
-	int item;
 	int ret = 3;
 
 	/* see if we have a ui override */
@@ -284,10 +277,7 @@ void do_cmd_inven_floor(void)
 				/* Track the object kind */
 				object_kind_track(o_ptr->k_idx);
 
-				/* for now just inspect it */
-				identify_fully_aux(o_ptr);
-
-				/*while ((ret = context_menu_object(o_ptr, o_ptr->k_idx)) == 2);*/
+				while ((ret = context_menu_object(o_ptr)) == 2);
 			}
 		} else {
 			/* Load screen */
@@ -889,7 +879,7 @@ void do_cmd_inscribe(void)
 /*
  * An "item_tester_hook" for refilling lanterns
  */
-static bool item_tester_refill_lantern(const object_type *o_ptr)
+bool item_tester_refill_lantern(const object_type *o_ptr)
 {
 	/* Flasks of oil are okay */
 	if (o_ptr->tval == TV_FLASK) return (TRUE);
@@ -977,7 +967,7 @@ static void do_cmd_refill_lamp(void)
 /*
  * An "item_tester_hook" for refilling torches
  */
-static bool item_tester_refill_torch(const object_type *o_ptr)
+bool item_tester_refill_torch(const object_type *o_ptr)
 {
 	/* Torches are okay */
 	if ((o_ptr->tval == TV_LITE) &&
@@ -2329,7 +2319,7 @@ bool destroy_squelched_item(object_type *o_ptr, int amt)
 static bool item_tester_hook_organizable(const object_type *o_ptr)
 {
 	byte amt = o_ptr->number;
-	byte *num = &(o_ptr->number);
+	byte *num = &(((object_type*)o_ptr)->number);
 	bool test = FALSE;
 	object_type * j_ptr;
 

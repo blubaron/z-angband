@@ -41,8 +41,14 @@ bool do_cmd_center_map(void);
 object_type *chest_check(int x, int y);
 
 int context_menu_command(void);
-int context_menu_object(const object_type *o_ptr, const int slot);
+int context_menu_object(const object_type *o_ptr);
 void textui_cmd_destroy_menu(int item);
+void roff_obj_aux(const object_type *o_ptr);
+void set_get_item_object(const object_type *obj);
+bool item_tester_hook_useable(const object_type *o_ptr);
+bool item_tester_hook_activate(const object_type *o_ptr);
+bool item_tester_refill_lantern(const object_type *o_ptr);
+bool item_tester_refill_torch(const object_type *o_ptr);
 
 int context_menu_command(void)
 {
@@ -75,6 +81,41 @@ bool player_can_cast(void)
 		}
 	}
 	return (TRUE);
+}
+bool player_can_cast_from(const object_type *o_ptr)
+{
+	if (p_ptr->spell.realm[0] == o_ptr->tval-TV_BOOKS_MIN +1) {
+    return (TRUE);
+  }
+	if (p_ptr->spell.realm[1] == o_ptr->tval-TV_BOOKS_MIN +1) {
+    return (TRUE);
+  }
+  return (FALSE);
+}
+bool player_can_read(void)
+{
+	if (query_timed(TIMED_BLIND) || no_lite()
+		|| query_timed(TIMED_CONFUSED))
+	{
+		return (FALSE);
+	}
+
+  return (TRUE);
+}
+bool player_can_study(void)
+{
+	if (p_ptr->spell.realm[0]) {
+		if (query_timed(TIMED_BLIND) || no_lite()
+			|| query_timed(TIMED_CONFUSED) || p_ptr->csp < 1)
+		{
+			return (FALSE);
+		}
+	}
+	if (p_ptr->rp.pclass == CLASS_MINDCRAFTER) {
+		return (FALSE);
+	}
+
+  return (TRUE);
 }
 
 bool player_can_fire(void)
@@ -183,6 +224,91 @@ bool player_has_pets(void)
 	return (FALSE);
 }
 
+
+bool obj_is_food(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_FOOD);
+}
+bool obj_is_potion(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_POTION);
+}
+bool obj_is_wand(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_WAND);
+}
+bool obj_is_scroll(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_SCROLL);
+}
+bool obj_is_staff(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_STAFF);
+}
+bool obj_is_rod(const object_type *o_ptr)
+{
+	return (o_ptr->tval == TV_ROD);
+}
+bool obj_has_charges(const object_type *o_ptr)
+{
+	return (o_ptr->pval > 0);
+}
+bool obj_is_activatable(const object_type *o_ptr)
+{
+	return (!o_ptr->timeout);
+}
+bool obj_can_zap(const object_type *o_ptr)
+{
+	/* A single rod is still charging */
+	if ((o_ptr->number == 1) && (o_ptr->timeout)) {
+		return FALSE;
+	} else
+	/* A stack of rods lacks enough energy. */
+	if ((o_ptr->number > 1)
+		&& (o_ptr->timeout > (o_ptr->number - 1) * k_info[o_ptr->k_idx].pval))
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+bool obj_can_fire(const object_type *o_ptr)
+{
+	object_type *j_ptr;
+	/* Get the "bow" (if any) */
+	j_ptr = &p_ptr->equipment[EQUIP_BOW];
+
+	/* Require a launcher */
+	if (j_ptr->tval) {
+		/* see if we have ammo for the launcher */
+		return (o_ptr->tval == p_ptr->ammo_tval);
+	}
+
+	return (FALSE);
+}
+bool obj_can_refill(const object_type *o_ptr)
+{
+	object_type *q_ptr;
+
+	/* Get the light */
+	q_ptr = &p_ptr->equipment[EQUIP_LITE];
+
+	/* It is nothing */
+	if (q_ptr->tval != TV_LITE) {
+		return (FALSE);
+  } else
+
+	/* It's a lamp */
+	if (q_ptr->sval == SV_LITE_LANTERN) {
+		return item_tester_refill_lantern(o_ptr);
+  } else
+
+	/* It's a torch */
+	if (q_ptr->sval == SV_LITE_TORCH) {
+		return item_tester_refill_torch(o_ptr);
+  }
+  return (FALSE);
+}
+
 int context_menu_player_2(int mx, int my)
 {
 	menu_type_a *m;
@@ -195,7 +321,7 @@ int context_menu_player_2(int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	menu_dynamic_add_label(m, "Knowledge", '~', 1, labels);
@@ -309,7 +435,7 @@ int context_menu_player(int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	feat  = &(f_info[c_ptr->feat]);
@@ -510,7 +636,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	feat  = &(f_info[c_ptr->feat]);
@@ -629,13 +755,14 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 			msgf("Target Selected.");
 		}
 	} else
-#if 0
 	if (selected == 2) {
 		/* use an item on the spot */
-		cmd_insert(CMD_USE_AIMED);
-		cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);
+		p_ptr->cmd.dir = 5;
+		p_ptr->cmd.cmd = 'u';
+		do_cmd_use();
+		/*cmd_insert(CMD_USE_AIMED);
+		cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);*/
 	} else
-#endif
 	if (selected == 3) {
 		/* cast a spell on the spot */
 		p_ptr->cmd.dir = 5;
@@ -792,68 +919,90 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 
 	return 1;
 }
-#if 0
+
 /* pick the context menu options appropiate for the item */
-int context_menu_object(const object_type *o_ptr, const int slot)
+int context_menu_object(const object_type *o_ptr)
 {
 	menu_type_a *m;
 	rect_region r;
 	int selected;
+	int location = 0;
 	char *labels;
 	char header[120];
-
-	textblock *tb;
-	region area = { 0, 0, 0, 0 };
+	s16b *list;
 
 	m = menu_dynamic_new();
 	if (!m || !o_ptr) {
 		return 0;
 	}
-	object_desc(header, sizeof(header), o_ptr, ODESC_PREFIX | ODESC_BASE);
+	object_desc(header, o_ptr, TRUE, 2, sizeof(header));
 
-	labels = string_make(lower_case);
+	list = look_up_list((object_type*)o_ptr);
+	if (list) {
+		if (list == &(p_ptr->inventory)) {
+			location = USE_INVEN;
+		} else
+		if (list == &(area(p_ptr->px, p_ptr->py)->o_idx)) {
+			location = USE_FLOOR;
+		} else
+		{
+			/* check if in a container */
+			location = USE_INVEN;
+		}
+	} else
+	if (GET_ARRAY_INDEX(p_ptr->equipment, o_ptr) >= EQUIP_WIELD) {
+		location = USE_EQUIP;
+	}
+
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	menu_dynamic_add_label(m, "Inspect", 'I', 1, labels);
 
-	if (obj_can_browse(o_ptr)) {
-		if (obj_can_cast_from(o_ptr) && player_can_cast()) {
-			menu_dynamic_add_label(m, "Cast", 'm', 8, labels);
+	if (item_tester_hook_is_book(o_ptr)) {
+		if (player_can_cast_from(o_ptr)) {
+			if (player_can_cast()) {
+				menu_dynamic_add_label(m, "Cast", 'm', 8, labels);
+			} else {
+				menu_dynamic_add_label(m, "$Cast", 'm', 8, labels);
+			}
+			if (player_can_study()) {
+				menu_dynamic_add_label(m, "Study", 'G', 10, labels);
+			} else {
+				menu_dynamic_add_label(m, "$Study", 'G', 10, labels);
+			}
 		}
-		if (obj_can_study(o_ptr) && player_can_study()) {
-			menu_dynamic_add_label(m, "Study", 'G', 10, labels);
-		}
-		if (player_can_read()) {
+		if (player_is_caster() && player_can_read()) {
 			menu_dynamic_add_label(m, "Browse", 'b', 9, labels);
 		}
 	} else
-	if (obj_is_useable(o_ptr)) {
+	if (item_tester_hook_useable(o_ptr)) {
 		if (obj_is_wand(o_ptr)) {
 			if (obj_has_charges(o_ptr)) {
 				menu_dynamic_add_label(m, "Aim", 'a', 8, labels);
 			} else {
-				menu_dynamic_add_label(m, "Aim (grey)", 'a', 8, labels);
+				menu_dynamic_add_label(m, "$Aim", 'a', 8, labels);
 			}
 		} else
 		if (obj_is_rod(o_ptr)) {
 			if (obj_can_zap(o_ptr)) {
 				menu_dynamic_add_label(m, "Zap", 'z', 8, labels);
 			} else {
-				menu_dynamic_add_label(m, "Zap (grey)", 'z', 8, labels);
+				menu_dynamic_add_label(m, "$Zap", 'z', 8, labels);
 			}
 		} else
 		if (obj_is_staff(o_ptr)) {
 			if (obj_has_charges(o_ptr)) {
 				menu_dynamic_add_label(m, "Use", 'u', 8, labels);
 			} else {
-				menu_dynamic_add_label(m, "Use (grey)", 'u', 8, labels);
+				menu_dynamic_add_label(m, "$Use", 'u', 8, labels);
 			}
 		} else
 		if (obj_is_scroll(o_ptr)) {
 			if (player_can_read()) {
 				menu_dynamic_add_label(m, "Read", 'r', 8, labels);
 			} else {
-				menu_dynamic_add_label(m, "Read (grey)", 'r', 8, labels);
+				menu_dynamic_add_label(m, "$Read", 'r', 8, labels);
 			}
 		} else
 		if (obj_is_potion(o_ptr)) {
@@ -862,54 +1011,69 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 		if (obj_is_food(o_ptr)) {
 			menu_dynamic_add_label(m, "Eat", 'E', 8, labels);
 		} else
-		if (obj_is_activatable(o_ptr)) {
-			menu_dynamic_add_label(m, "Activate", 'A', 8, labels);
-		} else
-		if (obj_can_fire(o_ptr)) {
-			menu_dynamic_add_label(m, "Fire", 'f', 8, labels);
+		if (item_tester_hook_activate(o_ptr)) {
+			if (obj_is_activatable(o_ptr)) {
+				menu_dynamic_add_label(m, "Activate", 'A', 8, labels);
+			} else {
+				menu_dynamic_add_label(m, "$Activate", 'A', 8, labels);
+			}
 		} else
 		{
 			menu_dynamic_add_label(m, "Use", 'U', 8, labels);
+		}
+	} else
+	if (item_tester_hook_ammo(o_ptr)) {
+		if (obj_can_fire(o_ptr)) {
+			menu_dynamic_add_label(m, "Fire", 'f', 15, labels);
+		} else {
+			menu_dynamic_add_label(m, "$Fire", 'f', 15, labels);
 		}
 	}
 	if (obj_can_refill(o_ptr)) {
 		menu_dynamic_add_label(m, "Refill", 'F', 11, labels);
 	}
-	if ((slot >= INVEN_WIELD) && obj_can_takeoff(o_ptr)) {
-		menu_dynamic_add_label(m, "Take off", 't', 3, labels);
-	} else
-	if ((slot < INVEN_WIELD) && obj_can_wear(o_ptr)) {
-		//if (obj_is_armor(o_ptr)) {
-		//	menu_dynamic_add(m, "Wear", 2);
-		//} else {
-		// 	menu_dynamic_add(m, "Wield", 2);
-		//}
-		menu_dynamic_add_label(m, "Equip", 'w', 2, labels);
+	if (item_tester_hook_wear(o_ptr)) {
+		if (location == USE_EQUIP) {
+			menu_dynamic_add_label(m, "Take off", 't', 3, labels);
+		} else
+		if (location == USE_INVEN) {
+			if (item_tester_hook_armour(o_ptr)) {
+				menu_dynamic_add_label(m, "Wear", 'w', 2, labels);
+			} else {
+		 		menu_dynamic_add_label(m, "Wield", 'w', 2, labels);
+			}
+			/*menu_dynamic_add_label(m, "Equip", 'w', 2, labels);*/
+		}
 	}
-	if (slot >= 0) {
+	if ((location == USE_INVEN) || (location == USE_EQUIP)) {
 		menu_dynamic_add_label(m, "Drop", 'd', 6, labels);
 		if (o_ptr->number > 1) {
 			menu_dynamic_add_label(m, "Drop All", 'd', 13, labels);
 		}
 	} else
-	{
+	if (location == USE_FLOOR) {
 		if (inven_carry_okay(o_ptr)) {
 			menu_dynamic_add_label(m, "Pickup", 'g', 7, labels);
 		} else {
-			menu_dynamic_add_label(m, "Pickup (Full)", 'g', 7, labels);
+			menu_dynamic_add_label(m, "$Pickup", 'g', 7, labels);
 		}
 	}
 	menu_dynamic_add_label(m, "Throw", 'v', 12, labels);
-	if (obj_has_inscrip(o_ptr)) {
+
+	/*if (obj_has_inscrip(o_ptr)) {*/
+	if (o_ptr->inscription) {
 		menu_dynamic_add_label(m, "Uninscribe", '}', 5, labels);
 	} else {
 		menu_dynamic_add_label(m, "Inscribe", '{', 4, labels);
 	}
+	menu_dynamic_add_label(m, "Destroy", 'k', 14, labels);
+#if 0
 	if (object_is_squelched(o_ptr)) {
 		menu_dynamic_add_label(m, "Unignore", 'k', 14, labels);
 	} else {
 		menu_dynamic_add_label(m, "Ignore", 'k', 14, labels);
 	}
+#endif
 
 	/* work out display region */
 	r.width = menu_dynamic_longest_entry(m) + 3 + 2; /* +3 for tag, 2 for pad */
@@ -923,17 +1087,13 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 	screen_save();
 	button_backup_all(TRUE);
 
-	/* Display info */
-	tb = object_info(o_ptr, OINFO_NONE);
-	object_desc(header, sizeof(header), o_ptr, ODESC_PREFIX | ODESC_FULL);
-
-	textui_textblock_place(tb, area, format("%s", header));
-	textblock_free(tb);
+	/* Recall object */
+	roff_obj_aux(o_ptr);
 
 	menu_layout(m, &r);
-	region_erase_bordered(&r);
+	rect_region_erase_bordered(&r);
 
-	prt(format("(Enter to select, ESC) Command for %s:", header), 0, 0);
+	prtf(0, 0, "($UEnter to select$Y\n$V, $UESC$Y%c$V) Command for %s:", ESCAPE, header);
 	selected = menu_dynamic_select(m);
 
 	menu_dynamic_free(m);
@@ -943,104 +1103,132 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 	screen_load();
 
 	if (selected == 1) {
-		/* copied from textui_obj_examine */
-		/* Display info */
-		tb = object_info(o_ptr, OINFO_NONE);
-		object_desc(header, sizeof(header), o_ptr, ODESC_PREFIX | ODESC_FULL);
-
-		textui_textblock_show(tb, area, format("%s", header));
-		textblock_free(tb);
+		/* inspect it */
+		identify_fully_aux(o_ptr);
 		return 2;
 	} else
 	if (selected == 2) {
 		/* wield the item */
- 		cmd_insert(CMD_WIELD);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'W';
+		do_cmd_wield();
+ 		/*cmd_insert(CMD_WIELD);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 3) {
 		/* take the item off */
- 		cmd_insert(CMD_TAKEOFF);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 't';
+		do_cmd_takeoff();
+ 		/*cmd_insert(CMD_TAKEOFF);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 4) {
 		/* inscribe the item */
- 		cmd_insert(CMD_INSCRIBE);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = '{';
+		do_cmd_inscribe();
+ 		/*cmd_insert(CMD_INSCRIBE);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 5) {
 		/* uninscribe the item */
- 		cmd_insert(CMD_UNINSCRIBE);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = '}';
+		do_cmd_uninscribe();
+ 		/*cmd_insert(CMD_UNINSCRIBE);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 6) {
 		/* drop the item */
- 		cmd_insert(CMD_DROP);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'd';
+		do_cmd_drop();
+ 		/*cmd_insert(CMD_DROP);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 7) {
 		/* pick the item up */
- 		cmd_insert(CMD_PICKUP);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		p_ptr->cmd.cmd = 'g';
+		if (inven_carry_okay(o_ptr)) {
+			py_pickup_aux((object_type*)o_ptr);
+		} else {
+			carry(TRUE);
+		}
+ 		/*cmd_insert(CMD_PICKUP);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 8) {
 		/* use the item */
-		if (obj_can_browse(o_ptr)) {
-			/* copied from textui_obj_cast */
-			int spell;
-			const char *verb = ((p_ptr->class->spell_book == TV_MAGIC_BOOK) ? "cast" : "recite");
-			/* Ask for a spell */
-			spell = get_spell(o_ptr, verb, spell_okay_to_cast);
-			if (spell >= 0) {
-				cmd_insert(CMD_CAST);
-				cmd_set_arg_choice(cmd_get_top(), 0, spell);
-			}
+		bool full = item_tester_full;
+		item_tester_full = FALSE;
+		if (player_can_cast_from(o_ptr)) {
+			set_get_item_object(o_ptr);
+ 			p_ptr->cmd.cmd = 'm';
+			do_cmd_cast();
 		} else {
-			cmd_insert(CMD_USE_ANY);
-			cmd_set_arg_item(cmd_get_top(), 0, slot);
+			set_get_item_object(o_ptr);
+			p_ptr->cmd.cmd = 'u';
+			do_cmd_use();
+			/*cmd_insert(CMD_USE_ANY);
+			cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 		}
+		item_tester_full = full;
 	} else
 	if (selected == 9) {
 		/* browse a spellbook */
+ 		p_ptr->cmd.cmd = 'b';
+		do_cmd_browse_aux(o_ptr);
 		/* copied from textui_spell_browse */
-		textui_book_browse(o_ptr);
+		/*textui_book_browse(o_ptr);*/
 		return 2;
 	} else
 	if (selected == 10) {
 		/* study a spell book */
-		/* copied from textui_obj_study */
-		if (player_has(PF_CHOOSE_SPELLS)) {
-			int spell = get_spell(o_ptr,
-				  "study", spell_okay_to_study);
-			if (spell >= 0) {
-				cmd_insert(CMD_STUDY_SPELL);
-				cmd_set_arg_choice(cmd_get_top(), 0, spell);
-			}
-		} else {
-			cmd_insert(CMD_STUDY_BOOK);
-			cmd_set_arg_item(cmd_get_top(), 0, slot);
-		}
+ 		p_ptr->cmd.cmd = 'G';
+		do_cmd_study(FALSE, (object_type*)o_ptr);
+
 	} else
 	if (selected == 11) {
 		/* use the item to refill a light source */
-		cmd_insert(CMD_REFILL);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'F';
+		do_cmd_refill();
+		/*cmd_insert(CMD_REFILL);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 12) {
 		/* throw the item */
-		cmd_insert(CMD_THROW);
-		cmd_set_arg_item(cmd_get_top(), 0, slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'v';
+		do_cmd_throw();
+		/*cmd_insert(CMD_THROW);
+		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
 	} else
 	if (selected == 13) {
 		/* drop all of the item stack */
 		if (get_check(format("Drop %s? ", header))) {
-			cmd_insert(CMD_DROP);
+			set_get_item_object(o_ptr);
+			p_ptr->cmd.arg = o_ptr->number;
+			p_ptr->cmd.cmd = 'd';
+			do_cmd_drop();
+			/*cmd_insert(CMD_DROP);
 			cmd_set_arg_item(cmd_get_top(), 0, slot);
-			cmd_set_arg_number(cmd_get_top(), 1, o_ptr->number);
+			cmd_set_arg_number(cmd_get_top(), 1, o_ptr->number);*/
 		}
 	} else
 	if (selected == 14) {
 		/* squelch or unsquelch the item */
-		textui_cmd_destroy_menu(slot);
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'k';
+		do_cmd_destroy();
+		/*textui_cmd_destroy_menu(slot);*/
+	} else
+	if (selected == 15) {
+		/* fire some ammo */
+		set_get_item_object(o_ptr);
+ 		p_ptr->cmd.cmd = 'f';
+		do_cmd_fire();
 	} else
 	if (selected == -1) {
 		/* this menu was canceled, tell whatever called us to display its menu again */
@@ -1049,6 +1237,7 @@ int context_menu_object(const object_type *o_ptr, const int slot)
 	return 1;
 }
 
+#if 0
 /* pick the context menu options appropiate for a store */
 int context_menu_store(struct store *store, const int oid, int mx, int my)
 {

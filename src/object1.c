@@ -216,7 +216,7 @@ cptr item_activation(const object_type *o_ptr)
 /*
  * Fully describe the known information about an item
  */
-static void roff_obj_aux(const object_type *o_ptr)
+void roff_obj_aux(const object_type *o_ptr)
 {
 	object_kind *k_ptr;
 	bonuses_type b;
@@ -3216,6 +3216,11 @@ static object_type *recall_object_choice(int *command_wrk)
 	return (NULL);
 }
 
+const object_type *next_get_item_object;
+void set_get_item_object(const object_type *obj)
+{
+	next_get_item_object = obj;
+}
 /*
  * Let the user select an item and return a pointer to it.
  *
@@ -3285,6 +3290,15 @@ object_type *get_item(cptr pmt, cptr str, int mode, int start)
 	object_type *q2_ptr;
 
 	object_type *o_ptr;
+
+	/* if we have a stored object, use it */
+	if (next_get_item_object) {
+		o_ptr = (object_type*)next_get_item_object;
+		next_get_item_object = NULL;
+		if (o_ptr && item_tester_okay(o_ptr)) {
+			return o_ptr;
+		}
+	}
 
 	/* Extract args */
 	if (mode & (USE_EQUIP)) equip = TRUE;
