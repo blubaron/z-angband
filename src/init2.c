@@ -223,7 +223,7 @@ void init_file_paths(const char *libpath, const char *configpath,
 	} else
 	{
 		path_parse(buf, 1024, datapath);
-		ANGBAND_DIR_DATA = string_make(buf);
+		ANGBAND_DIR_DATA = string_make(format("%sdata",buf));
 		/* Build data sub path names */
 		path_make(buf, ANGBAND_DIR_DATA, "scores");
 		ANGBAND_DIR_APEX = string_make(buf);

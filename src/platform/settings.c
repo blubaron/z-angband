@@ -137,7 +137,7 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 			sec->pRoot = NULL;
 			sec->pEnd = NULL;
 			sec->count = 0;
-			sec->name = string_make(&(buf[1]));
+			sec->name = (char*)string_make(&(buf[1]));
 			sec->pNext = NULL;
 			/* add the new section to the list */
 			if (!(ini->pRoot)) {
@@ -164,7 +164,7 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 			if (val->value) {
 				string_free(val->value);
 			}
-			val->value = string_make((sep+1));
+			val->value = (char*)string_make((sep+1));
 		} else {
 			/* create a new key */
 			res = ini_settings_new_key(ini, sec, NULL, &(buf[0]), (sep+1));
@@ -258,8 +258,8 @@ int ini_settings_new_key(ini_settings *ini, ini_settings_section *sec, const cha
 		return -3;
 	}
 	val->pNext = NULL;
-	val->key = string_make(key);
-	val->value = string_make(value);
+	val->key = (char*)string_make(key);
+	val->value = (char*)string_make(value);
 
 	if (sec) {
 		/* add the new pair to the list */
@@ -284,7 +284,7 @@ int ini_settings_new_key(ini_settings *ini, ini_settings_section *sec, const cha
 		sec->pRoot = val;
 		sec->pEnd = val;
 		sec->count = 1;
-		sec->name = string_make(section);
+		sec->name = (char*)string_make(section);
 		sec->pNext = NULL;
 		/* add the new section to the list */
 		if (!(ini->pRoot)) {
@@ -441,7 +441,7 @@ int ini_setting_set_string(ini_settings *ini, const char *section, const char* k
 		if (val->value) {
 			string_free(val->value);
 		}
-		val->value = string_make(value);
+		val->value = (char*)string_make(value);
 		return 1;
 	}
 	/* we need to make a new key */
@@ -459,7 +459,7 @@ int ini_setting_set_sint32(ini_settings *ini, const char *section, const char* k
 		if (val->value) {
 			string_free(val->value);
 		}
-		val->value = string_make(format("%d",value));
+		val->value = (char*)string_make(format("%d",value));
 		return 1;
 	}
 	/* we need to make a new key */
@@ -477,7 +477,7 @@ int ini_setting_set_uint32(ini_settings *ini, const char *section, const char* k
 		if (val->value) {
 			string_free(val->value);
 		}
-		val->value = string_make(format("%u",value));
+		val->value = (char*)string_make(format("%u",value));
 		return 1;
 	}
 	/* we need to make a new key */
@@ -527,7 +527,7 @@ int ini_setting_set_string_def(ini_settings *ini, const char *section, const cha
 			if (val->value) {
 				string_free(val->value);
 			}
-			val->value = string_make(value);
+			val->value = (char*)string_make(value);
 		}
 		return 1;
 	}
@@ -582,7 +582,7 @@ int ini_setting_set_sint32_def(ini_settings *ini, const char *section, const cha
 			if (val->value) {
 				string_free(val->value);
 			}
-			val->value = string_make(format("%d",value));
+			val->value = (char*)string_make(format("%d",value));
 		}
 		return 1;
 	}
@@ -637,7 +637,7 @@ int ini_setting_set_uint32_def(ini_settings *ini, const char *section, const cha
 			if (val->value) {
 				string_free(val->value);
 			}
-			val->value = string_make(format("%u",value));
+			val->value = (char*)string_make(format("%u",value));
 		}
 		return 1;
 	}

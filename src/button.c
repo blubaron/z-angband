@@ -200,7 +200,7 @@ int button_add_end(const char *label, keycode_t keypress,
 		if (button->label) {
 			(void)string_free(button->label);
 		}
-		button->label = string_make(label);
+		button->label = (char*)string_make(label);
 	}
 	if (button_call_fn) {
 		button->fn = button_call_fn;
@@ -286,7 +286,7 @@ bool button_backup_all(bool kill_all)
 
 			(void)C_COPY(dest, src, 1, button_mouse);
 			if (src->label) {
-				dest->label = string_make(src->label);
+				dest->label = (char*)string_make(src->label);
 			}
 			if (!(newbackup->buttons)) {
 				newbackup->buttons = dest;
@@ -665,7 +665,7 @@ keycode_t button_get_key(int x, int y)
 				int res = bttn->fn(bttn->key);
 				if (res > 1) return (keycode_t)res;
 				if (res == 0) return bttn->key;
-				return 0x80;
+				return (keycode_t)0x80;
 			} else
 			if (bttn->key & 0x80) {
 				mouse_press = bttn->key;

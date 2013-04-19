@@ -116,8 +116,8 @@ typedef unsigned int u32b;
 
 #ifdef USE_64B
 /* Signed/Unsigned 64bit value */
-typedef long u64b;
-typedef unsigned long s64b;
+typedef long s64b;
+typedef unsigned long u64b;
 #endif /* USE_64B */
 
 #else  /* L64 */

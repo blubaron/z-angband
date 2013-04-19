@@ -75,6 +75,7 @@
 
 #include "maid-grf.h"
 
+#include "settings.h"
 #include "grafmode.h"
 #include "win-menu.h"
 #include "button.h"

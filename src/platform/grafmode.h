@@ -47,7 +47,6 @@ typedef struct _graphics_mode {
 } graphics_mode;
 
 extern graphics_mode *graphics_modes;
-//extern graphics_mode graphics_modes[];
 extern graphics_mode *current_graphics_mode;
 extern int graphics_mode_high_id;
 

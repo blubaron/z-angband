@@ -2571,7 +2571,7 @@ void building_bank_info(void)
 void build_cmd_bank_deposit(void)
 {
 	store_type * st_ptr = get_current_store();
-	u32b amt;
+	s32b amt;
 
 	if (p_ptr->au > 0) {
 		amt = get_quantity_big("How much gold would you like to deposit? ", p_ptr->au/4, p_ptr->au);
@@ -2600,7 +2600,7 @@ void build_cmd_bank_deposit(void)
 void build_cmd_bank_withdraw(void)
 {
 	/*store_type * st_ptr = get_current_store();*/
-	u32b amt;
+	s32b amt;
 
 	if (p_ptr->bank_gold > 0) {
 		amt = get_quantity_big("How much gold would you like to withdraw? ", p_ptr->bank_gold, p_ptr->bank_gold);

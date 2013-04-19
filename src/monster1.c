@@ -41,7 +41,7 @@ cptr mon_race_name(const monster_race *r_ptr)
 	/* Hack: use "name" field as a quark for heroes */
 	if (r_ptr >= &r_info[HERO_MIN])
 	{
-		char * s = quark_str(r_ptr->name);
+		cptr s = quark_str(r_ptr->name);
 
 		/* We should really handle this more gracefully.
 		   Sometimes this can happen, when we're hallucinating and a random

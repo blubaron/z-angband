@@ -3730,6 +3730,11 @@ errr init_t_info_txt(ang_file *fp, char *buf)
 				t_ptr->action[n] = quark_add(s);
 			}
 
+			/*if (strlen(quark_str(t_ptr->action[n])) >= 1023) {
+			 *	part of the string was probably cut off
+			 *	return (PARSE_ERROR_OUT_OF_BOUNDS);
+			 *}
+
 			/* Next... */
 			continue;
 		}
@@ -5469,7 +5474,7 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 		}
 
 		/* Store the name */
-		dun_ptr->name = string_make(s);
+		dun_ptr->name = (char*)string_make(s);
 
 		return (0);
 	} else
@@ -5843,10 +5848,10 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 			cptr newstr = string_append(dun_ptr->text, s);
 			if (newstr) {
 				string_free(dun_ptr->text);
-				dun_ptr->text = newstr;
+				dun_ptr->text = (char*)newstr;
 			}
 		} else {
-			dun_ptr->text = string_make(s);
+			dun_ptr->text = (char*)string_make(s);
 		}
 #if 0
 		if (dun_ptr->text) FREE(dun_ptr->text);

@@ -1482,7 +1482,7 @@ bool file_putf(ang_file *f, const char *fmt, ...)
 
 	va_start(vp, fmt);
 	vfprintf(f->fh, fmt, vp);
-	status = TRUE;/*file_vputf(f, fmt, &vp);*/
+	status = TRUE;/*file_vputf(f, fmt, vp);*/
 	va_end(vp);
 
 	return status;
@@ -1572,7 +1572,7 @@ bool dir_create(const char *path, u16b permissions)
 			if (len == 0) continue;
 
 			/* If this is a duplicate path separator, continue */
-			if (*(ptr - 1) == PATH_SEP) continue;
+			/*if (*(ptr - 1) == PATH_SEP) continue;*/
 			if (strcmp((ptr-1), PATH_SEP) == 0) continue;
 
 			/* We can't handle really big filenames */
@@ -1630,7 +1630,7 @@ ang_dir *dir_open(const char *dirname)
 	/* Set up the handle */
 	dir = ZNEW(ang_dir);
 	dir->h = h;
-	dir->first_file = string_make(fd.cFileName);
+	dir->first_file = (char*)string_make(fd.cFileName);
 
 	/* Success */
 	return dir;

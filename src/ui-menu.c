@@ -990,14 +990,12 @@ menu_type_a *menu_dynamic_new(void)
 void menu_dynamic_add(menu_type_a *m, const char *text, int value)
 {
 	struct menu_entry *head = menu_priv(m);
-	//struct menu_entry *new = mem_zalloc(sizeof *new);
+	/*struct menu_entry *new = mem_zalloc(sizeof *new);*/
 	struct menu_entry *newm = ZNEW(struct menu_entry);
 
 	assert(m->row_funcs == &dynamic_iter);
 
-	//new->text = string_make(text);
-	//new->value = value;
-	newm->text = string_make(text);
+	newm->text = (char*)string_make(text);
 	newm->value = value;
 
 	if (head) {

@@ -1110,7 +1110,7 @@ int context_menu_object(const object_type *o_ptr)
 	if (selected == 2) {
 		/* wield the item */
 		set_get_item_object(o_ptr);
- 		p_ptr->cmd.cmd = 'W';
+ 		p_ptr->cmd.cmd = 'w';
 		do_cmd_wield();
  		/*cmd_insert(CMD_WIELD);
 		cmd_set_arg_item(cmd_get_top(), 0, slot);*/

@@ -70,7 +70,7 @@ static u32b x_check = 0L;
  */
 static u32b checksum_base;
 static u32b checksum;
-dun_gen_type old_dungeons[];
+dun_gen_type *old_dungeons;
 
 /*
  * Hack -- Show information on the screen, one line at a time.

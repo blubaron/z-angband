@@ -1968,7 +1968,7 @@ static bool player_birth_random(void)
 	prtf(2, 23,
 		"[$U'Ctrl-X' to quit$Y%c$V, $U'c' for name$Yn$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]",
 		KTRL('X'), KTRL('H'));
-
+	ch = 0;
 	while ((ch != '\n') && (ch != ' ')) {
 		/* Get a key */
 		ch = inkey();
