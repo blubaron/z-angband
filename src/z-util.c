@@ -158,16 +158,24 @@ void (*quit_aux) (cptr) = NULL;
 void quit(cptr str)
 {
 	/* Attempt to use the aux function */
-	if (quit_aux) (*quit_aux) (str);
+	if (quit_aux)
+		(*quit_aux) (str);
+	else
+	/* Send the string to plog() */
+	if (str)
+		plog(str);
 
+#ifdef __ANDROID__
+	/* exiting the process here messes up the app life cycle in
+	 * android, so leave the function */
+	return;
+#endif /* __ANDROID__ */
+	
 	/* Success */
 	if (!str) (void)(exit(0));
 
 	/* Extract a "special error code" */
 	if ((str[0] == '-') || (str[0] == '+')) (void)(exit(atoi(str)));
-
-	/* Send the string to plog() */
-	plog(str);
 
 	/* Failure */
 	(void)(exit(EXIT_FAILURE));

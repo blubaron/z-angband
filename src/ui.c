@@ -1814,7 +1814,7 @@ bool get_string(char *buf, int len, cptr str, ...)
  *
  * Note that "[y/n]" is appended to the prompt.
  */
-static bool get_check_base(bool def, bool esc, cptr prompt)
+bool get_check_base(bool def, bool esc, cptr prompt)
 {
 	int i;
 
