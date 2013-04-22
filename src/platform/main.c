@@ -117,8 +117,8 @@ static void quit_hook(cptr s)
 {
 	int j;
 
-	/* Unused parameter */
-	(void)s;
+	/* Show the error message */
+	if (s) plog(s);
 
 	/* Scan windows */
 	for (j = ANGBAND_TERM_MAX - 1; j >= 0; j--) {
@@ -231,18 +231,13 @@ static void init_stuff(void)
 		/* Look for "news" file - see init2.c */
 		path_make(buf, path, "file/news.txt");
 		
-		fd = fd_open(buf, O_RDONLY);
-
 		/* Failure */
-		if (fd < 0)
-		{
+		if (!file_exists(path)) {
 			/* plog_fmt("Cannot access the '%s' file!", buf); */
 		
 			/* Reset to be "./lib/" */
 			strcpy(path, "./lib/");	
 		}
-		
-		fd_close(fd);
 	}
 #endif /* HAVE_CONFIG_H */
 

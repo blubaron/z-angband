@@ -466,7 +466,7 @@ static void term_load_bitmap(void)
 	strnfmt(path, 1024, "%s/8x13.bmp", path);
   
 	/* See if the file exists */
-	if (fd_close(fd_open(path, O_RDONLY)))
+	if (!file_exists(path))
 	{
 		quit_fmt("Unable to load bitmap data file %s, bailing out....\n", path);
 		exit (-1);

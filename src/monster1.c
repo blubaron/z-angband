@@ -391,17 +391,16 @@ static void roff_mon_aux(int r_idx, int remem)
 
 #ifdef DELAY_LOAD_R_TEXT
 
-	int fd;
+	ang_file *fp;
 
 	/* Build the filename */
 	path_make(buf, ANGBAND_DIR_DATA, "r_info.raw");
 
 	/* Open the "raw" file */
-	fd = fd_open(buf, O_RDONLY);
+	fp = file_open(buf, MODE_READ, FTYPE_RAW);
 
 	/* Use file */
-	if (fd >= 0)
-	{
+	if (fp) {
 		huge pos;
 
 		/* Starting position */
@@ -413,13 +412,13 @@ static void roff_mon_aux(int r_idx, int remem)
 		pos += r_head->name_size;
 
 		/* Seek */
-		(void)fd_seek(fd, pos);
+		(void)file_seek(fp, pos);
 
 		/* Read a chunk of data */
-		(void)fd_read(fd, buf, 2048);
+		(void)file_read(fp, buf, 2048);
 
 		/* Close it */
-		(void)fd_close(fd);
+		(void)file_close(fp);
 	}
 
 #else

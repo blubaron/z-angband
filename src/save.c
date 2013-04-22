@@ -2001,9 +2001,7 @@ bool save_player(void)
 	fff = NULL;
 
 	/* Open the savefile */
-	safe_setuid_grab();
 	fff = file_open(new_savefile, MODE_WRITE, FTYPE_SAVE);
-	safe_setuid_drop();
 
 	/* Attempt to save the player */
 	if (fff) {
@@ -2088,17 +2086,8 @@ bool load_player(void)
 	/* Allow empty savefile name */
 	if (!savefile[0]) return (TRUE);
 
-	/* Grab permissions */
-	safe_setuid_grab();
-
-	/* Open the savefile */
-	fd = fd_open(savefile, O_RDONLY);
-
-	/* Drop permissions */
-	safe_setuid_drop();
-
 	/* No file */
-	if (fd < 0) {
+	if (!file_exists(savefile)) {
 		/* Give a message */
 		msgf("Savefile does not exist.");
 		message_flush();
@@ -2106,9 +2095,6 @@ bool load_player(void)
 		/* Allow this */
 		return (TRUE);
 	}
-
-	/* Close the file */
-	(void)fd_close(fd);
 
 
 	/* Okay */

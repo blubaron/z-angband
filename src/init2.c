@@ -305,7 +305,7 @@ cptr err_str[PARSE_ERROR_MAX] =
 #ifndef RISCOS
 #ifdef CHECK_MODIFICATION_TIME
 
-extern errr check_modification_date(int fd, cptr template_file)
+extern errr check_modification_date(cptr raw_file, cptr template_file)
 {
 	char buf[1024];
 
@@ -321,7 +321,7 @@ extern errr check_modification_date(int fd, cptr template_file)
 	}
 
 	/* Access stats on raw file */
-	else if (fstat(fd, &raw_stat))
+	else if (stat(raw_file, &raw_stat))
 	{
 		/* Error */
 		return (-1);
@@ -369,6 +369,10 @@ static errr init_info_raw(int fd, header *head)
 #ifdef HAVE_MMAP
 	char *data;
 #endif /* HAVE_MMAP */
+
+	if (fd < 0) {
+		return fd;
+	}
 
 	/* Read and verify the header */
 	if (fd_read(fd, (char *)(&test), sizeof(header)) ||
@@ -506,8 +510,6 @@ static void display_parse_error(cptr filename, errr err, cptr buf)
 static errr init_info(cptr filename, header *head,
                       void **info, char **name, char **text)
 {
-	int fd;
-
 	errr err = 1;
 
 	ang_file *fp;
@@ -523,23 +525,22 @@ static errr init_info(cptr filename, header *head,
 	path_make(buf, ANGBAND_DIR_DATA, format("%s.raw", filename));
 
 	/* Attempt to open the "raw" file */
-	fd = fd_open(buf, O_RDONLY);
+	fp = file_open(buf, MODE_READ, FTYPE_RAW);
 
 	/* Process existing "raw" file */
-	if (fd >= 0)
-	{
+	if (fp) {
 #ifdef CHECK_MODIFICATION_TIME
 
-		err = check_modification_date(fd, format("%s.txt", filename));
+		err = check_modification_date(buf, format("%s.txt", filename));
 
 #endif /* CHECK_MODIFICATION_TIME */
 
 		/* Attempt to parse the "raw" file */
 		if (!err)
-			err = init_info_raw(fd, head);
+			err = init_info_raw(file_descriptor(fp), head);
 
 		/* Close it */
-		fd_close(fd);
+		file_close(fp);
 	}
 
 	/* Do we have to parse the *.txt file? */
@@ -584,68 +585,36 @@ static errr init_info(cptr filename, header *head,
 
 		/*** Dump the binary image file ***/
 
-		/* File type is "DATA" */
-		FILE_TYPE(FILE_TYPE_DATA);
-
 		/* Build the filename */
 		path_make(buf, ANGBAND_DIR_DATA, format("%s.raw", filename));
 
 
-		/* Attempt to open the file */
-		fd = fd_open(buf, O_RDONLY);
+		/* Attempt to open the "raw" file */
+		fp = file_open(buf, MODE_WRITE, FTYPE_RAW);
 
 		/* Failure */
-		if (fd < 0)
-		{
-			int mode = 0644;
+		if (!fp) {
+			/* Crash and burn */
+			quit_fmt("Cannot create the '%s' file!", buf);
 
-			/* Grab permissions */
-			safe_setuid_grab();
-
-			/* Create a new file */
-			fd = fd_make(buf, mode);
-
-			/* Drop permissions */
-			safe_setuid_drop();
-
-			/* Failure */
-			if (fd < 0)
-			{
-				/* Crash and burn */
-				quit_fmt("Cannot create the '%s' file!", buf);
-			}
+			/* Paranoia */
+			return;
 		}
 
-		/* Close it */
-		fd_close(fd);
+		/* Dump it */
+		file_write(fp, (cptr)head, head->head_size);
 
-		/* Grab permissions */
-		safe_setuid_grab();
+		/* Dump the "*_info" array */
+		file_write(fp, head->info_ptr, head->info_size);
 
-		/* Attempt to create the raw file */
-		fd = fd_open(buf, O_WRONLY);
+		/* Dump the "*_name" array */
+		file_write(fp, head->name_ptr, head->name_size);
 
-		/* Drop permissions */
-		safe_setuid_drop();
+		/* Dump the "*_text" array */
+		file_write(fp, head->text_ptr, head->text_size);
 
-		/* Dump to the file */
-		if (fd >= 0)
-		{
-			/* Dump it */
-			fd_write(fd, (cptr)head, head->head_size);
-
-			/* Dump the "*_info" array */
-			fd_write(fd, head->info_ptr, head->info_size);
-
-			/* Dump the "*_name" array */
-			fd_write(fd, head->name_ptr, head->name_size);
-
-			/* Dump the "*_text" array */
-			fd_write(fd, head->text_ptr, head->text_size);
-
-			/* Close */
-			fd_close(fd);
-		}
+		/* Close */
+		file_close(fp);
 
 
 		/*** Kill the fake arrays ***/
@@ -669,19 +638,29 @@ static errr init_info(cptr filename, header *head,
 		path_make(buf, ANGBAND_DIR_DATA, format("%s.raw", filename));
 
 		/* Attempt to open the "raw" file */
-		fd = fd_open(buf, O_RDONLY);
+		fp = file_open(buf, MODE_READ, FTYPE_RAW);
 
 		/* Process existing "raw" file */
-		if (fd < 0) quit_fmt("Cannot load '%s.raw' file.", filename);
+		if (!fp) {
+			quit_fmt("Cannot load '%s.raw' file.", filename);
+
+			/* Paranoia */
+			return;
+		}
 
 		/* Attempt to parse the "raw" file */
-		err = init_info_raw(fd, head);
+		err = init_info_raw(file_descriptor(fp), head);
 
 		/* Close it */
-		fd_close(fd);
+		file_close(fp);
 
 		/* Error */
-		if (err) quit_fmt("Cannot parse '%s.raw' file.", filename);
+		if (err) {
+			quit_fmt("Cannot parse '%s.raw' file.", filename);
+
+			/* Paranoia */
+			return;
+		}
 
 #ifdef ALLOW_TEMPLATES
 	}
@@ -1610,22 +1589,17 @@ void display_introduction()
 	/* Build the filename */
 	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
 
-	/* Attempt to open the file */
-	fd = fd_open(buf, O_RDONLY);
-
-	/* Failure */
-	/*if (!file_exists(buf)) {*/
-	if (fd < 0)
-	{
+	/* make sure the file exists */
+	if (!file_exists(buf)) {
 		/* Message */
 		plog_fmt("Cannot access the '%s' file!", buf);
 
 		/* Crash and burn */
 		init_angband_fail();
-	}
 
-	/* Close it */
-	(void)fd_close(fd);
+		/* Paranoia */
+		return;
+	}
 
 
 	/*** Display the "news" file ***/
@@ -1634,19 +1608,17 @@ void display_introduction()
 	Term_clear();
 
 	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_FILE, "news.txt");
+	/*path_make(buf, ANGBAND_DIR_FILE, "news.txt");*/
 
 	/* Open the News file */
 	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
 
 	/* Dump */
-	if (fp)
-	{
+	if (fp) {
 		int i = 0;
 
 		/* Dump the file to the screen */
-		while (0 <= file_getl(fp, buf, 1024))
-		{
+		while (0 <= file_getl(fp, buf, 1024)) {
 			/* Display and advance */
 			put_fstr(0, i++, buf);
 		}
@@ -1709,9 +1681,7 @@ void display_introduction()
  */
 void init_angband(void)
 {
-	int fd = -1;
-
-	int mode = 0644;
+	ang_file *fff = NULL;
 
 	char buf[1024];
 
@@ -1727,36 +1697,23 @@ void init_angband(void)
 	path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
 
 	/* Attempt to open the high score file */
-	fd = fd_open(buf, O_RDONLY);
+	fff = file_open(buf, MODE_READ, FTYPE_RAW);
+	if (!fff) {
+		fff = file_open(buf, MODE_WRITE, FTYPE_RAW);
+	}	
+	if (!fff) {
+		/* Message */
+		plog_fmt("Cannot access the '%s' file!", buf);
 
-	/* Failure */
-	if (fd < 0)
-	{
-		/* File type is "DATA" */
-		FILE_TYPE(FILE_TYPE_DATA);
+		/* Crash and burn */
+		init_angband_fail();
 
-		/* Grab permissions */
-		safe_setuid_grab();
-
-		/* Create a new high score file */
-		fd = fd_make(buf, mode);
-
-		/* Drop permissions */
-		safe_setuid_drop();
-
-		/* Failure */
-		if (fd < 0)
-		{
-			/* Message */
-			plog_fmt("Cannot create the '%s' file!", buf);
-
-			/* Crash and burn */
-			init_angband_fail();
-		}
+		/* Paranoia */
+		return;
 	}
 
 	/* Close it */
-	(void)fd_close(fd);
+	file_close(fff);
 
 	Term_fresh();
 

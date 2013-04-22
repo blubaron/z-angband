@@ -288,7 +288,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",current_graphics_mode->file));
 
 		/* Use the file if it exists */
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
+		if (file_exists(filename))
 		{
 			use_transparency = TRUE;
 
@@ -305,7 +305,7 @@ bool pick_graphics(int graphics, int *xsize, int *ysize, char *filename)
 		path_build(filename, 1024, ANGBAND_DIR_XTRA, "graf/8x8.png");
 
 		/* Use the "8x8.bmp" file if it exists */
-		if (0 == fd_close(fd_open(filename, O_RDONLY)))
+		if (file_exists(filename))
 		{
 			/* Use graphics */
 			use_graphics = 1;

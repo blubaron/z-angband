@@ -2768,7 +2768,6 @@ errr file_character(cptr name, bool full)
 	byte a;
 	char c;
 	cptr paren = ")";
-	int fd = -1;
 	ang_file *fff = NULL;
 	store_type *st_ptr;
 	char buf[1024];
@@ -2780,28 +2779,18 @@ errr file_character(cptr name, bool full)
 	/* Build the filename */
 	path_make(buf, ANGBAND_DIR_USER, name);
 
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-
-	/* Check for existing file */
-	fd = fd_open(buf, O_RDONLY);
-
+	y = 1;
 	/* Existing file */
-	if (fd >= 0)
-	{
-		/* Close the file */
-		(void)fd_close(fd);
-
+	if (file_exists(buf)) {
 		/* Ask */
-		if (get_check("Replace existing file %s? ", buf)) fd = -1;
+		if (get_check("Replace existing file %s? ", buf)) y = 0;
 	}
 
 	/* Open the non-existing file */
-	if (fd < 0) fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
+	if (y) fff = file_open(buf, MODE_WRITE, FTYPE_TEXT);
 
 	/* Invalid file */
-	if (!fff)
-	{
+	if (!fff) {
 		/* Message */
 		msgf("Character dump failed!");
 		message_flush();
@@ -4306,10 +4295,10 @@ void do_cmd_save_game(int is_autosave)
 		safe_setuid_grab();
 
 		/* Remove the old backup */
-		(void)fd_kill(newsf);
+		(void)file_delete(newsf);
 
 		/* Preserve current savefile */
-		(void)fd_move(oldsf,newsf);
+		(void)file_move(oldsf,newsf);
 
 		/* Drop permissions */
 		safe_setuid_drop();
@@ -4319,8 +4308,9 @@ void do_cmd_save_game(int is_autosave)
 			msgf ("Autosave backup failed.");
 
 			safe_setuid_grab();
-			(void)fd_kill(oldsf);
-			(void)fd_move(newsf,oldsf);
+			(void)file_delete(oldsf);
+			(void)file_move(newsf,oldsf);
+			safe_setuid_drop();
 		} else {
 			/* do not include this in save count */
 			sf_saves--;

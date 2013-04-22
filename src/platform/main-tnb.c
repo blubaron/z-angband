@@ -311,7 +311,7 @@ int init_tnb(int argc, cptr *argv)
 	path_make(tnb_font_file, ANGBAND_DIR_XTRA, "font/16x16.txt");
 	
 	/* Use the "16x16.bmp" file if it exists */
-	if (fd_close(fd_open(tnb_font_file, O_RDONLY)))
+	if (!file_exists(tnb_font_file))
 	{
 		quit("Could not initialise font metrics!");
 	}

@@ -3566,7 +3566,7 @@ errr init_xpj(int argc, char *argv[])
 	path_make(filename, ANGBAND_DIR_XTRA, "font/16x16.txt");
 	
 	/* Use the "16x16.bmp" file if it exists */
-	if (0 == fd_close(fd_open(filename, O_RDONLY)))
+	if (file_exists(filename))
 	{
 		Display *dpy = Metadpy->dpy;
 

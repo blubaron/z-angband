@@ -5960,7 +5960,7 @@ static void init_stuff(void)
 		path_make(path, ANGBAND_DIR_FILE, "news.txt");
 		
 		/* Attempt to open and close that file */
-		if (0 == fd_close(fd_open(path, O_RDONLY))) break;
+		if (file_exists(path)) break;
 
 		/* Warning */
 		plog_fmt("Unable to open the file '%s'", path);

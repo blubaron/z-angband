@@ -1083,6 +1083,9 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 
 	switch (mode) {
 		case MODE_WRITE: {
+			/* Grab permissions */
+			safe_setuid_grab();
+
 			if (ftype == FTYPE_SAVE) {
 				int fd;
 
@@ -1113,6 +1116,10 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 				FILE_TYPE(FILE_TYPE_DATA);
 				f->fh = fopen(buf, "wb");
 			}
+
+			/* Drop permissions */
+			safe_setuid_drop();
+
 			break;
 		}
 
@@ -1120,13 +1127,23 @@ ang_file *file_open(const char *fname, file_mode mode, file_type ftype)
 			if ((ftype == FTYPE_TEXT) || (ftype == FTYPE_HTML)) {
 				f->fh = fopen(buf, "r");
 			} else
+			if (ftype == FTYPE_SAVE) {
+				safe_setuid_grab();
+				f->fh = fopen(buf, "rb");
+				safe_setuid_drop();
+			} else
 			{
 				f->fh = fopen(buf, "rb");
 			}
 			break;
 		}
 
-		case MODE_APPEND: f->fh = fopen(buf, "a+"); break;
+		case MODE_APPEND: {
+			safe_setuid_grab();
+			f->fh = fopen(buf, "a+");
+			safe_setuid_drop();
+			break;
+		}
 
 		default: f->fh = fopen(buf, "__");
 	}
@@ -1220,6 +1237,10 @@ bool file_eof(ang_file *f)
 int file_error(ang_file *f)
 {
 	return ferror(f->fh);
+}
+int file_descriptor(ang_file *f)
+{
+	return fileno(f->fh);
 }
 
 bool file_getpos(ang_file *f, u32b *retpos)

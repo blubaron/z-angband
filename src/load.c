@@ -3687,14 +3687,8 @@ errr rd_savefile_new(void)
 {
 	errr err;
 
-	/* Grab permissions */
-	safe_setuid_grab();
-
 	/* The savefile is a binary file */
-	fff = file_open(savefile, MODE_READ, FTYPE_RAW);
-
-	/* Drop permissions */
-	safe_setuid_drop();
+	fff = file_open(savefile, MODE_READ, FTYPE_SAVE);
 
 	/* Paranoia */
 	if (!fff) return (-1);

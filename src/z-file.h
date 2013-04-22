@@ -98,6 +98,15 @@ ang_file *file_open_temp(char *buf, int max);
  */
 bool file_close(ang_file *f);
 
+/**
+
+ * Attempt to get a descriptor for the file handle `f`.
+ *
+
+ * Returns the file descriptor handle if successful, -1 otherwise.
+ */
+int file_descriptor(ang_file *f);
+
 
 /** File locking **/
 
