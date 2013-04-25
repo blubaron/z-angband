@@ -233,7 +233,7 @@ char *analyze_file(char *path, int *wp, int *hp)
 {
 	int wid, hgt;
 
-	char *s, *p;
+	char *s, *p, *s2;
 
 	/* Start at the end */
 	p = path + strlen(path) - 1;
@@ -244,15 +244,19 @@ char *analyze_file(char *path, int *wp, int *hp)
 	/* Advance to file name */
 	++p;
 
-	/* Capitalize */
-	for (s = p; *s; ++s)
-	{
-		/* Capitalize (be paranoid) */
-		if (islower((unsigned char)*s)) *s = toupper((unsigned char)*s);
-	}
-
 	/* Find first 'X' */
 	s = strchr(p, 'X');
+	s2 = strchr(p, 'x');
+
+	if (s2) {
+		if (s) {
+			if (s2 < s) {
+				s = s2;
+			}
+		} else {
+			s = s2;
+		}
+	}
 
 	/* Extract font width */
 	wid = atoi(p);
