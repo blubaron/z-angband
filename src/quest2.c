@@ -2579,6 +2579,82 @@ void dump_castle_info(ang_file *fff, int town)
 	}
 }
 
+/*( Dump the quests related to these quest stairs into fff, only when display is set */
+void dump_quest_stair_info(ang_file *fff, int town)
+{
+	int j, k, sz, w;
+	quest_type *q_ptr;
+	char *s;
+	char tmp_str[256];
+	
+	(void)Term_get_size(&w, &j);
+	sz = w;
+
+	if (!(place[town].quest_num)) {
+		froff(fff, "No known quests here.\n");
+		return;
+	}
+
+	q_ptr = &quest[place[town].quest_num];
+
+	if (!(q_ptr->flags & QUEST_FLAG_KNOWN)) return;
+	if (q_ptr->status != QUEST_STATUS_TAKEN) {
+		froff(fff, "No known quests here.\n");
+		return;
+	}
+
+	if (q_ptr->place) {
+		if (place[q_ptr->place].numstores) {
+			froff(fff, "From a %s in %s (Danger level %i):\n",
+			      building_name(place[q_ptr->place].store[q_ptr->shop].type),place[q_ptr->place].name, q_ptr->level);
+		} else {
+			froff(fff, "From %s (Danger level %i):\n", place[q_ptr->place].name, q_ptr->level);
+		}
+	} else {
+		froff(fff, "Danger level %i:\n", q_ptr->level);
+	}
+	strnfmt(tmp_str, 256, "%s  %s",
+		q_ptr->name, quest_status_string(q_ptr));
+
+	/* Copy to the file */
+	s = tmp_str;
+	j = strlen(tmp_str);
+
+	/* break up tmp_str so that it displays nicely */
+	do {
+		if (j <= sz) {
+			froff(fff, "%s", s);
+			break;
+		}
+		for (k = sz; k >= sz-14; k--) {
+			if (s[k] == ' ') {
+				s[k] = 0;
+				froff(fff, "%s\n", s);
+				s[k] = ' ';
+				s = &s[k+1];
+				j -= k+1;
+				break;
+			}
+		}
+		if (k == sz-15) {
+			char c_tmp = s[sz];
+			s[sz] = 0;
+			froff(fff, "%s\n", s);
+			s[sz] = c_tmp;
+			s = &s[sz+1];
+			j -= sz+1;
+ 		}
+
+		sz = w;
+	} while (TRUE);
+
+	/* Line Breaks */
+	froff(fff, "\n\n");
+
+	/* TODO: Loop through the quests and find others that may */
+	/* be at least partially satisified here */
+}
+
 /*
  * Returns "true" if the monster listed matches this rule.
  * Ignores inclusion/exclusion and negation.

@@ -945,10 +945,13 @@ static void display_banner(wild_done_type *w_ptr)
 				quest_type *q_ptr = &quest[pl_ptr->quest_num];
 				if ((q_ptr->flags & QUEST_FLAG_KNOWN) && (q_ptr->status == QUEST_STATUS_TAKEN ||
 					q_ptr->status == QUEST_STATUS_COMPLETED || q_ptr->status == QUEST_STATUS_FAILED))
+				{
 					//banner = "Quest";
   				//banner = quest[pl_ptr->quest_num].name;
 					banner = format("Level %d Quest", q_ptr->level);
-				else
+					put_fstr(wid / 2 - 38, hgt - 1,
+							"Move around,$U press * for quest$Yt$V,$U ~ for info$Y~$V, or $Uhit any other key to continue$Y $V.");
+				} else
 					banner = "";
 			}
 
@@ -1032,6 +1035,8 @@ static bool dump_home_info(ang_file *fff, int town)
 	return (visited_town);
 }
 
+/*( Dump the quests related to these quest stairs into fff, only when display is set */
+void dump_quest_stair_info(ang_file *fff, int town);
 
 /* This function predicts whether keystroke c on a town has any effect */
 static bool dump_info_test(char c, int town)
@@ -1042,7 +1047,11 @@ static bool dump_info_test(char c, int town)
 
 	store_type *st_ptr;
 
-	/* Paranoia */
+	if ((place[town].type == PL_QUEST_STAIR) &&((c == '*') || (c == 't'))) {
+		return TRUE;
+	}
+
+	/* go away if nothing will happen */
 	if (place[town].numstores == 0) return (FALSE);
 
 	/* Find out if this command makes sense */
@@ -1115,9 +1124,6 @@ static bool do_cmd_view_map_aux(char c, int town)
 	cptr title = NULL;
 
 	/* Call this proc with a place that is a town */
-	if (place[town].numstores == 0) return (FALSE);
-
-	/* go away if nothing will happen */
 	if (!dump_info_test(c, town)) return (FALSE);
 
 	/* Open temporary file */
@@ -1133,9 +1139,13 @@ static bool do_cmd_view_map_aux(char c, int town)
 		case 't':
 		{
 			/* Display the list of shops */
-			dump_town_info(fff, town, FALSE);
-			title = "Town info";
-
+			if (place[town].type == PL_QUEST_STAIR) {
+				dump_quest_stair_info(fff, town);
+				title = "Quest info";
+			} else {
+				dump_town_info(fff, town, FALSE);
+				title = "Town info";
+			}
 			break;
 		}
 
