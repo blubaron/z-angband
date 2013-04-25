@@ -3259,39 +3259,35 @@ static errr rd_savefile_new_aux(void)
 				MAKE(place[i].dungeon, dun_type);
 			}
 			else
-//#if (0)
-      if (sf_version >= 63) {
+			if (sf_version >= 63) {
 				byte dungeon;
 
 				rd_byte(&dungeon);
-        if (dungeon) {
+				if (dungeon) {
 					dun_type *dun_ptr;
-				  /* Create a dungeon here */
-  				//rd_byte(&tmp8u);
-          //init_dungeon(&(place[i]), &(dungeons[tmp8u]));
-				  MAKE(place[i].dungeon, dun_type);
+					/* Create a dungeon here */
+					MAKE(place[i].dungeon, dun_type);
 
-				  dun_ptr = place[i].dungeon;
+					dun_ptr = place[i].dungeon;
 
-          rd_byte(&(dun_ptr->didx));
-          /* load the dungeon info */
-          pick_dungeon(dun_ptr, 0, dun_ptr->didx);
+					rd_byte(&(dun_ptr->didx));
+					/* load the dungeon info */
+					pick_dungeon(dun_ptr, 0, dun_ptr->didx);
 
-          /* read the stuff that can be overwritten for specific dungeons */
-          /* Levels in dungeon */
-			    rd_byte(&dun_ptr->min_level);
-			    rd_byte(&dun_ptr->max_level);
-			    rd_byte(&dun_ptr->level_change_step);
-          /* dungeon flags */
-				  rd_u32b(&dun_ptr->flags);
-			    /* Rating + feeling */
-			    rd_s16b(&dun_ptr->rating);
-          /* Recall depth */
-			    rd_byte(&dun_ptr->recall_depth);
+					/* read the stuff that can be overwritten for specific dungeons */
+					/* Levels in dungeon */
+					rd_byte(&dun_ptr->min_level);
+					rd_byte(&dun_ptr->max_level);
+					rd_byte(&dun_ptr->level_change_step);
+					/* dungeon flags */
+					rd_u32b(&dun_ptr->flags);
+					/* Rating + feeling */
+					rd_s16b(&dun_ptr->rating);
+					/* Recall depth */
+					rd_byte(&dun_ptr->recall_depth);
 
-        }
-      } else
-//#endif
+				}
+			} else
 			{
 				byte dungeon;
 
@@ -3371,63 +3367,64 @@ static errr rd_savefile_new_aux(void)
 
 						rd_byte(&dun_ptr->room_limit);
 
-            /* get the dungeon index */
-            for (j=0; j < 32; j++) {
-              dun_gen_type *dg_ptr = &old_dungeons[j];
-              if ((dun_ptr->rooms == dg_ptr->rooms)
-                && (dun_ptr->habitat == dg_ptr->habitat)
-                && (dun_ptr->theme.treasure == dg_ptr->theme.treasure)
-                && (dun_ptr->theme.combat == dg_ptr->theme.combat)
-                && (dun_ptr->theme.magic == dg_ptr->theme.magic)
-                && (dun_ptr->theme.tools == dg_ptr->theme.tools)
-                && (dun_ptr->floor == dg_ptr->floor)
-                && (dun_ptr->wall == dg_ptr->wall)
-                && (dun_ptr->perm_wall == dg_ptr->perm_wall)
-                && (dun_ptr->vein[0].shal == dg_ptr->vein[0].shal)
-                && (dun_ptr->vein[0].size == dg_ptr->vein[0].size)
-                && (dun_ptr->vein[0].number == dg_ptr->vein[0].number)
-                && (dun_ptr->vein[1].deep == dg_ptr->vein[1].shal)
-                && (dun_ptr->vein[1].size == dg_ptr->vein[1].size)
-                && (dun_ptr->vein[1].number == dg_ptr->vein[1].number)
-                && (dun_ptr->river[0].shal == dg_ptr->river[0].shal)
-                && (dun_ptr->river[0].deep == dg_ptr->river[0].deep)
-                && (dun_ptr->river[0].rarity == dg_ptr->river[0].rarity)
-                && (dun_ptr->river[0].size == dg_ptr->river[0].size)
-                && (dun_ptr->river[1].shal == dg_ptr->river[1].shal)
-                && (dun_ptr->river[1].deep == dg_ptr->river[1].deep)
-                && (dun_ptr->river[1].rarity == dg_ptr->river[1].rarity)
-                && (dun_ptr->river[1].size == dg_ptr->river[1].size)
-                && (dun_ptr->lake.shal == dg_ptr->lake.shal)
-                && (dun_ptr->lake.deep == dg_ptr->lake.deep)
-                && (dun_ptr->lake.rarity == dg_ptr->lake.rarity)
-                && (dun_ptr->lake.size == dg_ptr->lake.size)) {
-                dun_ptr->didx = dg_ptr->didx;
-                dun_ptr->rubble = dg_ptr->rubble;
-                dun_ptr->door_closed = dg_ptr->door_closed;
-                dun_ptr->door_open = dg_ptr->door_open;
-                dun_ptr->door_broken = dg_ptr->door_broken;
-                dun_ptr->door_secret = dg_ptr->door_secret;
-                dun_ptr->stairs_up = dg_ptr->stairs_up;
-                dun_ptr->stairs_down = dg_ptr->stairs_down;
-                dun_ptr->stairs_closed = dg_ptr->stairs_closed;
-                dun_ptr->pillar = dg_ptr->pillar;
-                dun_ptr->level_change_step = dg_ptr->level_change_step;
-                break;
-              }
-            }
-            if (j == z_info->dun_max+1) {
-              dun_ptr->didx = 1;
-              dun_ptr->rubble = dungeons[1].rubble;
-              dun_ptr->door_closed = dungeons[1].door_closed;
-              dun_ptr->door_open = dungeons[1].door_open;
-              dun_ptr->door_broken = dungeons[1].door_broken;
-              dun_ptr->door_secret = dungeons[1].door_secret;
-              dun_ptr->stairs_up = dungeons[1].stairs_up;
-              dun_ptr->stairs_down = dungeons[1].stairs_down;
-              dun_ptr->stairs_closed = dungeons[1].stairs_closed;
-              dun_ptr->pillar = dungeons[1].pillar;
-              dun_ptr->level_change_step = 1;
-            }
+						/* get the dungeon index */
+						for (j=0; j < 32; j++) {
+							dun_gen_type *dg_ptr = &old_dungeons[j];
+							if ((dun_ptr->rooms == dg_ptr->rooms)
+								&& (dun_ptr->habitat == dg_ptr->habitat)
+								&& (dun_ptr->theme.treasure == dg_ptr->theme.treasure)
+								&& (dun_ptr->theme.combat == dg_ptr->theme.combat)
+								&& (dun_ptr->theme.magic == dg_ptr->theme.magic)
+								&& (dun_ptr->theme.tools == dg_ptr->theme.tools)
+								&& (dun_ptr->floor == dg_ptr->floor)
+								&& (dun_ptr->wall == dg_ptr->wall)
+								&& (dun_ptr->perm_wall == dg_ptr->perm_wall)
+								&& (dun_ptr->vein[0].shal == dg_ptr->vein[0].shal)
+								&& (dun_ptr->vein[0].size == dg_ptr->vein[0].size)
+								&& (dun_ptr->vein[0].number == dg_ptr->vein[0].number)
+								&& (dun_ptr->vein[1].deep == dg_ptr->vein[1].shal)
+								&& (dun_ptr->vein[1].size == dg_ptr->vein[1].size)
+								&& (dun_ptr->vein[1].number == dg_ptr->vein[1].number)
+								&& (dun_ptr->river[0].shal == dg_ptr->river[0].shal)
+								&& (dun_ptr->river[0].deep == dg_ptr->river[0].deep)
+								&& (dun_ptr->river[0].rarity == dg_ptr->river[0].rarity)
+								&& (dun_ptr->river[0].size == dg_ptr->river[0].size)
+								&& (dun_ptr->river[1].shal == dg_ptr->river[1].shal)
+								&& (dun_ptr->river[1].deep == dg_ptr->river[1].deep)
+								&& (dun_ptr->river[1].rarity == dg_ptr->river[1].rarity)
+								&& (dun_ptr->river[1].size == dg_ptr->river[1].size)
+								&& (dun_ptr->lake.shal == dg_ptr->lake.shal)
+								&& (dun_ptr->lake.deep == dg_ptr->lake.deep)
+								&& (dun_ptr->lake.rarity == dg_ptr->lake.rarity)
+								&& (dun_ptr->lake.size == dg_ptr->lake.size))
+							{
+								dun_ptr->didx = dg_ptr->didx;
+								dun_ptr->rubble = dg_ptr->rubble;
+								dun_ptr->door_closed = dg_ptr->door_closed;
+								dun_ptr->door_open = dg_ptr->door_open;
+								dun_ptr->door_broken = dg_ptr->door_broken;
+								dun_ptr->door_secret = dg_ptr->door_secret;
+								dun_ptr->stairs_up = dg_ptr->stairs_up;
+								dun_ptr->stairs_down = dg_ptr->stairs_down;
+								dun_ptr->stairs_closed = dg_ptr->stairs_closed;
+								dun_ptr->pillar = dg_ptr->pillar;
+								dun_ptr->level_change_step = dg_ptr->level_change_step;
+								break;
+							}
+						}
+						if (j == z_info->dun_max+1) {
+							dun_ptr->didx = 1;
+							dun_ptr->rubble = dungeons[1].rubble;
+							dun_ptr->door_closed = dungeons[1].door_closed;
+							dun_ptr->door_open = dungeons[1].door_open;
+							dun_ptr->door_broken = dungeons[1].door_broken;
+							dun_ptr->door_secret = dungeons[1].door_secret;
+							dun_ptr->stairs_up = dungeons[1].stairs_up;
+							dun_ptr->stairs_down = dungeons[1].stairs_down;
+							dun_ptr->stairs_closed = dungeons[1].stairs_closed;
+							dun_ptr->pillar = dungeons[1].pillar;
+							dun_ptr->level_change_step = 1;
+						}
 
 						rd_u32b(&dun_ptr->flags);
 
@@ -3489,104 +3486,91 @@ static errr rd_savefile_new_aux(void)
 			}
 		}
 	}
-  if (p_ptr->home_place_num == 0) {
-    place_type *pl_ptr;
-  	s16b tmp16s;
-    /* set the home to the first one found */
-	  for (i = 0; i < place_count; i++)
-	  {
-		  pl_ptr = &place[i];
-      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-      {
-	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++)
-	      {
-          if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME)
-          {
-            p_ptr->home_place_num = i;
-            p_ptr->home_store_num = tmp16s;
-            break;
-          }
-        }
-        if (p_ptr->home_place_num != 0) {
-          break;
-        }
-      }
-    }
-  }
-  /* make sure we have a capital place set */
-  if (p_ptr->capital_place_num == 0) {
-    place_type *pl_ptr;
-  	s16b tmp16s;
-    /* set the palace to the first large castle found */
-	  for (i = 0; i < place_count; i++)
-	  {
-		  pl_ptr = &place[i];
-      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-      {
-	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
-          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE1)
-          {
-            p_ptr->capital_place_num = i;
-            p_ptr->capital_store_num = tmp16s;
-  	        p_ptr->capital_dun_num = 0;
-            break;
-          }
-        }
-        if (p_ptr->capital_place_num != 0) {
-          break;
-        }
-      }
-    }
-  }
-  if (p_ptr->capital_place_num == 0) {
-    place_type *pl_ptr;
-  	s16b tmp16s;
-    /* if we still haven't found a palace, set it to the first keep found */
-	  for (i = 0; i < place_count; i++)
-	  {
-		  pl_ptr = &place[i];
-      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-      {
-	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
-          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE0)
-          {
-            p_ptr->capital_place_num = i;
-            p_ptr->capital_store_num = tmp16s;
-  	        p_ptr->capital_dun_num = 0;
-            break;
-          }
-        }
-        if (p_ptr->capital_place_num != 0) {
-          break;
-        }
-      }
-    }
-  }
-  if (p_ptr->capital_place_num == 0) {
-    place_type *pl_ptr;
-  	s16b tmp16s;
-    /* if we still haven't found a palace, set it to the first town hall
-     * found, which is guranteed to exist in the starting town */
-	  for (i = 0; i < place_count; i++)
-	  {
-		  pl_ptr = &place[i];
-      if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD))
-      {
-	      for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
-          if (pl_ptr->store[tmp16s].type == BUILD_CASTLE2)
-          {
-            p_ptr->capital_place_num = i;
-            p_ptr->capital_store_num = tmp16s;
-  	        p_ptr->capital_dun_num = 0;
-            break;
-          }
-        }
-        if (p_ptr->capital_place_num != 0) {
-          break;
-        }
-      }
-    }
-  }
+	if (p_ptr->home_place_num == 0) {
+		place_type *pl_ptr;
+		s16b tmp16s;
+		/* set the home to the first one found */
+		for (i = 0; i < place_count; i++) {
+			pl_ptr = &place[i];
+			if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD)) {
+				for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+					if (pl_ptr->store[tmp16s].type == BUILD_STORE_HOME) {
+						p_ptr->home_place_num = i;
+						p_ptr->home_store_num = tmp16s;
+						break;
+					}
+				}
+				if (p_ptr->home_place_num != 0) {
+					break;
+				}
+			}
+		}
+	}
+	/* make sure we have a capital place set */
+	if (p_ptr->capital_place_num == 0) {
+		place_type *pl_ptr;
+		s16b tmp16s;
+		/* set the palace to the first large castle found */
+		for (i = 0; i < place_count; i++) {
+			pl_ptr = &place[i];
+			if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD)) {
+				for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+					if (pl_ptr->store[tmp16s].type == BUILD_CASTLE1) {
+						p_ptr->capital_place_num = i;
+						p_ptr->capital_store_num = tmp16s;
+						p_ptr->capital_dun_num = 0;
+						break;
+					}
+				}
+				if (p_ptr->capital_place_num != 0) {
+					break;
+				}
+			}
+		}
+	}
+	if (p_ptr->capital_place_num == 0) {
+		place_type *pl_ptr;
+		s16b tmp16s;
+		/* if we still haven't found a palace, set it to the first keep found */
+		for (i = 0; i < place_count; i++) {
+			pl_ptr = &place[i];
+			if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD)) {
+				for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+					if (pl_ptr->store[tmp16s].type == BUILD_CASTLE0) {
+						p_ptr->capital_place_num = i;
+						p_ptr->capital_store_num = tmp16s;
+						p_ptr->capital_dun_num = 0;
+						break;
+					}
+				}
+				if (p_ptr->capital_place_num != 0) {
+					break;
+				}
+			}
+		}
+	}
+	if (p_ptr->capital_place_num == 0) {
+		place_type *pl_ptr;
+		s16b tmp16s;
+		/* if we still haven't found a palace, set it to the first town hall
+		 * found, which is guranteed to exist in the starting town */
+		for (i = 0; i < place_count; i++) {
+			pl_ptr = &place[i];
+			if ((pl_ptr->type == PL_TOWN_FRACT) || (pl_ptr->type == PL_TOWN_OLD)) {
+				for (tmp16s = 0; tmp16s < pl_ptr->numstores; tmp16s++) {
+					if (pl_ptr->store[tmp16s].type == BUILD_CASTLE2) {
+						p_ptr->capital_place_num = i;
+						p_ptr->capital_store_num = tmp16s;
+						p_ptr->capital_dun_num = 0;
+						break;
+					}
+				}
+				if (p_ptr->capital_place_num != 0) {
+					break;
+				}
+			}
+		}
+	}
 
 	/* Read the pet command settings */
 	if (sf_version > 2)
