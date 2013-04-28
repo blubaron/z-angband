@@ -266,7 +266,7 @@ void message_add(cptr str, u16b type)
 		}
 
 		/* Limit the multiplier to 1000 */
-		if (buf && streq(buf, str) && (j < 1000))
+		if (streq(buf, str) && (j < 1000))
 		{
 			j++;
 
@@ -360,7 +360,6 @@ void message_add(cptr str, u16b type)
 
 			/* Kill "dead" messages */
 			if (o >= message__head)
-
 			{
 				/* Track oldest message */
 				message__last = i + 1;
@@ -587,7 +586,7 @@ static void msg_print_aux(u16b type, cptr msg)
 	t = buf;
 
 	/* Get the color of the message (if legal) */
-	if (message__color)
+	/*if (message__color)*/
 		color = message__color[type];
 
 	/* HACK -- no "black" messages */

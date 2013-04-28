@@ -435,6 +435,9 @@ int ini_setting_set_string(ini_settings *ini, const char *section, const char* k
 	ini_settings_section *sec = NULL;
 	ini_settings_value *val;
 
+	/* prevent a compiler warning */
+	(void)size;
+
 	val = ini_settings_find_key(ini, section, key,  &sec);
 	if (val) {
 		/* we already have this key for this section, so just change its value */
@@ -488,6 +491,9 @@ int ini_setting_set_string_def(ini_settings *ini, const char *section, const cha
 {
 	ini_settings_section *sec = NULL;
 	ini_settings_value *val;
+
+	/* prevent a compiler warning */
+	(void)size;
 
 	val = ini_settings_find_key(ini, section, key,  &sec);
 	if (val) {

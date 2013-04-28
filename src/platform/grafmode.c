@@ -18,7 +18,7 @@
 
 #include "angband.h"
 #include "grafmode.h"
-//#include "parser.h"
+/*#include "parser.h"*/
 
 graphics_mode *graphics_modes;
 graphics_mode *current_graphics_mode = NULL;
@@ -32,7 +32,7 @@ bool init_graphics_modes(const char *filename) {
 	char *zz[16];
 	char buf[1024];
 	ang_file *fp;
-	graphics_mode *mode,*next;
+	graphics_mode *mode = NULL,*next;
 
 	/* Build the filename */
 	path_make(buf, ANGBAND_DIR_USER, filename);
@@ -65,7 +65,7 @@ bool init_graphics_modes(const char *filename) {
 
     
 		/* Require "?:*" format */
-		if (buf[1] != ':') return FALSE;//(1);
+		if (buf[1] != ':') return FALSE;/*(1);*/
 
 		/* process the line */
 		/* Process "N:<id>:<menuname>" -- start a new record */
@@ -82,10 +82,10 @@ bool init_graphics_modes(const char *filename) {
 					mode->pNext = graphics_modes;
 					graphics_modes = mode;
 				} else {
-					return FALSE;//(PARSE_ERROR_OUT_OF_MEMORY);
+					return FALSE;/*(PARSE_ERROR_OUT_OF_MEMORY);*/
 				}
 			} else {
-				return FALSE;//(PARSE_ERROR_GENERIC);
+				return FALSE;/*(PARSE_ERROR_GENERIC);*/
 			}
 
 		}
@@ -101,10 +101,10 @@ bool init_graphics_modes(const char *filename) {
 					}
 					mode->pref[31] = 0;
 				} else {
-					return FALSE;//(PARSE_ERROR_MISSING_RECORD_HEADER);
+					return FALSE;/*(PARSE_ERROR_MISSING_RECORD_HEADER);*/
 				}
 			} else {
-				return FALSE;//(PARSE_ERROR_GENERIC);
+				return FALSE;/*(PARSE_ERROR_GENERIC);*/
 			}
 		}
 		/* Process "I:<cell width>:<cell height>:<filename>" -- read the tileset info */
@@ -116,10 +116,10 @@ bool init_graphics_modes(const char *filename) {
 					strncpy(mode->file, zz[2], 32);
 					mode->file[31] = 0;
 				} else {
-					return FALSE;//(PARSE_ERROR_MISSING_RECORD_HEADER);
+					return FALSE;/*(PARSE_ERROR_MISSING_RECORD_HEADER);*/
 				}
 			} else {
-				return FALSE;//(PARSE_ERROR_GENERIC);
+				return FALSE;/*(PARSE_ERROR_GENERIC);*/
 			}
 		}
 		/* Process "X:<alpha>:<overdraw_min>:<overdraw_max>" -- read some extra info */
@@ -130,15 +130,15 @@ bool init_graphics_modes(const char *filename) {
 					mode->overdrawRow = strtol(zz[1], NULL, 0);
 					mode->overdrawMax = strtol(zz[2], NULL, 0);
 				} else {
-					return FALSE;//(PARSE_ERROR_MISSING_RECORD_HEADER);
+					return FALSE;/*(PARSE_ERROR_MISSING_RECORD_HEADER);*/
 				}
 			} else {
-				return FALSE;//(PARSE_ERROR_GENERIC);
+				return FALSE;/*(PARSE_ERROR_GENERIC);*/
 			}
 		}
 		else {
 			/* Oops */
-			return FALSE;//(PARSE_ERROR_UNDEFINED_DIRECTIVE);
+			return FALSE;/*(PARSE_ERROR_UNDEFINED_DIRECTIVE);*/
 		}
 	}
 
@@ -198,7 +198,7 @@ void close_graphics_modes(void) {
 }
 
 graphics_mode* get_graphics_mode(byte id) {
-	if ((id <= graphics_mode_high_id) && (id >= 0)
+	if ((id <= graphics_mode_high_id)
 		&& graphics_modes[id].file[0])
 	{
 		return &(graphics_modes[id]);

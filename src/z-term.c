@@ -1627,7 +1627,7 @@ void Term_draw(int x, int y, byte a, char c)
 void Term_addch(byte a, char c)
 {
 	int w = Term->wid;
-	int x,y;
+
 	/* Handle "unusable" cursor */
 	if (Term->scr->cu) return;
 
@@ -1709,7 +1709,7 @@ void Term_big_putch(int x, int y, byte a, char c)
 			  Term_putch(x, y + vert, 255, -1);
 			else
 			  Term_putch(x, y + vert, 1, ' ');
-				//Term_putch(x, y + vert, TERM_WHITE, ' ');
+				/*Term_putch(x, y + vert, TERM_WHITE, ' ');*/
 		}
 	}
 }
