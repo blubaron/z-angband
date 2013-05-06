@@ -1684,6 +1684,9 @@ bool askfor_aux(char *buf, int len)
 
 	bool done = FALSE;
 
+	/* see if we have a ui override */
+	if (Term->askfor_hook) return (*(Term->askfor_hook))(buf, len);
+
 	/* Locate the cursor */
 	(void)Term_locate(&x, &y);
 

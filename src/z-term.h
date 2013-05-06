@@ -240,6 +240,7 @@ struct term
 	bool (*get_aim_dir_hook)(int *dp);
 	bool (*get_check_hook)(bool def, bool esc, cptr prompt);
 	bool (*get_string_hook)(char *buf, int len, cptr prompt);
+	bool (*askfor_hook)(char *buf, int len); /* uses text grid to display */
 	bool (*get_com_hook)(cptr prompt, char *command);
 	bool (*get_com_m_hook)(cptr prompt, char *command);
 	s32b (*get_quantity_big_hook)(cptr prompt, s32b initial, s32b max);
