@@ -598,7 +598,7 @@ static errr init_info(cptr filename, header *head,
 			quit_fmt("Cannot create the '%s' file!", buf);
 
 			/* Paranoia */
-			return;
+			return (-1);
 		}
 
 		/* Dump it */
@@ -645,7 +645,7 @@ static errr init_info(cptr filename, header *head,
 			quit_fmt("Cannot load '%s.raw' file.", filename);
 
 			/* Paranoia */
-			return;
+			return (-1);
 		}
 
 		/* Attempt to parse the "raw" file */
@@ -659,7 +659,7 @@ static errr init_info(cptr filename, header *head,
 			quit_fmt("Cannot parse '%s.raw' file.", filename);
 
 			/* Paranoia */
-			return;
+			return (-1);
 		}
 
 #ifdef ALLOW_TEMPLATES
@@ -1910,7 +1910,7 @@ void cleanup_angband(void)
 
 	/* Free spell effect colors */
 	for (i = 0; i < MAX_GF; i++) {
-		FREE(gf_color[i]);
+		FREE((void*)gf_color[i]);
 		gf_color[i] = NULL;
 	}
 
