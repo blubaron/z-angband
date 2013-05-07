@@ -341,6 +341,7 @@ extern void run_step(int dir);
 
 /* cmd2.c */
 extern int coords_to_dir(int x, int y);
+extern int coords_to_dir_rough(int x, int y);
 extern void do_cmd_go_up(void);
 extern void do_cmd_go_down(void);
 extern void do_cmd_search(void);

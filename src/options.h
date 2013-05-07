@@ -227,7 +227,7 @@
 #define check_transaction		p_ptr->options[158]
 /* {TRUE,  0, NULL,					"Number 175" }, p_ptr->options[159] */
 /* {TRUE,  0, NULL,					"Number 176" }, p_ptr->options[160] */
-/* {TRUE,  0, NULL,					"Number 177" }, p_ptr->options[161] */
+#define mouse_path			p_ptr->options[161]
 /* {TRUE,  0, NULL,					"Number 178" }, p_ptr->options[162] */
 /* {TRUE,  0, NULL,					"Number 179" }, p_ptr->options[163] */
 /* {TRUE,  0, NULL,					"Number 180" }, p_ptr->options[164] */

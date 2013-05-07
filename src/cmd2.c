@@ -705,6 +705,38 @@ int coords_to_dir(int x, int y)
 	return (5);
 }
 
+/*
+ * Convert a farther location to a rough direction.
+ */
+int coords_to_dir_rough(int x, int y)
+{
+	int ax, ay;
+
+	/* No movement required */
+	if ((y == p_ptr->py) && (x == p_ptr->px)) return (5);
+
+	/* South or North */
+	if (x == p_ptr->px) return ((y < p_ptr->py) ? 8 : 2);
+
+	/* East or West */
+	if (y == p_ptr->py) return ((x < p_ptr->px) ? 4 : 6);
+
+	/* some additional vectors for north, south, east and west */
+	if (y < p_ptr->py) ay = (p_ptr->py - y); else ay = (y - p_ptr->py);
+	if (x < p_ptr->px) ax = (p_ptr->px - x); else ax = (x - p_ptr->px);
+	if (ax > 2 * ay) return ((x < p_ptr->px) ? 4 : 6);
+	if (ay > 2 * ax) return ((y < p_ptr->py) ? 8 : 2);
+
+	/* South-east or South-west */
+	if (y < p_ptr->py) return ((x < p_ptr->px) ? 7 : 9);
+
+	/* North-east or North-west */
+	if (y > p_ptr->py) return ((x < p_ptr->px) ? 1 : 3);
+
+	/* Paranoia */
+	return (5);
+}
+
 
 /*
  * Perform the basic "open" command on doors

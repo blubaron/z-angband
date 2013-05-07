@@ -244,15 +244,21 @@ void process_click(char press, int xpos, int ypos)
 				do_cmd_locate();
 			} else
 			{
-				/* if the click was adjacent to the player, walk in that direction */
-				if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
-						&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
-				{
-					p_ptr->cmd.dir = coords_to_dir(x, y);
-					do_cmd_walk(FALSE);
+				if (mouse_path) {
+					/* if the click was adjacent to the player, walk in that direction */
+					if ((y-p_ptr->py >= -1) && (y-p_ptr->py <= 1)
+							&& (x-p_ptr->px >= -1) && (x-p_ptr->px <= 1))
+					{
+						p_ptr->cmd.dir = coords_to_dir(x, y);
+						do_cmd_walk(FALSE);
+					} else {
+						/* if not, pathfind to that spot */
+						do_cmd_pathfind(x,y);
+					}
 				} else {
-					/* if not, pathfind to that spot */
-					do_cmd_pathfind(x,y);
+					/* move roughly in the clicked direction */
+					p_ptr->cmd.dir = coords_to_dir_rough(x, y);
+					do_cmd_walk(FALSE);
 				}
 			}
 		}

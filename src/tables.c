@@ -3373,7 +3373,7 @@ option_type option_info[OPT_MAX] =
 	{TRUE,  1, "check_transaction",		"Prompt when buying or selling" },
 	{TRUE,  0, NULL,					"Number 175" },
 	{TRUE,  0, NULL,					"Number 176" },
-	{TRUE,  0, NULL,					"Number 177" },
+	{TRUE,  1, "mouse_path",			"Mouse move to spot instead of direction" },
 	{TRUE,  0, NULL,					"Number 178" },
 	{TRUE,  0, NULL,					"Number 179" },
 	{TRUE,  0, NULL,					"Number 180" },
