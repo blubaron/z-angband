@@ -2384,6 +2384,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 		/* Paranoia */
 		query = ' ';
 
+		/* backup and clear buttons */
+		button_backup_all(TRUE);
+
 		/* Assume boring */
 		boring = TRUE;
 
@@ -2444,7 +2447,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 			/* Display a message */
 			prtf(0, 0, "%s%s%ssomething strange [%s] (%s)", s1, s2, s3, name, info, s4);
 			move_cursor_relative(x, y);
-			query = inkey();
+			query = inkey_m();
+
+			/* restore previous buttons */
+			button_restore();
 
 			/* Stop on everything but "return" */
 			if ((query != '\r') && (query != '\n')) break;
@@ -2477,7 +2483,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 					s3 = "a ";
 					prtf(0, 0, "%s%s%s%s [%s] (%s)", s1, s2, s3, m_name, info, s4);
 					move_cursor_relative(x, y);
-					query = inkey();
+					query = inkey_m();
+
+					/* restore previous buttons */
+					button_restore();
 
 					/* Always stop at "normal" keys */
 					if ((query != '\r') && (query != '\n')
@@ -2518,13 +2527,21 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 							screen_roff_mon(m_ptr->r_idx, 0);
 
 							/* Hack -- Complete the prompt (again) */
-							roff("  [r,%s] (%s)", info, s4);
+							roff("  [$Xr,%s] (%s)", info, s4);
 
 							/* Command */
-							query = inkey();
+							query = inkey_m();
 
 							/* Restore */
 							screen_load();
+
+							/* If we had a mouse press, consume it and clear the recall info */
+							if (query & 0x80) {
+								char b;
+								int mx, my;
+								Term_getmousepress(&b, &mx, &my);
+								query = 'r';
+							}
 						}
 
 						/* Normal */
@@ -2540,7 +2557,7 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 								attitude = " ";
 
 							/* Describe, and prompt for recall */
-							prtf(0, 0, "%s%s%s%v (%s)%s[r,%s] (%s)",
+							prtf(0, 0, "%s%s%s%v (%s)%s[$Xr,%s] (%s)",
 									s1, s2, s3, MONSTER_FMT(m_ptr, 0x08),
 									look_mon_desc(c_ptr->m_idx), attitude,
 									info, s4);
@@ -2549,11 +2566,17 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 							move_cursor_relative(x, y);
 
 							/* Command */
-							query = inkey();
+							query = inkey_m();
 						}
+
+						/* restore previous buttons */
+						button_restore();
 
 						/* Normal commands */
 						if (query != 'r') break;
+
+						/* backup previous buttons again */
+						button_backup_all(TRUE);
 
 						/* Toggle recall */
 						recall = !recall;
@@ -2565,6 +2588,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 
 					/* Sometimes stop at "space" key */
 					if ((query == ' ') && !(mode & (TARGET_LOOK))) break;
+
+					/* backup previous buttons again */
+					button_backup_all(TRUE);
 
 					/* Change the intro */
 					s1 = "It is ";
@@ -2583,7 +2609,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 						prtf(0, 0, "%s%s%s%v [%s] (%s)", s1, s2, s3,
 							 OBJECT_FMT(o_ptr, TRUE, 3), info, s4);
 						move_cursor_relative(x, y);
-						query = inkey();
+						query = inkey_m();
+
+						/* restore previous buttons */
+						button_restore();
 
 						/* Always stop at "normal" keys */
 						if ((query != '\r') && (query != '\n')
@@ -2597,6 +2626,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 						{
 							return (query);
 						}
+
+						/* backup previous buttons again */
+						button_backup_all(TRUE);
 
 						/* Change the intro */
 						s2 = "also carrying ";
@@ -2641,7 +2673,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 					move_cursor_relative(x, y);
 
 					/* Command */
-					query = inkey();
+					query = inkey_m();
+
+					/* restore previous buttons */
+					button_restore();
 
 					/* Display list of items (query == "el", not "won") */
 					if ((floor_num > 1)
@@ -2667,6 +2702,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 						/* Stop */
 						break;
 					}
+
+					/* backup previous buttons again */
+					button_backup_all(TRUE);
 				}
 
 				/* Stop */
@@ -2687,7 +2725,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 				prtf(0, 0, "%s%s%s%v [%s] (%s)", s1, s2, s3,
 					 OBJECT_FMT(o_ptr, TRUE, 3), info, s4);
 				move_cursor_relative(x, y);
-				query = inkey();
+				query = inkey_m();
+
+				/* restore previous buttons */
+				button_restore();
 
 				/* Always stop at "normal" keys */
 				if ((query != '\r') && (query != '\n') && (query != ' '))
@@ -2700,6 +2741,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 				{
 					return (query);
 				}
+
+				/* backup previous buttons again */
+				button_backup_all(TRUE);
 
 				/* Change the intro */
 				s1 = "It is ";
@@ -2760,7 +2804,10 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 				/* Describe the field */
 				prtf(0, 0, "%s%s%s%s [%s] (%s)", s1, s2, s3, fld_name, info, s4);
 				move_cursor_relative(x, y);
-				query = inkey();
+				query = inkey_m();
+
+				/* restore previous buttons */
+				button_restore();
 
 				/* Always stop at "normal" keys */
 				if ((query != '\r') && (query != '\n') && (query != ' '))
@@ -2773,6 +2820,9 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 				{
 					return (query);
 				}
+
+				/* backup previous buttons again */
+				button_backup_all(TRUE);
 
 				/* Change the intro */
 				s1 = "It is ";
@@ -2863,11 +2913,20 @@ static int target_set_aux(int x, int y, int mode, cptr info)
 			else
 				prtf(0, 0, "%s%s%s%s [%s] (%s)", s1, s2, s3, name, info, s4);
 			move_cursor_relative(x, y);
-			query = inkey();
+			query = inkey_m();
+
+			/* restore previous buttons */
+			button_restore();
 
 			/* Always stop at "normal" keys */
 			if ((query != '\r') && (query != '\n') && (query != ' ')) break;
+
+			/* backup previous buttons again */
+			button_backup_all(TRUE);
 		}
+
+		/* restore previous buttons */
+		button_restore();
 
 		/* Stop on everything but "return" */
 		if ((query != '\r') && (query != '\n')) break;
@@ -2995,13 +3054,13 @@ bool target_set_interactive(int mode, int x, int y)
 
 			if (target_able(c_ptr->m_idx))
 			{
-				strcpy(info, "q,t,p,o,+,-,<dir>");
+				strcpy(info, "$Xq,$Xt,$Xp,$Xo,$X+,$X-,<dir>");
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				strcpy(info, "q,p,o,+,-,<dir>");
+				strcpy(info, "$Xq,$Xp,$Xo,$X+,$X-,<dir>");
 			}
 
 			/* Describe and Prompt */
@@ -3013,7 +3072,31 @@ bool target_set_interactive(int mode, int x, int y)
 			/* Assume no "direction" */
 			d = 0;
 
-			/* Analyze */
+			/* Analyze the mouse press */
+			if (query & 0x80) {
+				char b;
+				int mx, my, tx, ty;
+
+				Term_getmousepress(&b, &mx, &my);
+				/*mods = b & 0x78*/
+				b = b & 0x07;
+				if (b == 1) {
+					ty = ((my-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+					tx = ((mx-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+					if ((tx == x) && (ty == y)) {
+						target_set_grid(x, y);
+						done = TRUE;
+					} else {
+						x = tx;
+						y = ty;
+						d = 5;
+					}
+				} else
+				{
+					done = TRUE;
+				}
+			} else
+			/* Analyze the key press */
 			switch (query)
 			{
 				case ESCAPE:
@@ -3176,7 +3259,7 @@ bool target_set_interactive(int mode, int x, int y)
 		else
 		{
 			/* Default prompt */
-			strcpy(info, "q,t,p,m,+,-,<dir>");
+			strcpy(info, "$Xq,$Xt,$Xp,$Xm,$X+,$X-,<dir>");
 
 			/* Describe and Prompt (enable "TARGET_LOOK") */
 			query = target_set_aux(x, y, mode | TARGET_LOOK, info);
@@ -3187,6 +3270,30 @@ bool target_set_interactive(int mode, int x, int y)
 			/* Assume no direction */
 			d = 0;
 
+			/* Analyze the mouse press */
+			if (query & 0x80) {
+				char b;
+				int mx, my, tx, ty;
+
+				Term_getmousepress(&b, &mx, &my);
+				/*mods = b & 0x78*/
+				b = b & 0x07;
+				if (b == 1) {
+					ty = ((my-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+					tx = ((mx-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+					if ((tx == x) && (ty == y)) {
+						target_set_grid(x, y);
+						done = TRUE;
+					} else {
+						x = tx;
+						y = ty;
+						d = 5;
+					}
+				} else
+				{
+					done = TRUE;
+				}
+			} else
 			/* Analyze the keypress */
 			switch (query)
 			{
