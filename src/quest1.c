@@ -790,20 +790,25 @@ static u16b insert_kill_quest(u16b r_idx, int x, int y, int p_num)
 static bool ambig [NUM_DUNGEON];
 
 /*
- * Returns TRUE if the place pl_ptr
+ * Returns TRUE if a dungeon with the given place index
  * would be given the same description as another place.
  */
 static bool ambiguous (int place_num)
 {
 	static bool init = FALSE;
 	int i, j;
-	//char * town_name;
-	//char town_dir[20];
+	cptr town_name;
 	cptr town_dir;
 	char buf1[80];
 	char buf2[80];
 	place_type * pl_ptr;
 	place_type * pl_ptr2;
+
+	if ((place_num >= NUM_TOWNS) && (place_num < NUM_TOWNS + NUM_DUNGEON)) {
+		place_num -= NUM_TOWNS;
+	} else {
+		return FALSE;
+	}
 
 	if (init) return ambig[place_num];
 
@@ -814,19 +819,29 @@ static bool ambiguous (int place_num)
 		ambig[i] = FALSE;
 		pl_ptr = &place[NUM_TOWNS+i];
 
+		/* Paranoia */
+		if (!pl_ptr->dungeon) {
+			continue;
+		}
+
+		town_name = describe_quest_location(&town_dir, pl_ptr->x, pl_ptr->y, FALSE);
+		strnfmt(buf1, 80, "%s %s of %s",
+		        dungeon_type_name(pl_ptr->dungeon->habitat),
+		        town_dir, town_name);
+
 		for (j = 0; j < i; j++)
 		{
 			pl_ptr2 = &place[NUM_TOWNS+j];
 
-			//strnfmt(buf1, 80, "%s %s of %s", dungeon_type_name(pl_ptr->dungeon->habitat), town_dir,
-			//	describe_quest_location(town_dir, pl_ptr->x, pl_ptr->y, FALSE));
-			strnfmt(buf1, 80, "%s %s of %s", pl_ptr->name, town_dir,
-				describe_quest_location(&town_dir, pl_ptr->x, pl_ptr->y, FALSE));
+			/* Paranoia */
+			if (!pl_ptr2->dungeon) {
+				continue;
+			}
 
-			//strnfmt(buf2, 80, "%s %s of %s", dungeon_type_name(pl_ptr2->dungeon->habitat), town_dir,
-			//	describe_quest_location(&town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
-			strnfmt(buf2, 80, "%s %s of %s", pl_ptr2->name, town_dir,
-				describe_quest_location(&town_dir, pl_ptr2->x, pl_ptr2->y, FALSE));
+			town_name = describe_quest_location(&town_dir, pl_ptr2->x, pl_ptr2->y, FALSE);
+			strnfmt(buf2, 80, "%s %s of %s",
+			        dungeon_type_name(pl_ptr2->dungeon->habitat),
+			        town_dir, town_name);
 
 			if (streq(buf1, buf2))
 			{
@@ -836,7 +851,7 @@ static bool ambiguous (int place_num)
 		}
 	}
 
-  return ambig[place_num];
+	return ambig[place_num];
 }
 
 /*
@@ -2735,10 +2750,11 @@ static void create_quest_list(int place_num, int store_num)
 	for (i = 0; i < num_quests; i++)
 	{
 		q_num = create_quest_one(st_ptr);
-
-		/* Remember the quest giver */
-		quest[q_num].place = place_num;
-		quest[q_num].shop = store_num;
+		if (q_num >= 0) {
+			/* Remember the quest giver */
+			quest[q_num].place = place_num;
+			quest[q_num].shop = store_num;
+		}
 	}
 }
 

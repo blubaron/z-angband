@@ -2579,7 +2579,7 @@ void dump_castle_info(ang_file *fff, int town)
 	}
 }
 
-/*( Dump the quests related to these quest stairs into fff, only when display is set */
+/* Dump the quests related to these quest stairs into fff, only when display is set */
 void dump_quest_stair_info(ang_file *fff, int town)
 {
 	int j, k, sz, w;
