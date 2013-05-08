@@ -661,12 +661,15 @@ keycode_t button_get_key(int x, int y)
 	while (bttn) {
 		if ((y >= bttn->top) && (y <= bttn->bottom)
 				&& (x >= bttn->left) && (x <= bttn->right)) {
-			if (bttn->fn) {
+			/* removed to bypass a possible freeze. This can block Term_mousepress
+			 * from returning, leading to a freeze if the fn waits for input and the
+			 * input goes through this same thread. */
+			/*if (bttn->fn) {
 				int res = bttn->fn(bttn->key);
 				if (res > 1) return (keycode_t)res;
 				if (res == 0) return bttn->key;
 				return (keycode_t)0x80;
-			} else
+			} else*/
 			if (bttn->key & 0x80) {
 				mouse_press = bttn->key;
 				return mouse_press;

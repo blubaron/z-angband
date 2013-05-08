@@ -2471,9 +2471,13 @@ bool add_main_buttons(void)
 		/* setup the main menu bar 
 		 * if the screen is big enough put in bottom left corner, otherwise put
 		 * in blank line in center of info panel */
+		if (hgt > 24) {
+			button_add_2d(hgt-2, COL_BLANK, hgt-1, COL_MAP, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), ESCAPE);
+		} else
 		if (hgt > 23) {
-			button_add_2d(hgt-1, 0, hgt-1, 10, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), ESCAPE);
-		} else {
+			button_add_2d(hgt-1, COL_BLANK, hgt-1, COL_MAP, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), ESCAPE);
+		} else
+		{
 			button_add_2d(ROW_BLANK, COL_BLANK, ROW_BLANK, COL_MAP, format("%s[%s MENU]",CLR_UMBER, ANGBAND_SYS), ESCAPE);
 		}
 		button_set_fn(NULL);
