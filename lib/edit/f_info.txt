@@ -19,6 +19,7 @@
 
 # N:serial number:terrain name
 # G:symbol:color
+# P:mappriority:digdifficulty
 # F: flag | flag | etc
 
 # N' indicates the beginning of an entry. The serial number must
@@ -31,6 +32,13 @@
 # r - Red          g - Green          b - Blue          u - Brown
 # d - Black        W - Light Gray     v - Violet        y - Yellow
 # R - Light Red    G - Light Green    B - Light Blue    U - Light Brown
+
+# 'P' is for parameters - The first is the display priority. In the map
+# view, features with higher priority are drawn over others. The second
+# is dig difficulty, how easy or hard it is to dig through the feature.
+# The feature should have the DIG flag as well. If the priority is not
+# given it gets the value 5. If the dig difficulty is not given it gets
+# the value 0.
 
 # 'F' is for flags. These are fairly self-explanatory. As many F:
 # lines may be used as are needed to specify all the flags and flags
@@ -85,18 +93,21 @@ K:CLOSE:32:100
 
 N:5:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 # 0x06 --> up stairs
 
 N:6:up staircase
 G:<:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
 
 # 0x07 --> down stairs
 
 N:7:down staircase
 G:>:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
 N:8:sand
@@ -276,6 +287,7 @@ F:PWALK | PPASS | MWALK | MPASS | TRAP | OBJECT | MARK
 
 N:65:Pattern startpoint
 G:*:w
+P:20
 F:PWALK | PPASS | MWALK | MPASS | ICKY | PERM | OBJECT | PATTERN | MARK | QUEST
 
 N:66:section of the Pattern
@@ -390,10 +402,12 @@ F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | OBJECT | WILD
 
 N:102:obelisk
 G:%:b
+P:16
 F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | MARK
 
 N:103:pillar
 G:%:w
+P:16
 F:PWALK | PPASS | MWALK | MPASS | HALF_LOS | ICKY | OBJECT | MARK
 
 N:112:stone fence
@@ -466,6 +480,7 @@ F:PWALK | PPASS | MWALK | MPASS | MARK | WILD | DAMAGES | POISON
 # impassible jungle
 N:138:jungle
 G:#:D
+P:10
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | PERM | WILD
 
 N:139:mountain
@@ -475,10 +490,12 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | PERM | WILD
 # quest stairs
 N:140:up staircase
 G:<:y
+P:20
 F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | QUEST | ICKY | PERM | OBJECT | MARK
 
 N:141:down staircase
 G:>:y
+P:20
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | QUEST | ICKY | PERM | OBJECT | MARK
 
 N:142:smoke
@@ -523,6 +540,7 @@ K:CLOSE:147:100
 
 N:149:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 #### cavern dungeons
@@ -554,6 +572,7 @@ K:CLOSE:152:100
 
 N:154:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 # secret door
@@ -579,10 +598,12 @@ K:CLOSE:156:100
 # stairs
 N:158:up staircase
 G:<:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
 
 N:159:down staircase
 G:>:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
 #### end cavern dungeons
@@ -616,6 +637,7 @@ K:CLOSE:162:100
 
 N:164:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 # secret door
@@ -641,10 +663,12 @@ K:CLOSE:166:100
 # stairs
 N:168:up staircase
 G:<:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
 
 N:169:down staircase
 G:>:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
 #### end horror dungeons
@@ -678,6 +702,7 @@ K:CLOSE:172:100
 
 N:174:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 # secret door
@@ -703,10 +728,12 @@ K:CLOSE:176:100
 # stairs
 N:178:up staircase
 G:<:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_UP | ICKY | PERM | OBJECT | MARK
 
 N:179:down staircase
 G:>:w
+P:18
 F:PWALK | PPASS | MWALK | MPASS | EXIT_DOWN | ICKY | PERM | OBJECT | MARK
 
 #### end temple dungeons
@@ -722,7 +749,7 @@ F:PWALK | PPASS | MWALK | MPASS
 # rock column on dirt for caverns
 N:181:pillar on dirt floor
 G:#:D
-P:17:20
+P:16:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # pile of rubble for dirt floors
@@ -734,7 +761,7 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
 # pillar on dark tiled floor
 N:183:pillar
 G:#:D
-P:17:20
+P:16:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # pile of rubble on dark tiled floor
@@ -746,7 +773,7 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
 # pillar on light tiled floor
 N:185:pillar
 G:#:D
-P:17:20
+P:16:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # pile of rubble on light tiled floor
@@ -758,7 +785,7 @@ F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG | DIG_OBJ
 # pillar on wood floor
 N:187:pillar
 G:#:D
-P:17:20
+P:16:20
 F:PPASS | MPASS | NO_LOS | ICKY | OBJECT | MARK | DIG
 
 # pile of rubble on wood floor
@@ -785,6 +812,7 @@ K:CLOSE:189:100
 
 N:191:broken door
 G:':u
+P:12
 F:PWALK | PPASS | MWALK | MPASS | ICKY | OBJECT | MARK | DOOR | BROKEN
 
 
