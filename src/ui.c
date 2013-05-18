@@ -1971,6 +1971,7 @@ s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 	keycode_t k = 0;
 
 	bool done = FALSE;
+	bool first = TRUE;
 
 	/* Use "command_arg" */
 	if (p_ptr->cmd.arg)
@@ -2065,9 +2066,17 @@ s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 			if (mb == 5) {
 				amt -= scale;
 			}
+			if (amt > max) amt = max;
+			if (amt < 0) amt = 0;
+			first = FALSE;
 		} else
 		if (isdigit(k)) {
-			amt = amt*10 + (k-'0');
+			if (first) {
+				amt = (k-'0');
+				first = FALSE;
+			} else {
+				amt = amt*10 + (k-'0');
+			}
 			if (amt > max) amt = max;
 		} else
 		/* Analyze the key */
@@ -2111,9 +2120,13 @@ s32b get_quantity_big(cptr prompt, s32b initial, s32b max)
 					if ((i == 1) || (i == 3)) {
 						amt = 1;
 					}
+					first = FALSE;
+					if (amt > max) amt = max;
+					if (amt < 0) amt = 0;
 				}
 				if (isprint(k)) {
 					amt = max;
+					first = FALSE;
 				} else {
 					bell("Illegal edit key!");
 				}
