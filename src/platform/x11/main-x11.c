@@ -105,7 +105,7 @@ static metadpy metadpy_default;
 static metadpy *Metadpy = &metadpy_default;
 static infowin *Infowin = (infowin*)(NULL);
 static infoclr *Infoclr = (infoclr*)(NULL);
-static infofnt *Infofnt = (infofnt*)(NULL);
+infofnt *Infofnt = (infofnt*)(NULL);
 
 /*
  * The number of term data structures
@@ -904,7 +904,7 @@ static errr Infoclr_change_fg(Pixell fg)
 /*
  * Nuke an old 'infofnt'.
  */
-static errr Infofnt_nuke(void)
+errr Infofnt_nuke(void)
 {
 	infofnt *ifnt = Infofnt;
 
@@ -992,7 +992,7 @@ static errr Infofnt_init_real(XFontStruct *info)
  * Inputs:
  *	name: The name of the requested Font
  */
-static errr Infofnt_init_data(cptr name)
+errr Infofnt_init_data(cptr name)
 {
 	XFontStruct *info;
 

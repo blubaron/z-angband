@@ -29,6 +29,10 @@ extern bool SaveWindow(infowin *win, char*filename);
 extern errr Term_xtra_x11_react(void);
 extern errr Term_xtra_x11_clear(void);
 
+extern infofnt *Infofnt;
+errr Infofnt_nuke(void);
+errr Infofnt_init_data(cptr name);
+
 #ifdef USE_GRAPHICS
 extern XTilesheet tiles; /* tiles loaded from disk */
 extern XTilesheet viewtiles; /* tiles that are displayed on screen */
@@ -54,7 +58,7 @@ int main_menu_x11_graphics_mult(metadpy *mdpy, int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	/* list tile multipliers */
@@ -383,7 +387,7 @@ int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, in
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	/* list tile multipliers */
@@ -569,7 +573,7 @@ int main_menu_x11_term(term_data *td, int i, metadpy *mdpy, int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	/* per term */
@@ -647,8 +651,47 @@ int main_menu_x11_term(term_data *td, int i, metadpy *mdpy, int mx, int my)
 		} break;
 	case 3:
 		{
+			char file[256];
+			bool load = FALSE;
 			/* pick a font for this terminal window */
-			do_cmd_save_and_exit();
+			if (file_pick(file, 256, "Pick font file", ANGBAND_DIR_XTRA_FONT,
+			              "fon", "FON", NULL, NULL) >= 0)
+			{
+				/* strip the extension */
+				char *ext = strrchr(file, '.');
+				if (ext) *ext = 0;
+				if (td->fnt && td->fnt->name) {
+					if (!streq(file, td->fnt->name)) {
+						load = TRUE;
+					}
+				} else {
+					load = TRUE;
+				}
+				if (load) {
+					infofnt *newfnt;
+					MAKE(newfnt, infofnt);
+					Infofnt_set(newfnt);
+					if (!newfnt || Infofnt_init_data(file)) {
+						plog_fmt("Font load failed: %s",file);
+						if (newfnt) {
+							FREE(newfnt);
+						}
+					} else {
+						if (td->font_want) {
+							string_free(td->font_want);
+						}
+						td->font_want = string_make(file);
+
+						if (td->fnt) {
+							Infofnt_set(td->fnt);
+							(void)Infofnt_nuke();
+							FREE(td->fnt);
+						}
+						td->fnt = newfnt;
+					}
+					Infofnt_set(td->fnt);
+				}
+			}
 		} break;
 	case 4:
 		{
@@ -715,7 +758,7 @@ int main_menu_x11_pick_term(term_data *td, int n, metadpy *mdpy, int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	for (i = 0; i < n; i++) {
@@ -782,7 +825,7 @@ int main_menu_x11_other(int mx, int my)
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	menu_dynamic_add_label(m, "Version", ' ', 7, labels);
@@ -931,7 +974,7 @@ int main_menu_x11(metadpy *mdpy, term_data *data, int data_count, int mx, int my
 		return 0;
 	}
 
-	labels = string_make(lower_case);
+	labels = (char*)string_make(lower_case);
 	m->selections = labels;
 
 	menu_dynamic_add_label(m, "Terminal", ' ', 4, labels);
