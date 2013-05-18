@@ -804,6 +804,7 @@ static bool ambiguous (int place_num)
 	place_type * pl_ptr;
 	place_type * pl_ptr2;
 
+	/* shift the index to the range of dungeons */
 	if ((place_num >= NUM_TOWNS) && (place_num < NUM_TOWNS + NUM_DUNGEON)) {
 		place_num -= NUM_TOWNS;
 	} else {
@@ -971,7 +972,7 @@ static int insert_artifact_quest(u16b a_idx)
 	/* Get name of closest town + direction away from it */
 	town_name = describe_quest_location(&town_dir, pl_ptr->x, pl_ptr->y, FALSE);
 
-	strcpy(buf, dungeon_type_name(pl_ptr->dungeon->habitat));
+	my_strcpy(buf, dungeon_type_name(pl_ptr->dungeon->habitat), 80);
 	buf[0] = tolower(buf[0]);
 
 	/* XXX XXX Create quest name */

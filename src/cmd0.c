@@ -164,6 +164,9 @@ void process_click(char press, int xpos, int ypos)
 		}
 		return;
 	}
+	if (xpos < COL_MAP) {
+		return;
+	}
 
 	y = ((ypos-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
 	x = ((xpos-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
