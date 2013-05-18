@@ -9,6 +9,7 @@
  */
 
 #include "angband.h"
+#include "pickfile.h"
 
 
 /*
@@ -462,6 +463,7 @@ int main(int argc, char *argv[])
 	bool done = FALSE;
 
 	bool new_game = FALSE;
+	bool game_in_progress = FALSE;
 
 	int show_score = 0;
 
@@ -504,6 +506,7 @@ int main(int argc, char *argv[])
 			case 'n':
 			{
 				new_game = TRUE;
+				game_in_progress = TRUE;
 				break;
 			}
 
@@ -575,6 +578,7 @@ int main(int argc, char *argv[])
 
 				/* Make sure it's terminated */
 				player_name[31] = '\0';
+				game_in_progress = TRUE;
 				break;
 			}
 
@@ -655,8 +659,10 @@ int main(int argc, char *argv[])
 	/* Try the modules in the order specified by sound_modules[] */
 	/*for (i = 0; i < (int)N_ELEMENTS(sound_modules); i++)
 		if (!soundstr || streq(soundstr, sound_modules[i].name))
-			if (0 == sound_modules[i].init(argc, argv, NULL))
-				break;*/
+			if (0 == sound_modules[i].init(argc, argv, NULL)) {
+				ANGBAND_SOUND = sound_modules[i].name;
+				break;
+			}*/
 	/* initialize the first sound module (until there is a global variable
 	 * to store a pointer to the name, or a pointer to the sound module)*/
 	sound_modules[0].init(argc, argv, (unsigned char *)&new_game);
@@ -671,11 +677,179 @@ int main(int argc, char *argv[])
 	/* Hack -- If requested, display scores and quit */
 	if (show_score > 0) display_scores(0, show_score);
 
-	/* Wait for response */
-	pause_line(23);
+	/* This section is to play repeated games without exiting first was
+	 * modified from Sil */
+	while (1) {
+#ifdef USE_SAVER
+		if (screensaver) {
+			/* Start the screensaver */
+			start_screensaver();
+		}
+#endif /* USE_SAVER */
 
-	/* Play the game */
-	play_game(new_game);
+
+		/* Let the player choose a savefile or start a new game */
+		if (!game_in_progress) {
+			char key;
+
+			/* Process Events until "new" or "open" is selected */
+			while (!game_in_progress) {
+
+				/* process any windows messages */
+				Term_flush();
+
+				/* remove any previous buttons */
+				button_kill_all();
+
+				/* Show the initial screen again */
+				display_introduction();
+
+				/* Prompt the user */
+				if (savefile[0] != 0) {
+					if (p_ptr->state.is_dead) {
+						prtf(14, 22, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
+						prtf(14, 23, " [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
+					} else {
+						prtf(14, 22, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
+						prtf(14, 23, " [Or choose to $U'load (L)ast'$Yl$V]");
+					}
+				} else {
+					prtf(14, 23, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
+				}
+
+				/* Flush it */
+				Term_fresh();
+
+				/* see if there is a key press on the queue */
+				key = inkey();
+
+				if ((key == 'n') || (key == 'N')) {
+					/* New game */
+					savefile[0] = 0;
+					game_in_progress = TRUE;
+					new_game = TRUE;
+				} else
+				if ((key == 'o') || (key == 'O')) {
+					/* Load a save game */
+					char file[96];
+
+					/* pick a save file to load */
+#ifdef SAVEFILE_USE_UID
+					char plr_uid[32];
+					strnfmt(plr_uid, 32, "%u.", player_uid);
+					if (file_pick(file, 96, "Pick save file", ANGBAND_DIR_SAVE,
+					              NULL,NULL,NULL,plr_uid) >= 0)
+#else
+					if (file_pick(file, 96, "Pick save file", ANGBAND_DIR_SAVE,
+					              NULL,NULL,NULL,NULL) >= 0)
+#endif
+					{
+						strnfmt(savefile, 1024, "%s%s%s",ANGBAND_DIR_SAVE, PATH_SEP, file);
+						game_in_progress = TRUE;
+						new_game = FALSE;
+					}
+				} else
+				if ((key == 'l') || (key == 'L')) {
+					if (savefile[0] != 0) {
+						if (file_exists(savefile)) {
+							game_in_progress = TRUE;
+							new_game = FALSE;
+						}
+					} else
+					/* load the last saved file in the save dir, by date/time */
+					/* for now open a username based file, if it exists */
+					if (player_name[0] != 0) {
+						char buf[1024];
+#ifdef SAVEFILE_USE_UID
+						strnfmt(buf, 1024, "%s%s%d.%s",ANGBAND_DIR_SAVE, PATH_SEP, player_uid, player_name);
+#else
+						strnfmt(buf, 1024, "%s%s%s",ANGBAND_DIR_SAVE, PATH_SEP, player_name));
+#endif
+						if (file_exists(buf)) {
+							my_strcpy(savefile, buf, 1024);
+							game_in_progress = TRUE;
+							new_game = FALSE;
+						}
+					}
+				} else
+				if ((key == 'g') || (key == 'G')) {
+					if ((savefile[0] != 0) && (p_ptr->state.is_dead)) {
+						/* show the graveyard */
+						tomb_menu(FALSE);
+
+						button_kill_all();
+					}
+				} else
+				/*if ((key == 't') || (key == 'T')) {
+					/* Start the tutorial */ /*
+					game_in_progress = TRUE;
+					new_game = FALSE;
+				} else*/
+				if ((key == 's') || (key == 'S')) {
+					if (!angband_term[0]->resize_hook) {
+						angband_term[0]->resize_hook = resize_map;
+					}
+					/* Start the tutorial */
+					top_twenty();
+
+				} else
+				if ((key == ESCAPE) || (key == 10) || (key == 'x') || (key == 'X')) {
+					/* Free resources */
+					cleanup_angband();
+					/* Quit */
+					quit(NULL);
+					return (0);
+				}
+			}
+		}
+
+		button_kill_all();
+
+		/*
+		 * Play a game -- "new_game" is set by "new", "open" or the open document
+		 * event handler as appropriate
+		 */
+		play_game(new_game);
+
+		/* game no longer in progress */
+		game_in_progress = FALSE;
+		new_game = FALSE;
+
+/* abort the program until repeated play works */
+cleanup_angband();
+quit("Repeated play is not working yet");
+return 0;
+		/* Free the messages */
+		messages_free();
+
+		/* Free the "quarks" */
+		//quarks_free();
+
+		//cleanup_angband();
+
+		/* Hack - redraw everything + recalc bigtile regions */
+		angband_term[0]->resize_hook();
+    
+		// reset some globals that start at 0
+		character_loaded = FALSE;
+
+		// rerun the first initialization routine
+		//init_stuff();
+		
+		// do some more between-games initialization
+		//re_init_some_things();
+		/* Initialize the "quark" package */
+		//(void)quarks_init();
+
+		/* Initialize the "message" package */
+		(void)messages_init();
+
+		//init_angband();
+
+		/* reinitialize arrays that use quarks */
+		//note("[Initializing arrays... (wilderness)]");
+		//if (init_w_info()) quit("Cannot initialize wilderness");
+	}
 
 	/* Free resources */
 	cleanup_angband();
