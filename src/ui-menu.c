@@ -237,11 +237,21 @@ static const menu_skin menu_skin_scroll =
 static int columns_get_cursor(int row, int col, int n, int top, rect_region *loc)
 {
 	int rows_per_page = loc->page_rows;
-	int colw = loc->width / (n + rows_per_page - 1) / rows_per_page;
-	int cursor = row + rows_per_page * (col - loc->col) / colw;
+	/*int colw = loc->width / (n + rows_per_page - 1) / rows_per_page;*/
+	int cols = (n + rows_per_page - 1) / rows_per_page;
+	int colw = 23;/*loc->width / cols;*/
+	int cursor;
 
-	if (cursor < 0) cursor = 0;	/* assert: This should never happen */
-	if (cursor >= n) cursor = n - 1;
+	if ((colw * cols) > loc->width)
+		colw = loc->width / cols;
+
+	cursor = (row - loc->row) + rows_per_page * ((col - loc->col) / colw);
+/*	cursor = (row - loc->row) + rows_per_page * (((col - loc->col) / colw) + (top/colw));*/
+
+	/* don't check for valid bounds, so this cursor response will get rejected
+	 * in is_valid_row(), so presses not on a line get ignored */
+	/*if (cursor < 0) cursor = 0;*/	/* assert: This should never happen */
+	/*if (cursor >= n) cursor = n - 1;*/
 
 	return cursor;
 }

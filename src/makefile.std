@@ -100,8 +100,8 @@ ANGOBJS := $(LUAWOBJS) \
 	effects.o quest1.o racial.o run.o script.o \
 	artifact.o mutation.o flavor.o spells3.o \
 	mspells1.o mspells2.o scores.o mind.o platform/x11/maid-x11.o \
-	bldg.o obj_kind.o wild1.o wild2.o wild3.o avatar.o notes.o \
-	platform/grafmode.o platform/settings.o wild4.o button.o \
+	bldg.o obj_kind.o wild1.o wild2.o wild3.o wild4.o avatar.o notes.o \
+	platform/grafmode.o platform/settings.o platform/pickfile.o button.o \
 	platform/main-cap.o platform/main-gcu.o platform/x11/main-x11.o platform/x11/main-xaw.o platform/x11/main-xpj.o \
 	platform/main-lsl.o platform/main-vcs.o platform/main-gtk.o platform/win/main-win.o platform/main.o \
 	maid-grf.o platform/main-dos.o platform/main-ibm.o platform/main-emx.o \

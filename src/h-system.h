@@ -83,6 +83,7 @@
 
 # ifdef linux
 #  include <sys/file.h>
+#  define HAVE_DIRENT_H
 # endif
 
 # include <pwd.h>

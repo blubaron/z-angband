@@ -36,8 +36,8 @@ ANGOBJS := $(addprefix src/, maid-grf.o) \
 	x11-png.o x11-tiles.o x11-layout.o main-xaw.o main-xpj.o) \
 	$(addprefix src/platform/, main-cap.o main-gcu.o \
 	main-lsl.o main-vcs.o main-gtk.o main.o \
-	main-dos.o main-ibm.o main-emx.o \
-	main-ami.o main-tnb.o grafmode.o settings.o)
+	main-dos.o main-ibm.o main-emx.o main-tnb.o \
+	main-ami.o grafmode.o settings.o pickfile.o)
 
 WINOBJS := $(addprefix src/platform/win,\
 	main-win.o readdib.o \

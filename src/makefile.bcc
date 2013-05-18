@@ -63,6 +63,7 @@ OBJ = \
 	wild4.obj \
 	platform/grafmode.obj \
 	platform/settings.obj \
+	platform/pickfile.obj \
 	z-virt.obj \
 	z-util.obj \
 	z-term.obj \
