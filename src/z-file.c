@@ -1776,15 +1776,15 @@ bool dir_read(ang_dir *dir, char *fname, size_t len)
 	return TRUE;
 }
 
-void dir__close(ang_dir *dir)
+void dir_close(ang_dir *dir)
 {
 	/* Close directory */
 	if (dir->d)
 		closedir(dir->d);
 
 	/* Free memory */
-	FREE(dir->dirname);
-	FREE(dir);
+	string_free(dir->dirname);
+	FREE((void*)dir);
 }
 
 #endif /* HAVE_DIRENT_H */
