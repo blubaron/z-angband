@@ -1996,7 +1996,7 @@ static bool unsquelch_aux1(int tval_entry)
 	char buf[1024];
 	char prompt[80];
 
-	menu_type *item_menu;
+	menu_action *item_menu;
 
 	bool result;
 	bool *squelched;
@@ -2042,7 +2042,7 @@ static bool unsquelch_aux1(int tval_entry)
 
 
 	/* Create menu array */
-	C_MAKE(item_menu, num + 1, menu_type);
+	C_MAKE(item_menu, num + 1, menu_action);
 
 	/* Collect all the objects and their descriptions */
 	num = 0;
@@ -2068,7 +2068,7 @@ static bool unsquelch_aux1(int tval_entry)
 
 	/* Create the prompt */
 	strnfmt(prompt, 80, "Which kind of %s? ", tvals[tval_to_idx(tval)].desc);
-	result = display_menu(item_menu, -1, FALSE, NULL, prompt);
+	result = display_action_menu(item_menu, -1, FALSE, NULL, prompt);
 
 	/* Free the option strings */
 	for (i = 0; i <= num; i++)
@@ -2090,7 +2090,7 @@ static void unsquelch(void)
 
 	int tvs = 0;
 
-	menu_type *item_menu;
+	menu_action *item_menu;
 	bool *squelched;
 
 	/* Count number of options */
@@ -2120,7 +2120,7 @@ static void unsquelch(void)
 	}
 
 	/* Create menu array */
-	C_MAKE(item_menu, num + 1, menu_type);
+	C_MAKE(item_menu, num + 1, menu_action);
 
 	/* Collect all the tvals and their descriptions */
 	i = 0;
@@ -2137,7 +2137,7 @@ static void unsquelch(void)
 
 	/* Hack - we know that item_menu[num].text is NULL due to C_MAKE */
 
-	display_menu(item_menu, -1, FALSE, NULL, "What type of object? ");
+	display_action_menu(item_menu, -1, FALSE, NULL, "What type of object? ");
 
 	/* Free the arrays */
 	FREE(item_menu);

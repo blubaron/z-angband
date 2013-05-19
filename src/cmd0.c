@@ -321,7 +321,6 @@ void process_click(char press, int xpos, int ypos)
 
 }
 
-typedef char keycode_t;
 extern bool use_main_menu; /* whether a port is using the textui menu bar */
 extern int (*main_menu_bar_fn) (keycode_t); /* the button function for the textui menu bar */
 

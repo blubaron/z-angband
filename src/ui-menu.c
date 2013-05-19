@@ -17,7 +17,7 @@
  *    are included in all such copies.  Other copyrights may also apply.
  */
 #include "angband.h"
-//#include "ui-event.h"
+/*#include "ui-event.h"*/
 #include "ui-menu.h"
 
 /* Cursor colours */
@@ -46,8 +46,10 @@ static void display_action_aux(menu_action *act, byte color, int row, int col, i
 	/* TODO: wizard mode should show more data */
 	Term_erase(col, row, wid);
 
-	if (act->name)
-		Term_putstr(col, row, wid, color, act->name);
+	/*if (act->name)
+		Term_putstr(col, row, wid, color, act->name);*/
+	if (act->text)
+		Term_putstr(col, row, wid, color, act->text);
 }
 
 /* ------------------------------------------------------------------------
@@ -60,23 +62,27 @@ static void display_action_aux(menu_action *act, byte color, int row, int col, i
 static char menu_action_tag(menu_type_a *m, int oid)
 {
 	menu_action *acts = menu_priv(m);
-	return acts[oid].tag;
+	/*return acts[oid].tag;*/
+	return 0;/*acts[oid].tag;*/
 }
 
 static int menu_action_valid(menu_type_a *m, int oid)
 {
 	menu_action *acts = menu_priv(m);
 
-	if (acts[oid].flags & MN_ACT_HIDDEN)
+	/*if (acts[oid].flags & MN_ACT_HIDDEN)*/
+	if (acts[oid].flags & MN_ACTIVE)
 		return 2;
 
-	return acts[oid].name ? TRUE : FALSE;
+	/*return acts[oid].name ? TRUE : FALSE;*/
+	return acts[oid].text ? TRUE : FALSE;
 }
 
 static void menu_action_display(menu_type_a *m, int oid, bool cursor, int row, int col, int width)
 {
 	menu_action *acts = menu_priv(m);
-	byte color = curs_attrs[!(acts[oid].flags & (MN_ACT_GRAYED))][0 != cursor];
+	/*byte color = curs_attrs[!(acts[oid].flags & (MN_ACT_GRAYED))][0 != cursor];*/
+	byte color = curs_attrs[(acts[oid].flags & (MN_ACTIVE))][0 != cursor];
 
 	display_action_aux(&acts[oid], color, row, col, width);
 }
@@ -88,9 +94,11 @@ static bool menu_action_handle(menu_type_a *m, const ui_event *event, int oid)
 	//if (event->type == EVT_SELECT)
 	if (*event == (EVT_SELECT))
 	{
-		if (!(acts->flags & MN_ACT_GRAYED) && acts[oid].action)
+		/*if (!(acts->flags & MN_ACT_GRAYED) && acts[oid].action)*/
+		if ((acts->flags & MN_SELECT) && acts[oid].action)
 		{
-			acts[oid].action(acts[oid].name, m->cursor);
+			/*acts[oid].action(acts[oid].name, m->cursor);*/
+			acts[oid].action(m->cursor);
 			return TRUE;
 		}
 	}

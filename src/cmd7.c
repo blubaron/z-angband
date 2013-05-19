@@ -959,7 +959,7 @@ static bool do_cmd_list_places(int dummy)
 }
 
 /* Some gaps for options that should not show up always */
-static menu_type list_menu[16] =
+static menu_action list_menu[16] =
 {
 		{"List of monsters and other hazards", NULL, do_cmd_list_monster, MN_ACTIVE | MN_CLEAR},
 		{"List of objects", NULL, do_cmd_list_object, MN_ACTIVE | MN_CLEAR},
@@ -987,9 +987,6 @@ void do_cmd_list(void)
 {
 	int nr, last_option = 8;
 
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-	
 	/* start at the first free spot */
 	nr = last_option;
 
@@ -1002,7 +999,7 @@ void do_cmd_list(void)
 	}
 
 	/* Display the menu */
-	display_menu(list_menu, -1, FALSE, NULL, "Display lists of map tiles:");
+	display_action_menu(list_menu, -1, FALSE, NULL, "Display lists of map tiles:");
 
 	/* Clear these options again */
 	for (; nr >= last_option; nr--)

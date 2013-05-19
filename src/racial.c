@@ -673,7 +673,7 @@ static bool do_cmd_power_aux(int num)
  */
 void do_cmd_racial_power(void)
 {
-	menu_type racial_menu[37];
+	menu_action racial_menu[37];
 	int num = 0, i = 0;
 
 	char buf[1024];
@@ -754,7 +754,7 @@ void do_cmd_racial_power(void)
 	racial_menu[num].flags = 0x00;
 
 
-	if (!display_menu(racial_menu, -1, FALSE, display_racial_header, "Use which power?"))
+	if (!display_action_menu(racial_menu, -1, FALSE, display_racial_header, "Use which power?"))
 	{
 		/* We aborted */
 		p_ptr->state.energy_use = 0;

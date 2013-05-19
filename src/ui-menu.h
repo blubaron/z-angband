@@ -71,20 +71,53 @@ typedef enum
 /**
  * Primitive menu item with bound action.
  */
-typedef struct
+/*typedef struct
 {
 	int flags;
 	char tag;
 	char *name;
 	void (*action)(const char *title, int row);
-} menu_action;
+} menu_action;*/
 
 
 /**
  * Flags for menu_actions.
  */
-#define MN_ACT_GRAYED     0x0001 /* Allows selection but no action */
-#define MN_ACT_HIDDEN     0x0002 /* Row is hidden, but may be selected via tag */
+/*#define MN_ACT_GRAYED     0x0001*/ /* Allows selection but no action */
+/*#define MN_ACT_HIDDEN     0x0002*/ /* Row is hidden, but may be selected via tag */
+
+
+/*
+ * A function pointer used in displaying menus
+ *
+ * The function takes a number for the option chosen
+ * and will return TRUE if the selection works, and FALSE
+ * if the menu should stay up.
+ */
+typedef bool (*menu_select_type) (int option);
+
+typedef struct menu_action menu_action;
+
+struct menu_action
+{
+	/*char tag;*/					/* display tag */
+	cptr text;					/* Option text */
+	cptr help;					/* Help file to use */
+	menu_select_type action;	/* Action to do */
+
+	byte flags;					/* Flags controling option behaviour */
+};
+
+/* Menu seperator */
+#define MENU_SEPERATOR {"", NULL, NULL, 0x00}
+
+/* Menu terminator */
+#define MENU_END {NULL, NULL, NULL, 0x00}
+
+#define MN_ACTIVE		0x01	/* Available to choose */
+#define MN_SELECT		0x02	/* Can 'select' action */
+#define MN_CLEAR		0x04	/* Clear screen before calling */
+
 
 
 /**

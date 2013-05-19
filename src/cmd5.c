@@ -4923,7 +4923,7 @@ void do_cmd_pray(void)
 }
 
 /* Forward declare */
-extern menu_type pet_menu[PET_CHOICE_MAX + 1];
+extern menu_action pet_menu[PET_CHOICE_MAX + 1];
 
 
 /*
@@ -5136,7 +5136,7 @@ static bool cmd_pets_items(int dummy)
 
 
 /* The menu used to interact with pets */
-menu_type pet_menu[PET_CHOICE_MAX + 1] =
+menu_action pet_menu[PET_CHOICE_MAX + 1] =
 {
 	{"Stay close", NULL, cmd_pets_close, MN_ACTIVE | MN_SELECT},
 	{"Follow me", NULL, cmd_pets_follow, MN_ACTIVE | MN_SELECT},
@@ -5233,7 +5233,7 @@ void do_cmd_pet(void)
 	}
 
 	/* Interact with menu */
-	display_menu(pet_menu, pet_select, FALSE, NULL, NULL);
+	display_action_menu(pet_menu, pet_select, FALSE, NULL, NULL);
 }
 
 /*

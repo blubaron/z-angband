@@ -12,7 +12,7 @@ extern int get_player_choice(cptr *choices, int num, int col, int wid,
                              cptr helpfile, void (*hook) (cptr));
 extern int get_player_sort_choice(cptr *choices, int num, int col, int wid,
                                   cptr helpfile, void (*hook) (cptr));
-extern bool display_menu(menu_type *options, int select, bool scroll,
+extern bool display_action_menu(menu_action *options, int select, bool scroll,
 						 int (*disp)(int), cptr prompt);
 extern void bell(cptr reason);
 extern void sound(int num);

@@ -844,7 +844,7 @@ static bool wiz_create_itemtype_aux1(int tval_entry)
 	char buf[1024];
 	char prompt[80];
 
-	menu_type *item_menu;
+	menu_action *item_menu;
 
 	bool result;
 
@@ -857,7 +857,7 @@ static bool wiz_create_itemtype_aux1(int tval_entry)
 	}
 
 	/* Create menu array */
-	C_MAKE(item_menu, num + 1, menu_type);
+	C_MAKE(item_menu, num + 1, menu_action);
 
 	/* Collect all the objects and their descriptions */
 	num = 0;
@@ -885,7 +885,7 @@ static bool wiz_create_itemtype_aux1(int tval_entry)
 
 	/* Create the prompt */
 	strnfmt(prompt, 80, "What Kind of %s? ", tvals[tval_entry].desc);
-	result = display_menu(item_menu, -1, FALSE, NULL, prompt);
+	result = display_action_menu(item_menu, -1, FALSE, NULL, prompt);
 
 	/* Free the option strings */
 	for (i = 0; i <= num; i++)
@@ -909,14 +909,14 @@ static int wiz_create_itemtype(void)
 {
 	int i, num;
 
-	menu_type *item_menu;
+	menu_action *item_menu;
 
 	/* Count number of options */
 	num = 0;
 	while(tvals[num].tval) num++;
 
 	/* Create menu array */
-	C_MAKE(item_menu, num + 1, menu_type);
+	C_MAKE(item_menu, num + 1, menu_action);
 
 	/* Collect all the tvals and their descriptions */
 	for (i = 0; i < num; i++)
@@ -932,7 +932,7 @@ static int wiz_create_itemtype(void)
 	/* Clear item to make */
 	create_item_kidx = 0;
 
-	display_menu(item_menu, -1, FALSE, NULL, "Get what type of object? ");
+	display_action_menu(item_menu, -1, FALSE, NULL, "Get what type of object? ");
 
 	/* Free the array */
 	FREE(item_menu);

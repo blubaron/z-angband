@@ -697,7 +697,7 @@ static const cheat_option_type cheat_info[CHEAT_MAX] =
 };
 
 /* Forward declare */
-extern menu_type cheat_menu[CHEAT_MAX + 1];
+extern menu_action cheat_menu[CHEAT_MAX + 1];
 
 static bool do_cmd_options_cheat_aux(int option)
 {
@@ -727,7 +727,7 @@ static bool do_cmd_options_cheat_aux(int option)
 	return (FALSE);
 }
 
-menu_type cheat_menu[CHEAT_MAX + 1] =
+menu_action cheat_menu[CHEAT_MAX + 1] =
 {
 	{NULL, NULL, do_cmd_options_cheat_aux, MN_ACTIVE | MN_SELECT},
 	{NULL, NULL, do_cmd_options_cheat_aux, MN_ACTIVE | MN_SELECT},
@@ -766,7 +766,7 @@ static bool do_cmd_options_cheat(int dummy)
 		cheat_menu[i].text = string_make(buf);
 	}
 
-	display_menu(cheat_menu, 0, TRUE, NULL, "Cheaters never win");
+	display_action_menu(cheat_menu, 0, TRUE, NULL, "Cheaters never win");
 
 	return (FALSE);
 }
@@ -786,7 +786,7 @@ static const cheat_option_type autosave_info[3] =
 
 
 /* Forward declare */
-extern menu_type autosave_menu[5];
+extern menu_action autosave_menu[5];
 
 
 static bool do_cmd_options_toggle_frequency(int option)
@@ -842,7 +842,7 @@ static bool do_cmd_options_autosave_aux(int option)
 }
 
 
-menu_type autosave_menu[5] =
+menu_action autosave_menu[5] =
 {
 	{NULL, NULL, do_cmd_options_autosave_aux, MN_ACTIVE | MN_SELECT},
 	{NULL, NULL, do_cmd_options_autosave_aux, MN_ACTIVE | MN_SELECT},
@@ -888,7 +888,7 @@ static bool do_cmd_options_autosave(int dummy)
 	/* Save new string */
 	autosave_menu[3].text = string_make(buf);
 
-	display_menu(autosave_menu, 0, TRUE, NULL, "Autosave");
+	display_action_menu(autosave_menu, 0, TRUE, NULL, "Autosave");
 
 	return (FALSE);
 }
@@ -899,7 +899,7 @@ static byte option_flags;
 static int option_page;
 
 /* Forward declare */
-extern menu_type options_aux_menu[25];
+extern menu_action options_aux_menu[25];
 
 /*
  * Toggle the selected option
@@ -950,7 +950,7 @@ static bool do_cmd_options_aux2(int option)
 }
 
 
-menu_type options_aux_menu[25] =
+menu_action options_aux_menu[25] =
 {
 	{NULL, NULL, do_cmd_options_aux2, MN_ACTIVE | MN_SELECT},
 	{NULL, NULL, do_cmd_options_aux2, MN_ACTIVE | MN_SELECT},
@@ -1051,7 +1051,7 @@ static bool do_cmd_options_aux(int page)
 		return (FALSE);
 	}
 
-	display_menu(options_aux_menu, 0, TRUE, NULL, option_window_title[page]);
+	display_action_menu(options_aux_menu, 0, TRUE, NULL, option_window_title[page]);
 
 	/* Save the changes */
 	init_options(option_flags);
@@ -1372,7 +1372,7 @@ static bool do_cmd_options_dump(int dummy)
 
 
 /* The main options menu */
-static menu_type options_menu[OPTION_MENU_MAX] =
+static menu_action options_menu[OPTION_MENU_MAX] =
 {
 	{"Command Options", NULL, do_cmd_options_aux, MN_ACTIVE | MN_SELECT | MN_CLEAR},
 	{"Display Options", NULL, do_cmd_options_aux, MN_ACTIVE | MN_SELECT | MN_CLEAR},
@@ -1406,7 +1406,7 @@ void do_cmd_options(byte flags)
 	/* Save option flags so menu functions can access them */
 	option_flags = flags;
 
-	display_menu(options_menu, 0, TRUE, NULL, VERSION_NAME " options");
+	display_action_menu(options_menu, 0, TRUE, NULL, VERSION_NAME " options");
 
 	/* Hack - Redraw equippy chars */
 	p_ptr->redraw |= (PR_EQUIPPY);
@@ -2119,7 +2119,7 @@ static bool do_cmd_action_create(int dummy)
 #endif /* ALLOW_MACROS */
 
 /* The macro / keymap menu */
-static menu_type macro_menu[MACRO_MENU_MAX] =
+static menu_action macro_menu[MACRO_MENU_MAX] =
 {
 	{"Load a user pref file", NULL, do_cmd_pref_key_load, MN_ACTIVE},
 #ifdef ALLOW_MACROS
@@ -2146,10 +2146,7 @@ static menu_type macro_menu[MACRO_MENU_MAX] =
  */
 void do_cmd_macros(void)
 {
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-
-	display_menu(macro_menu, -1, FALSE, display_cur_action, "Interact with Macros");
+	display_action_menu(macro_menu, -1, FALSE, display_cur_action, "Interact with Macros");
 }
 
 
@@ -2775,7 +2772,7 @@ static bool do_cmd_reset_visuals(int dummy)
 
 
 /* The visuals menu */
-static menu_type visuals_menu[VISUAL_MENU_MAX] =
+static menu_action visuals_menu[VISUAL_MENU_MAX] =
 {
 	{"Load a user pref file", NULL, do_cmd_pref_vis_load, MN_ACTIVE},
 #ifdef ALLOW_VISUALS
@@ -2798,10 +2795,7 @@ static menu_type visuals_menu[VISUAL_MENU_MAX] =
  */
 void do_cmd_visuals(void)
 {
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-
-	display_menu(visuals_menu, -1, FALSE, NULL, "Interact with Visuals");
+	display_action_menu(visuals_menu, -1, FALSE, NULL, "Interact with Visuals");
 }
 
 
@@ -3165,7 +3159,7 @@ static bool do_cmd_modify_message(int dummy)
 #endif /* ALLOW_COLORS */
 
 
-static menu_type color_menu[COLOR_MENU_MAX] =
+static menu_action color_menu[COLOR_MENU_MAX] =
 {
 	{"Load a user pref file", NULL, do_cmd_pref_col_load, MN_ACTIVE},
 #ifdef ALLOW_COLORS
@@ -3182,10 +3176,7 @@ static menu_type color_menu[COLOR_MENU_MAX] =
  */
 void do_cmd_colors(void)
 {
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-
-	display_menu(color_menu, -1, FALSE, NULL, "Interact with Colours");
+	display_action_menu(color_menu, -1, FALSE, NULL, "Interact with Colours");
 }
 
 
@@ -4643,7 +4634,7 @@ static bool do_cmd_knowledge_symbol(int dummy)
 
 bool count_wilderness(int);
 /* Some gaps for options that should not show up always */
-static menu_type knowledge_menu[19] =
+static menu_action knowledge_menu[19] =
 {
 	{"Display known uniques", NULL, do_cmd_knowledge_uniques, MN_ACTIVE | MN_CLEAR},
 	{"Display known objects", NULL, do_cmd_knowledge_objects, MN_ACTIVE | MN_CLEAR},
@@ -4674,9 +4665,6 @@ void do_cmd_knowledge(void)
 {
 	int nr, last_option = 8;
 
-	/* File type is "TEXT" */
-	FILE_TYPE(FILE_TYPE_TEXT);
-
 	/* start at the first free spot */
 	nr = last_option;
 
@@ -4699,7 +4687,7 @@ void do_cmd_knowledge(void)
 		knowledge_menu[nr++] = knowledge_menu[17];
 
 	/* Display the menu */
-	display_menu(knowledge_menu, -1, FALSE, NULL, "Display current knowledge");
+	display_action_menu(knowledge_menu, -1, FALSE, NULL, "Display current knowledge");
 
 	/* Clear these options again */
 	for (; nr >= last_option; nr--)

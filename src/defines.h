@@ -3805,17 +3805,8 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 #define SKILL_DIG	9 /* Skill: Digging */
 
 /*** Menu Stuff ***/
+#include "ui-menu.h"
 
-
-/* Menu seperator */
-#define MENU_SEPERATOR {"", NULL, NULL, 0x00}
-
-/* Menu terminator */
-#define MENU_END {NULL, NULL, NULL, 0x00}
-
-#define MN_ACTIVE		0x01	/* Available to choose */
-#define MN_SELECT		0x02	/* Can 'select' action */
-#define MN_CLEAR		0x04	/* Clear screen before calling */
 
 /*** Option Definitions ***/
 #include "options.h"

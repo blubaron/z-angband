@@ -367,7 +367,7 @@ int get_player_sort_choice(cptr *choices, int num, int col, int wid,
 
 
 /* Show the option */
-static bool show_option(int x, int y, menu_type *option, char c, bool scroll, bool select)
+static bool show_action_option(int x, int y, menu_action *option, char c, bool scroll, bool select)
 {
 	if (option->flags & MN_ACTIVE)
 	{
@@ -418,7 +418,7 @@ static const char listsym[] =
  *
  * We return the number of active options.
  */
-static int show_menu(int num, menu_type *options, int select, bool scroll,
+static int show_action_menu(int num, menu_action *options, int select, bool scroll,
 					 int (*disp)(int), cptr prompt)
 {
 	int cnt = 0;
@@ -444,7 +444,7 @@ static int show_menu(int num, menu_type *options, int select, bool scroll,
 		{
 			select_me = i == select;
 
-			if (show_option(0, i + 2 + offset, &options[i], I2A(cnt), scroll, select_me))
+			if (show_action_option(0, i + 2 + offset, &options[i], I2A(cnt), scroll, select_me))
 			{
 				cnt++;
 			}
@@ -464,7 +464,7 @@ static int show_menu(int num, menu_type *options, int select, bool scroll,
 			x = (i / 18) * 40;
 			y = (i % 18) + 2;
 
-			if (show_option(x, y + offset, &options[i], listsym[cnt], scroll, select_me))
+			if (show_action_option(x, y + offset, &options[i], listsym[cnt], scroll, select_me))
 			{
 				cnt++;
 			}
@@ -484,7 +484,7 @@ static int show_menu(int num, menu_type *options, int select, bool scroll,
 			x = (i / 20) * 30;
 			y = (i % 20) + 2;
 
-			if (show_option(x, y + offset, &options[i], listsym[cnt], scroll, select_me))
+			if (show_action_option(x, y + offset, &options[i], listsym[cnt], scroll, select_me))
 			{
 				cnt++;
 			}
@@ -598,7 +598,7 @@ static int get_choice(char *c, int num, bool *ask)
  *       information when constucting the menu.
  * 'prompt' is an optional prompt.
  */
-bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
+bool display_action_menu(menu_action *options, int select, bool scroll, int (*disp)(int),
 					cptr prompt)
 {
 	int i = -1, j, cnt;
@@ -620,7 +620,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	button_backup_all(TRUE);
 
 	/* Show the list */
-	cnt = show_menu(num, options, select, scroll, disp, prompt);
+	cnt = show_action_menu(num, options, select, scroll, disp, prompt);
 
 	/* Paranoia */
 	if (!cnt)
@@ -694,7 +694,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				button_kill_all();
 
 				/* Show the list */
-				show_menu(num, options, select, scroll, disp, prompt);
+				show_action_menu(num, options, select, scroll, disp, prompt);
 
 				/* Next time */
 				continue;
@@ -717,7 +717,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 				button_kill_all();
 
 				/* Show the list */
-				show_menu(num, options, select, scroll, disp, prompt);
+				show_action_menu(num, options, select, scroll, disp, prompt);
 
 				/* Next time */
 				continue;
@@ -736,7 +736,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 					button_kill_all();
 
 					/* Show the list */
-					show_menu(num, options, select, scroll, disp, prompt);
+					show_action_menu(num, options, select, scroll, disp, prompt);
 
 					/* Next time */
 					continue;
@@ -775,7 +775,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 							button_kill_all();
 
 							/* Show the list */
-							show_menu(num, options, select, scroll, disp, prompt);
+							show_action_menu(num, options, select, scroll, disp, prompt);
 							break;
 						}
 					}
@@ -830,7 +830,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 					message_flush();
 
 					/* Show the list */
-					show_menu(num, options, select, scroll, disp, prompt);
+					show_action_menu(num, options, select, scroll, disp, prompt);
 
 					/* Get a new command */
 					break;
@@ -845,7 +845,7 @@ bool display_menu(menu_type *options, int select, bool scroll, int (*disp)(int),
 	/* restore any previous mouse buttons */
 	button_restore();
 	/* Paranoia for dumb compilers */
-	quit("Unreachable code in display_menu");
+	quit("Unreachable code in display_action_menu");
 	return (FALSE);
 }
 

@@ -2269,27 +2269,6 @@ struct mutation_type
 
 
 /*
- * A function pointer used in displaying menus
- *
- * The function takes a number for the option chosen
- * and will return TRUE if the selection works, and FALSE
- * if the menu should stay up.
- */
-typedef bool (*menu_select_type) (int option);
-
-typedef struct menu_type menu_type;
-
-struct menu_type
-{
-	cptr text;					/* Option text */
-	cptr help;					/* Help file to use */
-	menu_select_type action;	/* Action to do */
-
-	byte flags;					/* Flags controling option behaviour */
-};
-
-
-/*
  * Object bonuses to various stuff
  */
 typedef struct bonuses_type bonuses_type;
