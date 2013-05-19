@@ -40,7 +40,7 @@ extern XTilesheet maptiles; /* tiles same size as font */
 
 int main_menu_x11_graphics_mult(metadpy *mdpy, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected, tw, th;
 	char *labels;
@@ -258,7 +258,7 @@ int main_menu_x11_graphics_mult(metadpy *mdpy, int mx, int my)
 
 int main_menu_x11_graphics(metadpy *mdpy, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -368,7 +368,7 @@ int main_menu_x11_graphics(metadpy *mdpy, int mx, int my)
 
 int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected, tw, th;
 	char *labels;
@@ -563,7 +563,7 @@ int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, in
 
 int main_menu_x11_term(term_data *td, int i, metadpy *mdpy, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -740,7 +740,7 @@ int main_menu_x11_term(term_data *td, int i, metadpy *mdpy, int mx, int my)
 
 int main_menu_x11_pick_term(term_data *td, int n, metadpy *mdpy, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected, i;
 	char *labels;
@@ -815,7 +815,7 @@ int main_menu_x11_pick_term(term_data *td, int n, metadpy *mdpy, int mx, int my)
 
 int main_menu_x11_other(int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -964,7 +964,7 @@ int main_menu_x11_other(int mx, int my)
 
 int main_menu_x11(metadpy *mdpy, term_data *data, int data_count, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;

@@ -311,7 +311,7 @@ bool obj_can_refill(const object_type *o_ptr)
 
 int context_menu_player_2(int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -421,7 +421,7 @@ int context_menu_player_2(int mx, int my)
 
 int context_menu_player(int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -618,7 +618,7 @@ int context_menu_player(int mx, int my)
 
 int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -923,7 +923,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 /* pick the context menu options appropiate for the item */
 int context_menu_object(const object_type *o_ptr)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	int location = 0;
@@ -1241,7 +1241,7 @@ int context_menu_object(const object_type *o_ptr)
 /* pick the context menu options appropiate for a store */
 int context_menu_store(struct store *store, const int oid, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;
@@ -1358,7 +1358,7 @@ int context_menu_store(struct store *store, const int oid, int mx, int my)
 /* pick the context menu options appropiate for an item available in a store */
 int context_menu_store_item(struct store *store, const int oid, int mx, int my)
 {
-	menu_type_a *m;
+	menu_type *m;
 	rect_region r;
 	int selected;
 	char *labels;

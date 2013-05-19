@@ -37,7 +37,7 @@ errr file_pick(char*out, int outlen, cptr title, cptr dir, cptr ext1, cptr ext2,
 {
 	ang_dir *pdir;
 	char buf[1024];
-	menu_type_a *menu;
+	menu_type *menu;
 	rect_region r;
 	ui_event selected;
 	char *ext;

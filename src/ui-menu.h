@@ -43,7 +43,7 @@ extern const char all_letters[];		/* abc..zABC..Z */
    - a menu_skin, which describes the layout of the menu on the screen.
    - various bits and bobs of other data (e.g. the actual list of entries)
  */
-typedef struct menu_type_a menu_type_a;
+typedef struct menu_type menu_type;
 
 
 
@@ -126,24 +126,24 @@ struct menu_action
 typedef struct
 {
 	/* Returns menu item tag (optional) */
-	char (*get_tag)(menu_type_a *menu, int oid);
+	char (*get_tag)(menu_type *menu, int oid);
 
 	/*
 	 * Validity checker (optional--all rows are assumed valid if not present)
  	 * Return values will be interpreted as: 0 = no, 1 = yes, 2 = hide.
  	 */
-	int (*valid_row)(menu_type_a *menu, int oid);
+	int (*valid_row)(menu_type *menu, int oid);
 
 	/* Displays a menu row */
-	void (*display_row)(menu_type_a *menu, int oid, bool cursor,
+	void (*display_row)(menu_type *menu, int oid, bool cursor,
 			int row, int col, int width);
 
 	/* Handle 'positive' events (selections or cmd_keys) */
 	/* XXX split out into a select handler and a cmd_key handler */
-	bool (*row_handler)(menu_type_a *menu, const ui_event *event, int oid);
+	bool (*row_handler)(menu_type *menu, const ui_event *event, int oid);
 
 	/* Called when the screen resizes */
-	void (*resize)(menu_type_a *m);
+	void (*resize)(menu_type *m);
 } menu_iter;
 
 
@@ -167,13 +167,13 @@ typedef struct
 	int (*get_cursor)(int row, int col, int n, int top, rect_region *loc);
 
 	/* Displays the current list of visible menu items */
-	void (*display_list)(menu_type_a *menu, int cursor, int *top, rect_region *);
+	void (*display_list)(menu_type *menu, int cursor, int *top, rect_region *);
 
 	/* Specifies the relative menu item given the state of the menu */
-	char (*get_tag)(menu_type_a *menu, int pos);
+	char (*get_tag)(menu_type *menu, int pos);
 
 	/* Process a direction */
-	ui_event (*process_dir)(menu_type_a *menu, int dir);
+	ui_event (*process_dir)(menu_type *menu, int dir);
 } menu_skin;
 
 
@@ -207,7 +207,7 @@ enum
 
 
 /* Base menu type */
-struct menu_type_a
+struct menu_type
 {
 	/** Public variables **/
 	char *header;
@@ -257,14 +257,14 @@ struct menu_type_a
 /**
  * Allocate and return a new, initialised, menu.
  */
-menu_type_a *menu_new(skin_id, const menu_iter *iter);
-menu_type_a *menu_new_action(menu_action *acts, size_t n);
+menu_type *menu_new(skin_id, const menu_iter *iter);
+menu_type *menu_new_action(menu_action *acts, size_t n);
 
 
 /**
  * Initialise a menu, using the skin and iter functions specified.
  */
-void menu_init(menu_type_a *menu, skin_id skin, const menu_iter *iter);
+void menu_init(menu_type *menu, skin_id skin, const menu_iter *iter);
 
 
 /**
@@ -279,13 +279,13 @@ const menu_iter *menu_find_iter(menu_iter_id iter_id);
  * Menu private data is then available from inside menu callbacks using
  * menu_priv().
  */
-void menu_setpriv(menu_type_a *menu, int count, void *data);
+void menu_setpriv(menu_type *menu, int count, void *data);
 
 
 /**
  * Return menu private data, set with menu_setpriv().
  */
-void *menu_priv(menu_type_a *menu);
+void *menu_priv(menu_type *menu);
 
 
 /*
@@ -296,13 +296,13 @@ void *menu_priv(menu_type_a *menu);
  * object_list[] should be an array of indexes to display, and n should be its
  * length.
  */
-void menu_set_filter(menu_type_a *menu, const int object_list[], int n);
+void menu_set_filter(menu_type *menu, const int object_list[], int n);
 
 
 /**
  * Remove any filters set on a menu by menu_set_filer().
  */
-void menu_release_filter(menu_type_a *menu);
+void menu_release_filter(menu_type *menu);
 
 
 /**
@@ -310,7 +310,7 @@ void menu_release_filter(menu_type_a *menu);
  *
  * XXX not ready for dynamic resizing just yet
  */
-bool menu_layout(menu_type_a *menu, const rect_region *loc);
+bool menu_layout(menu_type *menu, const rect_region *loc);
 
 
 /**
@@ -318,7 +318,7 @@ bool menu_layout(menu_type_a *menu, const rect_region *loc);
  * If reset_screen is true, it will reset the screen to the previously saved
  * state before displaying.
  */
-void menu_refresh(menu_type_a *menu, bool reset_screen);
+void menu_refresh(menu_type *menu, bool reset_screen);
 
 
 /**
@@ -346,27 +346,27 @@ void menu_refresh(menu_type_a *menu, bool reset_screen);
  * and restored before each redraw. This allows variably-sized information
  * at the bottom of the menu.
  */
-ui_event menu_select(menu_type_a *menu, int notify, bool popup);
+ui_event menu_select(menu_type *menu, int notify, bool popup);
 
 /**
  * Set the menu cursor to the next valid row.
  */
-void menu_ensure_cursor_valid(menu_type_a *m);
+void menu_ensure_cursor_valid(menu_type *m);
 
 
 /* Interal menu stuff that cmd-know needs because it's quite horrible */
-bool menu_handle_mouse(menu_type_a *menu, const ui_event *in, ui_event *out);
-bool menu_handle_keypress(menu_type_a *menu, const ui_event *in, ui_event *out);
+bool menu_handle_mouse(menu_type *menu, const ui_event *in, ui_event *out);
+bool menu_handle_keypress(menu_type *menu, const ui_event *in, ui_event *out);
 
 
 /*** Dynamic menu handling ***/
 
-menu_type_a *menu_dynamic_new(void);
-void menu_dynamic_add(menu_type_a *m, const char *text, int value);
-void menu_dynamic_add_label(menu_type_a *m, const char *text, const char label, int value, char *label_list);
-void menu_dynamic_set_select(menu_type_a *m);
-size_t menu_dynamic_longest_entry(menu_type_a *m);
-int menu_dynamic_select(menu_type_a *m);
-void menu_dynamic_free(menu_type_a *m);
+menu_type *menu_dynamic_new(void);
+void menu_dynamic_add(menu_type *m, const char *text, int value);
+void menu_dynamic_add_label(menu_type *m, const char *text, const char label, int value, char *label_list);
+void menu_dynamic_set_select(menu_type *m);
+size_t menu_dynamic_longest_entry(menu_type *m);
+int menu_dynamic_select(menu_type *m);
+void menu_dynamic_free(menu_type *m);
 
 #endif /* INCLUDED_UI_MENU_H */
