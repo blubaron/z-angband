@@ -1367,8 +1367,32 @@ static bool do_cmd_options_dump(int dummy)
 	return (FALSE);
 }
 
+static bool do_cmd_options_interact(int page)
+{
+	/* WARNING these numbers need to be kept the same as
+	 * the indices in options_menu, below */
+	switch (page) {
+	case 16: {
+		/* Interact with macros */
+		do_cmd_macros();
+		break;
+	}
+	case 17: {
+		/* Interact with visuals */
+		do_cmd_visuals();
+		break;
+	}
+	case 18: {
+		/* Interact with colors */
+		do_cmd_colors();
+		break;
+	}
+	}
+	return (FALSE);
+}
+
 /* Number of things in the main options menu */
-#define OPTION_MENU_MAX			18
+#define OPTION_MENU_MAX			21
 
 
 /* The main options menu */
@@ -1390,6 +1414,9 @@ static menu_action options_menu[OPTION_MENU_MAX] =
 	{"Autosave Options", NULL, do_cmd_options_autosave, MN_ACTIVE | MN_SELECT | MN_CLEAR},
 	{"Window Flags", NULL, do_cmd_options_win, MN_ACTIVE | MN_SELECT},
 	MENU_SEPERATOR,
+	{"Interact with Macros", NULL, do_cmd_options_interact, MN_ACTIVE | MN_SELECT | MN_CLEAR},
+	{"Interact with Visuals", NULL, do_cmd_options_interact, MN_ACTIVE | MN_SELECT | MN_CLEAR},
+	{"Interact with Colors", NULL, do_cmd_options_interact, MN_ACTIVE | MN_SELECT | MN_CLEAR},
 	{"Dump Options to a Pref File", NULL, do_cmd_options_dump, MN_ACTIVE | MN_SELECT},
 	MENU_END
 };
