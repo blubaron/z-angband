@@ -409,11 +409,13 @@ int context_menu_player_2(int mx, int my)
 	} else
 	if (selected == 9) {
 		/* show the monster list */
-		Term_keypress('[');//,0);
+		do_cmd_list();
+		//Term_keypress('[');//,0);
 	} else
 	if (selected == 10) {
 		/* show the object list */
-		Term_keypress(']');//,0);
+		do_cmd_list();
+		//Term_keypress(']');//,0);
 	}
 
 	return 1;
