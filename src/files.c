@@ -3496,6 +3496,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 			if (!fff)
 			{
 				screen_load();
+				button_restore();
 				return (FALSE);
 			}
 
@@ -3622,6 +3623,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		/* Leave in case of resize */
 		if (mode == RESIZE_SHOW_FILE)
 		{
+			button_restore();
 			/* Hack: the file  will be closed by the other instance of show_file */
 			return (TRUE);
 		}
