@@ -406,12 +406,14 @@ int context_menu_player_2(int mx, int my)
 	} else
 	if (selected == 9) {
 		/* show the monster list */
-		do_cmd_list();
+		p_ptr->cmd.dir = 5;
+		do_cmd_list_monster(0);
 		//Term_keypress('[');//,0);
 	} else
 	if (selected == 10) {
 		/* show the object list */
-		do_cmd_list();
+		p_ptr->cmd.dir = 5;
+		do_cmd_list_object(0);
 		//Term_keypress(']');//,0);
 	} else
 	if (selected == 11) {

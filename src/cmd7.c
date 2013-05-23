@@ -237,7 +237,7 @@ static void dump_tile_summary(ang_file *fff, int x, int y, int setting)
 				}
 
 				/* Describe the field */
-				froff(fff, "%s: %s", pos, fld_name);
+				froff(fff, "%s: %s\n", pos, fld_name);
 			}
 		}
 		FLD_ITT_END;
