@@ -1298,6 +1298,16 @@ bool file_seek(ang_file *f, u32b pos)
 	return (fseek(f->fh, pos, SEEK_SET) == 0);
 }
 
+bool file_back_one(ang_file *f)
+{
+	return (fseek(f->fh, -1, SEEK_CUR) == 0);
+}
+
+bool file_skip(ang_file *f, s32b advance)
+{
+	return (fseek(f->fh, advance, SEEK_CUR) == 0);
+}
+
 /*
  * Read a single, 8-bit character from file 'f'.
  */

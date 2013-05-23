@@ -163,6 +163,8 @@ bool x_file_putf(ang_file *f, const char *fmt, ...);
  * Returns TRUE if successful, FALSE otherwise.
  */
 bool file_seek(ang_file *f, u32b pos);
+bool file_back_one(ang_file *f);
+bool file_skip(ang_file *f, s32b advance);
 
 /**
  * get the current position in the file represented by `f`.
