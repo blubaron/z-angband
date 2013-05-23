@@ -441,6 +441,9 @@ extern void ring_of_power(int dir);
 extern void do_cmd_use(void);
 
 /* cmd7.c */
+bool do_cmd_list_monster(int dummy);
+bool do_cmd_list_object(int dummy);
+bool do_cmd_list_interesting(int dummy);
 extern void do_cmd_list(void);
 
 /* dungeon.c */

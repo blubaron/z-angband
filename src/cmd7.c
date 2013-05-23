@@ -565,11 +565,11 @@ static void do_cmd_list_aux (int setting)
 {
 	int k, x, y, dir;
 	char com;
-  /* declatations moved here because in ansi c, declarations have to
-     be at the beginning of the scope - Brett */
+	/* declatations moved here because in ansi c, declarations have to
+	   be at the beginning of the scope - Brett */
 	ang_file *fff;
 	char file_name[1024];
-	//int place_order[place_count];
+	/*int place_order[place_count];*/
 
 	/* Can't do this while hallucinating. */
 	if (query_timed(TIMED_IMAGE))
@@ -578,10 +578,13 @@ static void do_cmd_list_aux (int setting)
 		return;
 	}
 	
-
+	if (p_ptr->cmd.dir)
+		dir = p_ptr->cmd.dir;
+	else
 	if (!get_com("Direction? ", &com))
 		dir = 5;
-	else dir = get_keymap_dir(com);
+	else
+		dir = get_keymap_dir(com);
 	if (dir < 1 || dir > 9) dir = 5;
 	
 	
@@ -660,14 +663,16 @@ static void do_cmd_list_aux (int setting)
 	(void)fd_kill(file_name);
 }
 
-static bool do_cmd_list_monster(int dummy) {
+bool do_cmd_list_monster(int dummy)
+{
 	/* Ignore parameter */
 	dummy = 0;
 	
 	do_cmd_list_aux(LIST_MONSTER);
 	return FALSE; 
 }
-static bool do_cmd_list_object(int dummy) {
+bool do_cmd_list_object(int dummy)
+{
 	/* Ignore parameter */
 	dummy = 0;
 	
@@ -703,7 +708,7 @@ static bool do_cmd_list_visible(int dummy)
 }
 
 
-static bool do_cmd_list_interesting(int dummy) 
+bool do_cmd_list_interesting(int dummy) 
 {
 	/* Ignore parameter */
 	dummy = 0;

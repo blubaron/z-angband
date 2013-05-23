@@ -114,8 +114,8 @@ static struct cmd_info cmd_info[] =
 	{ "Cast a spell", 'm', 0, NULL, NULL},//, textui_obj_cast, player_can_cast_msg },
 	{ "Pet Menu", 'p', 0, NULL, NULL},//, textui_obj_cast, player_can_cast_msg },
 	{ "Full dungeon map", 'M', 0, NULL, NULL},//, do_cmd_view_map, NULL },
-	{ "**Display visible monster list", '[', 0, NULL, NULL},//, do_cmd_monlist, NULL },
-	{ "**Display visible item list", ']', 0, NULL, NULL},//, do_cmd_itemlist, NULL },
+	{ "Display visible monster list", '[', 0, NULL, NULL},//, do_cmd_monlist, NULL },
+	{ "Display visible item list", ']', 0, NULL, NULL},//, do_cmd_itemlist, NULL },
 	{ "Locate player on map", 'L', 'W', NULL, NULL},//, do_cmd_locate, NULL },
 	{ "Identify symbol", '/', 0, NULL, NULL},//, do_cmd_query_symbol, NULL },
 	{ "Character description", 'C', 0, do_cmd_character, NULL },
@@ -290,7 +290,7 @@ static bool show_cmd_menu(command_list *list, int mx, int my)
 
 static bool cmd_list_action(menu_type *m, const ui_event *event, int oid)
 {
-	//if (event->type == EVT_SELECT)
+	/*if (event->type == EVT_SELECT)*/
 	if (*event == EVT_SELECT) {
 		command_list *list = menu_priv(m);
 		return show_cmd_menu(&list[oid], 0, 0);

@@ -843,6 +843,22 @@ void process_command(void)
 			break;
 		}
 
+		case '[':
+		{
+			/* Show visible monsters */
+			p_ptr->cmd.dir = 5;
+			do_cmd_list_monster(0);
+			break;
+		}
+
+		case ']':
+		{
+			/* Show visible objects */
+			p_ptr->cmd.dir = 5;
+			do_cmd_list_object(0);
+			break;
+		}
+
 		case '=':
 		{
 			/* Interact with options */
