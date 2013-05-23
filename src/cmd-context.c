@@ -332,6 +332,7 @@ int context_menu_player_2(int mx, int my)
 	menu_dynamic_add_label(m, "Destroy an item", 'k', 6, labels);
 	menu_dynamic_add_label(m, "Options", '=', 8, labels);
 	menu_dynamic_add_label(m, "Commands", '?', 7, labels);
+	menu_dynamic_add_label(m, "Back", ' ', 11, labels);
 
 	/* work out display region */
 	r.width = menu_dynamic_longest_entry(m) + 3 + 2; /* +3 for tag, 2 for pad */
@@ -412,6 +413,10 @@ int context_menu_player_2(int mx, int my)
 		/* show the object list */
 		do_cmd_list();
 		//Term_keypress(']');//,0);
+	} else
+	if (selected == 11) {
+		/* show the previous menu again */
+		return 2;
 	}
 
 	return 1;
@@ -567,12 +572,16 @@ int context_menu_player(int mx, int my)
 	case 9:
 		{
 			/* show another layer of menu options screen */
-			context_menu_player_2(mx,my);
+			int res;
+			while ((res = context_menu_player_2(mx,my)) == 3);
+			if (res == 2) return 3;
 		} break;
 	case 10:
 		{
 			/* show the commands */
-			context_menu_command(mx, my);
+			int res;
+			while ((res = context_menu_command(mx,my)) == 3);
+			if (res == 2) return 3;
 		} break;
 	case 11:
 		{

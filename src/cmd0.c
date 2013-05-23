@@ -207,8 +207,7 @@ void process_click(char press, int xpos, int ypos)
  				do_cmd_stay(TRUE);
 			} else
 			if (button == 2) {
-				context_menu_player(xpos, ypos);
-				//do_cmd_inven();
+				while (context_menu_player(xpos, ypos) == 3);
 			} else
 			/* temporary commands until context menus are implemented */
 			if (button == 3) {

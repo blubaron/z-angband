@@ -2423,7 +2423,7 @@ static void do_cmd_organize_aux(void)
 		item_tester_tval = 0;
 
 		/* Show the prompt */
-		prtf(0, 0, "Move to which container?%s", inven_carry_okay_no_containers(o_ptr) ? " (* for Inven)" : "");
+		prtf(0, 0, "Move to which container?%s", inven_carry_okay_no_containers(o_ptr) ? " $U(* for Inven)$Y*$V" : "");
 
 		/* Get a response */
 		while (TRUE)
