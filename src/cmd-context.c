@@ -40,7 +40,7 @@ void do_cmd_cast_wrapper(void);
 bool do_cmd_center_map(void);
 object_type *chest_check(int x, int y);
 
-int context_menu_command(void);
+int context_menu_command(int mx, int my);
 int context_menu_object(const object_type *o_ptr);
 void textui_cmd_destroy_menu(int item);
 void roff_obj_aux(const object_type *o_ptr);
@@ -50,10 +50,6 @@ bool item_tester_hook_activate(const object_type *o_ptr);
 bool item_tester_refill_lantern(const object_type *o_ptr);
 bool item_tester_refill_torch(const object_type *o_ptr);
 
-int context_menu_command(void)
-{
-  return 0;
-}
 bool player_is_caster(void)
 {
 	if (p_ptr->spell.realm[0]) {
@@ -401,7 +397,7 @@ int context_menu_player_2(int mx, int my)
 	} else
 	if (selected == 7) {
 		/* show the commands */
-		context_menu_command();
+		context_menu_command(mx,my);
 	} else
 	if (selected == 8) {
 		/* show options screen */
@@ -576,7 +572,7 @@ int context_menu_player(int mx, int my)
 	case 10:
 		{
 			/* show the commands */
-			context_menu_command();
+			context_menu_command(mx, my);
 		} break;
 	case 11:
 		{

@@ -39,7 +39,7 @@ OBJS := variable.o tables.o util.o cave.o \
 	melee1.o melee2.o save.o files.o fields.o\
 	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o cmd7.o\
 	cmd0.o ui.o ui-menu.o ui-region.o cmd-context.o \
-	store.o birth.o load.o fields.o run.o \
+	store.o birth.o load.o fields.o run.o cmd-menu.o \
 	wizard1.o wizard2.o grid.o streams.o rooms.o \
 	generate.o dungeon.o hero.o game.o init1.o init2.o \
 	effects.o quest1.o quest2.o racial.o script.o \

@@ -120,6 +120,10 @@ SOURCE=.\src\cmd-context.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\cmd-menu.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\cmd0.c
 # End Source File
 # Begin Source File

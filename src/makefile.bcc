@@ -123,6 +123,7 @@ OBJ = \
 	fields.obj \
 	effects.obj \
 	dungeon.obj \
+	cmd-menu.obj \
 	cmd-context.obj \
 	cmd7.obj \
 	cmd6.obj \

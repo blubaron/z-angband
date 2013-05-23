@@ -164,6 +164,7 @@ while (FALSE)
 #  define D2I(X)	((X) - '0')
 #  define I2D(X)	((char) ((X) + '0'))
 #  define KTRL(X)	((X) & 0x1F)
+#  define UN_KTRL(X)	((X) + 64)
 #  define ESCAPE	'\033'
 #  define ESCAPE_STR	"\033"
 #else
@@ -172,6 +173,7 @@ while (FALSE)
 #  define D2I(X)	((X) - '0')
 #  define I2D(X)	((char) ((X) + '0'))
 #  define KTRL(X)	((X) & 0x1F)
+#  define UN_KTRL(X)	((X) + 64)
 #  define ESCAPE	'\033'
 #  define ESCAPE_STR	"\033"
 #endif

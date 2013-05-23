@@ -195,6 +195,7 @@ void textui_textblock_show(textblock *tb, region orig_area, const char *header)
 
 	return;
 }
+#endif
 
 
 
@@ -206,14 +207,14 @@ void textui_textblock_show(textblock *tb, region orig_area, const char *header)
 void window_make(int origin_x, int origin_y, int end_x, int end_y)
 {
 	int n;
-	region to_clear;
+	rect_region to_clear;
 
 	to_clear.col = origin_x;
 	to_clear.row = origin_y;
 	to_clear.width = end_x - origin_x;
 	to_clear.page_rows = end_y - origin_y;
 
-	region_erase(&to_clear);
+	rect_region_erase(&to_clear);
 
 	Term_putch(origin_x, origin_y, TERM_WHITE, '+');
 	Term_putch(end_x, origin_y, TERM_WHITE, '+');
@@ -233,4 +234,3 @@ void window_make(int origin_x, int origin_y, int end_x, int end_y)
 	}
 }
 
-#endif

@@ -50,7 +50,7 @@ void textui_textblock_place(textblock *tb, region orig_area, const char *header)
 
 /*** Misc ***/
 
-/*void window_make(int origin_x, int origin_y, int end_x, int end_y);*/
+void window_make(int origin_x, int origin_y, int end_x, int end_y);
 
 
 #endif /* INCLUDED_UI_H */

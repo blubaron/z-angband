@@ -700,7 +700,7 @@ void Term_queue_line(int x, int y, int n, byte *a, char *c, byte *ta, char *tc)
  * This function is designed to be fast, with no consistancy checking.
  * It is used to update the map in the game.
  */
-void Term_queue_str(int x, int y, int n, byte a, char *s, byte ta, char tc)
+void Term_queue_str(int x, int y, int n, byte a, const char *s, byte ta, char tc)
 {
 	term_win *scrn = Term->scr;
 
@@ -1713,7 +1713,7 @@ void Term_big_putch(int x, int y, byte a, char c)
 		}
 	}
 }
-void Term_addstr(int n, byte a, char *s)
+void Term_addstr(int n, byte a, const char *s)
 {
 	int w = Term->wid;
 	int k;
@@ -1750,7 +1750,7 @@ void Term_addstr(int n, byte a, char *s)
 	return;
 }
 
-void Term_putstr(int x, int y, int n, byte a, char *s)
+void Term_putstr(int x, int y, int n, byte a, const char *s)
 {
 	/* Move first */
 	Term_gotoxy(x, y);
