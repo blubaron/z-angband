@@ -1096,8 +1096,6 @@ static errr init_dun_info(void)
 	/* General buffer */
 	char buf[1024];
 
-	int i;
-
 	/* Later must add in python support. */
 
 	/*** Load the ascii template file ***/
@@ -1576,10 +1574,6 @@ static void init_angband_fail(void)
  */
 void display_introduction()
 {
-	int fd = -1;
-
-	int mode = 0644;
-
 	ang_file *fp;
 
 	char buf[1024];

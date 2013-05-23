@@ -93,7 +93,7 @@ static int init_sound_dummy(int argc, char *argv[], unsigned char *new_game) {
 	return 0;
 }
 static void close_sound_dummy(void) {
-	return 0;
+	return;
 }
 
 /*

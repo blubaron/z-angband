@@ -202,6 +202,7 @@ static void cmd_sub_entry(menu_type *menu, int oid, bool cursor, int row, int co
 	keycode_t key;
 	const struct cmd_info *commands = menu_priv(menu);
 
+	(void)width;
 	if (commands[oid].prereq && !(*commands[oid].prereq)()) {
 		attr = (cursor ? curs_attrs[0][1] : curs_attrs[0][0]);
 	} else {
@@ -304,6 +305,7 @@ static void cmd_list_entry(menu_type *menu, int oid, bool cursor, int row, int c
 	byte attr = (cursor ? TERM_L_BLUE : TERM_WHITE);
 	command_list *list = menu_priv(menu);
 	Term_putstr(col, row, -1, attr, list[oid].name);
+	(void)width;
 }
 
 static menu_iter command_menu_iter =
