@@ -132,7 +132,7 @@ void do_cmd_inven(void)
 {
 	object_type *o_ptr;
 	char prompt[256];
-	char *no;
+	const char *no;
 	int ret = 3;
 
 	/* see if we have a ui override */
@@ -188,7 +188,7 @@ void do_cmd_equip(void)
 {
 	object_type *o_ptr;
 	char prompt[256];
-	char *no;
+	const char *no;
 	int ret = 3;
 
 	/* see if we have a ui override */

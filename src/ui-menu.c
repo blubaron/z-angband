@@ -674,7 +674,7 @@ bool menu_handle_keypress(menu_type *menu, const ui_event *in,
 
 	//else if (in->key.code == KC_ENTER)
 	//	out->type = EVT_SELECT;
-	else if (*in == '\n')
+	else if ((*in == '\n') || (*in == '\r'))
 		*out = EVT_SELECT;
 
 	/* Try directional movement */
