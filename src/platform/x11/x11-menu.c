@@ -28,6 +28,7 @@
 extern bool SaveWindow(infowin *win, char*filename);
 extern errr Term_xtra_x11_react(void);
 extern errr Term_xtra_x11_clear(void);
+extern errr context_menu_command(int mx, int my);
 
 extern infofnt *Infofnt;
 errr Infofnt_nuke(void);
@@ -830,7 +831,7 @@ int main_menu_x11_other(int mx, int my)
 
 	menu_dynamic_add_label(m, "Version", ' ', 7, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
-	menu_dynamic_add_label(m, "Dump Char", 'f', 2, labels);
+	menu_dynamic_add_label(m, "Access Lists", '$', 11, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
 	menu_dynamic_add_label(m, "Save Screenshot", '*', 3, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
@@ -838,6 +839,7 @@ int main_menu_x11_other(int mx, int my)
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
 	menu_dynamic_add_label(m, "^Redraw", 'R', 8, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
+	menu_dynamic_add_label(m, "Dump Char", 'f', 2, labels);
 	menu_dynamic_add_label(m, "Dump Screen", '(', 9, labels);
 	menu_dynamic_add_label(m, "Load Screen", ')', 10, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
@@ -957,6 +959,11 @@ int main_menu_x11_other(int mx, int my)
 			/* load the screen from disk */
 			do_cmd_load_screen();
 		} break;
+	case 11:
+		{
+			/* access  lists */
+			do_cmd_list();
+		} break;
 	}
 
 	return 1;
@@ -986,6 +993,8 @@ int main_menu_x11(metadpy *mdpy, term_data *data, int data_count, int mx, int my
 	menu_dynamic_add_label(m, "Help", '?', 6, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
 	menu_dynamic_add_label(m, "Options", '=', 7, labels);
+	menu_dynamic_add_label(m, "", '\0', 1, labels);
+	menu_dynamic_add_label(m, "Commands", ' ', 9, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
 	menu_dynamic_add_label(m, "Other", ' ', 8, labels);
 	menu_dynamic_add_label(m, "", '\0', 1, labels);
@@ -1079,6 +1088,11 @@ int main_menu_x11(metadpy *mdpy, term_data *data, int data_count, int mx, int my
 			int ret;
 			while ((ret = main_menu_x11_other(mx+(r.width>>1), my)) == 3);
 			if (ret == 2) return 3;
+		} break;
+	case 9:
+		{
+			/* show the list of commands */
+			context_menu_command(mx+(r.width>>1), my+1);
 		} break;
 	}
 

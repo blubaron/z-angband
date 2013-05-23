@@ -88,7 +88,7 @@ static struct cmd_info cmd_action[] =
 	{ "Open a door or a chest", 'o', 0, NULL, NULL },
 	{ "Close a door", 'c', 0, NULL, NULL },
 	{ "Jam a door shut", 'j', 'S', NULL, NULL },
-	{ "**Bash a door open", 'B', 'f', NULL, NULL },
+	/*{ "**Bash a door open", 'B', 'f', NULL, NULL },*/
 	{ "**Repeat Last Spell/Ranged Attack", 'h', '\t', NULL, NULL},//, textui_cmd_fire_at_nearest, NULL },
 	{ "**Fire at nearest target", 'h', '\t', NULL, NULL}//, textui_cmd_fire_at_nearest, NULL }
 };

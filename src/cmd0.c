@@ -354,6 +354,7 @@ void process_command(void)
 
 		case '\r':
 		{
+			context_menu_command(0,0);
 			/* Ignore return */
 			break;
 		}
