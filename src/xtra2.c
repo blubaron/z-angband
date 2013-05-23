@@ -2990,7 +2990,7 @@ bool target_set_interactive(int mode, int x, int y)
 
 	int wid, hgt;
 
-
+	m = 0;
 	/* Prepare the "temp" array */
 	target_set_prepare(mode);
 
@@ -3090,6 +3090,17 @@ bool target_set_interactive(int mode, int x, int y)
 						x = tx;
 						y = ty;
 						d = 5;
+						/* see if there is something interesting here */
+						for (i = 0; i < temp_n; i++) {
+							if ((x == temp_x[i]) && (y == temp_y[i])) {
+								m = i;
+								break;
+							}
+						}
+						/* if not, leave this mode */
+						if (i == temp_n) {
+							flag = FALSE;
+						}
 					}
 				} else
 				{
@@ -3288,6 +3299,14 @@ bool target_set_interactive(int mode, int x, int y)
 						x = tx;
 						y = ty;
 						d = 5;
+						/* see if there is something interesting here */
+						for (i = 0; i < temp_n; i++) {
+							if ((x == temp_x[i]) && (y == temp_y[i])) {
+								m = i;
+								flag = TRUE;
+								break;
+							}
+						}
 					}
 				} else
 				{
