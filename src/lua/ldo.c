@@ -258,7 +258,7 @@ static int protectedparser (lua_State *L, ZIO *z, int bin) {
   return status;
 }
 
-
+#if 0
 static int parse_file (lua_State *L, const char *filename) {
   ZIO z;
   int status;
@@ -285,10 +285,101 @@ static int parse_file (lua_State *L, const char *filename) {
     fclose(f);
   return status;
 }
+#endif /* if 0 */
+
+/***
+ * modifications to read from the Angband file type, instead of
+ * a regular FILE - Brett
+ */
+/* Mega-Hack: include the relevant parts of z-file.h and
+ * h-type.h to avoid compiler errors */
+#ifndef byte
+typedef unsigned char byte;
+#endif /* byte */
+#ifndef bool
+typedef char bool;
+#endif /* bool */
+#ifndef INCLUDED_Z_FILE_H
+typedef struct ang_file ang_file;
+typedef enum
+{
+	MODE_WRITE,
+	MODE_READ,
+	MODE_APPEND
+} file_mode;
+typedef enum
+{
+	FTYPE_TEXT = 1,
+	FTYPE_SAVE,
+	FTYPE_RAW,
+	FTYPE_HTML
+} file_type;
+extern ang_file *file_open(const char *buf, file_mode mode, file_type ftype);
+extern bool file_close(ang_file *f);
+extern bool file_back_one(ang_file *f);
+extern int file_read(ang_file *f, char *buf, size_t n);
+extern bool file_readc(ang_file *f, byte *b);
+extern bool file_eof(ang_file *f);
+#endif /* INCLUDED_Z_FILE_H */
+
+static int luazfangfilbuf (ZIO* z) {
+	size_t n;
+	if (file_eof((ang_file *)z->u)) return EOZ;
+	n = file_read((ang_file *)z->u, (char*)z->buffer, ZBSIZE);
+	if (n==0) return EOZ;
+	z->n = n-1;
+	z->p = z->buffer;
+	return *(z->p++);
+}
+
+
+static int parse_ang_file (lua_State *L, const char *filename) {
+	ZIO z;
+	int status;
+	int bin;  /* flag for file mode */
+	int c;    /* look ahead char */
+	byte b;
+	ang_file *fff;
+
+	if (!filename) {
+		return LUA_ERRFILE;
+	}
+
+	fff = file_open(filename, MODE_READ, FTYPE_TEXT);
+	if (fff == NULL) return LUA_ERRFILE;  /* unable to open file */
+	file_readc(fff, &b);
+	file_back_one(fff);
+	c = (int)b;
+	bin = (c == ID_CHUNK);
+	if (bin) {
+		file_close(fff);
+		fff = file_open(filename, MODE_READ, FTYPE_RAW);
+		if (fff == NULL) return LUA_ERRFILE;  /* unable to reopen file */
+	}
+	lua_pushstring(L, "@");
+	lua_pushstring(L, filename);
+	lua_concat(L, 2);
+	c = lua_gettop(L);
+	filename = lua_tostring(L, c);  /* filename = '@'..filename */
+
+	z.n = 0;
+	z.p = z.buffer;
+	z.filbuf = luazfangfilbuf;
+	z.u = fff;
+	z.name = filename;
+
+	status = protectedparser(L, &z, bin);
+	lua_remove(L, c);  /* remove `filename' from the stack */
+
+	file_close(fff);
+  
+	return status;
+}
 
 
 LUA_API int lua_dofile (lua_State *L, const char *filename) {
-  int status = parse_file(L, filename);
+  /*int status = parse_file(L, filename);*/
+  int status = parse_ang_file(L, filename);
   if (status == 0)  /* parse OK? */
     status = lua_call(L, 0, LUA_MULTRET);  /* call main */
   return status;

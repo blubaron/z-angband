@@ -916,7 +916,10 @@ errr script_init(void)
 
 	/* Initialization code */
 	path_make(buf, ANGBAND_DIR_SCRIPT, "init.lua");
-	script_do_file(buf);
+	if (!script_do_file(buf)) {
+		plog("Lua file init failed.");
+		return -4;
+	}
 
 	return 0;
 }

@@ -1722,7 +1722,7 @@ void init_angband(void)
 
 	/* Initialize scripting */
 	note("[Initializing scripts... (scripts)]");
-	if (script_init()) quit("Cannot initialize scripts");
+	if (script_init() < 0) quit("Cannot initialize scripts");
 
 	/* Initialize feature info */
 	note("[Initializing arrays... (features)]");
