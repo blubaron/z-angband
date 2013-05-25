@@ -9,6 +9,7 @@
  */
 
 #include "angband.h"
+#include "grafmode.h"
 #include "pickfile.h"
 
 
@@ -226,8 +227,6 @@ static void init_stuff(void)
 		 */
 		
 		char buf[1024];
-		
-		int fd = -1;
 		
 		/* Look for "news" file - see init2.c */
 		path_make(buf, path, "file/news.txt");
@@ -781,7 +780,7 @@ int main(int argc, char *argv[])
 					}
 				} else
 				/*if ((key == 't') || (key == 'T')) {
-					/* Start the tutorial */ /*
+					*//* Start the tutorial */ /*
 					game_in_progress = TRUE;
 					new_game = FALSE;
 				} else*/
@@ -793,7 +792,7 @@ int main(int argc, char *argv[])
 					top_twenty();
 
 				} else
-				if ((key == ESCAPE) || (key == 10) || (key == 'x') || (key == 'X')) {
+				if ((key == ESCAPE) || (key == 'x') || (key == 'X')) {
 					/* Free resources */
 					cleanup_angband();
 					/* Quit */
