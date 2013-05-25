@@ -2190,6 +2190,8 @@ struct place_type
 	byte gates_y[MAX_GATES];
 	
 	byte seen;              /* Has the player ever been here? */
+	byte surface_type;      /* The dun_gen_type of the walls and gates, usually 0 for towns and dungeon->didx for dungeons */
+	u16b landmark;          /* What the surface of the place looks like */
 
 	char name[T_NAME_LEN];  /* Town name */
 };

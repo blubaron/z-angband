@@ -3252,6 +3252,10 @@ static errr rd_savefile_new_aux(void)
 			{
 				rd_byte(&pl_ptr->seen);
 			}
+			if (sf_version >= 63) {
+				rd_byte(&pl_ptr->surface_type);
+				rd_u16b(&pl_ptr->landmark);
+			}
 
 			if (sf_version < 42)
 			{

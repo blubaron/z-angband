@@ -1811,6 +1811,12 @@ static bool wr_savefile_new(void)
 		/* Seen */
 		wr_byte(pl_ptr->seen);
 
+		/* Surface Type, if any */
+		wr_byte(pl_ptr->surface_type);
+
+		/* surface layout, if static */
+		wr_u16b(pl_ptr->landmark);
+
 		if (pl_ptr->dungeon) {
 			dun_type *dun_ptr;
 
