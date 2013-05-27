@@ -1497,6 +1497,12 @@ static void give_reward(store_type * st_ptr, quest_type * q_ptr)
 		/* Don't get too close to maxing out */
 		amt = MIN(amt, MAX((cap - p_ptr->stat[stat].cur)/2, 1));
 
+		/* restore the stat that we are goig to increase, for a penalty */
+		if (p_ptr->stat[stat].cur < p_ptr->stat[stat].max) {
+			p_ptr->stat[stat].cur = p_ptr->stat[stat].max;
+			amt = amt/2;
+		}
+
 		do_inc_stat_fixed(stat, amt);
 	}
 
