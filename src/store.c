@@ -3111,7 +3111,7 @@ void store_init(int town_num, int store_num, byte store)
 	cptr own_suffix = owner_suffix[randint0(owner_suffix_max)];
 
 	/* Activate that building */
-	store_type *st_ptr = &place[town_num].store[store_num];
+	store_type *st_ptr = &(place[town_num].store[store_num]);
 
 	/* Pick an owner */
 	st_ptr->owner_name = quark_fmt("%s %s", own_name, own_suffix);

@@ -1058,7 +1058,7 @@ static void add_monsters(int count)
 	{
 		/*
 		 * Calculate the total levels of monster ood'ness to get
-         * an appropriate level feeling.
+		 * an appropriate level feeling.
 		 *
 		 * The more boring the dungeon is right now,
 		 * the more out of depth to pick monsters.
@@ -1074,7 +1074,12 @@ static void add_monsters(int count)
 		if (alloc_monster(0, TRUE, delta_level)) num++;
 
 		/* If we failed, set back the counter: should guarantee at least one monster. */
-		else if (i+num < count) i--;
+		/*else if (i+num < count) i--;*/
+		/* the above line was part of an infinite loop with a bad quest seed on
+		 * a small level. alloc_monster tries 10,000 times to place the monster
+		 * so I am not concerned about the fewer monsters placed by this change.
+		 * The alternative is to have a limiting loop here. */
+		else if (num == 0) i--;
 	}
 
 	/* Sometimes have lots of monster of a given type */

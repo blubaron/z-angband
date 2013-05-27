@@ -5194,7 +5194,7 @@ dun_gen_type *dungeons;
 /* the original dungeons array, to find the dungeon index when
  * loading old save files this should be updated when there are
  * new variables in the dun_gen_type, but no data should be changed */
-dun_gen_type old_dungeons[] =
+dun_gen_type old_dungeons[32] =
 {
 	/* DUN_TYPE_VANILLA "Vanilla" dungeon type */
 	{1,{23, 23, 23, 23}, RF7_DUN, 1, 127, 1, 1,

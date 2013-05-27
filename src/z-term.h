@@ -315,7 +315,7 @@ struct term
 #define TERM_UMBER    7  /* u */    /* 2 1 0 */
 #define TERM_L_DARK   8  /* D */    /* 1 1 1 */
 #define TERM_L_WHITE  9  /* W */    /* 3 3 3 */
-#define TERM_L_PURPLE 10 /* P */    /* ? ? ? */
+#define TERM_VIOLET   10 /* v */    /* 4 0 4 */
 #define TERM_YELLOW   11 /* y */    /* 4 4 0 */
 #define TERM_L_RED    12 /* R */    /* 4 0 0 */
 #define TERM_L_GREEN  13 /* G */    /* 0 4 0 */
@@ -323,7 +323,7 @@ struct term
 #define TERM_L_UMBER  15 /* U */    /* 3 2 1 */
 
 #define TERM_PURPLE      16    /* p */
-#define TERM_VIOLET      17    /* v */
+#define TERM_L_PURPLE    17    /* P */
 #define TERM_TEAL        18    /* t */
 #define TERM_MUD         19    /* m */
 #define TERM_L_YELLOW    20    /* Y */
