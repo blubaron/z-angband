@@ -763,37 +763,40 @@ static void prt_time(void)
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Morning");
       }
     } else {
-      if (hour >= 22) {
+      if (hour >= 23) {
+			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Sunrise");
+      } else
+      if (hour >= 21) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Predawn");
       } else
-      if (hour >= 20) {
+      if (hour >= 19) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Night");
       } else
-      if (hour >= 18) {
+      if (hour >= 17) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "  Midnight");
       } else
-      if (hour >= 16) {
+      if (hour >= 15) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Evening");
       } else
-      if (hour >= 14) {
+      if (hour >= 13) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Evening");
       } else
-      if (hour >= 12) {
+      if (hour >= 11) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "    Sunset");
       } else
-      if (hour >= 10) {
+      if (hour >= 9) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Afternoon");
       } else
-      if (hour >= 8) {
+      if (hour >= 7) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, " Afternoon");
       } else
-      if (hour >= 6) {
+      if (hour >= 5) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "      Noon");
       } else
-      if (hour >= 4) {
+      if (hour >= 3) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "Late Morning");
       } else
-      if (hour >= 2) {
+      if (hour >= 1) {
 			  prtf(COL_DEPTH + 20, Term->hgt - 1, "   Morning");
       } else
       {
