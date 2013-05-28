@@ -286,7 +286,7 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
  *
  * We use "u" to point to an array of strings.
  */
-static bool ang_sort_comp_hook_string(const vptr u, const vptr v, int a, int b)
+bool ang_sort_comp_hook_string(const vptr u, const vptr v, int a, int b)
 {
 	cptr *x = (cptr *)(u);
 
@@ -302,7 +302,7 @@ static bool ang_sort_comp_hook_string(const vptr u, const vptr v, int a, int b)
  *
  * We use "u" to point to an array of strings.
  */
-static void ang_sort_swap_hook_string(const vptr u, const vptr v, int a, int b)
+void ang_sort_swap_hook_string(const vptr u, const vptr v, int a, int b)
 {
 	cptr *x = (cptr *)(u);
 

@@ -8,6 +8,8 @@
 extern void center_string(char *buf, uint max, cptr fmt, va_list *vp);
 extern void binary_fmt(char *buf, uint max, cptr fmt, va_list *vp);
 extern void fmt_clean(char *buf);
+extern bool ang_sort_comp_hook_string(const vptr u, const vptr v, int a, int b);
+extern void ang_sort_swap_hook_string(const vptr u, const vptr v, int a, int b);
 extern int get_player_choice(cptr *choices, int num, int col, int wid,
                              cptr helpfile, void (*hook) (cptr));
 extern int get_player_sort_choice(cptr *choices, int num, int col, int wid,

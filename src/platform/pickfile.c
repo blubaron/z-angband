@@ -16,11 +16,7 @@
  *    are included in all such copies.  Other copyrights may also apply.
  */
 
-#include <stdio.h>
-#include "z-virt.h"
-#include "z-file.h"
-#include "z-form.h"
-#include "ui-menu.h"
+#include "angband.h"
 #include "pickfile.h"
 
 /* Pick a file from the given directory, with one of the given extensions.
@@ -164,6 +160,14 @@ errr file_pick(char*out, int outlen, cptr title, cptr dir, cptr ext1, cptr ext2,
 		/* no files were found, display an empty list */
 		filelist = NULL;
 	}
+
+	/* Sort the strings */
+	ang_sort_comp = ang_sort_comp_hook_string;
+	ang_sort_swap = ang_sort_swap_hook_string;
+
+	/* Sort the (unique) slopes */
+	ang_sort((void *)filelist, NULL, count);
+
 	menu = menu_new(MN_SKIN_COLUMNS, menu_find_iter(MN_ITER_STRINGS));
 	if (!menu) {
 		if (filelist) {
