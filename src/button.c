@@ -722,7 +722,7 @@ size_t button_print(int row, int col)
 	bttn = button_stack;
 	while (bttn) {
 		if (bttn->label && bttn->label[0]) {
-			put_cstr(bttn->left, bttn->top, bttn->label, FALSE);
+			put_cstr(bttn->left, bttn->top, bttn->label, 0);
 		}
 		bttn = bttn->next;
 	}

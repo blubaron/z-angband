@@ -1136,7 +1136,7 @@ int len_cstr(cptr str)
 /*
  * Put a string with control characters at a given location
  */
-void put_cstr(int col, int row, cptr str, bool clear)
+void put_cstr(int col, int row, cptr str, int clear)
 {
 	cptr c = str;
 
@@ -1144,9 +1144,13 @@ void put_cstr(int col, int row, cptr str, bool clear)
 	byte a = TERM_WHITE;
 	byte da = a;
 	int x = col;
+	int mx = col + 255;
 
 	/* Clear line, position cursor */
-	if (clear) Term_erase(col, row, 255);
+	if (clear > 0) Term_erase(col, row, clear);
+	else if (clear < 0) clear = len_cstr(str);
+
+	if (clear) mx = col+clear;
 
 	while (*c)
 	{
@@ -1260,13 +1264,15 @@ void put_cstr(int col, int row, cptr str, bool clear)
 			c++;
 
 			/* Clear line, position cursor */
-			if (clear) Term_erase(col, row, 255);
+			if (clear > 0) Term_erase(col, row, clear);
 
 			continue;
 		}
 
+		if (x <= mx) {
 		/* Display the character */
 		Term_putch(x, row, a, *c);
+		}
 
 		/* Next position */
 		x++;
@@ -1293,7 +1299,7 @@ void put_fstr(int col, int row, cptr str, ...)
 	va_end(vp);
 
 	/* Display */
-	put_cstr(col, row, buf, FALSE);
+	put_cstr(col, row, buf, 0);
 }
 
 
@@ -1317,7 +1323,7 @@ void prtf(int col, int row, cptr str, ...)
 	va_end(vp);
 
 	/* Display */
-	put_cstr(col, row, buf, TRUE);
+	put_cstr(col, row, buf, 255);
 }
 
 
