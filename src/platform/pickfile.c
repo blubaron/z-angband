@@ -180,8 +180,8 @@ errr file_pick(char*out, int outlen, cptr title, cptr dir, cptr ext1, cptr ext2,
 	}
 	menu->flags = MN_NO_ACTION | MN_DBL_TAP | MN_NO_TAGS;
 	menu->title = (char*)title;
-	/*menu->prompt = "Pick a file or $Upress [ESC] to cancel$Y" ESCAPE_STR "$V";*/
-	menu->prompt = "Pick a file or press ESC to cancel";
+	menu->prompt = "Pick a file or $Upress [ESC] to cancel$Y" ESCAPE_STR "$V";
+	/*menu->prompt = "Pick a file or press ESC to cancel";*/
 	menu_setpriv(menu, count, filelist);
 	screen_save();
 	button_backup_all(TRUE);

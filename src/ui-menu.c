@@ -475,16 +475,13 @@ void menu_refresh(menu_type *menu, bool reset_screen)
 		oid = menu->filter_list[oid];
 
 	if (menu->title)
-		Term_putstr(menu->boundary.col, menu->boundary.row,
-				loc->width, TERM_WHITE, menu->title);
+		put_cstr(menu->boundary.col, menu->boundary.row, menu->title, loc->width);
 
 	if (menu->header)
-		Term_putstr(loc->col, loc->row - 1, loc->width,
-				TERM_WHITE, menu->header);
+		put_cstr(loc->col, loc->row - 1, menu->header, loc->width);
 
 	if (menu->prompt)
-		Term_putstr(menu->boundary.col, loc->row + loc->page_rows,
-				loc->width, TERM_WHITE, menu->prompt);
+		put_cstr(menu->boundary.col, loc->row + loc->page_rows, menu->prompt, loc->width);
 
 	if (menu->browse_hook && oid >= 0)
 		menu->browse_hook(oid, menu->menu_data, loc);
