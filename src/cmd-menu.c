@@ -208,7 +208,6 @@ static void cmd_sub_entry(menu_type *menu, int oid, bool cursor, int row, int co
 	} else {
 		attr = (cursor ? curs_attrs[1][1] : curs_attrs[1][0]);
 	}
-	Term_putstr(col, row, -1, attr, "test");
 
 	/* Write the description */
 	Term_putstr(col, row, -1, attr, commands[oid].desc);
