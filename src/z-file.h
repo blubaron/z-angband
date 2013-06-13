@@ -163,7 +163,19 @@ bool x_file_putf(ang_file *f, const char *fmt, ...);
  * Returns TRUE if successful, FALSE otherwise.
  */
 bool file_seek(ang_file *f, u32b pos);
+
+/**
+ * Move the file pointer backwards one byte.
+ * 
+ * returns TRUE if successful, FALSE otherwise.
+ */
 bool file_back_one(ang_file *f);
+
+/**
+ * Skip 'bytes' bytes.
+ * 
+ * returns TRUE if successful, FALSE otherwise.
+ */
 bool file_skip(ang_file *f, s32b advance);
 
 /**

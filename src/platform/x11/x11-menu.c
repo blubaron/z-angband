@@ -45,7 +45,7 @@ int main_menu_x11_graphics_mult(metadpy *mdpy, int mx, int my)
 	rect_region r;
 	int selected, tw, th;
 	char *labels;
-	graphics_mode *mode;
+	/*graphics_mode *mode;*/
 
 	/* Paranoia */
 	if (!mdpy) {
@@ -373,7 +373,6 @@ int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, in
 	rect_region r;
 	int selected, tw, th;
 	char *labels;
-	graphics_mode *mode;
 
 	/* Paranoia */
 	if (!td || !(td->fnt) || !mdpy) {
@@ -548,8 +547,8 @@ int main_menu_x11_term_tile_size(term_data *td, int i, metadpy *mdpy, int mx, in
 			res = ResizeTiles(dpy, &viewtiles, &tiles);
 
 			FreeTiles(&maptiles);
-			viewtiles.CellWidth = td->tile_wid;
-			viewtiles.CellHeight = td->tile_hgt;
+			maptiles.CellWidth = td->tile_wid;
+			maptiles.CellHeight = td->tile_hgt;
 			res = ResizeTiles(dpy, &maptiles, &tiles);
 		}
 		/* Clear screen */
@@ -746,7 +745,7 @@ int main_menu_x11_pick_term(term_data *td, int n, metadpy *mdpy, int mx, int my)
 	int selected, i;
 	char *labels;
 
-	if (n ==1) {
+	if (n == 1) {
 		int ret;
 		/* if there is only one term, use it automatically */
 		ret = main_menu_x11_term(&(td[0]), 1, mdpy, mx, my);
