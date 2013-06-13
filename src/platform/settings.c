@@ -157,6 +157,20 @@ int ini_settings_load(const char *filename, ini_settings **ret)
 		if (!sec) continue;
 
 		*sep = '\0';
+
+		if ((sep > buf) && isspace(*(sep-1))) {
+			/* remove trailing whitespace from buf */
+			char *end = sep-1;
+			while ((end > buf) && isspace(*(end-1)))
+				end--;
+			*end = '\0';
+		}
+		if (isspace(*(sep+1))) {
+			/* remove leading whitespace from sep */
+			while (isspace(*(sep+1)))
+				sep++;
+		}
+
 		temps = sec;
 		val = ini_settings_find_section_key(sec, &(buf[0]));
 		if (val) {
