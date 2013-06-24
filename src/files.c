@@ -3685,11 +3685,7 @@ bool show_file(cptr name, cptr what, int line, int mode)
 					/* see if the line is a menu item */
 					if (buf[0] && hook[0][0]) {
 						for (i = 0; i < 62; i++) {
-							if (!(hook[i][0])) {
-								/*line += my-2-((hgt-4)>>1);*/
-								break;
-							}
-							if (strstr(buf, hook[i])) {
+							if (hook[i][0] && strstr(buf, hook[i])) {
 								char *c = strchr(buf, '(');
 								if (c) k = *(c+1);
 								break;
