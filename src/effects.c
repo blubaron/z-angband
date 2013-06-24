@@ -2681,6 +2681,18 @@ void take_hit(int damage, cptr hit_from)
 		}
 	}
 
+	if (p_ptr->state.searching == SEARCH_MODE_STEALTH)
+	{
+		/* Since we were hit, cancel stealth mode */
+		p_ptr->state.searching = SEARCH_MODE_NONE;
+
+		/* Recalculate bonuses */
+		p_ptr->update |= (PU_BONUS);
+
+		/* Redraw the state */
+		p_ptr->redraw |= (PR_STATE);
+	}
+
 	if (query_timed(TIMED_WRAITH_FORM))
 	{
 		damage /= 5;
@@ -2945,8 +2957,7 @@ void disturb(bool stop_search)
 	}
 
 	/* Cancel searching if requested */
-	if (stop_search && p_ptr->state.searching
-		&& (p_ptr->state.searching != SEARCH_MODE_SWING))
+	if (stop_search	&& (p_ptr->state.searching == SEARCH_MODE_SEARCH))
 	{
 		/* Cancel */
 		p_ptr->state.searching = SEARCH_MODE_NONE;
