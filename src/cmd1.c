@@ -2808,6 +2808,7 @@ void move_player(int dir, int do_pickup)
 	if (c_ptr->m_idx
 		&& (m_ptr->ml || cave_floor_grid(c_ptr) || p_can_pass_walls))
 	{
+		bool swap = FALSE;
 		/* Attack -- only if we can see it OR it is not in a wall */
 		if (!is_hostile(m_ptr) &&
 			!(query_timed(TIMED_CONFUSED) || query_timed(TIMED_IMAGE) || !m_ptr->ml || query_timed(TIMED_STUN) ||
@@ -2816,7 +2817,17 @@ void move_player(int dir, int do_pickup)
 			((cave_floor_grid(c_ptr)) || p_can_pass_walls))
 		{
 			m_ptr->csleep = 0;
+			swap = TRUE;
+		} else
+		if (m_ptr->csleep && (p_ptr->lev > 39) 
+			&& (p_ptr->state.searching == SEARCH_MODE_STEALTH)
+			&& ((p_ptr->rp.pclass == CLASS_ROGUE)
+			|| (p_ptr->rp.pclass == CLASS_RANGER)))
+		{
+			swap = TRUE;
+		}
 
+		if (swap) {
 			/* Extract monster name (or "it") */
 			monster_desc(m_name, m_ptr, 0, 80);
 
