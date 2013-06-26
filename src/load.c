@@ -3373,7 +3373,7 @@ static errr rd_savefile_new_aux(void)
 
 						/* get the dungeon index */
 						for (j=0; j < 32; j++) {
-							dun_gen_type *dg_ptr = &old_dungeons[j];
+							dun_gen_type *dg_ptr = &(old_dungeons[j]);
 							if ((dun_ptr->rooms == dg_ptr->rooms)
 								&& (dun_ptr->habitat == dg_ptr->habitat)
 								&& (dun_ptr->theme.treasure == dg_ptr->theme.treasure)

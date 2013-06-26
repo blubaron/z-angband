@@ -1377,7 +1377,7 @@ errr file_getl(ang_file *f, char *buf, size_t len)
 		if (!file_readc(f, &b))
 		{
 			buf[i] = '\0';
-			return (i == 0) ? (-1) : i;
+			return (i == 0) ? (-1) : (errr)i;
 		}
 
 		c = (char) b;
@@ -1392,13 +1392,13 @@ errr file_getl(ang_file *f, char *buf, size_t len)
 		{
 			fseek(f->fh, -1, SEEK_CUR);
 			buf[i] = '\0';
-			return TRUE;
+			return i;
 		}
 
 		if (c == '\n')
 		{
 			buf[i] = '\0';
-			return TRUE;
+			return i;
 		}
 
 		/* Expand tabs */
@@ -1439,7 +1439,7 @@ errr file_getl_raw(ang_file *f, char *buf, size_t len)
 		if (!file_readc(f, &b))
 		{
 			buf[i] = '\0';
-			return (i == 0) ? (-1) : i;
+			return (i == 0) ? (-1) : (errr)i;
 		}
 
 		c = (char) b;
@@ -1454,13 +1454,13 @@ errr file_getl_raw(ang_file *f, char *buf, size_t len)
 		{
 			fseek(f->fh, -1, SEEK_CUR);
 			buf[i] = '\0';
-			return TRUE;
+			return i;
 		}
 
 		if (c == '\n')
 		{
 			buf[i] = '\0';
-			return TRUE;
+			return i;
 		}
 
 		/* Expand tabs */
@@ -1746,7 +1746,7 @@ ang_dir *dir_open(const char *dirname)
 
 	/* Set up the handle */
 	dir->d = d;
-	dir->dirname = string_make(dirname);
+	dir->dirname = (char*)string_make(dirname);
 
 	/* Success */
 	return dir;
