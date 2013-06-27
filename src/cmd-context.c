@@ -739,6 +739,18 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 	screen_save();
 	button_backup_all(TRUE);
 
+	/* if there is a monster, draw a target path, which will be erased by the
+	 * screen load below */
+	if (c_ptr->m_idx && m_list[c_ptr->m_idx].ml) {
+		sint path_n;
+		coord path_g[2*MAX_RANGE+1];
+
+		/* Find the path. */
+		path_n = project_path(path_g, p_ptr->px, p_ptr->py, cx, cy, PROJECT_THRU);
+		/* Draw the path. */
+		draw_path(path_n, path_g, NULL, NULL, p_ptr->px, p_ptr->py);
+	}
+
 	menu_layout(m, &r);
 	rect_region_erase_bordered(&r);
 

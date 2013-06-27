@@ -1721,6 +1721,150 @@ bool mimic_desc(char *m_name, const monster_race *r_ptr)
 
 
 
+/**
+ * Draw a visible path over the squares between (x1,y1) and (x2,y2).
+ *
+ * The path consists of "*", which are white except where there is a
+ * monster, object or feature in the grid.
+ *
+ * This routine has (at least) three weaknesses:
+ * - remembered objects/walls which are no longer present are not shown,
+ * - squares which (e.g.) the player has walked through in the dark are
+ *   treated as unknown space.
+ * - walls which appear strange due to hallucination aren't treated correctly.
+ *
+ * The first two result from information being lost from the dungeon arrays,
+ * which requires changes elsewhere
+ */
+sint draw_path(sint path_n, coord *path_g, byte *a, char *c, int x1, int y1)
+{
+	sint i;
+	int x, y;
+	byte colour;
+
+	bool on_screen;
+	bool visible_object;
+	cave_type *c_ptr;
+	pcave_type *pc_ptr;
+
+	/* No path, so do nothing. */
+	if (path_n < 1) return 0;
+
+	/* The starting square is never drawn, but notice if it is being
+	 * displayed. In theory, it could be the last such square.
+	 */
+	on_screen = panel_contains(x1, y1);
+
+	/* Draw the path. */
+	for (i = 0; i < path_n; i++) {
+		/* Find the co-ordinates on the level. */
+		y = path_g[i].y;
+		x = path_g[i].x;
+
+		/*
+		 * As path[] is a straight line and the screen is oblong,
+		 * there is only section of path[] on-screen.
+		 * If the square being drawn is visible, this is part of it.
+		 * If none of it has been drawn, continue until some of it
+		 * is found or the last square is reached.
+		 * If some of it has been drawn, finish now as there are no
+		 * more visible squares to draw.
+		 */
+		 if (panel_contains(x, y)) on_screen = TRUE;
+		 else if (on_screen) break;
+		 else continue;
+
+		/* Find the position on-screen */
+		move_cursor_relative(x,y);
+
+		/* This square is being overwritten, so save the original. */
+		if (a && c) {
+			Term_what(Term->scr->cx, Term->scr->cy, a+i, c+i);
+		}
+
+		/*if (a && c && ta && tc) {
+			if (Term_what(Term->scr->cx, Term->scr->cy, a+i, c+i)) {
+				*(ta+i) = Term->src->ta[y][x]
+				*(tc+i) = Term->src->tc[y][x]
+			}
+		}*/
+
+		c_ptr = area(x, y);
+		pc_ptr = parea(x, y);
+		visible_object = FALSE;
+
+		/* check if there is a visible object in the map grid */
+		if (c_ptr->o_idx) {
+			object_type *o_ptr;
+			/* Scan all objects in the grid */
+			OBJ_ITT_START (c_ptr->o_idx, o_ptr)
+			{
+				/* Known objects are yellow. */
+				if ((o_ptr->info & OB_SEEN) && (!SQUELCH(o_ptr->k_idx) || FLAG(o_ptr, TR_SQUELCH))) {
+					visible_object = TRUE;
+					break;
+				}
+			}
+			OBJ_ITT_END;
+		}
+
+		/* Choose a colour. */
+		if (c_ptr->m_idx && m_list[c_ptr->m_idx].ml) {
+			/* Visible monsters are red. Friendly monsters are green */
+			monster_type *m_ptr = &(m_list[c_ptr->m_idx]);
+
+			/* Mimics act as objects */
+			if (m_ptr->smart & SM_MIMIC) 
+				colour = TERM_YELLOW;
+			else if (m_ptr->smart & (SM_PET|SM_FRIENDLY))
+				colour = TERM_L_GREEN;
+			else
+				colour = TERM_L_RED;
+		}
+
+		else if (c_ptr->o_idx && visible_object)
+			/* Known objects are yellow. */
+			colour = TERM_YELLOW;
+
+		else if ((pc_ptr->player & GRID_SEEN) && !cave_floor_grid(c_ptr))
+			/* Known walls are blue. */
+			colour = TERM_BLUE;
+
+		else if (is_visible_trap(c_ptr))
+			/* Traps are violet. */
+			colour = TERM_VIOLET;
+
+		else if (!(pc_ptr->player & GRID_SEEN))
+			/* Unknown squares are grey. */
+			colour = TERM_L_DARK;
+
+		else
+			/* Unoccupied squares are white. */
+			colour = TERM_WHITE;
+
+		/* Draw the path segment */
+		Term_queue_char(Term->scr->cx, Term->scr->cy, colour, '*', 0, 0);
+	}
+	return i;
+}
+
+
+/**
+ * Load the attr/char at each point along "path" which is on screen from
+ * "a" and "c". This was saved in draw_path().
+ */
+void remove_path(sint path_n, coord *path_g, byte *a, char *c)
+{
+	sint i;
+	for (i = 0; i < path_n; i++) {
+		if (!panel_contains(path_g[i].x, path_g[i].y)) continue;
+		move_cursor_relative(path_g[i].x, path_g[i].y);
+		Term_queue_char(Term->scr->cx, Term->scr->cy, a[i], c[i], 0, 0);
+	}
+}
+
+
+
 /*
  * Update (if necessary) and verify (if possible) the target.
  *
@@ -2990,6 +3134,13 @@ bool target_set_interactive(int mode, int x, int y)
 
 	int wid, hgt;
 
+	/* These are used for displaying the path to the target */
+	int path_drawn = 0;
+	sint path_n = 0;
+	coord path_g[2*MAX_RANGE+1];
+	char old_path_char[MAX_RANGE];
+	byte old_path_attr[MAX_RANGE];
+
 	m = 0;
 	/* Prepare the "temp" array */
 	target_set_prepare(mode);
@@ -3063,8 +3214,25 @@ bool target_set_interactive(int mode, int x, int y)
 				strcpy(info, "$Xq,$Xp,$Xo,$X+,$X-,<dir>");
 			}
 
+			/* Draw the path in "target" mode. If there is one */
+			if (mode & (TARGET_KILL)) {
+				/* draw so the path overlay will look right */
+				Term_fresh();
+				/* Find the path. */
+				path_n = project_path(path_g, p_ptr->px, p_ptr->py, x, y, PROJECT_THRU);
+				/* Draw the path */
+				path_drawn = draw_path(path_n, path_g, old_path_attr, old_path_char, p_ptr->px, p_ptr->py);
+			}
+
 			/* Describe and Prompt */
 			query = target_set_aux(x, y, mode, info);
+
+			/* Remove the path */
+			if (path_drawn) {
+				remove_path(path_n, path_g, old_path_attr, old_path_char);
+				Term_fresh();
+				path_drawn = 0;
+			}
 
 			/* Cancel tracking */
 			/* health_track(0); */
@@ -3104,6 +3272,7 @@ bool target_set_interactive(int mode, int x, int y)
 					}
 				} else
 				{
+					p_ptr->target_who = 0;
 					done = TRUE;
 				}
 			} else
@@ -3113,6 +3282,7 @@ bool target_set_interactive(int mode, int x, int y)
 				case ESCAPE:
 				case 'q':
 				{
+					p_ptr->target_who = 0;
 					done = TRUE;
 					break;
 				}
@@ -3272,8 +3442,25 @@ bool target_set_interactive(int mode, int x, int y)
 			/* Default prompt */
 			strcpy(info, "$Xq,$Xt,$Xp,$Xm,$X+,$X-,<dir>");
 
+			/* Draw the path in "target" mode. If there is one */
+			if (mode & (TARGET_KILL)) {
+				/* draw so the path overlay will look right */
+				Term_fresh();
+				/* Find the path. */
+				path_n = project_path(path_g, p_ptr->px, p_ptr->py, x, y, PROJECT_THRU);
+				/* Draw the path */
+				path_drawn = draw_path(path_n, path_g, old_path_attr, old_path_char, p_ptr->px, p_ptr->py);
+			}
+
 			/* Describe and Prompt (enable "TARGET_LOOK") */
 			query = target_set_aux(x, y, mode | TARGET_LOOK, info);
+
+			/* Remove the path */
+			if (path_drawn) {
+				remove_path(path_n, path_g, old_path_attr, old_path_char);
+				Term_fresh();
+				path_drawn = 0;
+			}
 
 			/* Cancel tracking */
 			/* health_track(0); */
@@ -3310,6 +3497,7 @@ bool target_set_interactive(int mode, int x, int y)
 					}
 				} else
 				{
+					p_ptr->target_who = 0;
 					done = TRUE;
 				}
 			} else
@@ -3319,6 +3507,7 @@ bool target_set_interactive(int mode, int x, int y)
 				case ESCAPE:
 				case 'q':
 				{
+					p_ptr->target_who = 0;
 					done = TRUE;
 					break;
 				}
@@ -3440,7 +3629,7 @@ bool target_set_interactive(int mode, int x, int y)
 bool target_set(int mode)
 {
 	/* Cancel target */
-	p_ptr->target_who = 0;
+	/*p_ptr->target_who = 0;*/
 
 	return target_set_interactive(mode, p_ptr->px, p_ptr->py);
 }
@@ -3501,6 +3690,12 @@ bool get_aim_dir(int *dp)
 
 	cptr p;
 
+	sint path_n = 0;
+	coord path_g[2*MAX_RANGE+1];
+	int path_drawn;
+	char old_path_char[MAX_RANGE];
+	byte old_path_attr[MAX_RANGE];
+
 	/* see if we have a ui override */
 	if (Term->get_aim_dir_hook) return (*(Term->get_aim_dir_hook))(dp);
 
@@ -3539,13 +3734,15 @@ bool get_aim_dir(int *dp)
 		button_backup_all(TRUE);
 
 		/* Choose a prompt */
-		if (!target_okay())
-		{
-			p = "Direction ($U'*' to choose a target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y\033$V)? ";
-		}
-		else
-		{
-			p = "Direction ($U'5' for target$Y5$V, $U'*' to re-target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y\033$V)? ";
+		if (target_okay()) {
+			p = "Direction ($U'5' for target$Y5$V, $U'*' to re-target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y" ESCAPE_STR "$V)? ";
+			/* show the path to target */
+			/* Find the path. */
+			path_n = project_path(path_g, p_ptr->px, p_ptr->py, p_ptr->target_col, p_ptr->target_row, PROJECT_THRU);
+			/* Draw the path */
+			path_drawn = draw_path(path_n, path_g, old_path_attr, old_path_char, p_ptr->px, p_ptr->py);
+		} else {
+			p = "Direction ($U'*' to choose a target$Y*$V, $U'c' for closest$Yc$V, $UEscape to cancel$Y" ESCAPE_STR "$V)? ";
 		}
 
 		/* Get a command (or Cancel) */
@@ -3553,6 +3750,12 @@ bool get_aim_dir(int *dp)
 			/* restore any previous buttons */
 			button_restore();
 			break;
+		}
+
+		if (path_drawn) {
+			remove_path(path_n, path_g, old_path_attr, old_path_char);
+			Term_fresh();
+			path_drawn = 0;
 		}
 
 		/* restore any previous buttons */

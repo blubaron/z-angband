@@ -543,7 +543,13 @@ void Term_queue_char(int x, int y, byte a, char c, byte ta, char tc)
 
 	byte *scr_taa = &scrn->ta[y][x];
 	char *scr_tcc = &scrn->tc[y][x];
-	
+
+	/* Don't change if the terrain value is 0 */
+	if (!ta && !tc) {
+		ta = *scr_taa;
+		tc = *scr_tcc;
+	}
+
 	/* Hack -- Ignore non-changes */
 	if ((*scr_aa == a) && (*scr_cc == c) &&
 		(*scr_taa == ta) && (*scr_tcc == tc)) return;
