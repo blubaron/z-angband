@@ -724,6 +724,11 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 	if (player_can_fire()) {
 		menu_dynamic_add_label(m, "Fire On", 'f', 16, labels);
 	}
+	if (c_ptr->m_idx && m_list[c_ptr->m_idx].ml) {
+		if (is_pet(&(m_list[c_ptr->m_idx]))) {
+			menu_dynamic_add_label(m, "Pet Commands", 'p', 19, labels);
+		}
+	}
 	menu_dynamic_add_label(m, "Throw To", 'v', 17, labels);
 
 	/* work out display region */
@@ -949,6 +954,10 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 			button_restore();
 			screen_load();
 		}
+	} else
+	if (selected == 19) {
+		/* issue a pet command */
+		do_cmd_pet();
 	}
 
 	return 1;
