@@ -597,9 +597,22 @@ int context_menu_player(int mx, int my)
 		} break;
 	case 13:
 		{
-			/* there is an item on the floor, show the inventory screen starting
-			 * from the floor */
-			do_cmd_inven_floor();
+			if (c_ptr->o_idx) {
+				object_type *o_ptr = &(o_list[c_ptr->o_idx]);
+				/* there is an item on the floor, show the inventory screen starting
+				 * from the floor */
+				if (o_ptr->next_o_idx) {
+					do_cmd_inven_floor();
+				} else {
+					/* if  we only have one item, show the context menu directly */
+					if (o_ptr->k_idx) {
+						/* Track the object kind */
+						object_kind_track(o_ptr->k_idx);
+
+						while (context_menu_object(o_ptr) == 2);
+					}
+				}
+			}
 		} break;
 	case 14:
 		{
