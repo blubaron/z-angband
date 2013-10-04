@@ -479,7 +479,7 @@ static void msg_flush(int x)
 	if (!p_ptr->state.skip_more && !auto_more)
 	{
 		/* Pause for response */
-		prtf(x, 0, CLR_L_BLUE "-more-");
+		prtf(x, 0, CLR_L_BLUE "$U-more-$Y" ESCAPE_STR "$V");
 
 		/* Get an acceptable keypress */
 		while (1)
@@ -498,6 +498,7 @@ static void msg_flush(int x)
 			if (cmd == ' ') break;
 			if ((cmd == '\n') || (cmd == '\r')) break;
 			bell("Illegal response to a 'more' prompt!"); */
+			break; /* Paranoia */
 		}
 	}
 
