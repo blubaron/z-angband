@@ -2477,6 +2477,7 @@
 #define FEATC_JAM            247
 #define FEATC_UNLOCK         246
 #define FEATC_LOCK           245
+/*#define FEATC_SPIKE         244*/
 
 /*
  * Some things which induce learning
