@@ -1198,6 +1198,31 @@ void health_redraw(void)
 	{
 		/* Erase the health bar */
 		Term_erase(COL_INFO, ROW_INFO, 12);
+
+		/* if we are targeting a position, display to position offset */
+		if (p_ptr->target_who < 0) {
+			int x, y;
+			char cx,cy;
+
+			x = p_ptr->target_col - p_ptr->px;
+			y = p_ptr->target_row - p_ptr->py;
+
+			if (x < 0) {
+				x = -x;
+				cx = 'W';
+			} else {
+				cx = 'E';
+			}
+			if (y < 0) {
+				y = -x;
+				cy = 'N';
+			} else {
+				cy = 'S';
+			}
+
+			/* Dump the offset of the target spot */
+			put_fstr(COL_TARGET_NAME, ROW_TARGET_NAME, "( %2d%c %2d%c )", x,cx,y,cy);
+		}
 	}
 
 	/* Tracking an unseen monster */

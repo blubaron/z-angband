@@ -3159,6 +3159,12 @@ void move_player(int dir, int do_pickup)
 			p_ptr->redraw |= PR_DETECT;
 		}
 
+		/* if we are targeting a position, clear the target and update the display */
+		if (p_ptr->target_who < 0) {
+			p_ptr->target_who = 0;
+			p_ptr->redraw |= PR_HEALTH;
+		}
+
 		/* Spontaneous Searching */
 		if ((p_ptr->skills[SKILL_FOS] >= 49) || one_in_(50 - p_ptr->skills[SKILL_FOS]))
 		{
