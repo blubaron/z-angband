@@ -247,14 +247,17 @@ struct term
 	s16b (*get_quantity_hook)(cptr prompt, s16b initial, s16b max);
 	u32b (*get_number_hook)(cptr prompt, u32b initial);
 	void *(*get_item_hook)(cptr pmt, cptr str, int mode); /* return value is actually object_type */
-	void (*store_hook)(const void *f1_ptr, const void *st_ptr); /* f1 is actually a pointer to feild_type, st_ptr is store_type */
-	void (*bldg_hook)(const void *f_ptr, const void *b_ptr); /* f is actually a pointer to feild_type, b_ptr is store_type */
+	void (*store_hook)(const void *f1_ptr, const void *st_ptr); /* f1 is actually a pointer to field_type, st_ptr is store_type */
+	void (*bldg_hook)(const void *f_ptr, const void *b_ptr); /* f is actually a pointer to field_type, b_ptr is store_type */
 	void (*character_hook)(void);
 	void (*destroy_hook)(void);
 	void (*inven_hook)(void);
 	void (*equip_hook)(void);
 	void (*browse_hook)(void);
 	void (*term_fresh_hook)(void);
+	bool (*target_set_interactive_hook)(int mode, int x, int y);
+	void (*redraw_stuff_hook)(void);
+	void (*window_stuff_hook)(void);
 
 };
 
