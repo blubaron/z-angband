@@ -530,56 +530,56 @@ static const byte player_init[MAX_CLASS][3][2] =
 
 	{
 	 /* Mage */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: for r[0].realm book */
+	 {TV_SOFT_ARMOR, SV_ROBE},
 	 {TV_SWORD, SV_DAGGER},
-	 {TV_DEATH_BOOK, 0}			/* Hack: for r[1].realm book */
+	 {TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS}
 	 },
 
 	{
 	 /* Priest */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: for Life / Death book */
+	 {TV_SOFT_ARMOR, SV_ROBE},
 	 {TV_HAFTED, SV_MACE},
-	 {TV_DEATH_BOOK, 0}			/* Hack: for r[1].realm book */
+	 {TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS}
 	 },
 
 	{
 	 /* Rogue */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: for r[0].realm book */
-	 {TV_SWORD, SV_DAGGER},
+	 {TV_CLOAK, SV_CLOAK},
+	 {TV_SWORD, SV_SHORT_SWORD},
 	 {TV_SOFT_ARMOR, SV_SOFT_LEATHER_ARMOR}
 	 },
 
 	{
 	 /* Ranger */
-	 {TV_NATURE_BOOK, 0},
+	 {TV_BOW, SV_SHORT_BOW},
 	 {TV_SWORD, SV_DAGGER},
-	 {TV_DEATH_BOOK, 0}			/* Hack: for r[1].realm book */
+	 {TV_SOFT_ARMOR, SV_SOFT_LEATHER_ARMOR}
 	 },
 
 	{
 	 /* Paladin */
-	 {TV_SORCERY_BOOK, 0},
+	 {TV_HARD_ARMOR, SV_CHAIN_MAIL},
 	 {TV_SWORD, SV_BROAD_SWORD},
 	 {TV_SCROLL, SV_SCROLL_PROTECTION_FROM_EVIL}
 	 },
 
 	{
 	 /* Warrior-Mage */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: for r[0].realm book */
+	 {TV_HELM, SV_METAL_CAP},
 	 {TV_SWORD, SV_SHORT_SWORD},
-	 {TV_DEATH_BOOK, 0}			/* Hack: for r[1].realm book */
+	 {TV_HARD_ARMOR, SV_CHAIN_MAIL}
 	 },
 
 	{
 	 /* Chaos Warrior */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: For r[0].realm book */
+	 {TV_HELM, SV_METAL_CAP},
 	 {TV_SWORD, SV_BROAD_SWORD},
 	 {TV_HARD_ARMOR, SV_METAL_SCALE_MAIL}
 	 },
 
 	{
 	 /* Monk */
-	 {TV_SORCERY_BOOK, 0},
+	 {TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS},
 	 {TV_POTION, SV_POTION_HEALING},
 	 {TV_SOFT_ARMOR, SV_SOFT_LEATHER_ARMOR},
 	 },
@@ -593,7 +593,7 @@ static const byte player_init[MAX_CLASS][3][2] =
 
 	{
 	 /* High Mage */
-	 {TV_SORCERY_BOOK, 0},		/* Hack: for r[0].realm book */
+	 {TV_WAND, SV_WAND_MAGIC_MISSILE},
 	 {TV_SWORD, SV_DAGGER},
 	 {TV_RING, SV_RING_SUSTAIN_INT}
 	 },
@@ -660,13 +660,9 @@ static void player_outfit(void)
 
 		q_ptr->number = 5;
 
-		object_aware(q_ptr);
-		object_known(q_ptr);
-
+		object_aware(q_ptr); object_known(q_ptr);
 		/* These objects give no score */
-		q_ptr->info |= OB_NO_EXP;
-
-		(void)inven_carry(q_ptr);
+		q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
 	}
 	else
 	{
@@ -681,84 +677,41 @@ static void player_outfit(void)
 		(void)inven_carry(q_ptr);
 	}
 
-	/* Rangers get a bow and arrows; High Mages get wand of mag. missile */
-	if (p_ptr->rp.pclass == CLASS_RANGER)
-	{
-		/* Hack -- Give the player some arrows */
-		q_ptr = object_prep(lookup_kind(TV_ARROW, SV_AMMO_NORMAL));
-		q_ptr->number = (byte)rand_range(15, 20);
-
-		/* These objects give no score */
-		q_ptr->info |= OB_NO_EXP;
-
-		object_aware(q_ptr);
-		object_known(q_ptr);
-
-		(void)inven_carry(q_ptr);
-
-		/* Hack -- Give the player a bow */
-		q_ptr = object_prep(lookup_kind(TV_BOW, SV_SHORT_BOW));
-
-		/* These objects give no score */
-		q_ptr->info |= OB_NO_EXP;
-
-		object_aware(q_ptr);
-		object_known(q_ptr);
-
-		(void)inven_carry(q_ptr);
-	}
-	else if (p_ptr->rp.pclass == CLASS_HIGH_MAGE)
-	{
-		/* Hack -- Give the player a wand of magic missile */
-		q_ptr = object_prep(lookup_kind(TV_WAND, SV_WAND_MAGIC_MISSILE));
-		q_ptr->number = 1;
-		q_ptr->pval = (byte)rand_range(25, 30);
-
-		/* These objects give no score */
-		q_ptr->info |= OB_NO_EXP;
-
-		object_aware(q_ptr);
-		object_known(q_ptr);
-
-		(void)inven_carry(q_ptr);
-	}
-
 	/* give the player a word of recall scroll so the player can start diving */
 	q_ptr = object_prep(lookup_kind(TV_SCROLL, SV_SCROLL_WORD_OF_RECALL));
 
 	q_ptr->number = 1;
 
-	object_aware(q_ptr);
-	object_known(q_ptr);
-
+	object_aware(q_ptr); object_known(q_ptr);
 	/* These objects give no score */
-	q_ptr->info |= OB_NO_EXP;
-
-	(void)inven_carry(q_ptr);
+	q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
 
 	/* give the player some resurrection items */
-	q_ptr = object_prep(lookup_kind(TV_SPIRIT, 2));
+	if (!ironman_nightmare && !ironman_downward) {
+		q_ptr = object_prep(lookup_kind(TV_SPIRIT, 2));
 
-	q_ptr->number = 3;
+		q_ptr->number = 3;
 
-	object_aware(q_ptr);
-	object_known(q_ptr);
+		object_aware(q_ptr); object_known(q_ptr);
+		/* These objects give no score */
+		q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
+	}
 
-	/* These objects give no score */
-	q_ptr->info |= OB_NO_EXP;
-
-	(void)inven_carry(q_ptr);
-
-	/* Hack -- Give the player three useful objects */
+	/* Hack -- Give the player some useful objects */
 	for (i = 0; i < 3; i++)
 	{
 		/* Look up standard equipment */
 		tv = player_init[p_ptr->rp.pclass][i][0];
 		sv = player_init[p_ptr->rp.pclass][i][1];
 
+		/* if nothing listed in this spot, skip it */
+		if (tv == 0) continue;
+
 		/* Hack to initialize spellbooks */
-		if (tv == TV_SORCERY_BOOK) tv = TV_LIFE_BOOK + p_ptr->spell.realm[0] - 1;
-		else if (tv == TV_DEATH_BOOK) tv = TV_LIFE_BOOK + p_ptr->spell.realm[1] - 1;
+		if (tv == TV_SORCERY_BOOK)
+			tv = TV_LIFE_BOOK + p_ptr->spell.realm[0] - 1;
+		else if (tv == TV_DEATH_BOOK)
+			tv = TV_LIFE_BOOK + p_ptr->spell.realm[1] - 1;
 
 		else if (tv == TV_RING && sv == SV_RING_RES_FEAR &&
 				 p_ptr->rp.prace == RACE_BARBARIAN)
@@ -766,17 +719,63 @@ static void player_outfit(void)
 			/* Barbarians do not need a ring of resist fear */
 			sv = SV_RING_SUSTAIN_STR;
 		}
+		/* Hack -- if launcher, give ammo as well*/
+		else if (tv == TV_BOW) {
+			if (sv == SV_SLING) {
+				q_ptr = object_prep(lookup_kind(TV_SHOT, SV_AMMO_NORMAL));
+			} else
+			if ((sv == SV_LIGHT_XBOW) || (sv == SV_HEAVY_XBOW)) {
+				q_ptr = object_prep(lookup_kind(TV_BOLT, SV_AMMO_NORMAL));
+			} else
+			{
+				q_ptr = object_prep(lookup_kind(TV_ARROW, SV_AMMO_NORMAL));
+			}
+			q_ptr->number = (byte)rand_range(25, 40);
+
+			object_aware(q_ptr); object_known(q_ptr);
+			/* These objects give no score */
+			q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
+		}
 
 		/* Hack -- Give the player an object */
 		q_ptr = object_prep(lookup_kind(tv, sv));
 
+		/* Hack -- If a wand, randomize it's charges */
+		if ((tv == TV_WAND) || (tv == TV_STAFF)) {
+			q_ptr->pval = (byte)rand_range(q_ptr->pval*4/3, q_ptr->pval*2);
+		} else
+		/* Hack -- If ammo, give more of it */
+		if ((tv >= TV_THROWN) && (tv <= TV_BOLT)) {
+			q_ptr->pval = (byte)rand_range(25, 40);
+		}
+
+		object_aware(q_ptr); object_known(q_ptr);
 		/* These objects give no score */
-		q_ptr->info |= OB_NO_EXP;
+		q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
+	}
 
-		object_aware(q_ptr);
-		object_known(q_ptr);
+	/* Give the player their starting spellbooks */
+	if (p_ptr->spell.realm[0]) {
+		tv = TV_LIFE_BOOK + p_ptr->spell.realm[0] - 1;
+		q_ptr = player_has(tv, 0);
+		if (!q_ptr) {
+			q_ptr = object_prep(lookup_kind(tv, 0));
 
-		(void)inven_carry(q_ptr);
+			object_aware(q_ptr); object_known(q_ptr);
+			/* These objects give no score */
+			q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
+		}
+	}
+	if (p_ptr->spell.realm[1]) {
+		tv = TV_LIFE_BOOK + p_ptr->spell.realm[1] - 1;
+		q_ptr = player_has(tv, 0);
+		if (!q_ptr) {
+			q_ptr = object_prep(lookup_kind(tv, 0));
+
+			object_aware(q_ptr); object_known(q_ptr);
+			/* These objects give no score */
+			q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
+		}
 	}
 }
 
