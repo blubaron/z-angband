@@ -228,26 +228,34 @@ static void place_player_start(s32b *x, s32b *y, u16b this_town, u16b capital)
 	/* Set current town */
 	p_ptr->place_num = this_town;
 
-  /* Set starting home */
-  p_ptr->home_place_num = this_town;
-  p_ptr->home_store_num = 0;
-  /* using tempx instead of i for the index because it is already here */
+	/* Set starting home */
+	p_ptr->home_place_num = this_town;
+	p_ptr->home_store_num = 0;
+	/* using tempx instead of i for the index because it is already here */
 	for (tempx = 0; tempx < place[this_town].numstores; tempx++) {
-    if (place[this_town].store[tempx].type == BUILD_STORE_HOME)
-    {
-      p_ptr->home_store_num = tempx;
-      break;
-    }
+		if (place[this_town].store[tempx].type == BUILD_STORE_HOME)
+		{
+			p_ptr->home_store_num = tempx;
+			break;
+		}
 	}
-  p_ptr->capital_place_num = capital;
-  p_ptr->capital_store_num = 0;
-  p_ptr->capital_dun_num = 0;
-  for (tempx = 0; tempx < place[capital].numstores; tempx++) {
-    if (place[capital].store[tempx].type == BUILD_CASTLE1)
-    {
-      p_ptr->capital_store_num = tempx;
-      break;
-    }
+	p_ptr->capital_place_num = capital;
+	p_ptr->capital_store_num = 0;
+	p_ptr->capital_dun_num = 0;
+	for (tempx = 0; tempx < place[capital].numstores; tempx++) {
+		if ((place[capital].store[tempx].type == BUILD_CASTLE1)
+			|| (place[capital].store[tempx].type == BUILD_CASTLE0)
+			|| (place[capital].store[tempx].type == BUILD_CASTLE2))
+		{
+			p_ptr->capital_store_num = tempx;
+			break;
+		}
+	}
+	for (tempx = 0; tempx < place[capital].numstores; tempx++) {
+		if (place[capital].store[tempx].type == BUILD_STAIRS)  {
+			p_ptr->capital_dun_num = tempx;
+			break;
+		}
 	}
 }
 
@@ -3073,9 +3081,9 @@ static void init_dungeon(place_type *pl_ptr, const dun_gen_type *d_ptr)
 
 	dt_ptr = pl_ptr->dungeon;
 	
-  dt_ptr->didx = d_ptr->didx;
+	dt_ptr->didx = d_ptr->didx;
 	
-  //dt_ptr->rating = 0;
+	//dt_ptr->rating = 0;
 	//dt_ptr->region = 0;
 	//dt_ptr->recall_depth = 0;
 
@@ -3086,52 +3094,52 @@ static void init_dungeon(place_type *pl_ptr, const dun_gen_type *d_ptr)
 	dt_ptr->habitat = d_ptr->habitat;
 
 	/* Save level bounds */
-  if(d_ptr->level_change_step > 7) {
-    /* if we are using a large step, use the bounds directly, so hopefully
-     * less alignment will be needed when changing dungeon levels */
-    int align;
-	  dt_ptr->min_level = d_ptr->min_level;
-    align = (d_ptr->max_level-d_ptr->min_level) % d_ptr->level_change_step;
-    if (align != 0) {
-      if (align > (d_ptr->level_change_step>>1)) {
-  	    dt_ptr->max_level = d_ptr->max_level + (d_ptr->level_change_step - align);
-      } else {
-  	    dt_ptr->max_level = d_ptr->max_level - align;
-      }
-    } else {
-	    dt_ptr->max_level = d_ptr->max_level;
-    }
-  } else
-  if(d_ptr->level_change_step > 1) {
-    int align;
-    /* the step is not as large so allow some variation */
-	  dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-5,5));
-	  dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-5,5));
+	if(d_ptr->level_change_step > 7) {
+		/* if we are using a large step, use the bounds directly, so hopefully
+		 * less alignment will be needed when changing dungeon levels */
+		int align;
+		dt_ptr->min_level = d_ptr->min_level;
+		align = (d_ptr->max_level-d_ptr->min_level) % d_ptr->level_change_step;
+		if (align != 0) {
+			if (align > (d_ptr->level_change_step>>1)) {
+				dt_ptr->max_level = d_ptr->max_level + (d_ptr->level_change_step - align);
+			} else {
+				dt_ptr->max_level = d_ptr->max_level - align;
+			}
+		} else {
+			dt_ptr->max_level = d_ptr->max_level;
+		}
+	} else
+	if(d_ptr->level_change_step > 1) {
+		int align;
+		/* the step is not as large so allow some variation */
+		dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-5,5));
+		dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-5,5));
 
-    align = (dt_ptr->max_level-dt_ptr->min_level) % d_ptr->level_change_step;
-    if (align != 0) {
-      if (dt_ptr->max_level < d_ptr->max_level) {
-  	    dt_ptr->max_level = dt_ptr->max_level + (d_ptr->level_change_step - align);
-      } else {
-  	    dt_ptr->max_level = dt_ptr->max_level - align;
-      }
-    }
-  } else {
-	  dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-20,20));
-	  dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-20,20));
-  }
+		align = (dt_ptr->max_level-dt_ptr->min_level) % d_ptr->level_change_step;
+		if (align != 0) {
+			if (dt_ptr->max_level < d_ptr->max_level) {
+				dt_ptr->max_level = dt_ptr->max_level + (d_ptr->level_change_step - align);
+			} else {
+				dt_ptr->max_level = dt_ptr->max_level - align;
+			}
+		}
+	} else {
+		dt_ptr->min_level = POWER(d_ptr->min_level, rand_range(-20,20));
+		dt_ptr->max_level = POWER(d_ptr->max_level, rand_range(-20,20));
+	}
 	dt_ptr->level_change_step = d_ptr->level_change_step;
 
 	/* Cap min/max level */
 	if (dt_ptr->min_level < 1)
 		dt_ptr->min_level = 1;
-  if (dt_ptr->max_level > 127) {
-    int align = 0;
-    if (dt_ptr->level_change_step > 1) {
-      align = (127-dt_ptr->min_level)%dt_ptr->level_change_step;
-    }
-		dt_ptr->max_level = 127-align;
-  }
+	if (dt_ptr->max_level > MAX_DEPTH-1) {
+		int align = 0;
+		if (dt_ptr->level_change_step > 1) {
+			align = (MAX_DEPTH-1-dt_ptr->min_level)%dt_ptr->level_change_step;
+		}
+		dt_ptr->max_level = MAX_DEPTH-1-align;
+	}
 	if (dt_ptr->level_change_step < 1)
 		dt_ptr->level_change_step = 1;
 
@@ -3397,17 +3405,17 @@ static bool create_towns(int *xx, int *yy)
 			}
 			if (pl_ptr->store[i].type == BUILD_LIBRARY)
 			{
-        /* need a library somewhere to research bounty quests */
-        have_library++;
-      }
+				/* need a library somewhere to research bounty quests */
+				have_library++;
+			}
 		}
-    if (pl_ptr->numstores > high_count) {
-      /* keep track of the largest city since we are already touching all places */
-      high_count = pl_ptr->numstores;
-      high_count_place = place_count;
-    }
+		if (pl_ptr->numstores > high_count) {
+			/* keep track of the largest city since we are already touching all places */
+			high_count = pl_ptr->numstores;
+			high_count_place = place_count;
+		}
 
-    /* Increment number of places */
+		/* Increment number of places */
 		place_count++;
 	}
 
@@ -3467,71 +3475,118 @@ static bool create_towns(int *xx, int *yy)
 		else
 		{
 			/* Blank spot */
-      if (randint0(2) == 0) {
-			  general_init(best_town, i, BUILD_NONE);
-      } else {
+			if (randint0(2) == 0) {
+				general_init(best_town, i, BUILD_NONE);
+			} else {
 				build_init(best_town, i, BUILD_EMPTY);
-      }
+			}
 		}
 	}
 
 	pl_ptr = &place[best_town];
 
-  if (!have_library) {
-    /* need a library somewhere to research bounty quests */
-    int j = high_count_place;
-    /* check if the largest city has a blank spot */
-    y = 0;
-    for (i = place[j].numstores-1; i > 0; i--)
-    {
-      if (place[j].store[i].type == BUILD_NONE) {
-        /* change a random blank spot to a library, and init it */
-			  if (build_is_store(BUILD_LIBRARY))
-			  {
-				  store_init(j, i, BUILD_LIBRARY);
-			  }
-			  else
-			  {
-				  build_init(j, i, BUILD_LIBRARY);
-			  }
-        y++;
-        break;
-      }
-    }
-    x = place_count*10;
-    while ((!y) && (x >= 0)) {
-      /* we did not find a blank spot it the largest place, so try random places */
-      j = randint0(place_count);
-      if (place[j].type != PL_TOWN_FRACT) {
-        continue;
-      }
-      x--;
-      for (i = place[j].numstores-1; i > 0; i--)
-      {
-        if (place[j].store[i].type == BUILD_NONE) {
-          /* use this spot */
-			    if (build_is_store(BUILD_LIBRARY))
-			    {
-				    store_init(j, i, BUILD_LIBRARY);
-			    }
-			    else
-			    {
-				    build_init(j, i, BUILD_LIBRARY);
-			    }
-          y++;
-          break;
-        }
-      }
-    }
-    /* if x is 0 then no blank buildings were found, the player
-     * will just have to do without a library */
-  }
+	if (!have_library) {
+		/* need a library somewhere to research bounty quests */
+		int j = high_count_place;
+		/* check if the largest city has a blank spot */
+		y = 0;
+		for (i = place[j].numstores-1; i > 0; i--) {
+			if (place[j].store[i].type == BUILD_NONE) {
+				/* change a random blank spot to a library, and init it */
+				if (build_is_store(BUILD_LIBRARY)) {
+					store_init(j, i, BUILD_LIBRARY);
+				} else {
+					build_init(j, i, BUILD_LIBRARY);
+				}
+				y++;
+				break;
+			}
+		}
+		x = place_count*10;
+		while ((!y) && (x >= 0)) {
+			/* we did not find a blank spot it the largest place, so try random places */
+			j = randint0(place_count);
+			if (place[j].type != PL_TOWN_FRACT) {
+				continue;
+			}
+			x--;
+			for (i = place[j].numstores-1; i > 0; i--) {
+				if (place[j].store[i].type == BUILD_NONE) {
+					/* use this spot */
+					if (build_is_store(BUILD_LIBRARY)) {
+						store_init(j, i, BUILD_LIBRARY);
+					} else {
+						build_init(j, i, BUILD_LIBRARY);
+					}
+					y++;
+					break;
+				}
+			}
+		}
+		/* if x is 0 then no blank buildings were found, the player
+		 * will just have to do without a library */
+	}
 
-  /* scan the largest town for a large castle to make the palace
-   * and promote a small castle, keep or townhall to it if necessary
-   * or make an empty spot the large castle
-   * or make a random building the large castle
-   */
+	/* scan the largest town for a large castle to make the palace
+	 * and promote a small castle, keep or townhall to it if necessary
+	 * or make an empty spot the large castle
+	 * or make a random building the large castle
+	 */
+	for (i - 0; i < high_count; i++) {
+		if (place[high_count_place].store[i].type == BUILD_CASTLE1) {
+			break;
+		} else
+		if (place[high_count_place].store[i].type == BUILD_CASTLE0) {
+			build_init(high_count_place, i, BUILD_CASTLE1);
+			break;
+		} else
+		if (place[high_count_place].store[i].type == BUILD_CASTLE2) {
+			build_init(high_count_place, i, BUILD_CASTLE1);
+			break;
+		}
+	}
+	if (i == high_count) {
+		/* a castle was not found, make one */
+	}
+
+	/* make sure that there is a stairs to use as the palace dungeon */
+	for (i - 0; i < high_count; i++) {
+		if (place[high_count_place].store[i].type == BUILD_STAIRS) {
+			/* use the vanilla dungeon type */
+			init_dungeon(&(place[high_count_place]), &(dungeons[1]));
+			break;
+		}
+	}
+	if (i == high_count) {
+		/* a stairs was not found, make one */
+		for (i - 0; i < high_count; i++) {
+			if (place[high_count_place].store[i].type == BUILD_BLANK) {
+				break;
+			}
+		}
+		if (i == high_count) {
+			/* an empty spot was not found, try a blank building */
+			for (i - 0; i < high_count; i++) {
+				if (place[high_count_place].store[i].type == BUILD_NONE) {
+					break;
+				}
+			}
+		}
+		if (i == high_count) {
+			/* a blank building was not found, try an empty building */
+			for (i - 0; i < high_count; i++) {
+				if (place[high_count_place].store[i].type == BUILD_EMPTY) {
+					break;
+				}
+			}
+		}
+		if (i < high_count) {
+			/* use this spot for the stairs */
+			build_init(high_count_place, i, BUILD_STAIRS);
+			/* use the vanilla dungeon type */
+			init_dungeon(&(place[high_count_place]), &(dungeons[1]));
+		}
+	}
 
 	/* Build starting city / town */
 	draw_city(pl_ptr);
