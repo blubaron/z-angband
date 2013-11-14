@@ -5144,7 +5144,8 @@ static bool dimension_door_aux(int range)
 	int x = 0, y = 0;
 	cave_type *c_ptr;
 
-	if (!tgt_pt(&x, &y)) return FALSE;
+	if (!target_set_interactive(TARGET_LOOK|TARGET_GRID, px, py)) return FALSE;
+	x = p_ptr->target_col; y = p_ptr->target_row;
 
 	/* Selecting the player's own grid is equivalent to cancelling. */
 	if (x == px && y == py) return FALSE;
