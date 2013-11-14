@@ -2087,13 +2087,15 @@
  *      LOOK: Describe grid fully
  *      XTRA: Currently unused flag
  *      GRID: Select from all grids
- *		HOST: Select hostile creatures only.
+ *      HOST: Select hostile creatures only.
+ *      FRND: Select friendly creatures only.
  */
 #define TARGET_KILL             0x01
 #define TARGET_LOOK             0x02
 #define TARGET_XTRA             0x04
 #define TARGET_GRID             0x08
-#define TARGET_HOST				0x10
+#define TARGET_HOST             0x10
+#define TARGET_FRND             0x20
 
 
 /*
