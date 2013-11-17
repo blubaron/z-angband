@@ -678,12 +678,12 @@ bool auto_pickup_okay(const object_type *o_ptr)
 						sscanf(s+2, "%d", &stack_size);
 
 						/* Force boundary */
-						stack_size = MIN(MAX_STACK_SIZE-1, stack_size);
+						stack_size = MIN(MAX_STACK_SIZE, stack_size);
 						break;
 					}
 					else if (s[1] == 'g')
 					{
-						stack_size = MAX_STACK_SIZE-1;
+						stack_size = MAX_STACK_SIZE;
 						break;
 					}
 

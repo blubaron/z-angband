@@ -1634,7 +1634,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 {
 	int i;
 
-	int stack_size = MAX_STACK_SIZE-1;
+	int stack_size = MAX_STACK_SIZE;
 
 	/* Require identical object types */
 	if (o_ptr->k_idx != j_ptr->k_idx) return (FALSE);
@@ -1824,7 +1824,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 				sscanf(s+2, "%d", &stack_size);
 
 				/* Force boundary */
-				stack_size = MIN(MAX_STACK_SIZE-1, stack_size);
+				stack_size = MIN(MAX_STACK_SIZE, stack_size);
 				break;
 			}
 
@@ -1918,7 +1918,7 @@ bool object_can_contain(const object_type *j_ptr, const object_type *o_ptr, int 
 void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 {
 	int total = o_ptr->number + j_ptr->number;
-	int stack_size = MAX_STACK_SIZE-1;
+	int stack_size = MAX_STACK_SIZE;
 
 	/* Extract inscription-mandated stack size limit */
 	if (o_ptr->inscription || j_ptr->inscription)
@@ -1934,7 +1934,7 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 				sscanf(s+2, "%d", &stack_size);
 
 				/* Force boundary */
-				stack_size = MIN(MAX_STACK_SIZE-1, stack_size);
+				stack_size = MIN(MAX_STACK_SIZE, stack_size);
 				break;
 			}
 

@@ -469,7 +469,7 @@ static void store_object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	int total = o_ptr->number + j_ptr->number;
 
 	/* Combine quantity, lose excess items */
-	o_ptr->number = (total > 99) ? 99 : total;
+	o_ptr->number = (total > MAX_STACK_SIZE) ? MAX_STACK_SIZE : total;
 
 	/*
 	 * Hack -- if rods are stacking, add the pvals
