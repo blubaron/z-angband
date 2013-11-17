@@ -86,7 +86,7 @@ static void wiz_create_named_art(int a_idx)
 	int py = p_ptr->py;
 
 	/* Create the artifact */
-	create_named_art(a_idx, px, py);
+	place_named_art(a_idx, px, py);
 
 	/* All done */
 	msgf("Allocated.");

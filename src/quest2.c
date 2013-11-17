@@ -718,7 +718,7 @@ static void display_artifact_quest(quest_type *q_ptr)
 	int y = rand_range(p_ptr->min_hgt + 1, p_ptr->max_hgt - 2);
 
 	/* Drop artifact in dungeon */
-	create_named_art(q_ptr->data.fit.a_idx, x, y);
+	place_named_art(q_ptr->data.fit.a_idx, x, y);
 
 	/* Warn the player, maybe */
 	if (!preserve_mode) msgf ("You feel there is something special about this level...");

@@ -2194,7 +2194,7 @@ bool create_artifact(object_type *o_ptr, int level, bool a_scroll)
 /*
  * Create the artifact of the specified number
  */
-void create_named_art(int a_idx, int x, int y)
+object_type* create_named_art(int a_idx)
 {
 	object_type *q_ptr;
 	int i;
@@ -2202,16 +2202,16 @@ void create_named_art(int a_idx, int x, int y)
 	artifact_type *a_ptr = &a_info[a_idx];
 
 	/* Ignore "empty" artifacts */
-	if (!a_ptr->name) return;
+	if (!a_ptr->name) return NULL;
 
 	/* Don't create a second one */
-	if (a_ptr->cur_num) return;
+	if (a_ptr->cur_num) return NULL;
 
 	/* Acquire the "kind" index */
 	i = lookup_kind(a_ptr->tval, a_ptr->sval);
 
 	/* Oops */
-	if (!i) return;
+	if (!i) return NULL;
 
 	/* Create the artifact */
 	q_ptr = object_prep(i);
@@ -2261,6 +2261,16 @@ void create_named_art(int a_idx, int x, int y)
 		/* Hack - use the artifact price */
 		q_ptr->cost = k_info[q_ptr->k_idx].cost + a_ptr->cost;
 	}
+
+	return q_ptr;
+}
+
+/*
+ * Create and place the artifact of the specified number at or near the given point
+ */
+void place_named_art(int a_idx, int x, int y)
+{
+	object_type *q_ptr = create_named_art(a_idx);
 
 	/* Drop the artifact from heaven */
 	drop_near(q_ptr, -1, x, y);

@@ -1138,7 +1138,8 @@ extern bool monst_spell_monst(int m_idx);
 
 /* artifact.c */
 extern bool create_artifact(object_type *o_ptr, int level, bool a_scroll);
-extern void create_named_art(int a_idx, int x, int y);
+extern object_type* create_named_art(int a_idx);
+extern void place_named_art(int a_idx, int x, int y);
 
 /* scores.c */
 extern bool display_scores_aux(int from, int to, int note,

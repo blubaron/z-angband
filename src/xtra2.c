@@ -614,15 +614,15 @@ bool monster_death(int m_idx, bool explode)
 		    (mon_name_cont(r_ptr, "Morgoth") && !amber_monsters))
 		{
 			/* Make Grond */
-			create_named_art(ART_GROND, x, y);
+			place_named_art(ART_GROND, x, y);
 
 			/* Make Crown of Morgoth */
-			create_named_art(ART_MORGOTH, x, y);
+			place_named_art(ART_MORGOTH, x, y);
 		}
 		else if (mon_name_cont(r_ptr, "Stormbringer"))
 		{
 			/* Create the artifact */
-			create_named_art(ART_STORMBRINGER, x, y);
+			place_named_art(ART_STORMBRINGER, x, y);
 
 			/* The artifact has been created */
 			a_info[ART_STORMBRINGER].cur_num = 1;
@@ -722,7 +722,7 @@ bool monster_death(int m_idx, bool explode)
 				if (a_info[a_idx].cur_num == 0 && !(FLAG(&a_info[a_idx], TR_QUESTITEM)))
 				{
 					/* Create the artifact */
-					create_named_art(a_idx, x, y);
+					place_named_art(a_idx, x, y);
 
 					/* The artifact has been created */
 					a_info[a_idx].cur_num = 1;

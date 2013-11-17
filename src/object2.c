@@ -4282,7 +4282,7 @@ bool place_specific_object(int x, int y, int level, int k_idx, bool force)
 			if ((a_ptr->tval == k_ptr->tval) && (a_ptr->sval == k_ptr->sval))
 			{
 				/* Found it */
-				create_named_art(i, x, y);
+				place_named_art(i, x, y);
 				return TRUE;
 			}
 		}
