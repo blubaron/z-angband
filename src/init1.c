@@ -1797,29 +1797,48 @@ errr parse_v_info(char *buf, header *head)
 
 		/* Get the text */
 		s = buf + 2;
+		i = strlen(s);
+		if (i > v_ptr->wid) v_ptr->wid = i;
+		v_ptr->hgt++;
 
 		/* Store the text */
 		if (!add_text(&v_ptr->text, head, s))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
-	/* Process 'X' for "Extra info" (one line only) */
-	else if (buf[0] == 'X')
+	/* Process 'W' for "When info" (one line only) */
+	else if (buf[0] == 'W')
 	{
-		int typ, rat, hgt, wid;
+		int min, max, rarity;
 
 		/* There better be a current v_ptr */
 		if (!v_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf + 2, "%d:%d:%d:%d",
-						&typ, &rat, &hgt, &wid)) return (PARSE_ERROR_GENERIC);
+		if (3 != sscanf(buf + 2, "%d:%d:%d",
+						&min, &max, &rarity)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		/*v_ptr->min_level = min;
+		v_ptr->max_level = max;
+		v_ptr->rarity = rarity;*/
+	}
+
+	/* Process 'X' for "Extra info" (one line only) */
+	else if (buf[0] == 'X')
+	{
+		int typ, rat;
+
+		/* There better be a current v_ptr */
+		if (!v_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf + 2, "%d:%d",
+						&typ, &rat)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		v_ptr->typ = typ;
 		v_ptr->rat = rat;
-		v_ptr->hgt = hgt;
-		v_ptr->wid = wid;
 	}
 	else
 	{
