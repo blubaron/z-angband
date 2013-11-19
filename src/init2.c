@@ -296,6 +296,8 @@ cptr err_str[PARSE_ERROR_MAX] =
 	"invalid spell frequency",
 	"invalid number of items (0-99)",
 	"too many entries",
+	"room/vault not rectangular",
+	"room/vault too big",
 };
 
 

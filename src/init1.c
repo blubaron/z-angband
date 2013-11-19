@@ -1798,7 +1798,13 @@ errr parse_v_info(char *buf, header *head)
 		/* Get the text */
 		s = buf + 2;
 		i = strlen(s);
-		if (i > v_ptr->wid) v_ptr->wid = i;
+		if (i != v_ptr->wid) {
+			if (v_ptr->wid == 0) {
+				v_ptr->wid = i;
+			} else {
+				return (PARSE_ERROR_VAULT_NOT_RECTANGULAR);
+			}
+		}
 		v_ptr->hgt++;
 
 		/* Store the text */
