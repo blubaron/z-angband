@@ -598,11 +598,11 @@ static void do_cmd_list_aux (int setting)
 
 	/* Filter grids for what we are looking for */
 	/* Ensure we look at every close grid */
-	for (y = MAX(p_ptr->py - MAX_RANGE,p_ptr->min_hgt); 
-			y < MIN(p_ptr->py + MAX_RANGE + 1,p_ptr->max_hgt); y++)
+	for (y = MAX(p_ptr->py - MAX_SIGHT,p_ptr->min_hgt); 
+			y < MIN(p_ptr->py + MAX_SIGHT + 1,p_ptr->max_hgt); y++)
 	{
-		for (x = MAX(p_ptr->px - MAX_RANGE,p_ptr->min_wid); 
-				x <= MIN(p_ptr->px + MAX_RANGE + 1,p_ptr->max_wid); x++)
+		for (x = MAX(p_ptr->px - MAX_SIGHT,p_ptr->min_wid); 
+				x <= MIN(p_ptr->px + MAX_SIGHT + 1,p_ptr->max_wid); x++)
 		{
 			if (!point_matches_dir(x,y,dir)) continue;
 			if (grid_matches_list_setting(x,y,setting))
@@ -617,17 +617,17 @@ static void do_cmd_list_aux (int setting)
 	for (y = p_ptr->min_hgt; y < p_ptr->max_hgt; y++)
 	{
 		/* Skip values we did before */
-		if (y == MAX(p_ptr->py - MAX_RANGE,p_ptr->min_hgt))
+		if (y == MAX(p_ptr->py - MAX_SIGHT,p_ptr->min_hgt))
 		{
-			y = MIN(p_ptr->py + MAX_RANGE + 1,p_ptr->max_hgt);
+			y = MIN(p_ptr->py + MAX_SIGHT + 1,p_ptr->max_hgt);
 			continue;
 		}
 		for (x = p_ptr->max_wid; x < p_ptr->max_wid; x++)
 		{
 			/* Skip values we did before */
-			if (x == MAX(p_ptr->px - MAX_RANGE,p_ptr->min_wid))
+			if (x == MAX(p_ptr->px - MAX_SIGHT,p_ptr->min_wid))
 			{
-				x = MIN(p_ptr->px + MAX_RANGE + 1,p_ptr->max_wid);
+				x = MIN(p_ptr->px + MAX_SIGHT + 1,p_ptr->max_wid);
 				continue;
 			}
 			if (!point_matches_dir(x,y,dir)) continue;

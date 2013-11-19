@@ -847,6 +847,16 @@ bool make_attack_spell(int m_idx)
 		if (!f4 && !f5 && !f6) return (FALSE);
 	}
 
+	thrown_spell = choose_attack_spell(m_idx, f4, f5, f6);
+
+	/* Abort if no spell was chosen */
+	if (!thrown_spell) return (FALSE);
+
+	if ((thrown_spell >= 96) && (thrown_spell < 128)) {
+		/* breath spells should be short range */
+		if (m_ptr->cdis > MAX_SHORT_RANGE) return (FALSE);
+	}
+
 	/* Get the monster name (or "it") */
 	monster_desc(m_name, m_ptr, 0x00, 80);
 
@@ -855,11 +865,6 @@ bool make_attack_spell(int m_idx)
 
 	/* Hack -- Get the "died from" name */
 	monster_desc(ddesc, m_ptr, 0x88, 80);
-
-	thrown_spell = choose_attack_spell(m_idx, f4, f5, f6);
-
-	/* Abort if no spell was chosen */
-	if (!thrown_spell) return (FALSE);
 
 	/* Extract the monster level */
 	rlev = r_ptr->hdice * 2;
