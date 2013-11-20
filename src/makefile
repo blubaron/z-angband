@@ -20,7 +20,7 @@ COREOBJS := $(LUAWOBJS) \
 	object2.o monster1.o xtra2.o \
 	spells1.o spells2.o melee1.o melee2.o save.o \
 	fields.o cmd1.o cmd2.o cmd3.o cmd5.o cmd6.o cmd7.o \
-	store.o birth.o load.o hero.o wizard1.o wizard2.o \
+	store.o birth.o birth-modify.o load.o hero.o wizard1.o wizard2.o \
 	grid.o streams.o rooms.o generate.o dungeon.o init1.o \
 	init2.o effects.o quest1.o quest2.o racial.o run.o \
 	artifact.o mutation.o spells3.o \

@@ -677,9 +677,13 @@ static void player_outfit(void)
 		(void)inven_carry(q_ptr);
 	}
 
-	/* give the player a word of recall scroll so the player can start diving */
-	q_ptr = object_prep(lookup_kind(TV_SCROLL, SV_SCROLL_WORD_OF_RECALL));
-
+	if (jump_end_game) {
+		/* give an end game player a rod of recall instead of a scroll */
+		q_ptr = object_prep(lookup_kind(TV_ROD, SV_ROD_RECALL));
+	} else {
+		/* give the player a word of recall scroll so the player can start diving */
+		q_ptr = object_prep(lookup_kind(TV_SCROLL, SV_SCROLL_WORD_OF_RECALL));
+	}
 	q_ptr->number = 1;
 
 	object_aware(q_ptr); object_known(q_ptr);
@@ -687,7 +691,7 @@ static void player_outfit(void)
 	q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
 
 	/* give the player some resurrection items */
-	if (!ironman_nightmare && !ironman_downward) {
+	if (!jump_end_game && !ironman_nightmare && !ironman_downward) {
 		q_ptr = object_prep(lookup_kind(TV_SPIRIT, 2));
 
 		q_ptr->number = 3;
@@ -776,6 +780,17 @@ static void player_outfit(void)
 			/* These objects give no score */
 			q_ptr->info |= OB_NO_EXP; (void)inven_carry(q_ptr);
 		}
+	}
+
+	/*
+	 * If we are jumping to the end game at the start of
+	 * the game, fix starting equipment
+	 */
+	if (jump_end_game) {
+		void player_birth_jump_end_gam1(void);
+		player_birth_jump_end_game1();
+		/* the rest of the jump_end_game changes are at the
+		 * end of create_wilderness() in wild1.c */
 	}
 }
 

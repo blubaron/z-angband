@@ -3411,7 +3411,7 @@ option_type option_info[OPT_MAX] =
 	{TRUE,  6, "randart_rare",			"Random artifacts rarer instead of weaker" },
 	{FALSE, 6, "competition_mode",		"Force rebirth from starting point after death" },
 	{FALSE, 6, "accessible_mode",		"Change gameplay for blind accessibility" },
-	{TRUE,  0, NULL,					"Number 214" },
+	{FALSE,  6, "jump_end_game",		"Start at Level 45, above final dungeon" },
 	{TRUE,  0, NULL,					"Number 215" },
 	{TRUE,  0, NULL,					"Number 216" },
 	{TRUE,  0, NULL,					"Number 217" },

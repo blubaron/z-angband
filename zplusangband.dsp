@@ -104,6 +104,10 @@ SOURCE=.\src\birth.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\birth-modify.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\bldg.c
 # End Source File
 # Begin Source File

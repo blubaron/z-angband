@@ -3703,4 +3703,13 @@ void create_wilderness(void)
 
 	/* Done */
 	wild_done();
+
+	/*
+	 * If we are jumping to the end game at the start of
+	 * the game, fix the wilderness, quests, and uniques
+	 */
+	if (jump_end_game) {
+		void player_birth_jump_end_game2(void);
+		player_birth_jump_end_game2();
+	}
 }

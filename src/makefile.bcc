@@ -136,6 +136,7 @@ OBJ = \
 	cave.obj \
 	button.obj \
 	bldg.obj \
+	birth-modify.obj \
 	birth.obj \
 	avatar.obj \
 	artifact.obj \

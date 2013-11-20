@@ -269,6 +269,7 @@
 #define randart_weak			!randart_rare  /* one or the other. */
 #define competition_mode		p_ptr->birth[20]
 #define accessible_mode			p_ptr->birth[21]
+#define jump_end_game			p_ptr->birth[22]
 /* {TRUE,  0, NULL,					"Number 215" }, p_ptr->birth[23] */
 /* {TRUE,  0, NULL,					"Number 216" }, p_ptr->birth[24] */
 /* {TRUE,  0, NULL,					"Number 217" }, p_ptr->birth[25] */
