@@ -3532,7 +3532,7 @@ static bool create_towns(int *xx, int *yy)
 	 * or make an empty spot the large castle
 	 * or make a random building the large castle
 	 */
-	for (i - 0; i < high_count; i++) {
+	for (i = 0; i < high_count; i++) {
 		if (place[high_count_place].store[i].type == BUILD_CASTLE1) {
 			break;
 		} else
@@ -3550,7 +3550,7 @@ static bool create_towns(int *xx, int *yy)
 	}
 
 	/* make sure that there is a stairs to use as the palace dungeon */
-	for (i - 0; i < high_count; i++) {
+	for (i = 0; i < high_count; i++) {
 		if (place[high_count_place].store[i].type == BUILD_STAIRS) {
 			/* use the vanilla dungeon type */
 			init_dungeon(&(place[high_count_place]), &(dungeons[1]));
@@ -3559,14 +3559,14 @@ static bool create_towns(int *xx, int *yy)
 	}
 	if (i == high_count) {
 		/* a stairs was not found, make one */
-		for (i - 0; i < high_count; i++) {
+		for (i = 0; i < high_count; i++) {
 			if (place[high_count_place].store[i].type == BUILD_BLANK) {
 				break;
 			}
 		}
 		if (i == high_count) {
 			/* an empty spot was not found, try a blank building */
-			for (i - 0; i < high_count; i++) {
+			for (i = 0; i < high_count; i++) {
 				if (place[high_count_place].store[i].type == BUILD_NONE) {
 					break;
 				}
@@ -3574,7 +3574,7 @@ static bool create_towns(int *xx, int *yy)
 		}
 		if (i == high_count) {
 			/* a blank building was not found, try an empty building */
-			for (i - 0; i < high_count; i++) {
+			for (i = 0; i < high_count; i++) {
 				if (place[high_count_place].store[i].type == BUILD_EMPTY) {
 					break;
 				}
