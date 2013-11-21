@@ -1696,7 +1696,7 @@ void display_roff_mon(int r_idx)
 /*
  * Hack -- show a list of objects after the monsters in the current "term" window
  */
-void display_visable_item(int x, int y, object_type *o_ptr)
+void display_visible_item(int x, int y, object_type *o_ptr)
 {
   byte a;
   char c;
@@ -1727,7 +1727,7 @@ void display_visable_item(int x, int y, object_type *o_ptr)
 		put_fstr(x+3, y++, "%s" CLR_SET_DEFAULT "%v", attr, OBJECT_FMT(o_ptr, FALSE, 3));
   }
 }
-void display_visable_objects(void)
+void display_visible_objects(void)
 {
   //int max, mx,my;
   unsigned int num;
@@ -1745,8 +1745,8 @@ void display_visable_objects(void)
      */
     return;
   }
-  // we do not need to test for hallucinations here
-  // since it was done in display_visable
+	/* we do not need to test for hallucinations here
+	 * since it was done in display_visable*/
 	/* Are we hallucinating? */
 	if (query_timed(TIMED_IMAGE))
 	{
@@ -1754,12 +1754,15 @@ void display_visable_objects(void)
 
 		return;
 	}
+	/* clear the row intended to be blank */
+	clear_row(Term->scr->cy);
+
   c_ptr = area(p_ptr->px,p_ptr->py);
   o_ptr = test_floor(&num,c_ptr,3);
   if (o_ptr) {
-    display_visable_item(0,y++,o_ptr);
+    display_visible_item(0,y++,o_ptr);
   }
-  for (radius = 1; radius < 19; ++radius) {
+  for (radius = 1; radius <= MAX_SIGHT; ++radius) {
     j = p_ptr->py - radius;
     for (i=p_ptr->px-radius; i < p_ptr->px+radius; ++i) {
       if (y > Term->hgt) {
@@ -1769,7 +1772,7 @@ void display_visable_objects(void)
       c_ptr = area(i,j);
       o_ptr = test_floor(&num,c_ptr,3);
       if (o_ptr) {
-        display_visable_item(0,y++,o_ptr);
+        display_visible_item(0,y++,o_ptr);
       }
     }
     j = p_ptr->py + radius;
@@ -1781,12 +1784,12 @@ void display_visable_objects(void)
       c_ptr = area(i,j);
       o_ptr = test_floor(&num,c_ptr,3);
       if (o_ptr) {
-        display_visable_item(0,y++,o_ptr);
+        display_visible_item(0,y++,o_ptr);
       }
     }
 
     i = p_ptr->px - radius;
-    for (j=p_ptr->py-radius; j < p_ptr->py+radius; ++j) {
+    for (j=p_ptr->py-radius+1; j < p_ptr->py+radius; ++j) {
       if (y > Term->hgt) {
         break;
       }
@@ -1794,11 +1797,11 @@ void display_visable_objects(void)
       c_ptr = area(i,j);
       o_ptr = test_floor(&num,c_ptr,3);
       if (o_ptr) {
-        display_visable_item(0,y++,o_ptr);
+        display_visible_item(0,y++,o_ptr);
       }
     }
     i = p_ptr->px + radius;
-    for (j=p_ptr->py-radius; j < p_ptr->py+radius; ++j) {
+    for (j=p_ptr->py-radius; j <= p_ptr->py+radius; ++j) {
       if (y > Term->hgt) {
         break;
       }
@@ -1806,7 +1809,7 @@ void display_visable_objects(void)
       c_ptr = area(i,j);
       o_ptr = test_floor(&num,c_ptr,3);
       if (o_ptr) {
-        display_visable_item(0,y++,o_ptr);
+        display_visible_item(0,y++,o_ptr);
       }
     }
     if (y > Term->hgt) {
@@ -1920,7 +1923,7 @@ void display_visible(void)
 		}
 	}
   Term_gotoxy(0, y);
-  display_visable_objects();
+  display_visible_objects();
 }
 
 

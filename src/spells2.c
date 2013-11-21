@@ -1372,6 +1372,11 @@ static bool detect_obj_aux(bool tester(const object_type *o_ptr), cptr msg)
 			/* Detect */
 			detect = TRUE;
 
+			/* if this object was not visible before, update visible list */
+			if (!(o_ptr->info & OB_SEEN)) {
+				p_ptr->window |= PW_VISIBLE;
+			}
+
 			/* Hack -- memorize it */
 			o_ptr->info |= OB_SEEN;
 

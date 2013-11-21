@@ -1197,6 +1197,11 @@ void note_spot(int x, int y)
 		/* Hack -- memorize objects */
 		OBJ_ITT_START (c_ptr->o_idx, o_ptr)
 		{
+			/* if this object was not visible before, update visible list */
+			if (!(o_ptr->info & OB_SEEN)) {
+				p_ptr->window |= PW_VISIBLE;
+			}
+
 			/* Memorize objects */
 			o_ptr->info |= OB_SEEN;
 		}
@@ -2323,6 +2328,11 @@ void update_view(void)
 			/* Show the objects */
 			OBJ_ITT_START (c_ptr->o_idx, o_ptr)
 			{
+				/* if this object was not visible before, update visible list */
+				if (!(o_ptr->info & OB_SEEN)) {
+					p_ptr->window |= PW_VISIBLE;
+				}
+
 				/* Memorize objects */
 				o_ptr->info |= OB_SEEN;
 			}
@@ -2342,6 +2352,11 @@ void update_view(void)
 			/* Must note the new information on the screen */
 			if (!(info & CAVE_TEMP))
 			{
+				/* update visible list */
+				if (!(o_ptr->info & OB_SEEN)) {
+					p_ptr->window |= PW_VISIBLE;
+				}
+
 				/* Redraw */
 				lite_spot(x, y);
 			}
@@ -3219,6 +3234,11 @@ void wiz_lite(void)
 			/* Remember items on the grid */
 			OBJ_ITT_START (c_ptr->o_idx, o_ptr)
 			{
+				/* if this object was not visible before, update visible list */
+				if (!(o_ptr->info & OB_SEEN)) {
+					p_ptr->window |= PW_VISIBLE;
+				}
+
 				/* Memorize */
 				o_ptr->info |= OB_SEEN;
 			}
