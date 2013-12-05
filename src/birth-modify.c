@@ -186,13 +186,19 @@ void player_birth_jump_end_game1(void)
   }
   /* give the player all flavor/monster knowledge */
   for (i = 1; i < z_info->k_max; i++) {
-    /*if (k_info[i].flavor) {*/
+		if (!(FLAG(&(k_info[i]), TR_INSTA_ART)) && (k_info[i].chance[0])) {
       k_info[i].info |= OK_AWARE;
-    /*}*/
+		}
   }
   for (i = 1; i < z_info->r_max; i++) {
-    r_info[i].r_flags[6] |= RF6_LIBRARY;
-	  r_info[i].r_sights = 1000;
+		monster_race *r_ptr = &(r_info[i]);
+		if (!((!silly_monsters && FLAG(r_ptr, RF_SILLY))
+			|| (!cthulhu_monsters && FLAG(r_ptr, RF_CTH))
+			|| (!amber_monsters && FLAG(r_ptr, RF_AMBER))))
+		{
+			r_ptr->r_flags[6] |= RF6_LIBRARY;
+			r_ptr->r_sights = 1000;
+		}
   }
 }
 
@@ -340,16 +346,20 @@ void player_birth_jump_end_game2(void)
 
   /* kill off most of the underlevel uniques */
   for (i = 0; i < z_info->r_max; i++) {
-    if (FLAG( &(r_info[i]), RF_UNIQUE) && (r_info[i].level < 70)
-      && !(FLAG( &(r_info[i]), RF_QUESTOR))
-      && !(FLAG( &(r_info[i]), RF_FRIENDLY))
-      && (r_info[i].max_num > 0))
-    {
-      if (30+randint1(80) > r_info[i].level) {
-        r_info[i].r_pkills = 1;
-        r_info[i].max_num = 0;
-      }
-    }
+		monster_race *r_ptr = &(r_info[i]);
+		if (FLAG( r_ptr, RF_UNIQUE) && (r_ptr->level < 70)
+			&& !(FLAG( r_ptr, RF_QUESTOR))
+			&& !(FLAG( r_ptr, RF_FRIENDLY))
+			&& (r_ptr->max_num > 0)
+			&& !((!silly_monsters && FLAG(r_ptr, RF_SILLY))
+			|| (!cthulhu_monsters && FLAG(r_ptr, RF_CTH))
+			|| (!amber_monsters && FLAG(r_ptr, RF_AMBER))))
+		{
+			if (30+randint1(80) > r_ptr->level) {
+				r_ptr->r_pkills = 1;
+				r_ptr->max_num = 0;
+			}
+		}
   }
   p_ptr->state.skip_more = FALSE;
 }
