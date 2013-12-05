@@ -750,7 +750,7 @@ static void player_outfit(void)
 		} else
 		/* Hack -- If ammo, give more of it */
 		if ((tv >= TV_THROWN) && (tv <= TV_BOLT)) {
-			q_ptr->pval = (byte)rand_range(25, 40);
+			q_ptr->number = (byte)rand_range(25, 40);
 		}
 
 		object_aware(q_ptr); object_known(q_ptr);
