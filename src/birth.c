@@ -787,7 +787,7 @@ static void player_outfit(void)
 	 * the game, fix starting equipment
 	 */
 	if (jump_end_game) {
-		void player_birth_jump_end_gam1(void);
+		void player_birth_jump_end_game1(void);
 		player_birth_jump_end_game1();
 		/* the rest of the jump_end_game changes are at the
 		 * end of create_wilderness() in wild1.c */

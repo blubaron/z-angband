@@ -2353,7 +2353,7 @@ void update_view(void)
 			if (!(info & CAVE_TEMP))
 			{
 				/* update visible list */
-				if (!(o_ptr->info & OB_SEEN)) {
+				if (c_ptr->o_idx) {
 					p_ptr->window |= PW_VISIBLE;
 				}
 

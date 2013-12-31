@@ -1214,7 +1214,7 @@ void health_redraw(void)
 				cx = 'E';
 			}
 			if (y < 0) {
-				y = -x;
+				y = -y;
 				cy = 'N';
 			} else {
 				cy = 'S';

@@ -2273,5 +2273,7 @@ void place_named_art(int a_idx, int x, int y)
 	object_type *q_ptr = create_named_art(a_idx);
 
 	/* Drop the artifact from heaven */
-	drop_near(q_ptr, -1, x, y);
+	if (q_ptr) {
+		drop_near(q_ptr, -1, x, y);
+	}
 }

@@ -1787,6 +1787,8 @@ errr parse_v_info(char *buf, header *head)
 		/* Store the name */
 		if (!(v_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
+		v_ptr->hgt = 0;
+		v_ptr->wid = 0;
 	}
 
 	/* Process 'D' for "Description" */

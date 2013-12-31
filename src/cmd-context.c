@@ -672,7 +672,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		menu_dynamic_add_label(m, "Cast On", 'm', 3, labels);
 	}
 	if (adjacent) {
-		if (c_ptr->m_idx) {
+		if (c_ptr->m_idx && m_list[c_ptr->m_idx].ml) {
 			menu_dynamic_add_label(m, "Attack", '+', 4, labels);
 		} else {
 			menu_dynamic_add_label(m, "Alter", '+', 4, labels);
