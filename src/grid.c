@@ -212,7 +212,14 @@ void place_random_door(int x, int y)
 	else if (tmp < 600)
 	{
 		/* Create secret door */
-		set_feat_grid(c_ptr, the_feat(FEAT_SECRET));
+		if ((p_ptr->depth > 0) && (p_ptr->depth <= 12)
+			&& (randint1(12) > p_ptr->depth))
+		{
+			/* reduce the number of secret doors on early levels */
+			place_closed_door(x,y);
+		} else {
+			set_feat_grid(c_ptr, the_feat(FEAT_SECRET));
+		}
 	}
 
 	/* Closed, locked, or stuck doors (400/1000) */
