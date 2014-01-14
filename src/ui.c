@@ -258,16 +258,19 @@ int get_player_choice(cptr *choices, int num, int col, int wid,
 			/* Validate input */
 			if ((choice > -1) && (choice < num))
 			{
-				cur = choice;
-
-				/* Move it onto the screen */
-				if ((cur < top) || (cur > top + hgt))
-				{
-					top = cur;
+				if (choice == cur) {
+					/* Done */
+					done = TRUE;
 				}
 
-				/* Done */
-				done = TRUE;
+				cur = choice;
+
+				/* Move it into the center of the screen */
+				top = cur - (hgt>>1);
+				if (top + hgt > num-1)
+					top = num - hgt - 1;
+				if (top < 0)
+					top = 0;
 			}
 			else
 			{
