@@ -815,7 +815,7 @@ static bool get_player_sex(void)
 
 	/* Extra info */
 	put_fstr(QUESTION_COL, QUESTION_ROW,
-				"Your 'sex' does not have any significant gameplay effects.");
+				CLR_YELLOW "Your 'sex' does not have any significant gameplay effects." CLR_DEFAULT);
 
 	/* Tabulate genders */
 	for (i = 0; i < MAX_SEXES; i++)
@@ -903,7 +903,7 @@ static bool get_player_race(void)
 
 	/* Extra info */
 	put_fstr(QUESTION_COL, QUESTION_ROW,
-				"Your 'race' determines various intrinsic factors and bonuses.");
+				CLR_YELLOW "Your 'race' determines various intrinsic factors and bonuses." CLR_DEFAULT);
 
 	/* Tabulate races */
 	for (i = 0; i < MAX_RACES; i++)
@@ -990,8 +990,8 @@ static bool get_player_class(void)
 
 	/* Extra info */
 	put_fstr(QUESTION_COL, QUESTION_ROW,
-				"Your 'class' determines various intrinsic abilities and bonuses.\n"
-				"Any entries in parentheses should only be used by advanced players.");
+				CLR_YELLOW "Your 'class' determines various intrinsic abilities and bonuses.\n"
+				"Any entries in parentheses should only be used by advanced players." CLR_DEFAULT);
 
 	/* Tabulate classes */
 	for (i = 0; i < MAX_CLASS; i++)
@@ -1062,8 +1062,8 @@ static bool get_player_realms(void)
 
 	/* Extra info */
 	put_fstr(QUESTION_COL, QUESTION_ROW,
-				"Life and Sorcery are protective, Chaos and Death are destructive.\n"
-				"Nature has both defensive and offensive spells.");
+				CLR_YELLOW "Life and Sorcery are protective, Chaos and Death are destructive.\n"
+				"Nature has both defensive and offensive spells." CLR_DEFAULT);
 
 	choose = get_player_choice(realms, count, REALM1_COL, 10,
 							   "magic.txt#MagicRealms", NULL);
@@ -1133,11 +1133,12 @@ static bool player_birth_aux_1(void)
 	button_backup_all(TRUE);
 
 	/* Display some helpful information */
+	/* $N is CLR_L_GREEN, $R is CLR_DEFAULT */
 	put_fstr(QUESTION_COL, HEADER_ROW,
 			"Please select your character from the menu below.\n"
-			"Use the movement keys to scroll the menu, $U'enter' to select the current$Y\n$V\n"
-			"menu item, $U'*' for a random menu item$Y*$V, $U'ESC' to restart the character$Y%c$V\n"
-			"selection, $U'=' for the birth options$Y=$V, $U'?' for help$Y?$V, or $U'Ctrl-X' to quit$Y%c$V.",
+			"Use the $Nmovement keys$R to scroll the menu, $U'$NEnter$R' to select the current$Y\n$V\n"
+			"menu item, $U'$N*$R' for a random menu item$Y*$V, $U'$NESC$R' to restart the character$Y%c$V\n"
+			"selection, $U'$N=$R' for the birth options$Y=$V, $U'$N?$R' for help$Y?$V, or $U'$NCtrl-X$R' to quit$Y%c$V.",
 			ESCAPE, KTRL('X'));
 
 	if (!get_player_sex()) {
