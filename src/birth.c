@@ -1343,7 +1343,7 @@ static bool player_birth_aux_2(void)
 
 
 		/* Prompt XXX XXX XXX */
-		prtf(0, 0, "Total Cost %2d/48.  Use 2/8 to move, 4/6 to modify, Enter to accept.",
+		prtf(0, 0, "Total Cost %2d/48.  Use $N$U2$R/$V$N$U8$R $Vto move, $N$U4$R/$V$N$U6$R $Vto modify, $U$NEnter$R$Y\n$V to accept.",
 				cost);
 
 		/* Place cursor just after cost of current stat */
@@ -1568,7 +1568,7 @@ static bool player_birth_aux_3(void)
 			put_fstr(col + 13, 10, "Round:");
 
 			/* Indicate the state */
-			put_fstr(col + 13, 12, "$U(Hit ESC to stop)$Y%c$V",ESCAPE);
+			put_fstr(col + 13, 12, "$U(Hit $NESC$R to stop)$Y%c$V",ESCAPE);
 
 			best_score = -1;
 			for (i = 0; i < A_MAX; i++) {
@@ -1690,9 +1690,9 @@ static bool player_birth_aux_3(void)
 			display_player(mode);
 
 			/* Prepare a prompt (must squeeze everything in) */
-			prtf(2, 22, "[Press $U'?' for help$Y?$V, $U'=' for options$Y=$V]");
-			prtf(2, 23, "[$U'r' to reroll$Yr$V%s, $U'n' for next screen$Yn$V, or $UEnter to accept$Y\n$V]",
-				previous ? ", $U'p' for prev$Yp$V": "");
+			prtf(2, 22, "[Press $U'$N?$R' for help$Y?$V, $U'$N=$R' for options$Y=$V]");
+			prtf(2, 23, "[$U'$Nr$R' to reroll$Yr$V%s, $U'$Nn$R' for next screen$Yn$V, or $U$NEnter$R to accept$Y\n$V]",
+				previous ? ", $U'$Np$R' for prev$Yp$V": "");
 
 			/* Prompt and get a command */
 			ch = inkey();
@@ -1981,7 +1981,7 @@ static bool player_birth_random(void)
 
 	/* Prompt for it */
 	prtf(2, 23,
-		"[$U'Ctrl-X' to quit$Y%c$V, $U'c' for name$Yn$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]",
+		"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$Nc$R' for name$Yc$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]",
 		KTRL('X'), KTRL('H'));
 	ch = 0;
 	while ((ch != '\n') && (ch != ' ')) {
@@ -1997,7 +1997,7 @@ static bool player_birth_random(void)
 
 			/* Prompt for it */
 			prtf(2, 23,
-				"[$U'Ctrl-X' to quit$Y%c$V, $U'n' for name$Yn$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]",
+				"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$Nc$R' for name$Yc$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]",
 				KTRL('X'), KTRL('H'));
 		}
 
@@ -2217,7 +2217,7 @@ static bool player_birth_aux(void)
 
 	/* Prompt for it */
 	prtf(10, 23,
-		"[$U'Ctrl-X' to suicide$Y%c$V, $U'Del' to start over$Y%c$V, or $UEnter to continue$Y\n$V]", KTRL('X'), KTRL('H'));
+		"[$U'$NCtrl-X$R' to suicide$Y%c$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]", KTRL('X'), KTRL('H'));
 
 	/* Get a key */
 	ch = inkey();
