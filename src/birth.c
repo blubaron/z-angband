@@ -2008,7 +2008,7 @@ static bool player_birth_random(void)
 		}
 
 		/* Accepted */
-		if ((ch == '\n') && (ch == ' ')) {
+		if ((ch == '\n') || (ch == ' ')) {
 			break;
 		}
 	}
@@ -2235,7 +2235,7 @@ static bool player_birth_aux(void)
 		}
 
 		/* Accepted */
-		if ((ch == '\n') && (ch == ' ')) {
+		if ((ch == '\n') || (ch == ' ')) {
 			break;
 		}
 	}
