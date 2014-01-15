@@ -1690,9 +1690,9 @@ static bool player_birth_aux_3(void)
 			display_player(mode);
 
 			/* Prepare a prompt (must squeeze everything in) */
-			prtf(2, 22, "[Press $U'$N?$R' for help$Y?$V, $U'$N=$R' for options$Y=$V]");
-			prtf(2, 23, "[$U'$Nr$R' to reroll$Yr$V%s, $U'$Nn$R' for next screen$Yn$V, or $U$NEnter$R to accept$Y\n$V]",
-				previous ? ", $U'$Np$R' for prev$Yp$V": "");
+			prtf(2, 22, "[Press $U'$N?$R' for help$Y?$V, $U'$N=$R' for options$Y=$V, $U'$Nn$R' for next page$Yn$V]");
+			prtf(2, 23, "[$U'$Nr$R' to reroll$Yr$V%s, or $U$NEnter$R to accept$Y\n$V]",
+				previous ? ", $U'$Np$R' for previous roll$Yp$V": "");
 
 			/* Prompt and get a command */
 			ch = inkey();
@@ -1973,54 +1973,45 @@ static bool player_birth_random(void)
 	/* Initialize the virtues */
 	get_virtues();
 
-	/* Store any previous buttons */
-	button_backup_all(TRUE);
+	while (TRUE) {
+		/* Store any previous buttons */
+		button_backup_all(TRUE);
 
-	/* Display the player */
-	display_player(DISPLAY_PLAYER_STANDARD);
+		/* Display the player */
+		display_player(DISPLAY_PLAYER_STANDARD);
 
-	/* Prompt for it */
-	prtf(2, 23,
-		"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$Nc$R' for name$Yc$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]",
-		KTRL('X'), KTRL('H'));
-	ch = 0;
-	while ((ch != '\n') && (ch != ' ')) {
+		/* Prompt for it */
+		prtf(2, 23,
+			"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$NDel$R' to start over$Y%c$V, $U'$Nc$R' for name$Yc$V, or $U$NEnter$R to continue$Y\n$V]",
+			KTRL('X'), KTRL('H'));
+
 		/* Get a key */
 		ch = inkey();
+
+
+		/* restore any previous buttons */
+		button_restore();
 
 		/* Change name */
 		if ((ch == 'c') || (ch == 'C')) {
 			get_character_name();
-
-			/* Display the player */
-			display_player(DISPLAY_PLAYER_STANDARD);
-
-			/* Prompt for it */
-			prtf(2, 23,
-				"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$Nc$R' for name$Yc$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]",
-				KTRL('X'), KTRL('H'));
 		}
 
 		/* Quit */
 		if (ch == KTRL('X')) {
-			/* restore any previous buttons */
-			button_restore();
-
 			quit(NULL);
 		}
 
 		/* Start over */
 		if ((ch == 0x7F) || (ch == '.') || (ch == KTRL('H'))) {
-			/* restore any previous buttons */
-			button_restore();
-
 			return (FALSE);
 		}
-	}
-	/* Accepted */
 
-	/* restore any previous buttons */
-	button_restore();
+		/* Accepted */
+		if ((ch == '\n') && (ch == ' ')) {
+			break;
+		}
+	}
 
 	/* Done */
 	return (TRUE);
@@ -2209,29 +2200,40 @@ static bool player_birth_aux(void)
 	/* Initialize the virtues */
 	get_virtues();
 
-	/* Store any previous buttons */
-	button_backup_all(TRUE);
+	while (TRUE) {
+		/* Store any previous buttons */
+		button_backup_all(TRUE);
 
-	/* Display the player */
-	display_player(DISPLAY_PLAYER_STANDARD);
+		/* Display the player */
+		display_player(DISPLAY_PLAYER_STANDARD);
 
-	/* Prompt for it */
-	prtf(10, 23,
-		"[$U'$NCtrl-X$R' to suicide$Y%c$V, $U'$NDel$R' to start over$Y%c$V, or $U$NEnter$R to continue$Y\n$V]", KTRL('X'), KTRL('H'));
+		/* Prompt for it */
+		prtf(2, 23,
+			"[$U'$NCtrl-X$R' to quit$Y%c$V, $U'$NDel$R' to start over$Y%c$V, $U'$Nc$R' for name$Yc$V, or $U$NEnter$R to continue$Y\n$V]",
+			KTRL('X'), KTRL('H'));
 
-	/* Get a key */
-	ch = inkey();
+		/* Get a key */
+		ch = inkey();
 
-	/* restore any previous buttons */
-	button_restore();
+		/* restore any previous buttons */
+		button_restore();
 
-	/* Quit */
-	if (ch == KTRL('X')) quit(NULL);
+		/* Quit */
+		if (ch == KTRL('X')) quit(NULL);
 
-	/* Start over */
-	if ((ch == 0x7F) || (ch == '.') || (ch == KTRL('H'))) return (FALSE);
+		/* Start over */
+		if ((ch == 0x7F) || (ch == '.') || (ch == KTRL('H'))) return (FALSE);
 
-	/* Accepted */
+		/* Change name */
+		if ((ch == 'c') || (ch == 'C')) {
+			get_character_name();
+		}
+
+		/* Accepted */
+		if ((ch == '\n') && (ch == ' ')) {
+			break;
+		}
+	}
 
 	/* Done */
 	return (TRUE);
