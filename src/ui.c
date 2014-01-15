@@ -1840,7 +1840,7 @@ bool get_check_base(bool def, bool esc, cptr prompt)
 	message_flush();
 
 	/* Prompt for it */
-	prtf(0, 0, "%.70s[$Xy/$Xn] ", prompt);
+	prtf(0, 0, "%.70s$U[y$Yy$V$U/n]$Yn$V ", prompt);
 
 	/* Get an acceptable answer */
 	while (TRUE)
