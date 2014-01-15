@@ -1816,6 +1816,10 @@ static void set_place(byte place_num)
 	}
 
 	/* Shrink region size to minimum required */
+	for (j = ymax + WILD_BLOCK_SIZE; j < ri_ptr->ysize; j++) {
+		/* Free the unused region lines */
+		FREE(rg_list[ri_idx][j]);
+	}
 	ri_ptr->xsize = xmax + WILD_BLOCK_SIZE;
 	ri_ptr->ysize = ymax + WILD_BLOCK_SIZE;
 
