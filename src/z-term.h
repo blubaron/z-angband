@@ -258,6 +258,7 @@ struct term
 	bool (*target_set_interactive_hook)(int mode, int x, int y);
 	void (*redraw_stuff_hook)(void);
 	void (*window_stuff_hook)(void);
+	bool (*player_birth_hook)(void);
 
 };
 

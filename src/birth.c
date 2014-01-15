@@ -2155,6 +2155,11 @@ static bool player_birth_aux(void)
 	/* Try to rebirth.  If that fails, proceed to normal methods. */
 	if (player_rebirth()) return TRUE;
     
+	/* see if we have an override hook */
+	if (Term->player_birth_hook) {
+		return (*(Term->player_birth_hook))();
+	}
+
 	/* Ask questions */
 	if (!player_birth_aux_1()) return FALSE;
 
