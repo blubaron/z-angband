@@ -2109,7 +2109,7 @@ static bool player_rebirth(void)
 		display_player(DISPLAY_PLAYER_STANDARD);
 
 		/* check for rebirth */
-		if (!get_check("Rebirth? ")) {
+		if (!get_check("Start over with %s? ", player_name)) {
 			/* clear the info we set for the player display */
 			player_wipe();
 
