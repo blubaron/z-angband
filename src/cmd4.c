@@ -200,6 +200,9 @@ void do_cmd_messages(void)
 	/* Process requests until done */
 	while (1)
 	{
+		/* backup any current mouse buttons */
+		button_backup_all(TRUE);
+
 		/* Clear screen */
 		Term_clear();
 
@@ -240,10 +243,13 @@ void do_cmd_messages(void)
 
 		/* Display prompt (not very informative) */
 		prtf(0, hgt - 1,
-				"[Press 'p' for older, 'n' for newer, ..., or ESCAPE]");
+				"[Press $U'$Np$R' for older$Yp$V, $U'$Nn$R' for newer$Yn$V, ..., or $U$NESCAPE$R$Y"ESCAPE_STR"$V]");
 
 		/* Get a command */
 		k = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		/* Exit on Escape */
 		if (k == ESCAPE) break;
@@ -399,6 +405,9 @@ void do_cmd_messages_reverse(void)
 	/* Process requests until done */
 	while (1)
 	{
+		/* backup any current mouse buttons */
+		button_backup_all(TRUE);
+
 		/* Clear screen */
 		Term_clear();
 
@@ -439,10 +448,13 @@ void do_cmd_messages_reverse(void)
 
 		/* Display prompt (not very informative) */
 		prtf(0, hgt - 1,
-				"[Press 'p' for older, 'n' for newer, ..., or ESCAPE]");
+				"[Press $U'$Np$R' for older$Yp$V, $U'$Nn$R' for newer$Yn$V, ..., or $U$NESCAPE$R$Y"ESCAPE_STR"$V]");
 
 		/* Get a command */
 		k = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		/* Exit on Escape */
 		if (k == ESCAPE) break;

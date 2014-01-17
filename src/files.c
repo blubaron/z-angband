@@ -2688,7 +2688,7 @@ void do_cmd_character(void)
 
 		/* Prompt */
 		put_fstr(2, 23,
-					"[$U'c' to change name$Yc$V, $U'f' to file$Yf$V, $U'p' for previous$Yp$V, $U'n' for next$Yn$V, or $UESC$Y%c$V]", ESCAPE);
+					"[$U'$Nc$R' to change name$Yc$V, $U'$Nf$R' to file$Yf$V, $U'$Np$R' for previous$Yp$V, $U'$Nn$R' for next$Yn$V, or $U$NESC$R$Y%c$V]", ESCAPE);
 
 		/* Query */
 		c = inkey();
