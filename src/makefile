@@ -1,6 +1,6 @@
 DEFAULT: install
 
-zplusangband.exe : $(COREOBJS) $(LUAOBJS)
+z-angband.exe : $(COREOBJS) $(LUAOBJS)
 
 CC := lcc.exe
 CC64 := lcc64.exe
@@ -63,11 +63,11 @@ OBJS := $(COREOBJS) $(LUAOBJS)
 %.o : %.c
 	$(CC) $(CFLAGS) $< -o $@
 
-install : zplusangband.exe
+install : z-angband.exe
 
 MAKE-ZANGBAND = $(LINK) $(LFLAGS) -o $@ $^ $(LDFLAGS) $(OBJS)
 
-zplusangband.exe : $(OBJS) zplus.res
+z-angband.exe : $(OBJS) zplus.res
 	$(MAKE-ZANGBAND)
 
 zplus.res : zplus.rc

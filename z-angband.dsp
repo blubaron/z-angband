@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="zplusangband" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="z-angband" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=zplusangband - Win32 Debug
+CFG=z-angband - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "zplusangband.mak".
+!MESSAGE NMAKE /f "z-angband.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "zplusangband.mak" CFG="zplusangband - Win32 Debug"
+!MESSAGE NMAKE /f "z-angband.mak" CFG="z-angband - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "zplusangband - Win32 Release" (based on "Win32 (x86) Application")
-!MESSAGE "zplusangband - Win32 Debug" (based on "Win32 (x86) Application")
+!MESSAGE "z-angband - Win32 Release" (based on "Win32 (x86) Application")
+!MESSAGE "z-angband - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "zplusangband - Win32 Release"
+!IF  "$(CFG)" == "z-angband - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -53,9 +53,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 src\lua\tolua.lib d3d9.lib d3dx9.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"zplusangband.exe"
+# ADD LINK32 src\lua\tolua.lib d3d9.lib d3dx9.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"z-angband.exe"
 
-!ELSEIF  "$(CFG)" == "zplusangband - Win32 Debug"
+!ELSEIF  "$(CFG)" == "z-angband - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -79,14 +79,14 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 src\lua\tolua.lib d3d9.lib d3dx9.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"zplusangband_d.exe" /pdbtype:sept
+# ADD LINK32 src\lua\tolua.lib d3d9.lib d3dx9.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"z-angband_d.exe" /pdbtype:sept
 
 !ENDIF 
 
 # Begin Target
 
-# Name "zplusangband - Win32 Release"
-# Name "zplusangband - Win32 Debug"
+# Name "z-angband - Win32 Release"
+# Name "z-angband - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
