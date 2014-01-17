@@ -17,7 +17,7 @@ LUAWOBJS := \
 
 COREOBJS := $(LUAWOBJS) \
 	variable.o tables.o cave.o object1.o \
-	object2.o monster1.o xtra2.o \
+	object2.o monster1.o xtra2.o target.o \
 	spells1.o spells2.o melee1.o melee2.o save.o \
 	fields.o cmd1.o cmd2.o cmd3.o cmd5.o cmd6.o cmd7.o \
 	store.o birth.o birth-modify.o load.o hero.o wizard1.o wizard2.o \

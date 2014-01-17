@@ -372,6 +372,10 @@ SOURCE=.\src\tables.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\target.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\ui.c
 # End Source File
 # Begin Source File
@@ -565,6 +569,10 @@ SOURCE=".\src\signals.h"
 # Begin Source File
 
 SOURCE=.\src\streams.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\target.h
 # End Source File
 # Begin Source File
 

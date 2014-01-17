@@ -35,7 +35,7 @@ OBJS := variable.o tables.o util.o cave.o \
 	signals.o ui-inkey.o userid.o button.o \
 	z-file.o z-msg.o z-quark.o \
 	object1.o object2.o monster1.o monster2.o \
-	xtra1.o xtra2.o spells1.o spells2.o \
+	xtra1.o xtra2.o target.o spells1.o spells2.o \
 	melee1.o melee2.o save.o files.o fields.o\
 	cmd1.o cmd2.o cmd3.o cmd4.o cmd5.o cmd6.o cmd7.o\
 	cmd0.o ui.o ui-menu.o ui-region.o cmd-context.o \

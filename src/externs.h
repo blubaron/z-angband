@@ -1102,21 +1102,8 @@ extern void verify_panel(void);
 extern cptr look_mon_desc(int m_idx);
 extern void ang_sort_aux(vptr u, vptr v, int p, int q);
 extern void ang_sort(vptr u, vptr v, int n);
-extern bool target_able(int m_idx);
-extern bool target_okay(void);
-extern void target_set_monster(int m_idx);
-extern void target_set_location(int x, int y);
-extern bool target_set_grid(int x, int y);
-extern bool target_look_grid(int x, int y, bool recall);
-extern bool target_look_grid_prompt(int col, int row, int x, int y, char* pmt);
-extern bool target_set_interactive(int mode, int x, int y);
-extern bool target_set(int mode);
-extern bool get_aim_dir(int *dp);
-extern bool get_hack_dir(int *dp);
-extern bool get_rep_dir(int *dp);
 extern int get_chaos_patron(void);
 extern void gain_level_reward(int chosen_reward);
-extern bool tgt_pt(int *x, int *y);
 extern void do_poly_wounds(void);
 extern int mon_damage_mod(const monster_type *m_ptr, int dam, int type);
 extern void exp_for_kill(const monster_race *r_ptr, s32b *new_exp,
@@ -1129,6 +1116,8 @@ extern void object_kind_track(int k_idx);
 extern void ang_sort_swap_distance(vptr u, vptr v, int a, int b);
 extern bool ang_sort_comp_distance(vptr u, vptr v, int a, int b);
 extern bool mimic_desc(char *m_name, const monster_race *r_ptr);
+
+#include "target.h"
 
 /* mspells1.c */
 extern bool clean_shot(int x1, int y1, int x2, int y2, bool friendly);

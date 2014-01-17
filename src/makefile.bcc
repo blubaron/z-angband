@@ -84,6 +84,7 @@ OBJ = \
 	ui-inkey.obj \
 	userid.obj \
 	util.obj \
+	target.obj \
 	tables.obj \
 	streams.obj \
 	store.obj \
