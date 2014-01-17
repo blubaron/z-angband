@@ -5,7 +5,7 @@
 /*
  * Name of the version/variant
  */
-#define VERSION_NAME "Z+Angband"
+#define VERSION_NAME "Z-Angband"
 
 /* User-visible version */
 #define VER_MAJOR 0
