@@ -1454,6 +1454,8 @@ static void rd_extra(void)
 		rd_byte(&p_ptr->dc_count);
 		/* Read the number of times ankhs have been used */
 		rd_u16b(&p_ptr->used_ankhs);
+		/* Read the number of "lost" pets */
+		rd_byte(&p_ptr->lp_count);
 	} else {
 		/* skip the bytes and mark to look for an appropriate place later */
 		for (i = 0; i < 6; i++) rd_byte(&tmp8u);
@@ -1482,9 +1484,11 @@ static void rd_extra(void)
 		rd_byte(&tmp8u);
 		rd_byte(&tmp8u);
 		p_ptr->used_ankhs = 0;
+		rd_byte(&tmp8u);
+		p_ptr->lp_count = 0;
 	}
 	/* Future use */
-	for (i = 0; i < 10; i++) rd_byte(&tmp8u);
+	for (i = 0; i < 9; i++) rd_byte(&tmp8u);
 
 	/* Skip the flags */
 	strip_bytes(12);

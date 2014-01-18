@@ -1087,12 +1087,16 @@ static void wr_extra(void)
   /* Dump the number of buildings owned by the player - uses 1 future use byte */
  	wr_byte(p_ptr->ob_count);
   /* Dump the number of player death chests outstanding - uses 1 future use byte */
- 	wr_byte(p_ptr->dc_count);
- 	wr_u16b(p_ptr->used_ankhs);
+	wr_byte(p_ptr->dc_count);
+	wr_u16b(p_ptr->used_ankhs);
+	/* Dump the number of "lost" permanent pets - uses 1 future use byte */
+	wr_byte(p_ptr->lp_count);
+	/* Future use byte */
+	wr_byte(0);
 
-  /* Future use */
- 	wr_u16b(0);
-	for (i = 0; i < 2; i++) wr_u32b(0L);
+	/* Future use */
+	wr_u32b(0L);
+	wr_u32b(0L);
 
 	/* Ignore some flags */
 	wr_u32b(0L);				/* oops */
