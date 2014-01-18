@@ -963,6 +963,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 	return 1;
 }
 
+void roff_set_width(int width);
 /* pick the context menu options appropiate for the item */
 int context_menu_object(const object_type *o_ptr)
 {
@@ -1131,7 +1132,9 @@ int context_menu_object(const object_type *o_ptr)
 	button_backup_all(TRUE);
 
 	/* Recall object */
+	roff_set_width(r.col);
 	roff_obj_aux(o_ptr);
+	roff_set_width(0);
 
 	menu_layout(m, &r);
 	rect_region_erase_bordered(&r);

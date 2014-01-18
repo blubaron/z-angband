@@ -1330,6 +1330,19 @@ void prtf(int col, int row, cptr str, ...)
 }
 
 
+/* Set a on the display of roff text (below)
+ * mainly to show object descriptions with context menu */
+static int roff_width = 0;
+void roff_set_width(int width)
+{
+	if (width) {
+		roff_width = width;
+	} else {
+		roff_width = 0;
+	}
+}
+
+
 /*
  * Print some (colored) text to the screen at the current cursor position,
  * automatically "wrapping" existing text (at spaces) when necessary to
@@ -1349,6 +1362,8 @@ void roff(cptr str, ...)
 	int x, y;
 
 	int w, h;
+
+	int clear;
 
 	cptr s;
 
@@ -1374,6 +1389,15 @@ void roff(cptr str, ...)
 	/* Obtain the cursor */
 	(void)Term_locate(&x, &y);
 
+	/* limit the width, if requested */
+	if (roff_width) {
+		clear = roff_width;
+		if (roff_width < w)
+			w = roff_width;
+	} else {
+		clear = 255;
+	}
+
 	/* Process the string */
 	for (s = buf; *s; s++)
 	{
@@ -1387,7 +1411,7 @@ void roff(cptr str, ...)
 			y++;
 
 			/* Clear line, move cursor */
-			Term_erase(x, y, 255);
+			Term_erase(x, y, clear);
 
 			continue;
 		}
@@ -1497,14 +1521,14 @@ void roff(cptr str, ...)
 			if (n == 0) n = w;
 
 			/* Clear line */
-			Term_erase(n, y, 255);
+			Term_erase(n, y, clear);
 
 			/* Wrap */
 			x = 0;
 			y++;
 
 			/* Clear line, move cursor */
-			Term_erase(x, y, 255);
+			Term_erase(x, y, clear);
 
 			/* Wrap the word (if any) */
 			for (i = n; i < w - 1; i++)
