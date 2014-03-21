@@ -14,7 +14,7 @@
 #define VER_EXTRA 0
 
 /* Versions after release */
-#define VER_AFTER ""
+#define VER_AFTER "dev"
 
 /* Stringify argument */
 #define Z_STR(a) Z_STR1(a)

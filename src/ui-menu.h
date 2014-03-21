@@ -354,7 +354,7 @@ ui_event menu_select(menu_type *menu, int notify, bool popup);
 void menu_ensure_cursor_valid(menu_type *m);
 
 
-/* Interal menu stuff that cmd-know needs because it's quite horrible */
+/* Internal menu stuff that cmd-know needs because it's quite horrible */
 bool menu_handle_mouse(menu_type *menu, const ui_event *in, ui_event *out);
 bool menu_handle_keypress(menu_type *menu, const ui_event *in, ui_event *out);
 

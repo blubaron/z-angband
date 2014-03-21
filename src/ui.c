@@ -1330,7 +1330,7 @@ void prtf(int col, int row, cptr str, ...)
 }
 
 
-/* Set a on the display of roff text (below)
+/* Set a limit on the display of roff text (below)
  * mainly to show object descriptions with context menu */
 static int roff_width = 0;
 void roff_set_width(int width)

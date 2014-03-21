@@ -1062,32 +1062,33 @@ static void wr_extra(void)
 	wr_byte(0);					/* oops */
 	wr_byte(0);					/* oops */
 
-  /* Dump the main home info - Brett*/
-  /* uses 4 of the 48 future use bytes */
+	/* Dump the main home info - Brett*/
+	/* uses 4 of the 48 future use bytes */
 	wr_s16b(p_ptr->home_place_num);
 	wr_s16b(p_ptr->home_store_num);
-  /* Dump the capital info - uses 6 of the 48 future use bytes */
+	/* Dump the capital info - uses 6 of the 48 future use bytes */
 	wr_s16b(p_ptr->capital_place_num);
 	wr_s16b(p_ptr->capital_store_num);
 	wr_s16b(p_ptr->capital_dun_num);
 
-  /* Future use, possible for places/buildings used in static quests */
+	/* Future use, possible for places/buildings used in static quests */
 	for (i = 0; i < 4; i++) wr_u32b(0L);
 
-  /* Dump the amount of gold stored in banks
-       - uses 4 of the 48 future use bytes */
+	/* Dump the amount of gold stored in banks
+	    - uses 4 of the 48 future use bytes */
 	wr_u32b(p_ptr->bank_gold);
-  /* Dump the amount of gold needed for any layaway item
-       - uses 4 of the 48 future use bytes */
+	/* Dump the amount of gold needed for any layaway item
+	    - uses 4 of the 48 future use bytes */
  	wr_u32b(p_ptr->bank_layaway_gold);
-  if (p_ptr->bank_layaway_gold) {
-  	wr_u32b(p_ptr->bank_layaway_paid);
-  	wr_item(p_ptr->bank_layaway);
-  }
-  /* Dump the number of buildings owned by the player - uses 1 future use byte */
+	if (p_ptr->bank_layaway_gold) {
+		wr_u32b(p_ptr->bank_layaway_paid);
+		wr_item(p_ptr->bank_layaway);
+	}
+	/* Dump the number of buildings owned by the player - uses 1 future use byte */
  	wr_byte(p_ptr->ob_count);
-  /* Dump the number of player death chests outstanding - uses 1 future use byte */
+	/* Dump the number of player death chests outstanding - uses 1 future use byte */
 	wr_byte(p_ptr->dc_count);
+	/* Dump the number of ankhs used - uses 2 future use bytes */
 	wr_u16b(p_ptr->used_ankhs);
 	/* Dump the number of "lost" permanent pets - uses 1 future use byte */
 	wr_byte(p_ptr->lp_count);

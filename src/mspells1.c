@@ -847,6 +847,7 @@ bool make_attack_spell(int m_idx)
 		if (!f4 && !f5 && !f6) return (FALSE);
 	}
 
+	/* pick a spell to use */
 	thrown_spell = choose_attack_spell(m_idx, f4, f5, f6);
 
 	/* Abort if no spell was chosen */

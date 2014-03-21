@@ -1644,19 +1644,20 @@ struct player_command
  */
 typedef struct player_last_attack player_last_attack;
 struct player_last_attack {
-  byte type;
-  byte index;
-  char obj_loc;
-  object_type *obj;
-  /*
-   * if type is ranged, and index > 0, index is the tag same as @f{index} keymap
-   * if type is ranged, and index == 0, obj is the ammo
-   * if type is spell, obj is the spell book, and index is the spell
-   * if type is throw, and index > 0, index is the tag same as @v{index} keymap
-   * if type is throw, and index == 0, obj is the object to throw
-   * if type is 0, ignore the command
-   * obj_loc is the type of location the object is in
-   */
+	byte type;
+	byte index;
+	char obj_loc;
+	byte dir;
+	object_type *obj;
+	/*
+	 * if type is ranged, and index > 0, index is the tag same as @f{index} keymap
+	 * if type is ranged, and index == 0, obj is the ammo
+	 * if type is spell, obj is the spell book, and index is the spell
+	 * if type is throw, and index > 0, index is the tag same as @v{index} keymap
+	 * if type is throw, and index == 0, obj is the object to throw
+	 * if type is 0, ignore the command
+	 * obj_loc is the type of location the object is in
+	 */
 };
 
 /*
