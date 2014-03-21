@@ -4995,21 +4995,23 @@ int get_list_length(s16b list_start)
 /* Is the item on the floor? */
 bool floor_item(object_type *o_ptr)
 {
-	s16b *o_list = look_up_list(o_ptr);
+	return ((o_ptr->ix != 0) || (o_ptr->iy != 0));
+	/*s16b *o_list = look_up_list(o_ptr);
 
-	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
+	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);*/
 
 	/* On floor? */
-	if (o_list == &c_ptr->o_idx) return (TRUE);
+	/*if (o_list == &c_ptr->o_idx) return (TRUE);*/
 
 	/* Elsewhere */
-	return (FALSE);
+	/*return (FALSE);*/
 }
 
 /* Is the item in the players inventory or equipment? */
 bool player_item(object_type *o_ptr)
 {
-	return (!floor_item(o_ptr));
+	return ((o_ptr->ix == 0) && (o_ptr->iy == 0));
+	/*return (!floor_item(o_ptr));*/
 }
 
 
