@@ -514,6 +514,70 @@ static void player_wipe(void)
 	p_ptr->pet_follow_distance = PET_FOLLOW_DIST;
 }
 
+/*
+ * Try to wield everything wieldable in the inventory
+ */
+static void wield_all(void)
+{
+	object_type *q_ptr, *o_ptr;
+	int slot;
+
+	/* Test Inventory */
+	OBJ_ITT_START (p_ptr->inventory, q_ptr)
+	{
+		/* Check the slot */
+		slot = wield_slot(q_ptr);
+		if (slot < 0) {
+			continue;
+		}
+
+		/* Prevent wielding a cursed item */
+		if (cursed_p(q_ptr)) {
+			continue;
+		}
+
+		/* Access the wield slot */
+		o_ptr = &p_ptr->equipment[slot];
+
+		/* if we have something in the slot, see if we should switch */
+		if (o_ptr->k_idx) {
+			/* skip if this item is worth less than what is already wielded */
+			if (o_ptr->k_idx && (q_ptr->cost < o_ptr->cost)) {
+				/* Hack - rings are special, test against right ring too */
+				if (slot == EQUIP_LEFT) {
+					slot = EQUIP_RIGHT;
+					o_ptr = &p_ptr->equipment[slot];
+					if (o_ptr->k_idx && (q_ptr->cost < o_ptr->cost)) {
+						continue;
+					}
+				} else {
+					continue;
+				}
+			}
+
+			/* Take off the item */
+			(void)inven_takeoff(o_ptr);
+		}
+
+		/* Wear the new stuff */
+		swap_objects(o_ptr, q_ptr);
+
+		/* Fill in holes... */
+		if (!q_ptr->number) {
+			delete_held_object(&p_ptr->inventory, q_ptr);
+		}
+
+		/* Forget stack */
+		o_ptr->next_o_idx = 0;
+
+		/* Now no longer allocated in o_list[] */
+		o_ptr->allocated = FALSE;
+
+		/* Learn some "obvious" things about the item */
+		o_ptr->kn_flags[0] |= (o_ptr->flags[0] & TR0_EASY_MASK);
+	}
+	OBJ_ITT_END;
+}
 
 /*
  * Each player starts out with a few items, given as tval/sval pairs.
@@ -558,7 +622,7 @@ static const byte player_init[MAX_CLASS][3][2] =
 
 	{
 	 /* Paladin */
-	 {TV_HARD_ARMOR, SV_CHAIN_MAIL},
+	 {TV_HARD_ARMOR, SV_METAL_SCALE_MAIL},
 	 {TV_SWORD, SV_BROAD_SWORD},
 	 {TV_SCROLL, SV_SCROLL_PROTECTION_FROM_EVIL}
 	 },
@@ -567,7 +631,7 @@ static const byte player_init[MAX_CLASS][3][2] =
 	 /* Warrior-Mage */
 	 {TV_HELM, SV_METAL_CAP},
 	 {TV_SWORD, SV_SHORT_SWORD},
-	 {TV_HARD_ARMOR, SV_CHAIN_MAIL}
+	 {TV_HARD_ARMOR, SV_METAL_SCALE_MAIL}
 	 },
 
 	{
@@ -789,9 +853,12 @@ static void player_outfit(void)
 	if (jump_end_game) {
 		void player_birth_jump_end_game1(void);
 		player_birth_jump_end_game1();
-		/* the rest of the jump_end_game changes are at the
-		 * end of create_wilderness() in wild1.c */
+		/* the rest of the jump_end_game changes are at the end of
+		 * create_wilderness() in wild1.c and in birth-modify.c */
 	}
+
+	/* try to wield the initial items */
+	wield_all();
 }
 
 /* Locations of the tables on the screen */
