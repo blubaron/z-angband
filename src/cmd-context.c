@@ -378,6 +378,8 @@ int context_menu_player_2(int mx, int my)
 	} else
 	if (selected == 2) {
 		/* Toggle show map */
+		p_ptr->cmd.cmd = 'M';
+		repeat_check();
 		do_cmd_view_map();
 	} else
 	if (selected == 3) {
@@ -390,6 +392,8 @@ int context_menu_player_2(int mx, int my)
 	} else
 	if (selected == 5) {
 		/* show pet menu */
+		p_ptr->cmd.cmd = 'p';
+		repeat_check();
 		do_cmd_pet();
 	} else
 	if (selected == 6) {
@@ -536,21 +540,29 @@ int context_menu_player(int mx, int my)
 	case 1:
 		{
 			/* use an item */
+			p_ptr->cmd.cmd = 'u';
+			repeat_check();
 			do_cmd_use();
 		} break;
 	case 2:
 		{
 			/* Cast a spell */
+			p_ptr->cmd.cmd = 'm';
+			repeat_check();
 			do_cmd_cast_wrapper();
 		} break;
 	case 3:
 		{
 			/* search */
+			p_ptr->cmd.cmd = 's';
+			repeat_check();
 			do_cmd_search();
 		} break;
 	case 4:
 		{
 			/* rest */
+			p_ptr->cmd.cmd = 'R';
+			repeat_check();
 			do_cmd_rest();
 		} break;
 	case 5:
@@ -588,11 +600,15 @@ int context_menu_player(int mx, int my)
 	case 11:
 		{
 			/* go up stairs */
+			p_ptr->cmd.cmd = '<';
+			repeat_check();
 			do_cmd_go_up();
 		} break;
 	case 12:
 		{
 			/* go down stairs */
+			p_ptr->cmd.cmd = '>';
+			repeat_check();
 			do_cmd_go_down();
 		} break;
 	case 13:
@@ -630,6 +646,8 @@ int context_menu_player(int mx, int my)
 	case 16:
 		{
 			/* use character powers */
+			p_ptr->cmd.cmd = 'U';
+			repeat_check();
 			do_cmd_racial_power();
 		} break;
 
@@ -798,6 +816,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* use an item on the spot */
 		p_ptr->cmd.dir = 5;
 		p_ptr->cmd.cmd = 'u';
+		repeat_check();
 		do_cmd_use();
 		/*cmd_insert(CMD_USE_AIMED);
 		cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);*/
@@ -806,6 +825,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* cast a spell on the spot */
 		p_ptr->cmd.dir = 5;
 		p_ptr->cmd.cmd = 'm';
+		repeat_check();
 		do_cmd_cast_wrapper();
 		/*if (textui_obj_cast_ret() >= 0) {
 			cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);
@@ -816,6 +836,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.arg = 16;
 		p_ptr->cmd.cmd = '+';
+		repeat_check();
 		do_cmd_alter();
 		/*cmd_insert(CMD_ALTER);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -825,6 +846,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.arg = 1;
 		p_ptr->cmd.cmd = 'D';
+		repeat_check();
 		do_cmd_disarm();
 		/*cmd_insert(CMD_DISARM);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -836,6 +858,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.arg = 1;
 		p_ptr->cmd.cmd = 'W';
+		repeat_check();
 		do_cmd_walk(always_pickup);
 		easy_disarm = orig_disarm;
 		/*cmd_insert(CMD_JUMP);
@@ -846,6 +869,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		/*p_ptr->cmd.arg = 1;*/
 		p_ptr->cmd.cmd = 'c';
+		repeat_check();
 		do_cmd_close();
 		/*cmd_insert(CMD_CLOSE);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -855,6 +879,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		/*p_ptr->cmd.arg = 1;*/
 		p_ptr->cmd.cmd = 'o';
+		repeat_check();
 		do_cmd_open();
 		/*cmd_insert(CMD_OPEN);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -864,6 +889,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		/*p_ptr->cmd.arg = 1;*/
 		p_ptr->cmd.cmd = 'o';
+		repeat_check();
 		do_cmd_open();
 		/*p_ptr->cmd.cmd = 'B';
 		do_cmd_bash();*/
@@ -875,6 +901,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		/*p_ptr->cmd.arg = 1;*/
 		p_ptr->cmd.cmd = 'j';
+		repeat_check();
 		do_cmd_spike();
 		/*cmd_insert(CMD_JAM);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -884,6 +911,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.arg = 16;
 		p_ptr->cmd.cmd = 'T';
+		repeat_check();
 		do_cmd_tunnel();
 		/*cmd_insert(CMD_TUNNEL);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -892,6 +920,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* Search */
 		/*p_ptr->cmd.arg = 1;*/
 		p_ptr->cmd.cmd = 's';
+		repeat_check();
 		do_cmd_search();
 		/*cmd_insert(CMD_SEARCH);*/
 	} else
@@ -907,6 +936,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* walk towards the spot */
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.cmd = ';';
+		repeat_check();
 		do_cmd_walk(always_pickup);
 		/*cmd_insert(CMD_WALK);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -915,6 +945,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* run towards the spot */
 		p_ptr->cmd.dir = coords_to_dir(cx, cy);
 		p_ptr->cmd.cmd = '.';
+		repeat_check();
 		do_cmd_run();
 		/*cmd_insert(CMD_RUN);
 		cmd_set_arg_direction(cmd_get_top(), 0, coords_to_dir(cy,cx));*/
@@ -923,6 +954,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* Fire ammo towards the spot */
 		p_ptr->cmd.dir = 5;
 		p_ptr->cmd.cmd = 'f';
+		repeat_check();
 		do_cmd_fire();
 		/*cmd_insert(CMD_FIRE);
 		cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);*/
@@ -931,6 +963,7 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 		/* throw an item towards the spot */
 		p_ptr->cmd.dir = 5;
 		p_ptr->cmd.cmd = 'v';
+		repeat_check();
 		do_cmd_throw();
 		/*cmd_insert(CMD_THROW);
  		cmd_set_arg_target(cmd_get_top(), 1, DIR_TARGET);*/
@@ -957,6 +990,8 @@ int context_menu_cave(int cy, int cx, int adjacent, int mx, int my)
 	} else
 	if (selected == 19) {
 		/* issue a pet command */
+		p_ptr->cmd.cmd = 'p';
+		repeat_check();
 		do_cmd_pet();
 	}
 
