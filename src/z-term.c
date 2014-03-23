@@ -1422,6 +1422,12 @@ void Term_fresh(void)
 	term_win *scr = Term->scr;
 
 
+	/* If we have an ui override function, use it */
+	if (Term->term_fresh_hook) {
+		Term->term_fresh_hook();
+		return;
+	}
+
 	/* Do nothing unless "mapped" */
 	if (!Term->mapped_flag) return;
 

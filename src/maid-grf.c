@@ -1224,6 +1224,12 @@ void do_cmd_view_map(void)
 
 	void (*hook) (void);
 
+	/* If we have an ui override function, use it */
+	if (Term->view_map_hook) {
+		Term->view_map_hook(Term);
+		return;
+	}
+
 	/* Save screen */
 	screen_save();
 
