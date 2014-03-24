@@ -559,6 +559,11 @@ static void wield_all(void)
 			(void)inven_takeoff(o_ptr);
 		}
 
+		/* if we have more than one item, make sure that we only equip one */
+		if (q_ptr->number > 1) {
+			q_ptr = item_split(q_ptr, 1);
+		}
+
 		/* Wear the new stuff */
 		swap_objects(o_ptr, q_ptr);
 
