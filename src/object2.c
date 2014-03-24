@@ -5197,15 +5197,6 @@ static void item_optimize(object_type *o_ptr)
 {
 	s16b *list;
 
-	/* Default to looking under the player */
-	cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
-
-	/* The player could have moved due to a phase door scroll */
-	if (in_bounds2(o_ptr->ix, o_ptr->iy))
-	{
-		c_ptr = area(o_ptr->ix, o_ptr->iy);
-	}
-
 	/* Only optimize real items */
 	if (!o_ptr->k_idx) return;
 
@@ -5235,6 +5226,16 @@ static void item_optimize(object_type *o_ptr)
 	}
 	else
 	{
+		cave_type *c_ptr;
+
+		/* The player could have moved due to a phase door scroll */
+		if (in_bounds2(o_ptr->ix, o_ptr->iy)) {
+			c_ptr = area(o_ptr->ix, o_ptr->iy);
+		} else {
+			/* Default to looking under the player */
+			c_ptr = area(p_ptr->px, p_ptr->py);
+		}
+
 		/* Delete the object */
 		if (list == &p_ptr->inventory)
 		{
