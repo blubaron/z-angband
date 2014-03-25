@@ -4427,3 +4427,9 @@ bool mass_identify(void)
 	return (project_hack2(GF_IDENT, p_ptr->lev, PROJECT_ITEM));
 }
 
+bool mass_identify_fully(void)
+{
+	return (project_hack2(GF_IDENT_FULL, p_ptr->lev, PROJECT_ITEM));
+}
+
+

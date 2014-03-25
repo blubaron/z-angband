@@ -1160,6 +1160,56 @@ static bool project_o(int who, int r, int x, int y, int dam, int typ)
 				break;
 			}
 
+			case GF_IDENT_FULL:
+			{
+				/* Identify */
+				identify_item_fully(o_ptr);
+
+				break;
+			}
+
+			case GF_ALCHEMY:
+			{
+				int amt;
+				long price;
+
+				/* NOTE: keep current with alchemy in spells3.c */
+				/* Check for artifacts */
+				if (!can_player_destroy_object(o_ptr))
+				{
+					continue;
+				}
+
+				amt = o_ptr->number;
+				price = object_value_real(o_ptr);
+
+				if (price <= 0) {
+					/* We know it's worthless now */
+					object_worthless(o_ptr);
+				} else {
+					/* Formula changed.  Now it is harder & harder to get a lot of gold at once. */
+					price /= 3;
+
+					if (amt > 1) price *= amt;
+					if (price > 5000) price = 5000+(price-5000)/2;
+
+					p_ptr->au += price;
+
+					/* Redraw gold */
+					p_ptr->redraw |= (PR_GOLD);
+
+					/* Window stuff */
+					p_ptr->window |= (PW_PLAYER);
+
+				}
+
+				/* Eliminate the item */
+				item_increase(o_ptr, -amt);
+
+
+				break;
+			}
+
 			case GF_PURG_CURSE:
 			{
 				/* Purge curse - remove basic curses */

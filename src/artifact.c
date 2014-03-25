@@ -1608,6 +1608,12 @@ static const struct randart_activation randart_activations[] =
 		"banish_monsters(200)",
 		5, FALSE, 25000, 0, 0
 	},
+	{
+		"You learn about nearby objects!",
+		"mass identify",
+		"mass_identify(); identify_pack()",
+		5, FALSE, 25000, 0, 0
+	},
 
 	/* XXX stun, confuse, turn, stasis */
 

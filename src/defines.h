@@ -2455,11 +2455,13 @@
 #define GF_PETRIFY		99
 #define GF_SILENCE		100
 #define GF_TERRAFORM	101
-#define GF_PURG_CURSE	102
-#define GF_GROW     	  103		/* New types for Z- begin here... */
+#define GF_PURG_CURSE	102		/* New types for Z- begin here... */
+#define GF_GROW     	  103
 #define GF_WITHER   	  104
+#define GF_IDENT_FULL	  105
+#define GF_ALCHEMY	  106
 
-#define MAX_GF			104
+#define MAX_GF			106
 
 #define GF_ILLUSION		128   /* Illusion _offset_.  Illusionary fire, e.g. is GF_FIRE + GF_ILLUSION. */
 #define GF_STRONG_ILLUSION	256  /* Double-strength illusion. */

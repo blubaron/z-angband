@@ -1550,6 +1550,44 @@ void identify_pack(void)
 	notice_inven();
 }
 
+void identify_pack_fully(void)
+{
+	int i;
+	object_type *o_ptr;
+
+	/* Identify equipment */
+	for (i = 0; i < EQUIP_MAX; i++)
+	{
+		o_ptr = &p_ptr->equipment[i];
+
+		/* Skip non-objects */
+		if (!o_ptr->k_idx) continue;
+
+		/* Identify it */
+		identify_item_fully(o_ptr);
+	}
+
+	/* Identify inventory */
+	OBJ_ITT_START (p_ptr->inventory, o_ptr)
+	{
+		/* Identify it */
+		identify_item_fully(o_ptr);
+		/* HACK only identify one layer of pack contents - Brett */
+		if (o_ptr->tval == TV_CONTAINER) {
+			object_type *o2_ptr;
+			OBJ_ITT_START (o_ptr->contents_o_idx, o2_ptr)
+			{
+				identify_item_fully(o2_ptr);
+			}
+			OBJ_ITT_END;
+		}
+	}
+	OBJ_ITT_END;
+
+	/* Notice changes */
+	notice_inven();
+}
+
 /*
  * Try to remove a curse from an item
  *
@@ -1734,43 +1772,37 @@ bool alchemy(void)
 	/* Check for artifacts */
 	if (!can_player_destroy_object(o_ptr))
 	{
-    /* allow destroying artifacts if we have already completely identified it - Brett */
-    if (object_known_full(o_ptr))
-    {
-  	  if (!get_check("Really turn this artifact (%s) to gold? ", o_name)) return FALSE;
-    }
-    else
-    {
-		  /* Message */
-		  msgf("You fail to turn %s to gold!", o_name);
+		/* allow destroying artifacts if we have already completely identified it - Brett */
+		if (object_known_full(o_ptr)) {
+			if (!get_check("Really turn this artifact (%s) to gold? ", o_name)) return FALSE;
+		} else {
+			/* Message */
+			msgf("You fail to turn %s to gold!", o_name);
 
-		  /* Done */
-		  return FALSE;
-    }
+			/* Done */
+			return FALSE;
+		}
 	}
 
 	price = object_value_real(o_ptr);
 
-	if (price <= 0)
-	{
+	if (price <= 0) {
 		/* Message */
 		msgf("You turn %s to fool's gold.", o_name);
 
 		/* We know it's worthless now */
 		object_worthless(o_ptr);
-	}
-	else
-	{
+	} else {
 		/* Formula changed.  Now it is harder & harder to get a lot of gold at once. */
 		price /= 3;
 
 		if (amt > 1) price *= amt;
 
-		//if (price > 20000) price = 20000+(price-20000)/2;
-		//if (price > 10000) price = 10000+(price-10000)/2;
+		/*if (price > 20000) price = 20000+(price-20000)/2;*/
+		/*if (price > 10000) price = 10000+(price-10000)/2;*/
 		if (price > 5000) price = 5000+(price-5000)/2;
 
-		//if (price > 30000) price = 30000;
+		/*if (price > 30000) price = 30000;*/
 		if (price) msgf("You turn %s to %ld coins worth of gold.", o_name, price);
 		else msgf ("You turn %s into fine gold dust.", o_name);
 		p_ptr->au += price;
@@ -2447,6 +2479,22 @@ void identify_item(object_type *o_ptr)
 
 	/* Window stuff */
 	p_ptr->window |= (PW_PLAYER);
+
+	/* Notice changes */
+	notice_item();
+}
+
+void identify_item_fully(object_type *o_ptr)
+{
+	/* identify it */
+	identify_item(o_ptr);
+	object_mental(o_ptr);
+
+	/* Save all the known flags */
+	o_ptr->kn_flags[0] = o_ptr->flags[0];
+	o_ptr->kn_flags[1] = o_ptr->flags[1];
+	o_ptr->kn_flags[2] = o_ptr->flags[2];
+	o_ptr->kn_flags[3] = o_ptr->flags[3];
 
 	/* Notice changes */
 	notice_item();

@@ -1583,6 +1583,18 @@ static int toluaI_spell_identify_pack00(lua_State* tolua_S)
  return 0;
 }
 
+/* function: identify_pack_fully */
+static int toluaI_spell_identify_pack_fully00(lua_State* tolua_S)
+{
+ if (!tolua_isnoobj(tolua_S,1))
+ {
+  TOLUA_ERR_FN(identify_pack_fully);
+ } else {
+  identify_pack_fully();
+ }
+ return 0;
+}
+
 /* function: remove_curse */
 static int toluaI_spell_remove_curse00(lua_State* tolua_S)
 {
@@ -1744,6 +1756,20 @@ static int toluaI_spell_identify_item00(lua_State* tolua_S)
  return 0;
 }
 
+/* function: identify_item_fully */
+static int toluaI_spell_identify_item_fully00(lua_State* tolua_S)
+{
+ if (!tolua_istype(tolua_S,1,tolua_tag(tolua_S,"object_type"),0) ||
+     !tolua_isnoobj(tolua_S,2))
+ {
+  TOLUA_ERR_FN(identify_item_fully);
+ } else {
+  object_type* o_ptr = ((object_type*)  tolua_getusertype(tolua_S,1,0));
+  identify_item_fully(o_ptr);
+ }
+ return 0;
+}
+
 /* function: identify_fully */
 static int toluaI_spell_identify_fully00(lua_State* tolua_S)
 {
@@ -1755,6 +1781,33 @@ static int toluaI_spell_identify_fully00(lua_State* tolua_S)
   tolua_pushbool(tolua_S,(int)toluaI_ret);
  }
  return 1;
+}
+
+/* function: mass_identify */
+static int toluaI_spell_mass_identify00(lua_State* tolua_S)
+{
+ if (!tolua_isnoobj(tolua_S,1))
+ {
+  TOLUA_ERR_FN(mass_identify);
+ } else {
+  bool toluaI_ret = (bool)  mass_identify();
+  tolua_pushbool(tolua_S,(int)toluaI_ret);
+ }
+ return 0;
+}
+
+/* function: mass_identify_fully */
+static int toluaI_spell_mass_identify_fully00(lua_State* tolua_S)
+{
+ if (!tolua_isnoobj(tolua_S,1))
+ {
+  TOLUA_ERR_FN(mass_identify_fully);
+ } else {
+  bool toluaI_ret = (bool)  mass_identify_fully();
+  tolua_pushbool(tolua_S,(int)toluaI_ret);
+ }
+
+ return 0;
 }
 
 /* function: recharge */
@@ -2159,6 +2212,8 @@ int tolua_spell_open (lua_State* tolua_S)
  TOLUA_DEF(GF_PURG_CURSE);
  TOLUA_DEF(GF_GROW);
  TOLUA_DEF(GF_WITHER);
+ TOLUA_DEF(GF_IDENT_FULL);
+ TOLUA_DEF(GF_ALCHEMY);
  TOLUA_DEF(MAX_GF);
  TOLUA_DEF(PROJECT_JUMP);
  TOLUA_DEF(PROJECT_BEAM);
@@ -2276,6 +2331,7 @@ int tolua_spell_open (lua_State* tolua_S)
  TOLUA_FUN(warding_glyph,toluaI_spell_warding_glyph00);
  TOLUA_FUN(explosive_rune,toluaI_spell_explosive_rune00);
  TOLUA_FUN(identify_pack,toluaI_spell_identify_pack00);
+ TOLUA_FUN(identify_pack_fully,toluaI_spell_identify_pack_fully00);
  TOLUA_FUN(remove_curse,toluaI_spell_remove_curse00);
  TOLUA_FUN(remove_all_curse,toluaI_spell_remove_all_curse00);
  TOLUA_FUN(alchemy,toluaI_spell_alchemy00);
@@ -2287,7 +2343,10 @@ int tolua_spell_open (lua_State* tolua_S)
  TOLUA_FUN(ident_scroll,toluaI_spell_ident_scroll00);
  TOLUA_FUN(mundane_spell,toluaI_spell_mundane_spell00);
  TOLUA_FUN(identify_item,toluaI_spell_identify_item00);
+ TOLUA_FUN(identify_item_fully,toluaI_spell_identify_item_fully00);
  TOLUA_FUN(identify_fully,toluaI_spell_identify_fully00);
+ TOLUA_FUN(mass_identify,toluaI_spell_mass_identify00);
+ TOLUA_FUN(mass_identify_fully,toluaI_spell_mass_identify_fully00);
  TOLUA_FUN(recharge,toluaI_spell_recharge00);
  TOLUA_FUN(bless_weapon,toluaI_spell_bless_weapon00);
  TOLUA_FUN(acid_dam,toluaI_spell_acid_dam00);
@@ -2400,6 +2459,8 @@ void tolua_spell_close (lua_State* tolua_S)
  TOLUA_UNDEF(GF_PURG_CURSE);
  TOLUA_UNDEF(GF_GROW);
  TOLUA_UNDEF(GF_WITHER);
+ TOLUA_UNDEF(GF_IDENT_FULL);
+ TOLUA_UNDEF(GF_ALCHEMY);
  TOLUA_UNDEF(MAX_GF);
  TOLUA_UNDEF(PROJECT_JUMP);
  TOLUA_UNDEF(PROJECT_BEAM);
@@ -2517,6 +2578,7 @@ void tolua_spell_close (lua_State* tolua_S)
  TOLUA_UNDEF(warding_glyph);
  TOLUA_UNDEF(explosive_rune);
  TOLUA_UNDEF(identify_pack);
+ TOLUA_UNDEF(identify_pack_fully);
  TOLUA_UNDEF(remove_curse);
  TOLUA_UNDEF(remove_all_curse);
  TOLUA_UNDEF(alchemy);
@@ -2528,7 +2590,10 @@ void tolua_spell_close (lua_State* tolua_S)
  TOLUA_UNDEF(ident_scroll);
  TOLUA_UNDEF(mundane_spell);
  TOLUA_UNDEF(identify_item);
+ TOLUA_UNDEF(identify_item_fully);
  TOLUA_UNDEF(identify_fully);
+ TOLUA_UNDEF(mass_identify);
+ TOLUA_UNDEF(mass_identify_fully);
  TOLUA_UNDEF(recharge);
  TOLUA_UNDEF(bless_weapon);
  TOLUA_UNDEF(acid_dam);
