@@ -164,24 +164,12 @@ void player_birth_jump_end_game1(void)
     j = 23-j-1;
     for (i = 0; i < j; i++) {
 		  q_ptr = make_object(80, 20, NULL);
-      identify_item(q_ptr);
-	    /* Save all the known flags */
-	    q_ptr->kn_flags[0] = q_ptr->flags[0];
-	    q_ptr->kn_flags[1] = q_ptr->flags[1];
-	    q_ptr->kn_flags[2] = q_ptr->flags[2];
-	    q_ptr->kn_flags[3] = q_ptr->flags[3];
-		  object_aware(q_ptr); object_known(q_ptr); object_mental(q_ptr);
+      identify_item_fully(q_ptr);
 		  q_ptr->info |= OB_NO_EXP;	(void)inven_carry(q_ptr);
     }
     /* add a backpack */
 	  q_ptr = object_prep(lookup_kind(TV_CONTAINER, 17));
-    identify_item(q_ptr);
-	  /* Save all the known flags */
-	  q_ptr->kn_flags[0] = q_ptr->flags[0];
-	  q_ptr->kn_flags[1] = q_ptr->flags[1];
-	  q_ptr->kn_flags[2] = q_ptr->flags[2];
-	  q_ptr->kn_flags[3] = q_ptr->flags[3];
-		object_aware(q_ptr); object_known(q_ptr); object_mental(q_ptr);
+    identify_item_fully(q_ptr);
 		q_ptr->info |= OB_NO_EXP;	(void)inven_carry(q_ptr);
   }
   /* give the player all flavor/monster knowledge */
@@ -308,14 +296,8 @@ void player_birth_jump_end_game2(void)
         int a_idx = quest[i].data.fit.a_idx;
         object_type *o_ptr;
         o_ptr = create_named_art(a_idx);
-        identify_item(o_ptr);
-	      /* Save all the known flags */
-	      o_ptr->kn_flags[0] = o_ptr->flags[0];
-	      o_ptr->kn_flags[1] = o_ptr->flags[1];
-	      o_ptr->kn_flags[2] = o_ptr->flags[2];
-	      o_ptr->kn_flags[3] = o_ptr->flags[3];
-		    object_aware(o_ptr); object_known(o_ptr);
-		    object_mental(o_ptr);	(void)inven_carry(o_ptr);
+        identify_item_fully(o_ptr);
+	(void)inven_carry(o_ptr);
       }
       if ((quest[i].type == QUEST_TYPE_BOUNTY)
         || (quest[i].type == QUEST_TYPE_DEFEND))
