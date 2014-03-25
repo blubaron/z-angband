@@ -4214,12 +4214,12 @@ void do_cmd_save_game(int is_autosave)
 	if (is_autosave)
 	{
 	  prtf(0, 0, "Autosaving the game...");
-		//msgf("Autosaving the game...");
+		/*msgf("Autosaving the game...");*/
 	}
 	else
 	{
   	prtf(0, 0, "Saving the game...");
-		//msgf("Saving the game...");
+		/*msgf("Saving the game...");*/
 		/* Disturb the player */
 		disturb(TRUE);
 	}
@@ -4231,7 +4231,7 @@ void do_cmd_save_game(int is_autosave)
 	handle_stuff();
 
 	/* Message */
-	//prtf(0, 0, "Saving game...");
+	/*prtf(0, 0, "Saving game...");*/
 
 	/* Refresh */
 	Term_fresh();
@@ -4252,6 +4252,12 @@ void do_cmd_save_game(int is_autosave)
 	else
 	{
 		prtf(0, 0, "Saving game... failed!");
+		if (file_exists(savefile)) {
+			/* delete the file */
+			safe_setuid_grab();
+			(void)file_delete(savefile);
+			safe_setuid_drop();
+		}
 	}
 
 	/* Allow suspend again */
@@ -4275,38 +4281,52 @@ void do_cmd_save_game(int is_autosave)
 		/* Copy the file */
 		char newsf[1024];
 		char oldsf[1024];
-		//char buf[1024];
 
-		strnfmt(oldsf, 1024, "%s", savefile);
-		/*strnfmt(newsf, 1024, "%s.auto", savefile);
-		 * add a second autosave slot, for additional protection */
-		//if (autosave_freq & 1) {
-		if (sf_saves & 1) {
-			strnfmt(newsf, 1024, "%s.auto1", savefile);
-			//autosave_freq -= 1;
-		} else {
-			strnfmt(newsf, 1024, "%s.auto", savefile);
-			//autosave_freq += 1;
+		/* build the backup filenames */
+		strnfmt(oldsf, 1024, "%s.auto", savefile);
+		strnfmt(newsf, 1024, "%s.auto1", savefile);
+
+		/* add a second autosave slot, for additional protection */
+		if (file_exists(oldsf)) {
+			/* Grab permissions */
+			safe_setuid_grab();
+
+			/* Remove the old backup */
+			(void)file_delete(newsf);
+
+			/* Preserve current backup savefile */
+			(void)file_move(oldsf,newsf);
+
+			/* Drop permissions */
+			safe_setuid_drop();
 		}
 
-		/* Grab permissions */
-		safe_setuid_grab();
+		/* Backup the last save */
+		if (file_exists(savefile)) {
+			/* Grab permissions */
+			safe_setuid_grab();
 
-		/* Remove the old backup */
-		(void)file_delete(newsf);
+			/* Remove the old backup */
+			(void)file_delete(oldsf);
 
-		/* Preserve current savefile */
-		(void)file_move(oldsf,newsf);
+			/* Preserve current savefile */
+			(void)file_move(savefile,oldsf);
 
-		/* Drop permissions */
-		safe_setuid_drop();
+			/* Drop permissions */
+			safe_setuid_drop();
+		}
 
+		/* TODO: implement a file copy function instead of
+		 * calling save_player() again
+		 * if (file_copy(savefile,oldsf)) { */
+		/* resave the savefile */
 		if (!save_player())
 		{
 			msgf ("Autosave backup failed.");
 
 			safe_setuid_grab();
-			(void)file_delete(oldsf);
+			(void)file_delete(savefile);
+			(void)file_move(oldsf,savefile);
 			(void)file_move(newsf,oldsf);
 			safe_setuid_drop();
 		} else {
