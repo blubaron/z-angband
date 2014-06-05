@@ -246,7 +246,7 @@ void do_cmd_messages(void)
 				"[Press $U'$Np$R' for older$Yp$V, $U'$Nn$R' for newer$Yn$V, ..., or $U$NESCAPE$R$Y"ESCAPE_STR"$V]");
 
 		/* Get a command */
-		k = inkey();
+		k = inkey_m();
 
 		/* restore any previous mouse buttons */
 		button_restore();
@@ -256,6 +256,56 @@ void do_cmd_messages(void)
 
 		/* Hack -- Save the old index */
 		j = i;
+
+		if (k & 0x80) {
+			/* translate a mouse press */
+			char mb, mods;
+			int mx, my;
+			Term_getmousepress(&mb, &mx, &my);
+			mods = mb & 0x78;
+			mb = mb & 0x07;
+			k = 0;
+			if (mb == 2) {
+				/* Exit on Escape */
+				break;
+			} else
+			if (mb == 1) {
+				/* show newer or older messages depending where the press is */
+				if (n > hgt - 4) {
+					/* move the page up or down */
+					if ((my > 1) && (my < hgt-2)) {
+						i += my - 2 - ((hgt-4)>>1);
+						if (i<0) i = 0;
+						if (i>n-(hgt-4)) i = n-(hgt-4);
+					}
+				}
+			} else
+			if (mb == 4) {
+				/* scroll up */
+				/* Go older (if able) */
+ 				if (n > hgt - 4) {
+					if (mods & 32) {
+						i = (i >= (hgt - 4) / 2) ? (i - (hgt - 4) / 2) : 0;
+					} else {
+						i = (i >= 1) ? (i - 1) : 0;
+					}
+				}
+				//if (i < 0) i = 0;
+			} else
+			if (mb == 5) {
+				/* scroll down */
+				/* Go newer if legal */
+ 				if (n > hgt - 4) {
+					if (mods & 32) {
+						if (i + (hgt - 4) / 2 < n) i += (hgt - 4) / 2;
+					} else {
+						if (i + 1 < n) i += 1;
+					}
+					if (i>n-(hgt-4)) i = n-(hgt-4);
+				}
+			}
+			/* otherwise do nothing */
+		}
 
 		/* Horizontal scroll */
 		if (k == '4')
@@ -451,7 +501,7 @@ void do_cmd_messages_reverse(void)
 				"[Press $U'$Np$R' for older$Yp$V, $U'$Nn$R' for newer$Yn$V, ..., or $U$NESCAPE$R$Y"ESCAPE_STR"$V]");
 
 		/* Get a command */
-		k = inkey();
+		k = inkey_m();
 
 		/* restore any previous mouse buttons */
 		button_restore();
@@ -461,6 +511,56 @@ void do_cmd_messages_reverse(void)
 
 		/* Hack -- Save the old index */
 		j = i;
+
+		if (k & 0x80) {
+			/* translate a mouse press */
+			char mb, mods;
+			int mx, my;
+			Term_getmousepress(&mb, &mx, &my);
+			mods = mb & 0x78;
+			mb = mb & 0x07;
+			k = 0;
+			if (mb == 2) {
+				/* Exit on Escape */
+				break;
+			} else
+			if (mb == 1) {
+				/* show newer or older messages depending where the press is */
+				if (n > hgt - 4) {
+					/* move the page up or down */
+					if ((my > 1) && (my < hgt-2)) {
+						i += my - 2 - ((hgt-4)>>1);
+						if (i<0) i = 0;
+						if (i>n-(hgt-4)) i = n-(hgt-4);
+					}
+				}
+			} else
+			if (mb == 4) {
+				/* scroll up */
+				/* Go newer (if able) */
+ 				if (n > hgt - 4) {
+					if (mods & 32) {
+						i = (i >= (hgt - 4) / 2) ? (i - (hgt - 4) / 2) : 0;
+					} else {
+						i = (i >= 1) ? (i - 1) : 0;
+					}
+				}
+				//if (i < 0) i = 0;
+			} else
+			if (mb == 5) {
+				/* scroll down */
+				/* Go older if legal */
+ 				if (n > hgt - 4) {
+					if (mods & 32) {
+						if (i + (hgt - 4) / 2 < n) i += (hgt - 4) / 2;
+					} else {
+						if (i + 1 < n) i += 1;
+					}
+					if (i>n-(hgt-4)) i = n-(hgt-4);
+				}
+			}
+			/* otherwise do nothing */
+		}
 
 		/* Horizontal scroll */
 		if (k == '4')
