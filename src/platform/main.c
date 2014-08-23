@@ -312,6 +312,27 @@ static void change_path(cptr info)
 			break;
 		}
 
+		case 'g':
+		{
+			string_free(ANGBAND_DIR_XTRA_GRAF);
+			ANGBAND_DIR_XTRA_GRAF = string_make(s + 1);
+			break;
+		}
+
+		case 'n':
+		{
+			string_free(ANGBAND_DIR_XTRA_FONT);
+			ANGBAND_DIR_XTRA_FONT = string_make(s + 1);
+			break;
+		}
+
+		case 'o':
+		{
+			string_free(ANGBAND_DIR_XTRA_SOUND);
+			ANGBAND_DIR_XTRA_SOUND = string_make(s + 1);
+			break;
+		}
+
 		case 'b':
 		{
 			string_free(ANGBAND_DIR_BONE);
