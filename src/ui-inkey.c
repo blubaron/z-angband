@@ -688,7 +688,7 @@ char inkey(void)
 	term *old = Term;
 
 	/* Hack -- Use the "inkey_next" pointer */
-	if (inkey_next && *inkey_next && !p_ptr->cmd.inkey_xtra)
+	while (inkey_next && *inkey_next && !p_ptr->cmd.inkey_xtra)
 	{
 		/* Get next character, and advance */
 		ch = *inkey_next++;
@@ -698,6 +698,28 @@ char inkey(void)
 		p_ptr->cmd.inkey_xtra = FALSE;
 		p_ptr->cmd.inkey_flag = FALSE;
 		p_ptr->cmd.inkey_scan = FALSE;
+
+		/* peek at the key, and see if we want to skip more prompts */
+		/* use parentheses because it fits the usage and I don't think
+		 *  anyone will want to load/save screen dumps in keymaps */
+		if (ch == '(') {
+			p_ptr->state.skip_more = TRUE;
+			/* since we are not returning this char, make sure the next key below works well */
+			if (!inkey_next || !(*inkey_next)) {
+				ch = 0;
+				break;
+			}
+			continue;
+		} else
+		if (ch == ')') {
+			p_ptr->state.skip_more = FALSE;
+			/* since we are not returning this char, make sure the next key below works well */
+			if (!inkey_next || !(*inkey_next)) {
+				ch = 0;
+				break;
+			}
+			continue;
+		}
 
 		/* Accept result */
 		return (ch);
