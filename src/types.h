@@ -465,23 +465,27 @@ typedef struct vault_symbol vault_symbol;
 
 struct vault_symbol
 {
-  struct vault_symbol *pNext;
+	struct vault_symbol *pNext;
 
-	byte sym;	/* symbol that will be used */
-	/*byte type;*/	/* type of id (feature, field, monster, object, monster group, or object tval) */
-	/*u16b id;*/	/* id used with the symbol */
+	char sym;	/* symbol that will be used */
 	byte flags;
 	u16b feat;	/* feature used */
 	u16b feat_mod_flags;	/* feature used */
 	s16b r_idx;	/* monster race - if r_idx < 0 make hero from -r_idx */
 	s16b k_idx;	/* object kind - if k_idx < 0 make randart from -k_idx */
 	s16b ego;	  /* ego used or artifact idx - if ego < 0 make artifact from -ego */
-	/* # if ego > 0, if k_idx > 0, use k_idx as base if appropiate tval for ego
-	 *# if ego > 0, if k_idx < 0, make randart that includes ego
-	 *# if ego > 0, if k_idx = 0, pick random object for ego */
+	/* if ego > 0, if k_idx > 0, use k_idx as base if appropriate tval for ego
+	 * if ego > 0, if k_idx < 0, make randart that includes ego
+	 * if ego > 0, if k_idx = 0, pick random object for ego */
 	u16b trap;	/* trap/field used on the spot */
 	/* if r_idx, k_idx, or trap start with '*', then the number means out
 	 * of depth rather than index
+	 * if k_idx starts with '#', then k_idx is an object tval, rather than
+	 *  an index. an out of depth tval would be "#{tval}*{depthdiff}".
+	 *  ego/randart rules are the same.
+	 * if r_idx starts with '#', then r_idx is a monster group index, rather
+	 *  than a monster race index. an out of depth monster group would be
+	 *  "#{grp_idx}*{depthdiff}". hero/depth rules are the same.
 	 */
 };
 

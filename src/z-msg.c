@@ -468,6 +468,12 @@ void messages_free(void)
 	ZFREE(message__ptr);
 	ZFREE(message__buf);
 	ZFREE(message__type);
+	
+	/* reset the variables */
+	message__head = 0;
+	message__tail = 0;
+	message__next = 0;
+	message__last = 0;
 }
 
 

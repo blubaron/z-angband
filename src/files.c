@@ -369,38 +369,38 @@ errr process_pref_file_command(char *buf)
 			f_ptr = &f_info[i];
 			if (n1) f_ptr->x_attr = n1;
 			if (n2) f_ptr->x_char = n2;
-		  f_ptr->xd_attr = f_ptr->x_attr;
-		  f_ptr->xd_char = f_ptr->x_char;
-		  f_ptr->xl_attr = f_ptr->x_attr;
-		  f_ptr->xl_char = f_ptr->x_char;
-      if (count == 7) {
-			  n1 = strtol(zz[3], NULL, 0);
-			  n2 = strtol(zz[4], NULL, 0);
-			  if (n1) f_ptr->xd_attr = n1;
-			  if (n2) f_ptr->xd_char = n2;
+			f_ptr->xd_attr = f_ptr->x_attr;
+			f_ptr->xd_char = f_ptr->x_char;
+			f_ptr->xl_attr = f_ptr->x_attr;
+			f_ptr->xl_char = f_ptr->x_char;
+			if (count == 7) {
+				n1 = strtol(zz[3], NULL, 0);
+				n2 = strtol(zz[4], NULL, 0);
+				if (n1) f_ptr->xd_attr = n1;
+				if (n2) f_ptr->xd_char = n2;
 
-			  n1 = strtol(zz[5], NULL, 0);
-			  n2 = strtol(zz[6], NULL, 0);
-			  if (n1) f_ptr->xl_attr = n1;
-			  if (n2) f_ptr->xl_char = n2;
-      } else
-      if (count == 5) {
-			  n1 = strtol(zz[3], NULL, 0);
-			  n2 = strtol(zz[4], NULL, 0);
-			  if (n1) f_ptr->xd_attr = n1;
-			  if (n2) f_ptr->xd_char = n2;
-      } else
-      {
-        if (f_ptr->x_attr < 16) {
-			    /* If is ascii graphics */
-		      f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
-		      f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
-        }/* else
-        if (f_ptr->flags & FF_USE_TRANS) {
-          f_ptr->xd_char += 1;
-          f_ptr->xl_char -= 1;
-        }*/
-      }
+				n1 = strtol(zz[5], NULL, 0);
+				n2 = strtol(zz[6], NULL, 0);
+				if (n1) f_ptr->xl_attr = n1;
+				if (n2) f_ptr->xl_char = n2;
+			} else
+			if (count == 5) {
+				n1 = strtol(zz[3], NULL, 0);
+				n2 = strtol(zz[4], NULL, 0);
+				if (n1) f_ptr->xd_attr = n1;
+				if (n2) f_ptr->xd_char = n2;
+			} else
+			{
+				if (f_ptr->x_attr < 16) {
+					/* If is ascii graphics */
+					f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
+					f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
+				}/* else
+				if (f_ptr->flags & FF_USE_TRANS) {
+					f_ptr->xd_char += 1;
+					f_ptr->xl_char -= 1;
+				}*/
+			}
 			return (0);
 		}
 	}
