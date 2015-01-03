@@ -1656,6 +1656,11 @@
 #define FT_GLYPH_ABSORB			0x009E
 #define FT_BUILD_EMPTY          0x009F
 
+#define FT_OBJECT_PILE          160
+#define FT_TRAP_DETECT          161
+#define FT_UNKNOWN_OBJ          162
+#define FT_UNKNOWN_GOLD         163
+#define FT_UNKNOWN_MON          164
 
 /*** Artifact indexes (see "lib/edit/a_info.txt") ***/
 

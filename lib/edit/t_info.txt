@@ -2590,3 +2590,20 @@ L:BUILD2:if (command == 'B') then
 #L:BUILD2: building_buy_info()
 L:BUILD2:	done = TRUE
 L:BUILD2:end
+
+# Fields to hold special visuals
+# if changed, also change hard-coded value in defines.h
+N:160:Object pile
+G:*:W
+
+N:161:Trap Detect Border
+G:*:g
+
+N:162:Unknown Object
+G:*:o
+
+N:163:Unknown Treasure
+G:*:y
+
+N:164:Unknown Creature
+G:*:r
