@@ -2586,14 +2586,14 @@
 
 /*
  * Object kind flags */
-#define OK_AWARE		0x01	/* Aware of the object kind */
-#define OK_TRIED		0x02	/* Have tried the object without success */
-#define OK_WORTHLESS	0x04	/* Unaware, but know the kind is worthless */
-#define OK_CURSED		0x08	/* Unaware, but know the kind can be cursed */
-#define OK_EASY_KNOW	0x10	/* Object is always known if aware */
-#define OK_DUMMY2		0x20
-#define OK_DUMMY3		0x40
-#define OK_DUMMY4		0x80
+#define OK_AWARE        0x01	/* Aware of the object kind */
+#define OK_TRIED        0x02	/* Have tried the object without success */
+#define OK_WORTHLESS    0x04	/* Unaware, but know the kind is worthless */
+#define OK_CURSED       0x08	/* Unaware, but know the kind can be cursed */
+#define OK_EASY_KNOW    0x10	/* Object is always known if aware */
+#define OK_SKIP_FLAVOR  0x20
+#define OK_DUMMY3       0x40
+#define OK_DUMMY4       0x80
 
 
 /*
@@ -3876,7 +3876,8 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
  * Default to user definitions.
  */
 #define object_attr(T) \
-	((k_info[(T)->k_idx].flavor) ? \
+	(((k_info[(T)->k_idx].flavor) \
+	 && !((k_info[(T)->k_idx].info & OK_SKIP_FLAVOR) && object_known_p(T))) ? \
 	 (misc_to_attr[k_info[(T)->k_idx].flavor]) : \
 	 (k_info[(T)->k_idx].x_attr))
 
@@ -3886,7 +3887,8 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
  * Default to user definitions.
  */
 #define object_char(T) \
-	((k_info[(T)->k_idx].flavor) ? \
+	(((k_info[(T)->k_idx].flavor) \
+	 && !((k_info[(T)->k_idx].info & OK_SKIP_FLAVOR) && object_known_p(T))) ? \
 	 (misc_to_char[k_info[(T)->k_idx].flavor]) : \
 	 (k_info[(T)->k_idx].x_char))
 
