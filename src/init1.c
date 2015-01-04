@@ -6014,6 +6014,7 @@ void clear_dun_info()
 			}
 		}
 		ZFREE(dungeons);
+		z_info->dun_max = 0;
 	}
 }
 

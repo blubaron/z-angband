@@ -3370,7 +3370,7 @@ static bool create_towns(int *xx, int *yy)
 				if (!pl_ptr->dungeon)
 				{
 					/* Use sewer */
-					init_dungeon(pl_ptr, &dungeons[2]);
+					init_dungeon(pl_ptr, &dungeons[DUNGEON_SEWERS]);
 				}
 
 
@@ -3557,7 +3557,7 @@ static bool create_towns(int *xx, int *yy)
 	for (i = 0; i < high_count; i++) {
 		if (place[high_count_place].store[i].type == BUILD_STAIRS) {
 			/* use the vanilla dungeon type */
-			init_dungeon(&(place[high_count_place]), &(dungeons[1]));
+			init_dungeon(&(place[high_count_place]), &(dungeons[DUNGEON_VANILLA]));
 			break;
 		}
 	}
@@ -3588,7 +3588,7 @@ static bool create_towns(int *xx, int *yy)
 			/* use this spot for the stairs */
 			build_init(high_count_place, i, BUILD_STAIRS);
 			/* use the vanilla dungeon type */
-			init_dungeon(&(place[high_count_place]), &(dungeons[1]));
+			init_dungeon(&(place[high_count_place]), &(dungeons[DUNGEON_VANILLA]));
 		}
 	}
 
@@ -4295,7 +4295,7 @@ void init_vanilla_town(void)
 	}
 
 	/* Create dungeon */
-  init_dungeon(pl_ptr, &dungeons[1]);
+	init_dungeon(pl_ptr, &dungeons[DUNGEON_VANILLA]);
 	d_ptr = pl_ptr->dungeon;
 	d_ptr->max_level = MAX_DEPTH - 1;
 	d_ptr->min_level = 1;

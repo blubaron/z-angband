@@ -2534,8 +2534,8 @@ void generate_cave(void)
 	/* Get random dungeon */
 	if (vanilla_town)
 	{
-		/* Use d_ptr = DUN_TYPE_VANILLA */
-		const dun_gen_type *d_ptr = &dungeons[13];
+		/* Use d_ptr = DUNGEON_VANILLA */
+		const dun_gen_type *d_ptr = &dungeons[DUNGEON_VANILLA];
 
 		/* Get floor type */
 		dundata->floor = d_ptr->floor;

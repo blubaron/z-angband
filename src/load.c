@@ -3421,16 +3421,16 @@ static errr rd_savefile_new_aux(void)
 							}
 						}
 						if (j == z_info->dun_max+1) {
-							dun_ptr->didx = 1;
-							dun_ptr->rubble = dungeons[1].rubble;
-							dun_ptr->door_closed = dungeons[1].door_closed;
-							dun_ptr->door_open = dungeons[1].door_open;
-							dun_ptr->door_broken = dungeons[1].door_broken;
-							dun_ptr->door_secret = dungeons[1].door_secret;
-							dun_ptr->stairs_up = dungeons[1].stairs_up;
-							dun_ptr->stairs_down = dungeons[1].stairs_down;
-							dun_ptr->stairs_closed = dungeons[1].stairs_closed;
-							dun_ptr->pillar = dungeons[1].pillar;
+							dun_ptr->didx = DUNGEON_VANILLA;
+							dun_ptr->rubble = dungeons[DUNGEON_VANILLA].rubble;
+							dun_ptr->door_closed = dungeons[DUNGEON_VANILLA].door_closed;
+							dun_ptr->door_open = dungeons[DUNGEON_VANILLA].door_open;
+							dun_ptr->door_broken = dungeons[DUNGEON_VANILLA].door_broken;
+							dun_ptr->door_secret = dungeons[DUNGEON_VANILLA].door_secret;
+							dun_ptr->stairs_up = dungeons[DUNGEON_VANILLA].stairs_up;
+							dun_ptr->stairs_down = dungeons[DUNGEON_VANILLA].stairs_down;
+							dun_ptr->stairs_closed = dungeons[DUNGEON_VANILLA].stairs_closed;
+							dun_ptr->pillar = dungeons[DUNGEON_VANILLA].pillar;
 							dun_ptr->level_change_step = 1;
 						}
 

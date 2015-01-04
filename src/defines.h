@@ -127,6 +127,9 @@
 #define DF_BASIC  	0x00080000  /* this type is a regular dungeon, that appears in the wilderness */
 #define DF_GUARDED	0x00100000  /* this dungeon is always guarded in the wilderness */
 
+#define DUNGEON_TOWN    0 /* index of the dungeon type used to change town visuals in dungeons.txt */
+#define DUNGEON_VANILLA 1 /* index of the vanilla dungeon type in dungeons.txt */
+#define DUNGEON_SEWERS  2 /* index of the dungeon type used in town sewers in dungeons.txt */
 
 
 /*
