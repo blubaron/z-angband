@@ -1872,9 +1872,9 @@ static bool player_birth_random(void)
 
 	/*** pick a random race ***/
 	/* give priority to races early in the list */
-	if (MAX_RACES > 10) {
-		p_ptr->rp.prace = (unsigned char) randint0(20);
-		if (p_ptr->rp.prace > 10)
+	if (MAX_RACES > 9) {
+		p_ptr->rp.prace = (unsigned char) randint0(18);
+		if (p_ptr->rp.prace > 9)
 			p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);
 	} else {
 		p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);

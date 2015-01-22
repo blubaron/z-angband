@@ -3881,7 +3881,7 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 #define object_attr(T) \
 	(((k_info[(T)->k_idx].flavor) \
 	 && !((k_info[(T)->k_idx].flags[3] & TR3_SKIP_FLAVOR) && object_known_p(T))) ? \
-	 (misc_to_attr[k_info[(T)->k_idx].flavor]) : \
+	 (flavor_info[k_info[(T)->k_idx].flavor].x_attr) : \
 	 (k_info[(T)->k_idx].x_attr))
 
 /*
@@ -3892,7 +3892,7 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
 #define object_char(T) \
 	(((k_info[(T)->k_idx].flavor) \
 	 && !((k_info[(T)->k_idx].flags[3] & TR3_SKIP_FLAVOR) && object_known_p(T))) ? \
-	 (misc_to_char[k_info[(T)->k_idx].flavor]) : \
+	 (flavor_info[k_info[(T)->k_idx].flavor].x_char) : \
 	 (k_info[(T)->k_idx].x_char))
 
 

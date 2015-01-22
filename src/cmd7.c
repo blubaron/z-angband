@@ -387,7 +387,9 @@ static bool grid_matches_list_setting(int x, int y, int setting)
 	pcave_type *pc_ptr = parea(x,y);
 
 	/* only List_unexplored and List_visible are interested in non-known grids */
-	if (setting != LIST_UNEXPLORED && setting != LIST_VISIBLE && !(pc_ptr->player & GRID_KNOWN))
+	if (!(pc_ptr->player & GRID_KNOWN) && !(setting == LIST_MONSTER
+	  || setting == LIST_OBJECT || setting == LIST_UNEXPLORED
+	  || setting == LIST_VISIBLE))
 	{
 		return FALSE;
 	}
