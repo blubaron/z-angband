@@ -81,6 +81,7 @@ struct maxima
 	u16b dun_max;	/* Max size for dungeon type array */
 	u16b lmk_max;	/* Max size for landmark array */
 	u16b lvl_max;	/* Max size for defined level array */
+	u16b flavor_max; /* Max size for flavor info array */
 
 };
 
@@ -154,6 +155,28 @@ struct feature_type
 	feature_change effects[MAX_FEAT_CHANGE]; /* use an array to store in raw file */
 };
 
+
+/*
+ * Information about an object flavor
+ */
+typedef struct object_kind_flavor object_kind_flavor;
+
+struct object_kind_flavor
+{
+	u16b idx;
+	byte x_attr;
+	char x_char;
+	byte d_attr;
+	char d_char;
+	byte tval;
+	byte sval; /* if > 0, this has a fixed assignment */
+	byte min_level;
+	u16b k_idx; /* what object kind this is assigned to. 0 means available */
+	char *name;
+	struct object_kind_flavor *next;
+};
+
+
 /*
  * Hack - a type for 'object flags'
  */
@@ -217,7 +240,7 @@ struct object_kind
 	char x_char;	/* Desired object character */
 
 
-	byte flavor;	/* Special object flavor (or zero) */
+	u16b flavor;	/* Special object flavor (or zero) */
 
 	byte info;      /* Info known about this object kind */
 };

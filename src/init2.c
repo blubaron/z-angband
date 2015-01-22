@@ -298,6 +298,7 @@ cptr err_str[PARSE_ERROR_MAX] =
 	"too many entries",
 	"room/vault not rectangular",
 	"room/vault too big",
+	"duplicate record",
 };
 
 
@@ -945,7 +946,7 @@ errr init_w_info(void)
 	if (!fp) quit("Cannot open 'wilderns.txt' file.");
 
 	/* Parse the file */
-	err = init_w_info_txt(fp, buf);
+	err = init_w_info_txt(fp, buf, 1024);
 
 	/* Close it */
 	file_close(fp);
@@ -1002,7 +1003,7 @@ errr init_t_info(void)
 	if (!fp) quit("Cannot open 't_info.txt' file.");
 
 	/* Parse the file */
-	err = init_t_info_txt(fp, buf);
+	err = init_t_info_txt(fp, buf, 1024);
 
 	/* Close it */
 	file_close(fp);
@@ -1058,7 +1059,7 @@ static errr init_mg_info(void)
 
 
 	/* Parse the file */
-	err = init_mg_info_txt(fp, buf);
+	err = init_mg_info_txt(fp, buf, 1024);
 
 	/* Close it */
 	file_close(fp);
@@ -1085,11 +1086,11 @@ static errr init_mg_info(void)
 	/* Success */
 	return (0);
 }
+
+
 /*
  * Initialize the "dungeons" array
  */
-errr init_dun_info_txt(ang_file *fp, char *buf);
-
 static errr init_dun_info(void)
 {
 	errr err;
@@ -1097,8 +1098,6 @@ static errr init_dun_info(void)
 
 	/* General buffer */
 	char buf[1024];
-
-	/* Later must add in python support. */
 
 	/*** Load the ascii template file ***/
 
@@ -1112,7 +1111,7 @@ static errr init_dun_info(void)
 	if (!fp) quit("Cannot open 'dungeons.txt' file.");
 
 	/* Parse the file */
-	err = init_dun_info_txt(fp, buf);
+	err = init_dun_info_txt(fp, buf, 1024);
 
 	/* Close it */
 	file_close(fp);
@@ -1134,6 +1133,57 @@ static errr init_dun_info(void)
 
 		/* Quit */
 		quit("Error in 'dungeons.txt' file.");
+	}
+
+	/* Success */
+	return (0);
+}
+
+/*
+ * Initialize the "flavor_info" array
+ */
+static errr init_flavor_info(void)
+{
+	errr err;
+	ang_file *fp;
+
+	/* General buffer */
+	char buf[1024];
+
+	/*** Load the ascii template file ***/
+
+	/* Build the filename */
+	path_make(buf, ANGBAND_DIR_EDIT, "flavor.txt");
+
+	/* Open the file */
+	fp = file_open(buf, MODE_READ, FTYPE_TEXT);
+
+	/* Parse it */
+	if (!fp) quit("Cannot open 'flavor.txt' file.");
+
+	/* Parse the file */
+	err = init_flavor_info_txt(fp, buf, 1024, 0);
+
+	/* Close it */
+	file_close(fp);
+
+	/* Errors */
+	if (err)
+	{
+		cptr oops;
+
+		/* Error string */
+		oops =
+			(((err > 0) && (err < PARSE_ERROR_MAX)) ? err_str[err] : "unknown");
+
+		/* Oops */
+		msgf("Error %d at line %d of 'flavor.txt'.", err, error_line);
+		msgf("Record %d contains a '%s' error.", error_idx, oops);
+		msgf("Parsing '%s'.", buf);
+		message_flush();
+
+		/* Quit */
+		quit("Error in 'flavor.txt' file.");
 	}
 
 	/* Success */
@@ -1785,6 +1835,10 @@ void init_angband(void)
 	note("[Initializing arrays... (dungeons)]");
 	if (init_dun_info()) quit("Cannot initialize dungeons");
 
+	/* Initialize flavor info */
+	note("[Initializing arrays... (flavors)]");
+	if (init_flavor_info()) quit("Cannot initialize flavors");
+
 
 	/*** Load default user pref files ***/
 
@@ -2024,6 +2078,12 @@ void cleanup_angband(void)
 	/* free stuff from init_w_info */
 	ZFREE(wild_choice_tree);
 	ZFREE(wild_gen_data);
+	/* free stuff from init_flavor_info */
+	clear_flavor_info();
+	/* free stuff from init_dun_info */
+	clear_dun_info();
+	/* free stuff from init_mg_info */
+	ZFREE(mg_info);
 	/* free stuff from init_t_info */
 	if (t_info) {
 		for (i = 0; i < z_info->t_max; i++) {
@@ -2032,10 +2092,6 @@ void cleanup_angband(void)
 	}
 	ZFREE(t_info);
 	ZFREE(fld_list);
-	/* free stuff from init_mg_info */
-	ZFREE(mg_info);
-	/* free stuff from init_dun_info */
-	clear_dun_info();
 
 	/* Free the info, name, and text arrays */
 	free_info(&s_head);
@@ -2131,7 +2187,9 @@ void re_init_some_things(void)
 		Term_activate(old);
 	}
 #endif
-
+	/* clear flavor assignments */
+	clear_flavor_assignments();
+	
 	/* Free the buttons */
 	button_kill_all();
 

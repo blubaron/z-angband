@@ -423,6 +423,23 @@ errr process_pref_file_command(char *buf)
 		}*/
 	}
 
+	/* Process "L:<num>:<a>/<c>" -- attr/char for object flavors */
+	else if (buf[0] == 'L')
+	{
+		if (tokenize(buf + 2, 3, zz, TOKENIZE_CHECKQUOTE) == 3)
+		{
+			object_kind_flavor *fl_ptr;
+			i = (huge) strtol(zz[0], NULL, 0);
+			n1 = strtol(zz[1], NULL, 0);
+			n2 = strtol(zz[2], NULL, 0);
+			if ((i < 0) || (i >= z_info->flavor_max)) return (1);
+			fl_ptr = &flavor_info[i];
+			if (n1) fl_ptr->x_attr = n1;
+			if (n2) fl_ptr->x_char = n2;
+			return (0);
+		}
+	}
+
 	/* Process "S:<num>:<a>/<c>" -- attr/char for special things */
 	else if (buf[0] == 'S')
 	{

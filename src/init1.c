@@ -725,8 +725,8 @@ static cptr k_info_flags4[] =
 	"EASY_ENCHANT",
 	"XXX5",
 	"SH_FEAR",
-	"XXX7",
-	"XXX8",
+	"SKIP_FLAVOR",
+	"NO_FLAVOR",
 	"IM_LITE",
 	"IM_DARK",
 	"SH_ACID",
@@ -3327,7 +3327,7 @@ static errr grab_one_wild_flag(wild_gen_data_type *w_ptr, cptr what)
  * Initialize the "wild_choice_tree" and "wild_gen_data" arrays,
  *  by parsing an ascii "template" file
  */
-errr init_w_info_txt(ang_file *fp, char *buf)
+errr init_w_info_txt(ang_file *fp, char *buf, u32b bufsize)
 {
 	char *s, *t;
 
@@ -3346,7 +3346,7 @@ errr init_w_info_txt(ang_file *fp, char *buf)
 	error_idx = -1;
 
 	/* Parse */
-	while (0 <= file_getl(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, bufsize))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -3545,7 +3545,7 @@ static errr grab_one_info_flag(field_thaum *t_ptr, cptr what)
  * Initialize the field "thaumatergical" arrays,
  *  by parsing an ascii "template" file
  */
-errr init_t_info_txt(ang_file *fp, char *buf)
+errr init_t_info_txt(ang_file *fp, char *buf, u32b bufsize)
 {
 	char *s, *t;
 
@@ -3563,7 +3563,7 @@ errr init_t_info_txt(ang_file *fp, char *buf)
 
 
 	/* Parse */
-	while (0 <= file_getl(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, bufsize))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -3879,7 +3879,7 @@ static errr grab_one_dungeon_flag(monster_group_type *mg_ptr, cptr what)
  * Initialize the monster group arrays,
  *  by parsing an ascii "template" file
  */
-errr init_mg_info_txt(ang_file *fp, char *buf)
+errr init_mg_info_txt(ang_file *fp, char *buf, u32b bufsize)
 {
 	char *s, *t;
 
@@ -3899,7 +3899,7 @@ errr init_mg_info_txt(ang_file *fp, char *buf)
 
 
 	/* Parse */
-	while (0 <= file_getl(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, bufsize))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -5446,7 +5446,7 @@ errr parse_s_info(char *buf, header *head)
 /*
  * Initialize the "dungeons" array, by parsing an ascii "template" file
  */
-errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
+static errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 {
 	int i;
 
@@ -5945,7 +5945,7 @@ errr parse_dun_info(char *buf, dun_gen_type **pdun_ptr)
 	return (0);
 }
 
-errr init_dun_info_txt(ang_file *fp, char *buf)
+errr init_dun_info_txt(ang_file *fp, char *buf, u32b bufsize)
 {
 	u16b i = 0;
 	errr errorr;
@@ -5962,7 +5962,7 @@ errr init_dun_info_txt(ang_file *fp, char *buf)
 
 
 	/* Parse */
-	while (0 <= file_getl(fp, buf, 1024))
+	while (0 <= file_getl(fp, buf, bufsize))
 	{
 		/* Advance the line number */
 		error_line++;
@@ -6018,3 +6018,228 @@ void clear_dun_info()
 	}
 }
 
+static errr parse_flavor_info(char *buf, object_kind_flavor **pfl_ptr)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	object_kind_flavor *fl_ptr = NULL;
+	if (pfl_ptr == NULL) {
+		return (PARSE_ERROR_GENERIC);
+	}
+	fl_ptr = *pfl_ptr;
+
+
+	/* Process 'N' for "New/Number/TVal/SVal" */
+	if (buf[0] == 'N')
+	{
+		int tv,sv;
+		/* Find the colon before the name */
+		s = strchr(buf + 2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf + 2);
+
+		/* Verify information */
+		/*if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);*/
+
+		/* allocate memory for the dungeon */
+		*pfl_ptr = ZNEW(object_kind_flavor);
+		if (!(*pfl_ptr)) {
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+
+		if (fl_ptr) 
+			fl_ptr->next = *pfl_ptr;
+		fl_ptr = *pfl_ptr;
+
+		fl_ptr->idx = i;
+
+		if (i > z_info->flavor_max) {
+			z_info->flavor_max = i;
+		}
+
+		i = atoi(s);
+		fl_ptr->tval = i;
+
+		/* see if we have an sval */
+		t = strchr(s + 1, ':');
+		if (t) {
+			i = atoi(t+1);
+			fl_ptr->sval = i;
+			if (i==0) {
+				/* see if we have a min level */
+				s = strchr(t + 1, ':');
+				if (s) {
+					i = atoi(s+1);
+					fl_ptr->min_level = i;
+				} else {
+					fl_ptr->min_level = 0;
+				}
+			}
+		} else {
+			fl_ptr->sval = 0;
+			fl_ptr->min_level = 0;
+		}
+
+		return (0);
+	} else
+
+	/* Process 'G' for "default visual" (one line only) */
+	if (buf[0] == 'G') {
+		/* There better be a current pointer */
+		if (!fl_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* make sure there is enough  */
+		if (strlen(buf) < 5) {
+			return (PARSE_ERROR_GENERIC);
+		}
+
+		fl_ptr->d_char = buf[2];
+		fl_ptr->d_attr = color_char_to_attr(buf[4]);
+		fl_ptr->x_char = fl_ptr->d_char;
+		fl_ptr->x_attr = fl_ptr->d_attr;
+
+		return (0);
+	} else
+
+	/* Process 'D' for "flavor name" (one line only) */
+	if (buf[0] == 'D') {
+		/* Length of name string */
+		u16b length;
+
+		/* There better be a current pointer */
+		if (!fl_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		s = buf+2;
+		length = strlen(s);
+		if ((length == 0) || (length > 256)) {
+			return (PARSE_ERROR_GENERIC);
+		}
+
+		/* Store the name */
+		fl_ptr->name = (char*)string_make(s);
+
+		return (0);
+	}	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+}
+errr init_flavor_info_txt(ang_file *fp, char *buf, u32b bufsize, u16b extra)
+{
+	errr errorr;
+
+	/* Current entry */
+	object_kind_flavor *fl_ptr = NULL, *next;
+	object_kind_flavor *first = NULL;
+
+	/* Just before the first line */
+	error_line = -1;
+
+	/* The last index used */
+	error_idx = -1;
+
+
+	/* Parse */
+	while (0 <= file_getl(fp, buf, bufsize))
+	{
+		/* Advance the line number */
+		error_line++;
+
+		/* Skip comments and blank lines */
+		if (!buf[0] || (buf[0] == '#')) continue;
+
+		/* Verify correct "colon" format */
+		if (buf[1] != ':') return (PARSE_ERROR_GENERIC);
+
+		errorr = parse_flavor_info(buf, &fl_ptr);
+		if (buf[0] == 'N') {
+			error_idx = fl_ptr->idx;
+		}
+		if (errorr) {
+			return errorr;
+		}
+		if (fl_ptr && !first) {
+			first = fl_ptr;
+		}
+	}
+
+	z_info->flavor_max += extra+1;
+
+	C_MAKE(flavor_info, z_info->flavor_max, object_kind_flavor);
+
+	fl_ptr = first;
+	while (fl_ptr) {
+		next = fl_ptr->next;
+		/* check if this is a duplicate entry */
+		if (flavor_info[fl_ptr->idx].idx) {
+			/* this is a duplicate entry, clear the lists
+			 * and return an error */
+			error_idx = fl_ptr->idx;
+			while (fl_ptr) {
+				next = fl_ptr->next;
+				string_free(fl_ptr->name);
+				FREE(fl_ptr);
+				fl_ptr = next;
+			}
+			return (PARSE_ERROR_DUPLICATE_RECORD);
+		}
+		COPY(&(flavor_info[fl_ptr->idx]), fl_ptr, object_kind_flavor);
+		if (next) {
+			flavor_info[fl_ptr->idx].next = &(flavor_info[next->idx]);
+		} else {
+			flavor_info[fl_ptr->idx].next = NULL;
+		}
+		FREE(fl_ptr);
+		fl_ptr = next;
+	}
+
+	/* Success */
+	return (0);
+}
+
+void clear_flavor_info()
+{
+	int i;
+	object_kind_flavor *fl_ptr;
+
+	/* Clear flavor assignments and name memory */
+	for (i = 1; i < z_info->flavor_max; i++) {
+		fl_ptr = &(flavor_info[i]);
+		if (fl_ptr->name) {
+			string_free(fl_ptr->name);
+			fl_ptr->name = NULL;
+		}
+		flavor_info[i].k_idx = 0;
+	}
+
+	/* Check every object */
+	for (i = 1; i < z_info->k_max; i++) {
+		object_kind *k_ptr = &k_info[i];
+
+		/* Skip "empty" objects */
+		if (!k_ptr->name) continue;
+
+		/* Extract "flavor" (if any) */
+		k_ptr->flavor = 0;
+	}
+
+	flavor_info = FREE(flavor_info);
+	z_info->flavor_max = 0;
+}

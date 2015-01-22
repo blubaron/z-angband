@@ -99,6 +99,16 @@ void reset_visuals(void)
 		t_ptr->f_char = t_ptr->d_char;
 	}
 
+	/* Extract default attr/char code for flavors */
+	for (i = 0; i < z_info->flavor_max; i++)
+	{
+		object_kind_flavor *fl_ptr = &(flavor_info[i]);
+
+		/* Default attr/char */
+		fl_ptr->x_attr = fl_ptr->d_attr;
+		fl_ptr->x_char = fl_ptr->d_char;
+	}
+
 	if (use_graphics)
 	{
 		graphics_mode *mode = get_graphics_mode(use_graphics);
@@ -4017,7 +4027,7 @@ static void dump_full_item_aux(ang_file *fff, object_type *o_ptr, int indent)
 				(o_ptr->flags[1] & ~TR1_XXX1) |
 				(o_ptr->flags[2] & ~(TR2_QUESTITEM | TR2_XXX4 | TR2_HIDDEN_POWERS | TR2_EASY_KNOW |
 									 TR2_HIDE_TYPE | TR2_SHOW_MODS | TR2_CURSED)) |
-				(o_ptr->flags[3] & ~(TR3_SQUELCH | TR3_XXX7 | TR3_XXX8 | TR3_XXX27 | TR3_XXX28))))
+				(o_ptr->flags[3] & ~(TR3_SQUELCH | TR3_SKIP_FLAVOR | TR3_NO_FLAVOR | TR3_XXX27 | TR3_XXX28))))
 		bail_out = TRUE;
 
 	/* A '&' in the object inscription forces verbose mode, so cancel bailing out. */

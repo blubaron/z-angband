@@ -575,8 +575,10 @@ extern void change_shimmer(void);
 extern void change_repair(void);
 
 /* flavor.c */
+extern object_kind_flavor *flavor_info;
 extern void get_table_name(char *out_string, bool quotes);
 extern void flavor_init(void);
+extern void clear_flavor_assignments(void);
 extern void object_desc(char *buf, const object_type *o_ptr, int pref,
 						int mode, int size);
 extern void object_fmt(char *buf, uint max, cptr fmt, va_list *vp);

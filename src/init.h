@@ -33,8 +33,9 @@
 #define PARSE_ERROR_TOO_MANY_ENTRIES        14
 #define PARSE_ERROR_VAULT_NOT_RECTANGULAR   15
 #define PARSE_ERROR_VAULT_TOO_BIG           16
+#define PARSE_ERROR_DUPLICATE_RECORD        17
 
-#define PARSE_ERROR_MAX                     17
+#define PARSE_ERROR_MAX                     18
 
 
 typedef struct header header;
@@ -132,11 +133,13 @@ extern header e_head;
 extern header r_head;
 
 /* init1.c */
-extern errr init_w_info_txt(ang_file *fp, char *buf);
-extern errr init_t_info_txt(ang_file *fp, char *buf);
-extern errr init_mg_info_txt(ang_file *fp, char *buf);
-extern errr init_dun_info_txt(ang_file *fp, char *buf);
+extern errr init_w_info_txt(ang_file *fp, char *buf, u32b bufsize);
+extern errr init_t_info_txt(ang_file *fp, char *buf, u32b bufsize);
+extern errr init_mg_info_txt(ang_file *fp, char *buf, u32b bufsize);
+extern errr init_dun_info_txt(ang_file *fp, char *buf, u32b bufsize);
 extern void clear_dun_info(void);
+extern errr init_flavor_info_txt(ang_file *fp, char *buf, u32b bufsize, u16b extra);
+extern void clear_flavor_info(void);
 s32b monster_auto_experience(monster_race *r_ptr, bool verbose);
 
 /* init2.c */

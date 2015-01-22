@@ -12,339 +12,12 @@
 
 #include "angband.h"
 
+object_kind_flavor *flavor_info;
 
 /*
  * Max sizes of the following arrays
  */
-#define MAX_ROCKS      80		/* Used with rings (min 55) */
-#define MAX_AMULETS    45		/* Used with amulets (min 20) */
-#define MAX_WOODS      50		/* Used with staffs (min 30) */
-#define MAX_METALS     65		/* Used with wands/rods (min 30/29) */
-#define MAX_POTIONS    100		/* Used with potions (min 64) */
-#define MAX_SHROOM     40		/* Used with mushrooms (min 20) */
-#define MAX_TITLES     75		/* Used with scrolls (min 48) */
 #define MAX_SYLLABLES 164		/* Used with scrolls (see below) */
-
-
-/*
- * Rings (adjectives and colors)
- */
-
-static cptr ring_adj[MAX_ROCKS] =
-{
-	/* 0-9 */
-	"Alexandrite", "Amethyst", "Aquamarine", "Azurite", "Beryl",
-	"Bloodstone", "Calcite", "Carnelian", "Corundum", "Diamond",
-	/* 10-19 */
-	"Emerald", "Fluorite", "Garnet", "Granite", "Jade",
-	"Jasper", "Lapis Lazuli", "Malachite", "Marble", "Moonstone",
-	/* 20-29 */
-	"Onyx", "Opalescent", "Pearl", "Quartz", "Quartzite",
-	"Rhodonite", "Ruby", "Sapphire", "Tiger Eye", "Topaz",
-	/* 30-39 */
-	"Turquoise", "Zircon", "Platinum", "Bronze", "Gold",
-	"Obsidian", "Silver", "Tortoise Shell", "Mithril", "Jet",
-	/* 40-49 */
-	"Engagement", "Adamantite", "Wire", "Dilithium", "Bone",
-	"Wooden", "Iron", "Serpent", "Wedding", "Double",
-	/* 50-59 */
-	"Plain", "Brass", "Scarab", "Shining", "Rusty",
-	"Transparent", "Cat's-Eye", "Chrysoberyl", "Serpentine", "Spinel",
-	/* 60-69 */
-	"Sunstone", "Morganite", "Heliodor", "Tourmaline", "Chalcedony",
-	"Peridot", "Hematite", "Coral", "Citrine", "Copper",
-    /* 70-79 */
-	"Crystal", "Fire Opal", "Star Ruby", "Star Sapphire", "Pyrite",
-	"Soapstone", "Ivory", "Diamond-studded", "Tanzanite", "Olivine"
-};
-
-static byte ring_col[MAX_ROCKS] =
-{
-	/* 0-9 */
-	TERM_GREEN, TERM_VIOLET, TERM_L_BLUE, TERM_L_BLUE, TERM_L_GREEN,
-	TERM_RED, TERM_WHITE, TERM_RED, TERM_SLATE, TERM_WHITE,
-	/* 10-19 */
-	TERM_GREEN, TERM_L_GREEN, TERM_RED, TERM_L_DARK, TERM_L_GREEN,
-	TERM_UMBER, TERM_BLUE, TERM_GREEN, TERM_WHITE, TERM_L_WHITE,
-	/* 20-29 */
-	TERM_L_RED, TERM_L_WHITE, TERM_WHITE, TERM_L_WHITE, TERM_L_WHITE,
-	TERM_L_RED, TERM_RED, TERM_BLUE, TERM_YELLOW, TERM_YELLOW,
-	/* 30-39 */
-	TERM_L_BLUE, TERM_L_UMBER, TERM_WHITE, TERM_L_UMBER, TERM_YELLOW,
-	TERM_L_DARK, TERM_L_WHITE, TERM_GREEN, TERM_L_BLUE, TERM_L_DARK,
-	/* 40-49 */
-	TERM_YELLOW, TERM_VIOLET, TERM_UMBER, TERM_L_WHITE, TERM_WHITE,
-	TERM_UMBER, TERM_BLUE, TERM_GREEN, TERM_YELLOW, TERM_ORANGE,
-	/* 50-59 */
-	TERM_ORANGE, TERM_ORANGE, TERM_L_GREEN, TERM_YELLOW, TERM_RED,
-	TERM_WHITE, TERM_YELLOW, TERM_YELLOW, TERM_L_GREEN, TERM_RED,
-	/* 60-69 */
-	TERM_YELLOW, TERM_L_RED, TERM_YELLOW, TERM_GREEN, TERM_L_DARK,
-	TERM_L_GREEN, TERM_L_DARK, TERM_L_RED, TERM_L_RED, TERM_ORANGE,
-	/* 70-79 */
-	TERM_WHITE, TERM_RED, TERM_RED, TERM_BLUE, TERM_YELLOW,
-	TERM_WHITE, TERM_WHITE, TERM_L_WHITE, TERM_VIOLET, TERM_L_GREEN
-};
-
-
-/*
- * Amulets (adjectives and colors)
- */
-static cptr amulet_adj[MAX_AMULETS] =
-{
-	/* 0-9 */
-	"Amber", "Driftwood", "Coral", "Agate", "Ivory",
-	"Obsidian", "Bone", "Brass", "Bronze", "Pewter",
-	/* 10-19 */
-	"Tortoise Shell", "Golden", "Azure", "Crystal", "Silver",
-	"Copper", "Rosetted", "Spiral", "Star", "Square",
-	/* 20-29 */
-	"Hexagonal", "Steel", "Skull", "Platinum", "Electrum",
-	"Glass", "Cracked", "Heartwood", "Bark", "Mirrored",
-	/* 30-39 */
-	"Beaded", "Polished", "Stone", "Heavy", "Braided",
-	"Twisted", "Carven", "Demon's Tooth", "Dragon's Tooth", "Woven",
-	/* 40-44 */
-	"Iron", "Lead", "Adamant", "Stained Glass", "Alabaster"
-};
-
-static byte amulet_col[MAX_AMULETS] =
-{
-	/* 0-9 */
-	TERM_YELLOW, TERM_L_UMBER, TERM_WHITE, TERM_L_WHITE, TERM_WHITE,
-	TERM_L_DARK, TERM_WHITE, TERM_L_UMBER, TERM_L_UMBER, TERM_SLATE,
-	/* 10-19 */
-	TERM_GREEN, TERM_YELLOW, TERM_L_BLUE, TERM_L_BLUE, TERM_L_WHITE,
-	TERM_L_UMBER, TERM_VIOLET, TERM_VIOLET, TERM_YELLOW, TERM_L_UMBER,
-	/* 20-29 */
-	TERM_L_DARK, TERM_WHITE, TERM_L_DARK, TERM_L_WHITE, TERM_WHITE,
-	TERM_L_RED, TERM_RED, TERM_UMBER, TERM_UMBER, TERM_WHITE,
-	/* 30-39 */
-	TERM_ORANGE, TERM_WHITE, TERM_L_WHITE, TERM_SLATE, TERM_L_UMBER,
-	TERM_L_BLUE, TERM_L_GREEN, TERM_RED, TERM_GREEN, TERM_UMBER,
-	/* 40-44 */
-	TERM_SLATE, TERM_SLATE, TERM_VIOLET, TERM_BLUE, TERM_WHITE
-};
-
-
-/*
- * Staffs (adjectives and colors)
- */
-static cptr staff_adj[MAX_WOODS] =
-{
-	/* 0-9 */
-	"Aspen", "Balsa", "Banyan", "Birch", "Cedar",
-	"Cottonwood", "Cypress", "Dogwood", "Elm", "Willow",
-	/* 10-19 */
-	"Hemlock", "Hickory", "Ironwood", "Locust", "Mahogany",
-	"Maple", "Mulberry", "Oak", "Pine", "Redwood",
-	/* 20-29 */
-	"Rosewood", "Spruce", "Sycamore", "Teak", "Walnut",
-	"Mistletoe", "Hawthorn", "Bamboo", "Silver", "Runed",
-	/* 30-39 */
-	"Golden", "Ashen", "Gnarled", "Ivory", "Sandalwood",
-	"Yew", "Thorned", "Charred", "Darkwood", "Flowering",
-	/* 40-49 */
-	"Holly", "Driftwood", "Larch", "Cherry", "Wormwood",
-	"Walnut", "Acacia", "Linden", "Mallorn", "Bleached"
-};
-
-static byte staff_col[MAX_WOODS] =
-{
-	/* 0-9 */
-	TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER,
-	TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER,
-	/* 10-19 */
-	TERM_L_UMBER, TERM_L_UMBER, TERM_UMBER, TERM_L_UMBER, TERM_UMBER,
-	TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_RED,
-	/* 20-29 */
-	TERM_RED, TERM_L_UMBER, TERM_L_UMBER, TERM_L_UMBER, TERM_UMBER,
-	TERM_GREEN, TERM_L_UMBER, TERM_L_UMBER, TERM_L_WHITE, TERM_UMBER,
-	/* 30-39 */
-	TERM_YELLOW, TERM_SLATE, TERM_UMBER, TERM_L_WHITE, TERM_YELLOW,
-	TERM_L_UMBER, TERM_L_UMBER, TERM_L_DARK, TERM_L_DARK, TERM_L_GREEN,
-	/* 40-49 */
-	TERM_L_GREEN, TERM_L_WHITE, TERM_L_UMBER, TERM_L_RED, TERM_L_GREEN,
-	TERM_UMBER, TERM_UMBER, TERM_L_UMBER, TERM_YELLOW, TERM_WHITE
-};
-
-
-/*
- * Wands (adjectives and colors)
- */
-static cptr wand_adj[MAX_METALS] =
-{
-	/* 0-9 */
-	"Aluminium", "Cast Iron", "Chromium", "Copper", "Gold",
-	"Iron", "Magnesium", "Molybdenum", "Nickel", "Rusty",
-	/* 10-19 */
-	"Silver", "Steel", "Tin", "Titanium", "Tungsten",
-	"Zirconium", "Zinc", "Aluminium-Plated", "Copper-Plated", "Gold-Plated",
-	/* 20-29 */
-	"Nickel-Plated", "Silver-Plated", "Steel-Plated", "Tin-Plated", "Zinc-Plated",
-	"Mithril-Plated", "Mithril", "Runed", "Bronze", "Brass",
-	/* 30-39 */
-	"Platinum", "Lead", "Lead-Plated", "Ivory", "Adamantite",
-	"Uridium", "Long", "Short", "Hexagonal", "Titanium-Plated",
-	/* 40-49 */
-	"Tungsten-Plated", "Chromium-Plated", "Palladium", "Palladium-Plated", "Iridium",
-	"Zirconium-Plated", "Vanadium", "Carbon Steel", "Pewter", "Brass-Plated",
-	/* 50-59 */
-	"Bronze-Plated", "Electrum", "Electrum-Plated", "White Gold", "Thin",
-	"Gem-Tipped", "Gem-Studded", "Bone", "Hollow", "Willow",
-	/* 60-64 */
-	"Wire", "Glass", "Magnesium-Plated", "Crystal", "Bone"
-};
-
-static byte wand_col[MAX_METALS] =
-{
-	/* 0-9 */
-	TERM_L_BLUE, TERM_L_DARK, TERM_WHITE, TERM_L_UMBER, TERM_YELLOW,
-	TERM_SLATE, TERM_L_WHITE, TERM_L_WHITE, TERM_L_UMBER, TERM_RED,
-	/* 10-19 */
-	TERM_L_WHITE, TERM_L_WHITE, TERM_L_WHITE, TERM_WHITE, TERM_WHITE,
-	TERM_L_WHITE, TERM_L_WHITE, TERM_L_BLUE, TERM_L_UMBER, TERM_YELLOW,
-	/* 20-29 */
-	TERM_L_UMBER, TERM_L_WHITE, TERM_L_WHITE, TERM_L_WHITE, TERM_L_WHITE,
-	TERM_L_BLUE, TERM_L_BLUE, TERM_UMBER, TERM_L_UMBER, TERM_L_UMBER,
-	/* 30-39 */
-	TERM_WHITE, TERM_SLATE, TERM_SLATE, TERM_WHITE, TERM_VIOLET,
-	TERM_L_RED, TERM_L_BLUE, TERM_BLUE, TERM_RED, TERM_WHITE,
-	/* 40-49 */
-	TERM_WHITE, TERM_WHITE, TERM_L_WHITE, TERM_L_WHITE, TERM_L_RED,
-	TERM_L_WHITE, TERM_L_WHITE, TERM_L_WHITE, TERM_L_DARK, TERM_L_UMBER,
-	/* 50-59 */
-	TERM_L_UMBER, TERM_YELLOW, TERM_YELLOW, TERM_WHITE, TERM_L_UMBER,
-	TERM_GREEN, TERM_VIOLET, TERM_WHITE, TERM_L_DARK, TERM_L_UMBER,
-	/* 60-64 */
-	TERM_L_DARK, TERM_L_BLUE, TERM_L_WHITE, TERM_L_BLUE, TERM_WHITE
-};
-
-
-/*
- * Rods (adjectives and colors).
- * Efficiency -- copied from wand arrays
- */
-
-static cptr rod_adj[MAX_METALS];
-
-static byte rod_col[MAX_METALS];
-
-
-/*
- * Mushrooms (adjectives and colors)
- */
-
-static cptr food_adj[MAX_SHROOM] =
-{
-	/* 0-9 */
-	"Blue", "Black", "Black Spotted", "Brown", "Dark Blue",
-	"Dark Green", "Dark Red", "Yellow", "Furry", "Green",
-	/* 10-19 */
-	"Grey", "Light Blue", "Light Green", "Violet", "Red",
-	"Slimy", "Tan", "White", "White Spotted", "Wrinkled",
-	/* 20-29 */
-	"Strange", "Silver", "Glowing", "Orange", "Dried",
-	"Grey Spotted", "Purple", "Indigo", "Pink", "Pink Spotted",
-	/* 30-39 */
-	"Withered", "Pungent", "Fragrant", "Delicate", "Orange Spotted",
-	"Blue Spotted", "Green Spotted", "Brown Spotted", "Chewy", "Revolting"
-};
-
-static byte food_col[MAX_SHROOM] =
-{
-	/* 0-9 */
-	TERM_BLUE, TERM_L_DARK, TERM_L_DARK, TERM_UMBER, TERM_BLUE,
-	TERM_GREEN, TERM_RED, TERM_YELLOW, TERM_L_WHITE, TERM_GREEN,
-	/* 10-19 */
-	TERM_SLATE, TERM_L_BLUE, TERM_L_GREEN, TERM_VIOLET, TERM_RED,
-	TERM_SLATE, TERM_L_UMBER, TERM_WHITE, TERM_WHITE, TERM_UMBER,
-	/* 20-29 */
-	TERM_L_BLUE, TERM_WHITE, TERM_YELLOW, TERM_ORANGE, TERM_UMBER,
-	TERM_SLATE, TERM_VIOLET, TERM_BLUE, TERM_L_RED, TERM_L_RED,
-	/* 30-39 */
-	TERM_L_UMBER, TERM_ORANGE, TERM_UMBER, TERM_L_WHITE, TERM_ORANGE,
-	TERM_BLUE, TERM_GREEN, TERM_UMBER, TERM_L_DARK, TERM_L_GREEN
-};
-
-
-/*
- * Color adjectives and colors, for potions.
- * Hack -- The first four entries are hard-coded.
- * (water, apple juice, slime mold juice, something)
- */
-
-static cptr potion_adj[MAX_POTIONS] =
-{
-	/* Fixed colors */
-	"Clear", "Light Brown", "Icky Green", "Puzzling",
-	/* 4-9 */
-	"Azure",
-	"Blue", "Blue Speckled", "Black", "Brown", "Brown Speckled",
-	/* 10-19 */
-	"Bubbling", "Chartreuse", "Cloudy", "Copper Speckled", "Crimson",
-	"Cyan", "Dark Blue", "Dark Green", "Dark Red", "Gold Speckled",
-	/* 20-29 */
-	"Green", "Green Speckled", "Grey", "Grey Speckled", "Hazy",
-	"Indigo", "Light Blue", "Light Green", "Magenta", "Metallic Blue",
-	/* 30-39 */
-	"Metallic Red", "Metallic Green", "Metallic Purple", "Misty", "Orange",
-	"Orange Speckled", "Pink", "Pink Speckled", "Puce", "Purple",
-	/* 40-49 */
-	"Purple Speckled", "Red", "Red Speckled", "Silver Speckled", "Smoky",
-	"Tangerine", "Violet", "Vermilion", "White", "Yellow",
-	/* 50-59 */
-	"Violet Speckled", "Pungent", "Clotted Red", "Viscous Pink", "Oily Yellow",
-	"Gloopy Green", "Shimmering", "Coagulated Crimson", "Yellow Speckled", "Gold",
-	/* 60-69 */
-	"Manly", "Stinking", "Oily Black", "Ichor", "Ivory White",
-	"Sky Blue", "Bloody", "Inky Black", "Silver Flecked", "Red Flecked",
-	/* 70-79 */
-	"Green Flecked", "Sea Green", "Umber", "Layered", "Fizzy Yellow",
-	"Fizzy Green", "Aqua", "Clear Blue", "Clear Green", "Clear Red",
-	/* 80-89 */
-	"Clear Purple", "Clear Yellow", "Clear White", "Clear Brown", "Volatile",
-	"Thick White", "Thick Black", "Thick Green", "Thick Blue", "Thick Red",
-	/* 90-99 */
-	"Thick Yellow", "Creamy", "Spicy", "Fizzy Blue", "Fizzy",
-	"Sweet", "Brownish", "Greenish", "Gold", "Silver"
-};
-
-static byte potion_col[MAX_POTIONS] =
-{
-	/* Fixed colors */
-	TERM_WHITE, TERM_L_UMBER, TERM_GREEN, 0,
-	/* 4-9 */
-	TERM_L_BLUE,
-	TERM_BLUE, TERM_BLUE, TERM_L_DARK, TERM_UMBER, TERM_UMBER,
-	/* 10-19 */
-	TERM_L_WHITE, TERM_L_GREEN, TERM_WHITE, TERM_L_UMBER, TERM_RED,
-	TERM_L_BLUE, TERM_BLUE, TERM_GREEN, TERM_RED, TERM_YELLOW,
-	/* 20-29 */
-	TERM_GREEN, TERM_GREEN, TERM_SLATE, TERM_SLATE, TERM_L_WHITE,
-	TERM_VIOLET, TERM_L_BLUE, TERM_L_GREEN, TERM_RED, TERM_BLUE,
-	/* 30-39 */
-	TERM_RED, TERM_GREEN, TERM_VIOLET, TERM_L_WHITE, TERM_ORANGE,
-	TERM_ORANGE, TERM_L_RED, TERM_L_RED, TERM_VIOLET, TERM_VIOLET,
-	/* 40-49 */
-	TERM_VIOLET, TERM_RED, TERM_RED, TERM_L_WHITE, TERM_L_DARK,
-	TERM_ORANGE, TERM_VIOLET, TERM_RED, TERM_WHITE, TERM_YELLOW,
-	/* 50-59 */
-	TERM_VIOLET, TERM_L_RED, TERM_RED, TERM_L_RED, TERM_YELLOW,
-	TERM_GREEN, TERM_VIOLET, TERM_RED, TERM_YELLOW, TERM_YELLOW,
-	/* 60-69 */
-	TERM_L_UMBER, TERM_UMBER, TERM_L_DARK, TERM_RED, TERM_WHITE,
-	TERM_L_BLUE, TERM_RED, TERM_L_DARK, TERM_WHITE, TERM_RED,
-	/* 70-79 */
-	TERM_GREEN, TERM_L_GREEN, TERM_UMBER, TERM_L_BLUE, TERM_YELLOW,
-	TERM_L_GREEN, TERM_L_BLUE, TERM_L_BLUE, TERM_L_GREEN, TERM_L_RED,
-	/* 80-89 */
-	TERM_VIOLET, TERM_YELLOW, TERM_WHITE, TERM_L_UMBER, TERM_ORANGE,
-	TERM_WHITE, TERM_L_DARK, TERM_GREEN, TERM_BLUE, TERM_RED,
-	/* 90-99 */
-	TERM_YELLOW, TERM_L_WHITE, TERM_RED, TERM_BLUE, TERM_WHITE,
-	TERM_L_UMBER, TERM_L_UMBER, TERM_L_GREEN, TERM_YELLOW, TERM_L_WHITE
-};
 
 
 /*
@@ -376,15 +49,6 @@ static cptr syllables[MAX_SYLLABLES] =
 	"foo", "ju", "xuxu"
 };
 
-
-/*
- * Hold the titles of scrolls, 6 to 14 characters each
- * Also keep an array of scroll colors (always WHITE for now)
- */
-static char scroll_adj[MAX_TITLES][16];
-
-static byte scroll_col[MAX_TITLES];
-
 /*
  * Certain items, if aware, are known instantly
  * This function is used only by "flavor_init()"
@@ -397,68 +61,6 @@ static bool object_easy_know(int i)
 
 	/* Nope */
 	return (FALSE);
-}
-
-
-/*
- * Certain items have a flavor
- * This function is used only by "flavor_init()"
- */
-static bool object_flavor(int k_idx)
-{
-	object_kind *k_ptr = &k_info[k_idx];
-
-	/* Analyze the item */
-	switch (k_ptr->tval)
-	{
-		case TV_AMULET:
-		{
-			return (0x80 + amulet_col[k_ptr->sval]);
-		}
-
-		case TV_RING:
-		{
-			return (0x90 + ring_col[k_ptr->sval]);
-		}
-
-		case TV_STAFF:
-		{
-			return (0xA0 + staff_col[k_ptr->sval]);
-		}
-
-		case TV_WAND:
-		{
-			return (0xB0 + wand_col[k_ptr->sval]);
-		}
-
-		case TV_ROD:
-		{
-			return (0xC0 + rod_col[k_ptr->sval]);
-		}
-
-		case TV_SCROLL:
-		{
-			return (0xD0 + scroll_col[k_ptr->sval]);
-		}
-
-		case TV_POTION:
-		{
-			return (0xE0 + potion_col[k_ptr->sval]);
-		}
-
-		case TV_FOOD:
-		{
-			if (k_ptr->sval < SV_FOOD_MIN_FOOD)
-			{
-				return (0xF0 + food_col[k_ptr->sval]);
-			}
-
-			break;
-		}
-	}
-
-	/* No flavor */
-	return (0);
 }
 
 
@@ -497,6 +99,85 @@ void get_table_name(char *out_string, bool quotes)
 }
 
 
+static void flavor_assign_fixed(void)
+{
+	int i,j;
+	object_kind_flavor *fl_ptr;
+	object_kind *k_ptr;
+
+	for (i = 1; i < z_info->flavor_max; i++) {
+		if (flavor_info[i].sval == 0)
+			continue;
+		fl_ptr = &(flavor_info[i]);
+		for (j = 0; j < z_info->k_max; j++) {
+		  k_ptr = &k_info[j];
+			if ((k_ptr->tval == fl_ptr->tval)
+			  && (k_ptr->sval == fl_ptr->sval))
+			{
+				k_ptr->flavor = i;
+				fl_ptr->k_idx = j;
+			}
+		}
+	}
+}
+
+
+static errr flavor_assign_random(byte tval)
+{
+	int i,j;
+	int flavor_count = 0;
+	int choice;
+	object_kind_flavor *fl_ptr;
+	/*object_kind *k_ptr;*/
+
+	/* Count the random flavors for the given tval */
+	for (i = 1; i < z_info->flavor_max; i++) {
+		fl_ptr = &(flavor_info[i]);
+		if ((fl_ptr->tval == tval) && (fl_ptr->sval == 0)
+		  && (fl_ptr->k_idx == 0))
+			flavor_count++;
+	}
+
+	for (i = 0; i < z_info->k_max; i++) {
+		if (k_info[i].tval != tval || k_info[i].flavor)
+			continue;
+
+		if (k_info[i].flags[3] & TR3_NO_FLAVOR)
+			continue;
+
+		/* HACK - Ordinary food is "boring" */
+		if ((tval == TV_FOOD) && (k_info[i].sval > SV_FOOD_MIN_FOOD))
+			continue;
+
+		if (!flavor_count) {
+			msgf("Not enough flavors for tval %d.", tval);
+			message_flush();
+			return (PARSE_ERROR_GENERIC);
+		}
+
+		choice = randint0(flavor_count);
+	
+		for (j = 1; j < z_info->flavor_max; j++) {
+			fl_ptr = &(flavor_info[j]);
+			if ((fl_ptr->tval == tval) && (fl_ptr->sval == 0)
+			  && (fl_ptr->k_idx == 0))
+			{
+				if (choice == 0) {
+					k_info[i].flavor = j;
+					fl_ptr->k_idx = i;
+					flavor_count--;
+					break;
+				}
+
+				choice--;
+			}
+		}
+	}
+	/* Success */
+	return (0);
+}
+
+
 /*
  * Prepare the "variable" part of the "k_info" array.
  *
@@ -517,25 +198,16 @@ void get_table_name(char *out_string, bool quotes)
  * current title has 6 letters and the new word has 8 letters, which
  * would result in a 6 letter scroll title.
  *
- * Duplicate titles are avoided by requiring that no two scrolls share
- * the same first four letters (not the most efficient method, and not
- * the least efficient method, but it will always work).
- *
  * Hack -- make sure everything stays the same for each saved game
  * This is accomplished by the use of a saved "random seed", as in
  * "town_gen()".  Since no other functions are called while the special
  * seed is in effect, so this function is pretty "safe".
- *
- * Note that the "hacked seed" may provide an RNG with alternating parity!
  */
 void flavor_init(void)
 {
 	int i, j;
-
-	byte temp_col;
-
-	cptr temp_adj;
-
+	char buf[26];
+	char *end = buf + 1;
 
 	/* Hack -- Use the "simple" RNG */
 	Rand_quick = TRUE;
@@ -543,121 +215,25 @@ void flavor_init(void)
 	/* Hack -- Induce consistant flavors */
 	Rand_value = seed_flavor;
 
-
-	/* Efficiency -- Rods/Wands share initial array */
-	for (i = 0; i < MAX_METALS; i++)
-	{
-		rod_adj[i] = wand_adj[i];
-		rod_col[i] = wand_col[i];
-	}
-
-
-	/* Rings have "ring colors" */
-	for (i = 0; i < MAX_ROCKS; i++)
-	{
-		j = randint0(MAX_ROCKS);
-		temp_adj = ring_adj[i];
-		ring_adj[i] = ring_adj[j];
-		ring_adj[j] = temp_adj;
-		temp_col = ring_col[i];
-		ring_col[i] = ring_col[j];
-		ring_col[j] = temp_col;
-	}
-
-	/* Amulets have "amulet colors" */
-	for (i = 0; i < MAX_AMULETS; i++)
-	{
-		j = randint0(MAX_AMULETS);
-		temp_adj = amulet_adj[i];
-		amulet_adj[i] = amulet_adj[j];
-		amulet_adj[j] = temp_adj;
-		temp_col = amulet_col[i];
-		amulet_col[i] = amulet_col[j];
-		amulet_col[j] = temp_col;
-	}
-
-	/* Staffs */
-	for (i = 0; i < MAX_WOODS; i++)
-	{
-		j = randint0(MAX_WOODS);
-		temp_adj = staff_adj[i];
-		staff_adj[i] = staff_adj[j];
-		staff_adj[j] = temp_adj;
-		temp_col = staff_col[i];
-		staff_col[i] = staff_col[j];
-		staff_col[j] = temp_col;
-	}
-
-	/* Wands */
-	for (i = 0; i < MAX_METALS; i++)
-	{
-		j = randint0(MAX_METALS);
-		temp_adj = wand_adj[i];
-		wand_adj[i] = wand_adj[j];
-		wand_adj[j] = temp_adj;
-		temp_col = wand_col[i];
-		wand_col[i] = wand_col[j];
-		wand_col[j] = temp_col;
-	}
-
-	/* Rods */
-	for (i = 0; i < MAX_METALS; i++)
-	{
-		j = randint0(MAX_METALS);
-		temp_adj = rod_adj[i];
-		rod_adj[i] = rod_adj[j];
-		rod_adj[j] = temp_adj;
-		temp_col = rod_col[i];
-		rod_col[i] = rod_col[j];
-		rod_col[j] = temp_col;
-	}
-
-	/* Foods (Mushrooms) */
-	for (i = 0; i < MAX_SHROOM; i++)
-	{
-		j = randint0(MAX_SHROOM);
-		temp_adj = food_adj[i];
-		food_adj[i] = food_adj[j];
-		food_adj[j] = temp_adj;
-		temp_col = food_col[i];
-		food_col[i] = food_col[j];
-		food_col[j] = temp_col;
-	}
-
-	/* Potions */
-	for (i = 4; i < MAX_POTIONS; i++)
-	{
-		j = rand_range(4, MAX_POTIONS - 1);
-		temp_adj = potion_adj[i];
-		potion_adj[i] = potion_adj[j];
-		potion_adj[j] = temp_adj;
-		temp_col = potion_col[i];
-		potion_col[i] = potion_col[j];
-		potion_col[j] = temp_col;
-	}
-
-	/* Scrolls (random titles, always white) */
-	for (i = 0; i < MAX_TITLES; i++)
-	{
+  /* Create names for any flavor that does not have a name */
+	for (i = 1; i < z_info->flavor_max; i++) {
+		char buf[80];
+		object_kind_flavor *fl_ptr = &(flavor_info[i]);
+		if (fl_ptr->name || !(fl_ptr->idx)) {
+		  continue;
+		}
 		/* Get a new title */
-		while (TRUE)
-		{
-			char buf[80];
-
+		while (TRUE) {
+			char tmp[80];
 			int buf_len = 0;
-
-			bool okay;
+			bool okay = TRUE;
 
 			/* Start a new title */
 			buf[0] = '\0';
 
 			/* Collect words until done */
-			while (1)
-			{
+			while (TRUE) {
 				int q, s;
-
-				char tmp[80];
-
 				int len = 0;
 
 				/* Start a new word */
@@ -667,52 +243,49 @@ void flavor_init(void)
 				s = ((randint0(100) < 30) ? 1 : 2);
 
 				/* Add a one or two syllable word */
-				for (q = 0; q < s; q++)
-				{
+				for (q = 0; q < s; q++) {
 					/* Add the syllable */
 					strnfcat(tmp, 80, &len, syllables[randint0(MAX_SYLLABLES)]);
 				}
 
 				/* Stop before getting too long */
-				if (strlen(buf) + 1 + strlen(tmp) > 15) break;
+				if (strlen(buf) + 1 + strlen(tmp) > 15)
+					break;
 
 				/* Add a space + word */
 				strnfcat(buf, 80, &buf_len, " %s", tmp);
 			}
-
-			/* Save the title */
-			strcpy(scroll_adj[i], buf + 1);
-
-			/* Assume okay */
-			okay = TRUE;
-
-			/* Check for "duplicate" scroll titles */
-			for (j = 0; j < i; j++)
-			{
-				cptr hack1 = scroll_adj[j];
-				cptr hack2 = scroll_adj[i];
-
-				/* Compare first four characters */
-				if (*hack1++ != *hack2++) continue;
-				if (*hack1++ != *hack2++) continue;
-				if (*hack1++ != *hack2++) continue;
-				if (*hack1++ != *hack2++) continue;
-
-				/* Not okay */
-				okay = FALSE;
-
-				/* Stop looking */
-				break;
+			/* Check for duplicate names (if any other flavor has this name) */
+			for (j = 1; j < z_info->flavor_max; j++) {
+				object_kind_flavor *fl2_ptr = &(flavor_info[j]);
+				if ((j != i) && fl2_ptr->name
+				  && (strcmp(buf+1, fl2_ptr->name) == 0))
+				{
+					okay = FALSE;
+				}
 			}
-
-			/* Break when done */
-			if (okay) break;
+			if (okay)
+				break;
 		}
+		/* Save the title */
+		fl_ptr->name = string_make(buf+1);
 
-		/* All scrolls are white */
-		scroll_col[i] = TERM_WHITE;
 	}
 
+	/* Hack -- Induce consistant flavors */
+	Rand_value = seed_flavor;
+
+	flavor_assign_fixed();
+
+	flavor_assign_random(TV_RING);
+	flavor_assign_random(TV_AMULET);
+	flavor_assign_random(TV_STAFF);
+	flavor_assign_random(TV_WAND);
+	flavor_assign_random(TV_ROD);
+	flavor_assign_random(TV_FOOD);
+	flavor_assign_random(TV_POTION);
+
+	flavor_assign_random(TV_SCROLL);
 
 	/* Hack -- Use the "complex" RNG */
 	Rand_quick = FALSE;
@@ -725,14 +298,95 @@ void flavor_init(void)
 		/* Skip "empty" objects */
 		if (!k_ptr->name) continue;
 
-		/* Extract "flavor" (if any) */
-		k_ptr->flavor = object_flavor(i);
-
 		/* No flavor yields aware */
 		if (!k_ptr->flavor) k_ptr->info |= OK_AWARE;
+	}
+}
 
-		/* Check for "easily known" */
-		if (object_easy_know(i)) k_ptr->info |= OK_EASY_KNOW;
+void clear_flavor_assignments()
+{
+	int i;
+
+	/* R */
+
+	/* Note: To reset any flavor names that were not given in
+	 * flavor.txt, any name that is all lower case is considered
+	 * to have been generated by flavor_init and will be removed.
+	 * However, nothing in flavor.txt is all lower case, so this
+	 * behavior is not currently a problem. And we can avoid testing
+	 * each sylable to see if a name is completely a collection
+	 * of sylables and spaces.
+	 */
+
+	/* Check every flavor */
+	for (i = 1; i < z_info->flavor_max; i++) {
+		flavor_info[i].k_idx = 0;
+		/* check if the flavor's name was generated*/
+		/* if it was, remove it */
+		if (flavor_info[i].name) {
+			char *s = flavor_info[i].name;
+			s32b len = strlen(flavor_info[i].name);
+			int j;
+			bool remove = TRUE;
+			
+			for (j=0; j <= len; j++) {
+				if (isupper(s++)) {
+					/* generated names do not have an upper
+					 * case letter, so this cannot be one */
+					remove = FALSE;
+					break;
+				}
+			}
+#if 0
+			if (remove) {
+				while (*s) {
+					for (j = 0; j < MAX_SYLLABLES; j++) {
+						len = strlen(syllables[j])
+						if (strncmp(s, syllables[j], len) == 0) {
+							if (len > bestlen) {
+								best = j;
+								bestlen = len;
+							}
+						}
+					}
+					if (bestlen > 0) {
+						s += besetlen;
+					} else {
+						/* no syllable was found so this was not
+						 * generated, so go to the next flavor */
+						 remove = FALSE;
+						 break;
+					}
+					if (*s == ' ') {
+						s++;
+					}
+					if (*s == '\0') {
+						/* the whole name was comprised of syllables
+						* so remove the name */
+						 remove = TRUE;
+						break;
+					}
+				}
+			}
+#endif
+			if (remove) {
+				ZFREE(flavor_info[i].name);
+			}
+		}
+	}
+
+	/* Check every object */
+	for (i = 1; i < z_info->k_max; i++) {
+		object_kind *k_ptr = &k_info[i];
+
+		/* Skip "empty" objects */
+		if (!k_ptr->name) continue;
+
+		/* Remove "flavor" (if any) */
+		if (k_ptr->flavor) {
+			k_ptr->info &= ~OK_AWARE;
+			k_ptr->flavor = 0;
+		}
 	}
 }
 
@@ -911,7 +565,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 			if ((FLAG(k_ptr, TR_INSTA_ART)) && aware) break;
 
 			/* Color the object */
-			modstr = amulet_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
@@ -929,7 +585,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 			if ((FLAG(k_ptr, TR_INSTA_ART)) && aware) break;
 
 			/* Color the object */
-			modstr = ring_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
@@ -946,7 +604,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_STAFF:
 		{
 			/* Color the object */
-			modstr = staff_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			/* Hack: unusual plurals */
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
@@ -969,7 +629,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_WAND:
 		{
 			/* Color the object */
-			modstr = wand_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
 				basenm = "& Wand~";
@@ -981,7 +643,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_ROD:
 		{
 			/* Color the object */
-			modstr = rod_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
 				basenm = "& Rod~";
@@ -993,7 +657,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_SCROLL:
 		{
 			/* Color the object */
-			modstr = scroll_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
 				basenm = "& Scroll~";
@@ -1005,7 +671,9 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		case TV_POTION:
 		{
 			/* Color the object */
-			modstr = potion_adj[o_ptr->sval];
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
 				basenm = "& Potion~";
@@ -1018,9 +686,11 @@ void object_desc(char *buf, const object_type *o_ptr, int pref, int mode,
 		{
 			/* Ordinary food is "boring" */
 			if (o_ptr->sval >= SV_FOOD_MIN_FOOD) break;
+			if (o_ptr->flags[3] & TR3_NO_FLAVOR) break;
 
 			/* Color the object */
-			modstr = food_adj[o_ptr->sval];
+			if (k_ptr->flavor)
+				modstr = flavor_info[k_ptr->flavor].name;
 			if (aware) append_name = TRUE;
 			if (((plain_descriptions) && (aware)) || (o_ptr->info & OB_STOREB))
 				basenm = "& Mushroom~";
@@ -1904,4 +1574,3 @@ void object_store_fmt(char *buf, uint max, cptr fmt, va_list *vp)
 
 	object_desc_store(buf, o_ptr, pref, mode, max);
 }
-

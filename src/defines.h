@@ -2594,7 +2594,7 @@
 #define OK_WORTHLESS    0x04	/* Unaware, but know the kind is worthless */
 #define OK_CURSED       0x08	/* Unaware, but know the kind can be cursed */
 #define OK_EASY_KNOW    0x10	/* Object is always known if aware */
-#define OK_SKIP_FLAVOR  0x20
+#define OK_DUMMY2       0x20
 #define OK_DUMMY3       0x40
 #define OK_DUMMY4       0x80
 
@@ -2748,8 +2748,8 @@
 #define TR3_EASY_ENCHANT        0x00000008L /* Easy to enchant */
 #define TR3_SQUELCH             0x00000010L /* Item ignores squelching */
 #define TR3_SH_FEAR             0x00000020L /* Aura of fear */
-#define TR3_XXX7                0x00000040L
-#define TR3_XXX8                0x00000080L
+#define TR3_SKIP_FLAVOR         0x00000040L
+#define TR3_NO_FLAVOR           0x00000080L
 #define TR3_IM_LITE             0x00000100L
 #define TR3_IM_DARK             0x00000200L
 #define TR3_SH_ACID             0x00000400L
@@ -2913,8 +2913,8 @@
 #define TR_EASY_ENCHANT		3,  TR3_EASY_ENCHANT
 #define TR_SQUELCH 		 	3,  TR3_SQUELCH
 #define TR_SH_FEAR 		 	3,  TR3_SH_FEAR
-#define TR_XXX7 		 	3,  TR3_XXX7
-#define TR_XXX8 		 	3,  TR3_XXX8
+#define TR_SKIP_FLAVOR	 	3,  TR3_SKIP_FLAVOR
+#define TR_NO_FLAVOR	 	3,  TR3_NO_FLAVOR
 #define TR_IM_LITE  	 	3,  TR3_IM_LITE
 #define TR_IM_DARK  	 	3,  TR3_IM_DARK
 #define TR_SH_ACID  	 	3,  TR3_SH_ACID
@@ -3880,7 +3880,7 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
  */
 #define object_attr(T) \
 	(((k_info[(T)->k_idx].flavor) \
-	 && !((k_info[(T)->k_idx].info & OK_SKIP_FLAVOR) && object_known_p(T))) ? \
+	 && !((k_info[(T)->k_idx].flags[3] & TR3_SKIP_FLAVOR) && object_known_p(T))) ? \
 	 (misc_to_attr[k_info[(T)->k_idx].flavor]) : \
 	 (k_info[(T)->k_idx].x_attr))
 
@@ -3891,7 +3891,7 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
  */
 #define object_char(T) \
 	(((k_info[(T)->k_idx].flavor) \
-	 && !((k_info[(T)->k_idx].info & OK_SKIP_FLAVOR) && object_known_p(T))) ? \
+	 && !((k_info[(T)->k_idx].flags[3] & TR3_SKIP_FLAVOR) && object_known_p(T))) ? \
 	 (misc_to_char[k_info[(T)->k_idx].flavor]) : \
 	 (k_info[(T)->k_idx].x_char))
 
