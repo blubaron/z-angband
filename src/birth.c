@@ -1425,7 +1425,10 @@ static bool player_birth_aux_2(void)
 		ch = inkey();
 
 		/* Quit */
-		if (ch == KTRL('X')) quit(NULL);
+		if (ch == KTRL('X')) {
+			cleanup_angband();
+			quit(NULL);
+		}
 
 		/* Start over */
 		if (ch == ESCAPE) return (FALSE);
@@ -1773,7 +1776,10 @@ static bool player_birth_aux_3(void)
 			button_restore();
 
 			/* Quit */
-			if (ch == KTRL('X')) quit(NULL);
+			if (ch == KTRL('X')) {
+				cleanup_angband();
+				quit(NULL);
+			}
 
 			/* Start over */
 			if (ch == ESCAPE) return (FALSE);
@@ -2078,6 +2084,7 @@ static bool player_birth_random(void)
 
 		/* Quit */
 		if (ch == KTRL('X')) {
+			cleanup_angband();
 			quit(NULL);
 		}
 
@@ -2303,7 +2310,10 @@ static bool player_birth_aux(void)
 		button_restore();
 
 		/* Quit */
-		if (ch == KTRL('X')) quit(NULL);
+		if (ch == KTRL('X')) {
+			cleanup_angband();
+			quit(NULL);
+		}
 
 		/* Start over */
 		if ((ch == 0x7F) || (ch == '.') || (ch == KTRL('H'))) return (FALSE);
