@@ -1865,7 +1865,14 @@ static bool player_birth_random(void)
 
 
 	/*** pick a random race ***/
-	p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);
+	/* give priority to races early in the list */
+	if (MAX_RACES > 10) {
+		p_ptr->rp.prace = (unsigned char) randint0(20);
+		if (p_ptr->rp.prace > 10)
+			p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);
+	} else {
+		p_ptr->rp.prace = (unsigned char) randint0(MAX_RACES);
+	}
 
 	/* Give beastman a mutation at character birth */
 	if (p_ptr->rp.prace == RACE_BEASTMAN) {
