@@ -428,6 +428,10 @@ enum
        it turns any mode off.
       the additional modes use the same speed penalty as search mode. (speed-10)
        (half with no speed bonus)
+      if in stealth mode, rogues and rangers can pass through sleeping monsters,
+        by switching places with them. Perhaps in the future, skip when there is
+        only one monster in the way, for extra energy, and switch otherwise.
+
 
     Added items to resurrect the player when s/he dies.
      *still need to remove gold/items from the player and put in a "death
@@ -495,6 +499,15 @@ enum
       *have only recreated basic transions so far.
 
     Added magic effects to grow/kill basic trees. *Not used anywhere.
+
+    Added a stairs in the capital, to be the palace dungeon, and
+     made it the angband dungeon type, with a level step of 10, min level
+     10, and max level 120
+      
+    *Created rods/staves of *Perception*, as well as rods/scrolls/staves of
+      mass identify, *mass identify*, and mass alchemy. so that less time is 
+      spent on id-ing and transmuting loot piles in the late game. *Still need
+	  to put them at appropriate depth/rarities/costs.
 
 
 

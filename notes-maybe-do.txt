@@ -62,11 +62,6 @@
       Magesmith (armor) and Magesmith (weapon) will only offer appropriate
       items. need to add a magesmith (jewelery) for rings, amulets, lights, etc.
 
-    if in stealth mode, player can pass through sleeping monsters. either by 
-      skipping past their position or by switching places with them. I prefer
-      the latter. or skip when there is only one monster in the way, for extra
-      energy, and switch otherwise.
-
     be able to "pick up" tamed pets that were not summoned.
 
     allow platforms to override parts of the ui.
@@ -77,19 +72,15 @@
       also be able to set dun_gen_type based on level range with/without
        changing habitat.
 
-    make a stairs generate in the capital, to be the palace dungeon, and
-     make it the angband dungeon type, with a level step of 10, min level
-     10, and max level 120
-      
     use angband lighting style (array[MAX_LIGHTING]) for feature and field
       lighting.
 
     possible start:
-     You are from out of town. You heard that a fried/familty member was
+     You are from out of town. You heard that a friend/familty member was
       missing, so you came to town to find him/her. You get to town, find
       the house locked. while looking around town for information, you go
       town hall and the mayor tells you that the person has been missing
-      for a while, and asks you to look for itb (get quest), and gives you
+      for a while, and asks you to look for it (get quest), and gives you
       the key. when you get to the house, you search around, then enter the
       cellar. There you find non-breeding vermin (probably snakes/lizards),
       and notes on gameplay (tutorial). You then find a note that says that
@@ -178,11 +169,15 @@
 # V:<sym>:<feat>:<feat_mod_flags>:<r_idx>:<k_idx>:<ego>:<trap>? from Z2.4.0
 # if r_idx < 0 make hero from -r_idx
 # if k_idx < 0 make randart from -k_idx
-# if ego > 0, if k_idx > 0, use k_idx as base if appropiate tval for ego
+# if ego > 0, if k_idx > 0, use k_idx as base if appropriate tval for ego
 # if ego > 0, if k_idx < 0, make randart that includes ego
 # if ego > 0, if k_idx = 0, pick random object for ego
 # if ego < 0 make artifact from -ego?
 # if r_idx, k_idx, or trap start with '*', then the number means out of depth rather than index 
+# if k_idx starts with '#', then k_idx is an object tval, rather than an index. an out of depth 
+# tval would be "#{tval}*{depthdiff}". ego/randart rules are the same.
+# if r_idx starts with '#', then r_idx is a monster group index, rather than a monster index
+#   an out of depth monster group would be "#{grp_idx}*{depthdiff}". hero/depth rules are the same.
 # M: Message that replaces the normal level feeling?
 # N:y:x:notefeat:note - message that comes up when steping on the spot (bumping into if wall)
 FA/DaJangband have extra vault types/chars incorporate, modify above?
@@ -190,7 +185,22 @@ FA/DaJangband have extra vault types/chars incorporate, modify above?
 add vault symbol like line that makes a specific item/creature spawn elsewhere
 on the level (next to entry point if nowhere else possible). the idea is to make
 an item generate that would get the player through a feature of the vault by a
-feature change, but the item would not be nearby. (R for remote?)
+feature change even if the player usually does not have the capability, but the item would not be nearby. (R for remote?)
+
+Also add remote note lines,('O:message') that would be placed wherever R lines are placed.
+if O lines are used, there should be one for each R line.
+
+Add random group lines. Replace one of a group of symbols with one symbol 
+and the rest of the group with another symbol for an effect similar to
+Angband's interesting rooms. Format is: G:a:b:c:d{:e:f:g:h:i}, where
+d to i are symbols used in the description, one of which is selected to be replaced by the main symbol
+a is the symbol that replaces the selected symbol
+b is the symbol that replaces the symbols that are not selected
+c is the chance of selecting the first symbol('d')
+d is the first possible symbol and must be present
+e to i are optional symbols that all have an equal chance of being selected
+a and b may be symbols given on V: lines, whether or not those symbols are used in the description, or standard symbols
+
 
 add easier depth level symbols, so alot can be used.
   i - monster up to 15 levels over depth?
