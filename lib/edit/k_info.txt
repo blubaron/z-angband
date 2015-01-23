@@ -7086,3 +7086,121 @@ F:IGNORE_FIRE | IGNORE_ACID | EASY_KNOW
 D:Anchors your soul to this plane. If you have one on you when you
 D: die, you will be returned to the nearest temple or cathedral.
 D: However, your items and gold will remain in the dungeon.
+
+N:704:Mass Alchemy
+G:?:d
+I:70:13:0
+W:30:0:5:500
+A:30/1:60/1:90/1
+F:EASY_KNOW
+L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  ident = TRUE
+D:This scroll turns objects in an area (radius 2) to gold.
+
+N:705:Mass Alchemy
+G:-:d
+I:66:32:20
+W:80:0:10:500
+A:75/20:79/5
+F:EASY_KNOW
+L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  ident = TRUE
+D:This rod turns objects in an area (radius 2) to gold.
+
+N:706:Mass Alchemy
+G:_:d
+I:55:29:20
+W:80:0:10:500
+A:75/20:79/5
+F:EASY_KNOW
+L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  ident = TRUE
+D:This staff turns objects in an area (radius 2) to gold.
+
+N:707:Mass Identify
+G:?:d
+I:70:13:0
+W:30:0:5:500
+A:30/1:60/1:90/1
+F:EASY_KNOW
+L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  identify_pack()
+L:USE:  ident = TRUE
+D:This scroll identifies all visible objects.
+
+N:708:Mass Identify
+G:-:d
+I:66:33:20
+W:80:0:10:50000
+A:75/20:90/5
+F:EASY_KNOW
+L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  identify_pack()
+L:USE:  ident = TRUE
+D:This rod identifies all visible objects.
+
+N:709:Mass Identify
+G:-:d
+I:55:33:20
+W:80:0:10:50000
+A:75/20:90/5
+F:EASY_KNOW
+L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  identify_pack()
+L:USE:  ident = TRUE
+D:This staff identifies all visible objects.
+
+N:710:*Mass Identify*
+G:?:d
+I:70:13:0
+W:30:0:5:500
+A:30/1:60/1:90/1
+F:EASY_KNOW
+L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  identify_pack_fully()
+L:USE:  ident = TRUE
+D:This scroll reveals all powers of all visible objects.
+
+N:711:*Mass Identify*
+G:-:d
+I:66:34:20
+W:80:0:10:100000
+A:75/20:90/5
+F:EASY_KNOW
+L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  identify_pack_fully()
+L:USE:  ident = TRUE
+D:This rod reveals all powers of all visible objects.
+
+N:712:*Mass Identify*
+G:-:d
+I:55:34:20
+W:80:0:10:50000
+A:75/20:90/5
+F:EASY_KNOW
+L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  identify_pack_fully()
+L:USE:  ident = TRUE
+D:This staff reveals all powers of all visible objects.
+
+N:713:*Perception*
+G:-:d
+I:66:29:20
+W:80:0:10:80000
+A:75/20:90/5
+F:EASY_KNOW
+L:USE:  if not identify_fully() then result = FALSE end
+L:USE:  ident = TRUE
+D:This rod identifies one item and reveals all of its powers.
+
+N:714:*Perception*
+G:_:d
+I:55:29:20
+W:80:0:10:50000
+A:75/20:90/5
+P:0:1d2:0:0:0
+F:EASY_KNOW
+L:USE:  result = identify_fully()
+L:USE:  ident = TRUE
+D:This staff identifies one item and reveals all of its powers.
+
