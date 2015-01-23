@@ -24,7 +24,7 @@
 ##### Rings #####
 
 # Fixed: the One Ring
-N:1:45:55
+N:1:45:37
 G:=:y
 D:Plain Gold
 
