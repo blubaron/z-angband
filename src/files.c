@@ -221,6 +221,9 @@ const byte darking_colours[16];
  * Specify the attr/char values for "fields" by field index.
  *   T:<num>:<a>:<c>
  *
+ * Specify the attr/char values for "object flavors" by field index.
+ *   L:<num>:<a>:<c>
+ *
  * Specify the attr/char values for unaware "objects" by kind tval.
  *   U:<tv>:<a>:<c>
  *
@@ -323,10 +326,10 @@ errr process_pref_file_command(char *buf)
 		}
 	}
 
-	/* Process "T:<num>:<a>/<c>{:fF}" -- attr/char for fields */
+	/* Process "T:<num>:<a>/<c>{:<d_a>/<d_c>:<l_a>/<l_c>}" -- attr/char for fields */
 	else if (buf[0] == 'T')
 	{
-    byte count = tokenize(buf + 2, 4, zz, TOKENIZE_CHECKQUOTE);
+		byte count = tokenize(buf + 2, 8, zz, TOKENIZE_CHECKQUOTE);
 		if (count >= 3)
 		{
 			field_thaum *t_ptr;
@@ -335,27 +338,70 @@ errr process_pref_file_command(char *buf)
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= z_info->t_max)) return (1);
 			t_ptr = &t_info[i];
-			if (n1) t_ptr->f_attr = n1;
-			if (n2) t_ptr->f_char = n2;
-      if (count == 4) {
-        // we have some flag modifications
-        if (strchr(zz[3],'l'))
-        {
-          // force no dynamic lighting changes
-          t_ptr->info &= ~FIELD_INFO_TRANS;
-        }
-        else if (strchr(zz[3],'L')) {
-          // force dynamic lighting changes
-          t_ptr->info |= FIELD_INFO_TRANS;
-        //else if (strchr(zz[3],'O')) {
-          // mark that this tile gets drawn with overdraw
-        }
-      }
+			if (n1) t_ptr->x_attr = n1;
+			if (n2) t_ptr->x_char = n2;
+			t_ptr->xd_attr = t_ptr->x_attr;
+			t_ptr->xd_char = t_ptr->x_char;
+			t_ptr->xl_attr = t_ptr->x_attr;
+			t_ptr->xl_char = t_ptr->x_char;
+
+			if (count > 7) {
+				// we have some flag modifications
+				if (strchr(zz[7],'T')) {
+					/* mark that this tile gets drawn with overdraw */
+					t_ptr->info |= FIELD_INFO_TALL;
+				} else {
+					t_ptr->info &= ~FIELD_INFO_TALL;
+				}
+			}
+			if (count == 7) {
+				n1 = strtol(zz[3], NULL, 0);
+				n2 = strtol(zz[4], NULL, 0);
+				if (n1) t_ptr->xd_attr = n1;
+				if (n2) t_ptr->xd_char = n2;
+
+				n1 = strtol(zz[5], NULL, 0);
+				n2 = strtol(zz[6], NULL, 0);
+				if (n1) t_ptr->xl_attr = n1;
+				if (n2) t_ptr->xl_char = n2;
+			} else
+			if (count == 5) {
+				n1 = strtol(zz[3], NULL, 0);
+				n2 = strtol(zz[4], NULL, 0);
+				if (n1) t_ptr->xd_attr = n1;
+				if (n2) t_ptr->xd_char = n2;
+			} else
+			if (count == 4) {
+				// we have some flag modifications
+				if (strchr(zz[3],'T')) {
+					/* mark that this tile gets drawn with overdraw */
+					t_ptr->info |= FIELD_INFO_TALL;
+				} else {
+					t_ptr->info &= ~FIELD_INFO_TALL;
+				}
+				if (strchr(zz[3],'l')) {
+					/* this tile uses a specific order for the bright/dark tiles */
+					t_ptr->xd_char += 1;
+					t_ptr->xl_char += 2;
+				} else
+				if (strchr(zz[3],'L')) {
+					/* this tile uses a specific order for the bright/dark tiles */
+					t_ptr->xd_char += 1;
+					t_ptr->xl_char -= 1;
+				}
+			} else
+			{
+				if (t_ptr->x_attr < 16) {
+					/* if is ascii graphics */
+					t_ptr->xd_attr = darking_colours[t_ptr->x_attr];
+					t_ptr->xl_attr = lighting_colours[t_ptr->x_attr];
+				}
+			}
 			return (0);
 		}
 	}
 
-	/* Process "F:<num>:<a>/<c>{:fF}" -- attr/char for terrain features */
+	/* Process "F:<num>:<a>/<c>{:<d_a>/<d_c>:<l_a>/<l_c>}" -- attr/char for terrain features */
 	else if (buf[0] == 'F')
 	{
     byte count = tokenize(buf + 2, 7, zz, TOKENIZE_CHECKQUOTE);
@@ -390,16 +436,24 @@ errr process_pref_file_command(char *buf)
 				if (n1) f_ptr->xd_attr = n1;
 				if (n2) f_ptr->xd_char = n2;
 			} else
+			if (count == 4) {
+				if (strchr(zz[3],'l')) {
+					/* this tile uses a specific order for the bright/dark tiles */
+					f_ptr->xd_char += 1;
+					f_ptr->xl_char += 2;
+				} else
+				if (strchr(zz[3],'L')) {
+					/* this tile uses a specific order for the bright/dark tiles */
+					f_ptr->xd_char += 1;
+					f_ptr->xl_char -= 1;
+				}
+			} else
 			{
 				if (f_ptr->x_attr < 16) {
 					/* If is ascii graphics */
 					f_ptr->xd_attr = darking_colours[f_ptr->x_attr];
 					f_ptr->xl_attr = lighting_colours[f_ptr->x_attr];
-				}/* else
-				if (f_ptr->flags & FF_USE_TRANS) {
-					f_ptr->xd_char += 1;
-					f_ptr->xl_char -= 1;
-				}*/
+				}
 			}
 			return (0);
 		}
@@ -4337,6 +4391,13 @@ void do_cmd_save_game(int is_autosave)
 		 * calling save_player() again
 		 * if (file_copy(savefile,oldsf)) { */
 		/* resave the savefile */
+
+		/* The player is not dead */
+		(void)strcpy(p_ptr->state.died_from, "(autosaved)");
+
+		/* Forbid suspend */
+		signals_ignore_tstp();
+
 		if (!save_player())
 		{
 			msgf ("Autosave backup failed.");
@@ -4350,6 +4411,12 @@ void do_cmd_save_game(int is_autosave)
 			/* do not include this in save count */
 			sf_saves--;
 		}
+
+		/* Allow suspend again */
+		signals_handle_tstp();
+
+		/* Note that the player is not dead */
+		(void)strcpy(p_ptr->state.died_from, "(alive and well)");
 	}
 }
 

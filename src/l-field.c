@@ -18,7 +18,7 @@ static void toluaI_reg_types (lua_State* tolua_S)
 (void) tolua_S;	/* Hack - prevent compiler warnings */
  tolua_usertype(tolua_S,"field_type");
 }
-
+#if 0
 /* get function: f_attr of class  field_type */
 static int toluaI_get_field_field_type_f_attr(lua_State* tolua_S)
 {
@@ -54,7 +54,7 @@ static int toluaI_set_field_field_type_f_char(lua_State* tolua_S)
   self->f_char = ((char)  tolua_getnumber(tolua_S,2,0));
  return 0;
 }
-
+#endif /* if 0 */
 /* get function: t_idx of class  field_type */
 static int toluaI_get_field_field_type_t_idx(lua_State* tolua_S)
 {
@@ -917,7 +917,7 @@ int tolua_field_open (lua_State* tolua_S)
  TOLUA_DEF(FIELD_INFO_FEAT);
  TOLUA_DEF(FIELD_INFO_VIS);
  TOLUA_DEF(FIELD_INFO_MARK);
- TOLUA_DEF(FIELD_INFO_TRANS);
+ TOLUA_DEF(FIELD_INFO_TALL);
  TOLUA_DEF(FIELD_INFO_NO_LOOK);
  TOLUA_DEF(FIELD_INFO_NFT_LOOK);
  TOLUA_DEF(FIELD_INFO_MERGE);
@@ -934,8 +934,8 @@ int tolua_field_open (lua_State* tolua_S)
  TOLUA_DEF(GS_LOW_MEMBER);
  TOLUA_DEF(GS_MEMBER);
  tolua_cclass(tolua_S,"field_type","");
- tolua_tablevar(tolua_S,"field_type","f_attr",toluaI_get_field_field_type_f_attr,toluaI_set_field_field_type_f_attr);
- tolua_tablevar(tolua_S,"field_type","f_char",toluaI_get_field_field_type_f_char,toluaI_set_field_field_type_f_char);
+ /*tolua_tablevar(tolua_S,"field_type","f_attr",toluaI_get_field_field_type_f_attr,toluaI_set_field_field_type_f_attr);
+ tolua_tablevar(tolua_S,"field_type","f_char",toluaI_get_field_field_type_f_char,toluaI_set_field_field_type_f_char);*/
  tolua_tablevar(tolua_S,"field_type","t_idx",toluaI_get_field_field_type_t_idx,toluaI_set_field_field_type_t_idx);
  tolua_tablevar(tolua_S,"field_type","fy",toluaI_get_field_field_type_fy,toluaI_set_field_field_type_fy);
  tolua_tablevar(tolua_S,"field_type","fx",toluaI_get_field_field_type_fx,toluaI_set_field_field_type_fx);
@@ -1012,7 +1012,7 @@ void tolua_field_close (lua_State* tolua_S)
  TOLUA_UNDEF(FIELD_INFO_FEAT);
  TOLUA_UNDEF(FIELD_INFO_VIS);
  TOLUA_UNDEF(FIELD_INFO_MARK);
- TOLUA_UNDEF(FIELD_INFO_TRANS);
+ TOLUA_UNDEF(FIELD_INFO_TALL);
  TOLUA_UNDEF(FIELD_INFO_NO_LOOK);
  TOLUA_UNDEF(FIELD_INFO_NFT_LOOK);
  TOLUA_UNDEF(FIELD_INFO_MERGE);

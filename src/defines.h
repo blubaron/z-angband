@@ -4473,7 +4473,7 @@ extern int PlayerUID;
 #define FIELD_INFO_FEAT		0x0002	/* Terrain feature based field */
 #define FIELD_INFO_VIS		0x0004	/* Has attr / char */
 #define FIELD_INFO_MARK		0x0008	/* Known */
-#define FIELD_INFO_TRANS	0x0010	/* Tile uses 16x16 transparency effects */
+#define FIELD_INFO_TALL		0x0010	/* When drawn tile is extra high */
 #define FIELD_INFO_NO_LOOK	0x0020	/* Do not describe when looked at */
 #define FIELD_INFO_NFT_LOOK	0x0040	/* Do not describe feat when looked at */
 #define FIELD_INFO_MERGE	0x0080	/* Merge counter with similar fields */

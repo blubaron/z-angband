@@ -95,8 +95,24 @@ void reset_visuals(void)
 		field_thaum *t_ptr = &t_info[i];
 
 		/* Default attr/char */
-		t_ptr->f_attr = t_ptr->d_attr;
-		t_ptr->f_char = t_ptr->d_char;
+		t_ptr->x_attr = t_ptr->d_attr;
+		t_ptr->x_char = t_ptr->d_char;
+		if (t_ptr->x_attr < 16) {
+			/* If is ascii graphics */
+			t_ptr->xd_attr = darking_colours[t_ptr->x_attr];
+			t_ptr->xl_attr = lighting_colours[t_ptr->x_attr];
+			t_ptr->xd_char = t_ptr->x_char;
+			t_ptr->xl_char = t_ptr->x_char;
+		} else
+		{
+			t_ptr->xd_attr = t_ptr->x_attr;
+			t_ptr->xl_attr = t_ptr->x_attr;
+			t_ptr->xd_char = t_ptr->x_char;
+			t_ptr->xl_char = t_ptr->x_char;
+		}
+		t_ptr->info &= ~FIELD_INFO_TALL;
+		/* also flip horizontal, vertical flags and draw dark flags
+		 *  when implemented */
 	}
 
 	/* Extract default attr/char code for flavors */

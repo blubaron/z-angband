@@ -520,8 +520,7 @@ typedef struct vault_type vault_type;
 
 struct vault_type
 {
-	/*vault_type *next;*/
-	/*u16b vidx;*/
+	/*u16b idx;*/
 
 	u32b name;	/* Name (offset) */
 	u32b text;	/* Text (offset) */
@@ -533,11 +532,17 @@ struct vault_type
 	byte hgt;	/* Vault height */
 	byte wid;	/* Vault width */
 
+	/*u16b room_types;*/ /* Can be used in dungeons with these room types */
+	/*u16b flags;*/ /* whether text is loaded, possible rotations, force generation, etc */
+
 	vault_symbol *pSymbols;
 	/*floor_note *notes;*/
+	/*vault_symbol *pRemoteSymbols; */
+	/*floor_note *pRemoteNotes;*/
 	/*u32b line;*/
 	/*u32b message;*/
 	u16b vidx;
+	/*vault_type *next;*/
 };
 
 
@@ -1006,11 +1011,16 @@ struct field_thaum
 	/*u16b idx;*/
 	char *name;	/* The name of the field */
 
-	byte f_attr;	/* attribute */
-	char f_char;	/* character */
+	byte x_attr;	/* attribute */
+	char x_char;	/* character */
 
 	byte d_attr;	/* Default attribute */
 	char d_char;	/* Default char */
+
+	byte xd_attr;	/* Desired attribute when dimmed*/
+	char xd_char;	/* Desired char when dimmed */
+	byte xl_attr;	/* Desired attribute when bright */
+	char xl_char;	/* Desired char when bright */
 
 	byte priority;	/* LOS priority higher = more visible */
 
@@ -1040,9 +1050,6 @@ struct field_thaum
 typedef struct field_type field_type;
 struct field_type
 {
-	byte f_attr;	/* attribute */
-	char f_char;	/* character */
-
 	s16b t_idx;	/* field type index */
 
 	s16b fy;	/* Y location on map */

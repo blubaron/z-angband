@@ -2281,6 +2281,7 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 	bool lite = (c_ptr->info & CAVE_MNLT) || (player & GRID_LITE);
 
 	bool float_field = FALSE;
+	s32b count = 0;
 
 	term_map map;
 
@@ -2346,19 +2347,23 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 			if (((!(player & (GRID_VIEW))) && view_special_lite)
 				|| !visible)
 			{
-		    a = f_ptr->xd_attr;
-		    c = f_ptr->xd_char;
-        lighting = 1;
+				a = f_ptr->xd_attr;
+				c = f_ptr->xd_char;
+				lighting = 1;
 			}
 			else if (lite && view_yellow_lite)
 			{
-		    a = f_ptr->xl_attr;
-		    c = f_ptr->xl_char;
-        lighting = 2;
+				a = f_ptr->xl_attr;
+				c = f_ptr->xl_char;
+				lighting = 2;
 			}
 		}
 
+		map.lighting = lighting;
+		
 		/* Save the terrain info for the transparency effects */
+		(*tap) = a;
+		(*tcp) = c;
 
 		/* Does the feature have "extended terrain" information? */
 		/*if (f_ptr->w_attr)
@@ -2371,10 +2376,10 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 			(*tcp) = f_ptr->w_char + c - f_ptr->x_char;
 		}
 		else
-		{*/
+		{
 			(*tap) = a;
 			(*tcp) = c;
-		/*}*/
+		}*/
 	}
 
 
@@ -2394,41 +2399,35 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 			/* High priority tile */
 			map.priority = 20;
 
-			/* Which display level to use? */
-			if (fld_ptr->info & FIELD_INFO_FEAT)
+			/* pick  */
+			if (lighting == 2) {
+				a = t_info[map.field].xl_attr;
+				c = t_info[map.field].xl_char;
+			} else
+			if (lighting == 1) {
+				a = t_info[map.field].xd_attr;
+				c = t_info[map.field].xd_char;
+			} else 
 			{
-				/* Terrain level */
-				if ((use_graphics == GRAPHICS_ADAM_BOLT)
-					&& (fld_ptr->info & (FIELD_INFO_TRANS)))
-				{
-					/* Take into account dynamic lighting. */
-					c += fld_ptr->f_char - f_ptr->x_char;
-				}
-				else
-				{
-					/* Normal char */
-					c = fld_ptr->f_char;
-				}
+				a = t_info[map.field].x_attr;
+				c = t_info[map.field].x_char;
+			}
+			/* adjust corpse image */
+			if (use_graphics && (t_info[map.field].type == FTYPE_CORPSE)) {
+				c += fld_ptr->data[7];
+			}
 
-				/* Normal attr */
-				a = fld_ptr->f_attr;
-
+			/* Which display level to use? */
+			if (fld_ptr->info & FIELD_INFO_FEAT) {
 				/* Save the terrain info for the transparency effects */
 				(*tap) = a;
 				(*tcp) = c;
 			}
-			else
+			/* Do we need to look at objects? */
+			if (!(fld_ptr->info & (FIELD_INFO_IGNORE)))
 			{
-				/* Tile */
-				c = fld_ptr->f_char;
-				a = fld_ptr->f_attr;
-
-				/* Do we need to look at objects? */
-				if (!(fld_ptr->info & (FIELD_INFO_IGNORE)))
-				{
-					/* Above objects */
-					float_field = TRUE;
-				}
+				/* Above objects */
+				float_field = TRUE;
 			}
 
 			/* Done */
@@ -2438,6 +2437,7 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 	FLD_ITT_END;
 
 	/* Objects */
+	count = 0;
 	OBJ_ITT_START (c_ptr->o_idx, o_ptr)
 	{
 		if (SQUELCH(o_ptr->k_idx) && !FLAG(o_ptr, TR_SQUELCH)) continue;  /* completely ignore squelched objects */
@@ -2479,14 +2479,29 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 
 				/* Normal attr */
 				a = object_attr(o_ptr);
+				count++;
 			}
 
 			/* Done */
 			break;
+		/*} else
+		if (o_ptr->info & OB_FUZZY) {
+			if (o_ptr->tval == TV_GOLD) {
+				a = t_info[FT_UNKNOWN_GOLD].x_attr;
+				c = t_info[FT_UNKNOWN_GOLD].x_char;
+			} else {
+				a = t_info[FT_UNKNOWN_OBJ].x_attr;
+				c = t_info[FT_UNKNOWN_OBJ].x_char;
+			}
+			count++;*/
 		}
 	}
 	OBJ_ITT_END;
 
+	if (count > 1) {
+		a = t_info[FT_OBJECT_PILE].x_attr;
+		c = t_info[FT_OBJECT_PILE].x_char;
+	}
 
 	/* Handle monsters */
 	if (c_ptr->m_idx)
@@ -2529,8 +2544,9 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 		/* Get the "player" char */
 		c = r_ptr->x_char;
 #ifdef VARIABLE_PLAYER_GRAPH
-
-		variable_player_graph(&a, &c)
+		if (use_graphics == GRAPHICS_NONE) {
+			variable_player_graph(&a, &c)
+		}
 #endif /* VARIABLE_PLAYER_GRAPH */
 
 		/* High priority tile */
@@ -3063,8 +3079,8 @@ void display_map(int *cx, int *cy)
 								&& ((y+ j) == pl_ptr->y)
 								&& (t_info[FT_BUILD_FARM].info & FIELD_INFO_VIS))
 							{
-								ma[j + 1][i + 1] = t_info[FT_BUILD_FARM].f_attr;
-								mc[j + 1][i + 1] = t_info[FT_BUILD_FARM].f_char;
+								ma[j + 1][i + 1] = t_info[FT_BUILD_FARM].x_attr;
+								mc[j + 1][i + 1] = t_info[FT_BUILD_FARM].x_char;
 								if (t_info[FT_BUILD_FARM].info & FIELD_INFO_FEAT)
 									feat = FEAT_NONE;								
 							}

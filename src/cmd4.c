@@ -2608,8 +2608,8 @@ static bool do_cmd_dump_field(int dummy)
 		froff(fff, "# %s\n", t_ptr->name);
 
 		/* Dump the field attr/char info */
-		froff(fff, "F:%d:0x%02X:0x%02X\n\n", i,
-				(byte)(t_ptr->f_attr), (byte)(t_ptr->f_char));
+		froff(fff, "T:%d:0x%02X:0x%02X\n\n", i,
+				(byte)(t_ptr->x_attr), (byte)(t_ptr->x_char));
 	}
 
 	/* All done */
@@ -2846,8 +2846,8 @@ static bool do_cmd_change_field(int dummy)
 
 		byte da = (byte)t_ptr->d_attr;
 		byte dc = (byte)t_ptr->d_char;
-		byte ca = (byte)t_ptr->f_attr;
-		byte cc = (byte)t_ptr->f_char;
+		byte ca = (byte)t_ptr->x_attr;
+		byte cc = (byte)t_ptr->x_char;
 
 		/* Label the object */
 		prtf(5, 7, "Field = %d, Name = %-40.40s", f, t_ptr->name);
@@ -2874,10 +2874,10 @@ static bool do_cmd_change_field(int dummy)
 		/* Analyze */
 		if (i == 'n') f = (f + z_info->t_max + 1) % z_info->t_max;
 		if (i == 'N') f = (f + z_info->t_max - 1) % z_info->t_max;
-		if (i == 'a') t_info[f].f_attr = (byte)(ca + 1);
-		if (i == 'A') t_info[f].f_attr = (byte)(ca - 1);
-		if (i == 'c') t_info[f].f_char = (byte)(cc + 1);
-		if (i == 'C') t_info[f].f_char = (byte)(cc - 1);
+		if (i == 'a') t_info[f].x_attr = (byte)(ca + 1);
+		if (i == 'A') t_info[f].x_attr = (byte)(ca - 1);
+		if (i == 'c') t_info[f].x_char = (byte)(cc + 1);
+		if (i == 'C') t_info[f].x_char = (byte)(cc - 1);
 	}
 
 	screen_load();

@@ -122,6 +122,7 @@ struct term_map
 	s16b field;
 	byte terrain;
 	char unknown;
+	byte lighting;
 
 	/* Location */
 	u16b x;

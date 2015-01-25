@@ -743,10 +743,6 @@ void field_prep(field_type *f_ptr, s16b t_idx)
 	/* Get pointer to thaum type. */
 	t_ptr = &t_info[t_idx];
 
-	/* What it looks like */
-	f_ptr->f_attr = t_ptr->f_attr;
-	f_ptr->f_char = t_ptr->f_char;
-
 	f_ptr->priority = t_ptr->priority;
 	f_ptr->counter = t_ptr->count_init;
 	f_ptr->info = t_ptr->info;
@@ -778,10 +774,6 @@ void init_fields(void)
 
 		/* Get pointer to thaum type. */
 		t_ptr = &t_info[f_ptr->t_idx];
-
-		/* What it looks like */
-		f_ptr->f_attr = t_ptr->f_attr;
-		f_ptr->f_char = t_ptr->f_char;
 
 		/* Call loading routine */
 		(void) field_script_single(f_ptr, FIELD_ACT_LOAD, "");
@@ -1330,17 +1322,10 @@ void test_field_data_integrity(void)
  */
 void set_corpse_size(field_type *f_ptr, int size)
 {
-	/* Initialise the graphic */
-	//if ((use_graphics == GRAPHICS_ADAM_BOLT) ||
-	//		(use_graphics == GRAPHICS_DAVID_GERVAIS))
-  if (use_graphics > 1)
-	{
-		/* Paranoia */
-		if ((size > 0) && (size < 7))
-		{
-			/* Hack - get new tile via offset table */
-			f_ptr->f_char += size;
-		}
+	/* Paranoia */
+	if ((size > 0) && (size < 7)) {
+		/* Hack - get new tile via offset table */
+		f_ptr->data[7] = size;
 	}
 }
 
