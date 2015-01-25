@@ -106,7 +106,7 @@ static void flavor_assign_fixed(void)
 	object_kind *k_ptr;
 
 	for (i = 1; i < z_info->flavor_max; i++) {
-		if (flavor_info[i].sval == 0)
+		if (flavor_info[i].sval == SV_ANY)
 			continue;
 		fl_ptr = &(flavor_info[i]);
 		for (j = 0; j < z_info->k_max; j++) {
@@ -133,7 +133,7 @@ static errr flavor_assign_random(byte tval)
 	/* Count the random flavors for the given tval */
 	for (i = 1; i < z_info->flavor_max; i++) {
 		fl_ptr = &(flavor_info[i]);
-		if ((fl_ptr->tval == tval) && (fl_ptr->sval == 0)
+		if ((fl_ptr->tval == tval) && (fl_ptr->sval == SV_ANY)
 		  && (fl_ptr->k_idx == 0))
 			flavor_count++;
 	}
@@ -159,7 +159,7 @@ static errr flavor_assign_random(byte tval)
 	
 		for (j = 1; j < z_info->flavor_max; j++) {
 			fl_ptr = &(flavor_info[j]);
-			if ((fl_ptr->tval == tval) && (fl_ptr->sval == 0)
+			if ((fl_ptr->tval == tval) && (fl_ptr->sval == SV_ANY)
 			  && (fl_ptr->k_idx == 0))
 			{
 				if (choice == 0) {

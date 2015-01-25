@@ -6077,8 +6077,11 @@ static errr parse_flavor_info(char *buf, object_kind_flavor **pfl_ptr)
 		t = strchr(s + 1, ':');
 		if (t) {
 			i = atoi(t+1);
-			fl_ptr->sval = i;
-			if (i==0) {
+			if (i<0)
+				fl_ptr->sval = SV_ANY;
+			else
+				fl_ptr->sval = i;
+			if (i<0) {
 				/* see if we have a min level */
 				s = strchr(t + 1, ':');
 				if (s) {
@@ -6089,7 +6092,7 @@ static errr parse_flavor_info(char *buf, object_kind_flavor **pfl_ptr)
 				}
 			}
 		} else {
-			fl_ptr->sval = 0;
+			fl_ptr->sval = SV_ANY;
 			fl_ptr->min_level = 0;
 		}
 
