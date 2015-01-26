@@ -242,6 +242,20 @@ void delete_object_list(s16b *o_idx_ptr)
 	/* Scan all objects in the grid */
 	OBJ_ITT_START (*o_idx_ptr, o_ptr)
 	{
+		if (o_ptr->contents_o_idx) {
+			object_type *q_ptr;
+			/* delete objects in this container */
+			OBJ_ITT_START (o_ptr->contents_o_idx, q_ptr)
+			{
+				/* Wipe the object */
+				object_wipe(o_ptr);
+
+				/* Count objects */
+				if (o_cnt) o_cnt--;
+			}
+			OBJ_ITT_END;
+			o_ptr->contents_o_idx = 0;
+		}
 		/* Wipe the object */
 		object_wipe(o_ptr);
 
@@ -462,6 +476,16 @@ void wipe_o_list(void)
 		OBJ_ITT_START (p_ptr->inventory, o_ptr)
 		{
 			o_ptr->allocated = TRUE;
+			
+			if (o_ptr->contents_o_idx) {
+				/* Save objects in the container */
+				object_type *q_ptr;
+				OBJ_ITT_START (o_ptr->contents_o_idx, q_ptr)
+				{
+					q_ptr->allocated = TRUE;
+				}
+				OBJ_ITT_END;
+			}
 		}
 		OBJ_ITT_END;
 	}
