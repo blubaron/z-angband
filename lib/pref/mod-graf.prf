@@ -175,6 +175,11 @@ T:156:0x9D:0xD7 # Town Hall
 T:157:0x93:0xFF # Hypnotic Pattern ^
 T:158:0x92:0xFF # Rune of Absorption ^
 T:159:0x98:0xEC # Empty Building  
+T:160:0x87:0xB7 # Pile of Objects
+T:161:0x81:0xDE # Trap detect border
+T:162:0x87:0xB7 # Unknown Object
+T:163:0x81:0xE3 # Unknown Treasure
+T:164:0x81:0xE6 # Unknown Creature
 
 ##### Feature attr/char definitions ##### f_info.txt
 
@@ -1507,9 +1512,9 @@ K:196:0x8B:0xB5 # & Mithril Shot~
 ### K:219:          # Holy Prayer
 ### K:220:          # Word of Recall
 ### K:221:          # *Destruction*
-### K:222:          # Slime Mold Juice
-### K:223:          # Apple Juice
-### K:224:          # Water
+K:222:0x88:0x91 # Bottle of Slime Mold Juice
+K:223:0x88:0x83 # Bottle of Apple Juice
+K:224:0x88:0x9A # Bottle of Water
 ### K:225:          # Strength
 ### K:226:          # Weakness
 ### K:227:          # Restore Strength
@@ -1936,6 +1941,19 @@ K:698:0x8A:0xF7 # & Pouch~ ^
 K:699:0x8A:0xF9 # & Large Pouch~ ^
 K:700:0x8A:0xF8 # & Indestructable Pouch~ ^
 K:701:0x8A:0xFA # & Indestructable Pack~ ^
+K:702:0x8A:0xF1 # & Ankh~ ^
+K:703:0x8A:0xF2 # & Ankh~ ^
+# K:704:0x87:0xCD # Mass Alchemy
+### K:705:          # Mass Alchemy
+### K:706:          # Mass Alchemy
+# K:707:0x87:0xCD # Mass Identify
+### K:708:          # Mass Identify
+### K:709:          # Mass Identify
+# K:710:0x87:0xCD # *Mass Identify*
+### K:711:          # *Mass Identify*
+### K:712:          # *Mass Identify*
+### K:713:          # *Perception*
+### K:714:          # *Perception*
 
 # Load the flavor pictures
 %:mod-flvr.prf

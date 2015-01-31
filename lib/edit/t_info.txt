@@ -1942,7 +1942,9 @@ I:FEAT | VIS | MARK | NFT_LOOK | NO_OBJECT | PERM
 D:0:0:25:0:0:0:100:8
 L:SBINIT:place_sb(rand_range(105, 110), rand_range(5, 10) * 10)
 L:PENTER:do_cmd_store(field)
-L:STORE2:result = item_tester_hook_tval(object, TV_FOOD)
+L:STORE2:result = FALSE
+L:STORE2:if (item_tester_hook_tval(object, TV_FOOD) == TRUE) then result = TRUE end
+L:STORE2:if (item_tester_hook_tval(object, TV_POTION) == TRUE) then result = TRUE end
 
 # Library
 N:138:Library

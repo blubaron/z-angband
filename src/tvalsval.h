@@ -556,12 +556,12 @@
 #define SV_POTION_WATER                  0
 #define SV_POTION_APPLE_JUICE            1
 #define SV_POTION_SLIME_MOLD             2
-/* xxx (fixed color) */
+/*#define SV_POTION_PINT_OF_ALE             3*/
 #define SV_POTION_SLOWNESS               4
 #define SV_POTION_SALT_WATER             5
 #define SV_POTION_POISON                 6
 #define SV_POTION_BLINDNESS              7
-/* xxx */
+/*#define SV_POTION_PINT_OF_WINE            8*/
 #define SV_POTION_CONFUSION              9
 /* xxx */
 #define SV_POTION_SLEEP                 11
@@ -645,8 +645,11 @@
 #define SV_FOOD_RATION                  35
 #define SV_FOOD_SLIME_MOLD              36
 #define SV_FOOD_WAYBREAD                37
-#define SV_FOOD_PINT_OF_ALE             38
-#define SV_FOOD_PINT_OF_WINE            39
+/* these two were made potions, but the svals are not used for anything */
+/*#define SV_FOOD_PINT_OF_ALE             38*/
+/*#define SV_FOOD_PINT_OF_WINE            39*/
+/*#define SV_POTION_PINT_OF_ALE             3*/
+/*#define SV_POTION_PINT_OF_WINE            8*/
 
 
 /*

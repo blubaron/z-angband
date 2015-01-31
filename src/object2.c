@@ -4025,7 +4025,16 @@ byte kind_is_theme(int k_idx)
 		case TV_WAND: return (match_theme.magic);
 		case TV_ROD: return (match_theme.magic);
 		case TV_SCROLL: return (match_theme.magic);
-		case TV_POTION: return (match_theme.magic);
+		case TV_POTION:
+		{
+			/* HACK - Allow potions that are food to be
+			 * in the tool category */
+			if ((k_ptr->cost > 0) && (k_ptr->pval > 800)) {
+				return (match_theme.tools);
+			} else {
+				return (match_theme.magic);
+			}
+		}
 		case TV_FLASK: return (match_theme.tools);
 		case TV_FOOD: return (match_theme.tools);
 		case TV_LIFE_BOOK: return (match_theme.magic);
