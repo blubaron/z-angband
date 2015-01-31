@@ -1290,7 +1290,7 @@ R:967:0x93:0xAF  # Manbearpig ^
 
 ##### Object attr/char definitions ##### k_info.txt
 
-### K:0:          # something
+K:0:0x8A:0xFE # something
 ### K:1:          # Blindness
 ### K:2:          # Paranoia
 ### K:3:          # Confusion
@@ -1463,55 +1463,55 @@ K:131:0x80:0xDB # & Tower Shield~
 K:170:0x80:0xEB # & Double Ring Mail~  
 ### K:171:          # the Magi
 ### K:172:          # Doom
-### K:173:          # Enchant Weapon Accuracy
-### K:174:          # Enchant Weapon Damage
-### K:175:          # Enchant Armor
-### K:176:          # Identify
-### K:177:          # *Identify*
-### K:178:          # Rumor
-### K:179:          # Logrus
-### K:180:          # Remove Curse
-### K:181:          # Light
-### K:182:          # Fire
-### K:183:          # Ice
-### K:184:          # Summon Monster
-### K:185:          # Phase Door
-### K:186:          # Teleportation
-### K:187:          # Teleport Level
-### K:188:          # Monster Confusion
-### K:189:          # Magic Mapping
-### K:190:          # Rune of Protection
-### K:191:          # *Remove Curse*
-### K:192:          # Treasure Detection
-### K:193:          # Object Detection
-### K:194:          # Trap Detection
+K:173:0x87:0xD0 # Enchant Weapon Accuracy
+K:174:0x87:0xD1 # Enchant Weapon Damage
+K:175:0x87:0xD3 # Enchant Armor
+K:176:0x87:0xCE # Identify
+K:177:0x87:0xCF # *Identify*
+K:178:0x87:0x92 # Rumor
+K:179:0x87:0xCC # Logrus
+K:180:0x87:0xF1 # Remove Curse
+K:181:0x87:0xD4 # Light
+K:182:0x87:0x92 # Fire
+K:183:0x87:0x92 # Ice
+K:184:0x87:0xD5 # Summon Monster
+K:185:0x87:0xD6 # Phase Door
+K:186:0x87:0xD7 # Teleportation
+K:187:0x87:0xD8 # Teleport Level
+K:188:0x87:0xD9 # Monster Confusion
+K:189:0x87:0xDA # Magic Mapping
+K:190:0x87:0xDB # Rune of Protection
+K:191:0x87:0xF2 # *Remove Curse*
+K:192:0x87:0xF0 # Treasure Detection
+K:193:0x87:0xF4 # Object Detection
+K:194:0x87:0xE3 # Trap Detection
 K:195:0x8A:0xB1 # & Sheaf Arrow~  
 K:196:0x8B:0xB5 # & Mithril Shot~  
-### K:197:          # Detection
-### K:198:          # Acquirement
-### K:199:          # *Acquirement*
-### K:200:          # Mass Genocide
-### K:201:          # Detect Invisible
-### K:202:          # Aggravate Monster
-### K:203:          # Trap Creation
-### K:204:          # Trap/Door Destruction
-### K:205:          # Artifact Creation
-### K:206:          # Recharging
-### K:207:          # Genocide
-### K:208:          # Darkness
-### K:209:          # Protection from Evil
-### K:210:          # Satisfy Hunger
-### K:211:          # Dispel Undead
-### K:212:          # *Enchant Weapon*
-### K:213:          # Curse Weapon
-### K:214:          # *Enchant Armor*
-### K:215:          # Curse Armor
-### K:216:          # Summon Undead
-### K:217:          # Blessing
-### K:218:          # Holy Chant
-### K:219:          # Holy Prayer
-### K:220:          # Word of Recall
-### K:221:          # *Destruction*
+K:197:0x87:0xCE # Detection
+K:198:0x87:0xF5 # Acquirement
+K:199:0x87:0xF6 # *Acquirement*
+K:200:0x87:0xEA # Mass Genocide
+K:201:0x87:0xEF # Detect Invisible
+K:202:0x87:0xE5 # Aggravate Monster
+K:203:0x87:0xE2 # Trap Creation
+K:204:0x87:0xF3 # Trap/Door Destruction
+K:205:0x87:0xFB # Artifact Creation
+K:206:0x87:0xDC # Recharging
+K:207:0x87:0xE4 # Genocide
+K:208:0x87:0xE8 # Darkness
+K:209:0x87:0xEE # Protection from Evil
+K:210:0x87:0xE7 # Satisfy Hunger
+K:211:0x87:0xED # Dispel Undead
+K:212:0x87:0xEC # *Enchant Weapon*
+K:213:0x87:0xEB # Curse Weapon
+K:214:0x87:0xD2 # *Enchant Armor*
+K:215:0x87:0xE6 # Curse Armor
+K:216:0x87:0xDF # Summon Undead
+K:217:0x87:0xDE # Blessing
+K:218:0x87:0xDD # Holy Chant
+K:219:0x87:0xE1 # Holy Prayer
+K:220:0x87:0xE0 # Word of Recall
+K:221:0x87:0xF7 # *Destruction*
 K:222:0x88:0x91 # Bottle of Slime Mold Juice
 K:223:0x88:0x83 # Bottle of Apple Juice
 K:224:0x88:0x9A # Bottle of Water
@@ -1814,7 +1814,7 @@ K:562:0x82:0x9B # & Jingasa~
 K:563:0x80:0xE8 # & Haramaki-do~  
 K:564:0x87:0xB6 # & Incandescent Globe~ ^
 K:565:0x8B:0xF8 # & Diamond Edge~ ^
-### K:566:          # Mundanity
+K:566:0x87:0x92 # Mundanity
 K:567:0x85:0xF3 # & Magical Figurine~ of #  
 K:568:0x85:0xF4 # & Wooden Statue~ of #  
 K:569:0x85:0xF5 # & Clay Statue~ of #  
@@ -1871,11 +1871,11 @@ K:613:0x80:0xE7 # & Mithril Crown~
 ### K:628:          # Weaponmastery
 ### K:629:          # Trickery
 ### K:630:          # Hold Life
-### K:631:          # Weapon Branding
-### K:632:          # Rustproofing
-### K:633:          # Disenchantment
-### K:634:          # Alchemy
-### K:635:          # Wizard Eye
+K:631:0x87:0x92 # Weapon Branding
+K:632:0x87:0x92 # Rustproofing
+K:633:0x87:0x92 # Disenchantment
+K:634:0x87:0x92 # Alchemy
+K:635:0x87:0x92 # Wizard Eye
 ### K:636:          # *Speed*
 ### K:637:          # Lesser Restoration
 ### K:638:          # Lore
@@ -1901,9 +1901,9 @@ K:613:0x80:0xE7 # & Mithril Crown~
 ### K:659:          # Enchant Armor
 ### K:660:          # Enchant Weapon
 ### K:661:          # Dimension Door
-### K:662:          # Dimension Door
+K:662:0x87:0xD6 # Dimension Door
 ### K:663:          # Recharging
-### K:664:          # Stone Skin
+K:664:0x87:0xD3 # Stone Skin
 ### K:665:          # ESP
 ### K:666:          # Immortality
 ### K:667:          # & Ring~
@@ -1923,11 +1923,11 @@ K:679:0x86:0xBE # [Tome of Shadows]
 ### K:681:          # Elemental Immunity
 ### K:682:          # Invisibility
 ### K:683:          # Preservation
-### K:684:          # Corrosion Resistance
+K:684:0x87:0xCD # Corrosion Resistance
 ### K:685:          # Polishing
-### K:686:          # Infuse Magic
-### K:687:          # *Infuse Magic*
-### K:688:          # Shadow Jump
+K:686:0x87:0xCC # Infuse Magic
+K:687:0x87:0xCD # *Infuse Magic*
+K:688:0x87:0xCD # Shadow Jump
 K:689:0x8A:0xF4 # & Small Food Sack~ ^
 K:690:0x8A:0xF4 # & Food Sack~ ^
 K:691:0x8A:0xF4 # & Large Food Sack~ ^
@@ -1943,13 +1943,13 @@ K:700:0x8A:0xF8 # & Indestructable Pouch~ ^
 K:701:0x8A:0xFA # & Indestructable Pack~ ^
 K:702:0x8A:0xF1 # & Ankh~ ^
 K:703:0x8A:0xF2 # & Ankh~ ^
-# K:704:0x87:0xCD # Mass Alchemy
+K:704:0x87:0xCD # Mass Alchemy
 ### K:705:          # Mass Alchemy
 ### K:706:          # Mass Alchemy
-# K:707:0x87:0xCD # Mass Identify
+K:707:0x87:0xCD # Mass Identify
 ### K:708:          # Mass Identify
 ### K:709:          # Mass Identify
-# K:710:0x87:0xCD # *Mass Identify*
+K:710:0x87:0xCD # *Mass Identify*
 ### K:711:          # *Mass Identify*
 ### K:712:          # *Mass Identify*
 ### K:713:          # *Perception*

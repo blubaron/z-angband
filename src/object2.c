@@ -463,10 +463,10 @@ void wipe_o_list(void)
 		o_ptr = &o_list[i];
 
 		if (o_ptr->allocated == 2) {
-      o_ptr->allocated = TRUE;
-    } else {
-  		o_ptr->allocated = FALSE;
-    }
+			o_ptr->allocated = TRUE;
+		} else {
+			o_ptr->allocated = FALSE;
+		}
 		//o_ptr->allocated = FALSE;
 	}
 

@@ -326,6 +326,7 @@ N:22:& Hard Biscuit~
 G:,:U
 I:80:32:500
 W:0:0:2:1
+A:1/1:9/1:17/1
 F:EASY_KNOW|NO_FLAVOR
 L:USE:  msgf("That tastes good.")
 D:A biscuit, cooked hard to last.
@@ -335,6 +336,7 @@ N:23:& Strip~ of Venison
 G:,:u
 I:80:33:1500
 W:0:0:2:2
+A:1/1:9/1:17/1
 F:EASY_KNOW|NO_FLAVOR
 L:USE:  msgf("That tastes good.")
 D:A piece of dried meat, from the haunch of a deer.
@@ -344,7 +346,7 @@ N:24:& Slime Mold~
 G:,:g
 I:80:36:3000
 W:1:0:5:2
-A:1/1
+A:1/1:9/1:17/1
 F:EASY_KNOW|NO_FLAVOR
 L:USE:  msgf("That tastes okay.")
 D:A green, slimy... something.
@@ -364,7 +366,7 @@ D:  Provides sustenance for about 3750 turns under normal conditions.
 N:26:& Pint~ of Fine Ale
 G:!:y
 I:75:3:1500
-W:0:0:5:1
+W:1:0:5:1
 A:1/3
 F:EASY_KNOW|NO_FLAVOR
 L:USE:  msgf("That tastes good.")
@@ -374,7 +376,7 @@ D:  Provides sustenance for about 750 turns under normal conditions.
 N:27:& Pint~ of Fine Wine
 G:!:r
 I:75:8:2000
-W:0:0:10:2
+W:1:0:10:2
 A:1/3
 F:EASY_KNOW|NO_FLAVOR
 L:USE:  msgf("That tastes good.")
@@ -1721,64 +1723,64 @@ L:MAKE: if (one_in_(30) ~= 0) then create_artifact(object, level/2, FALSE) end
 ##### Scrolls #####
 
 N:173:Enchant Weapon Accuracy
-G:?:d
+G:?:U
 I:70:17:0
 W:8:0:5:250
 A:8/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not enchant_spell(1, 0, 0, 0) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll makes a single weapon easier to hit with.
 D:  It might not work on a weapon that's already enchanted.
 
 N:174:Enchant Weapon Damage
-G:?:d
+G:?:U
 I:70:18:0
 W:8:0:5:250
 A:8/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not enchant_spell(0, 1, 0, 0) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll makes a single weapon more damaging.
 D:  It might not work on a weapon that's already enchanted.
 
 N:175:Enchant Armor
-G:?:d
+G:?:U
 I:70:16:0
 W:10:0:5:250
 A:10/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not enchant_spell(0, 0, 1, 0) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll makes a single piece of armor more effective protection.
 D:  It might not work on armor that's already enchanted.
 
 N:176:Identify
-G:?:d
+G:?:U
 I:70:12:0
 W:5:0:5:50
 A:1/1:9/1:17/1:52/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not ident_scroll(object.k_idx) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll identifies one item.
 
 N:177:*Identify*
-G:?:d
+G:?:U
 I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not identify_fully() then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll identifies one item and reveals all of its powers.
 
 N:178:Rumor
-G:?:d
+G:?:U
 I:70:51:0
 W:1:0:5:10
 A:1/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  msgf("There is a message on the scroll. It says:"); message_flush()
 L:USE:  msgf(get_rumor()); message_flush()
 L:USE:  msgf("The scroll disappears in a puff of smoke!")
@@ -1786,12 +1788,12 @@ L:USE:  ident = TRUE
 D:Someone has written something on this scroll.
 
 N:179:Logrus
-G:?:d
+G:?:U
 I:70:50:0
 W:80:0:5:1000
 A:80/1
 F:IGNORE_FIRE | IGNORE_ACID | IGNORE_COLD | IGNORE_ELEC
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  fire_ball(GF_CHAOS, 0, 400, 4)
 L:USE:  if not player_res(TR1_RES_CHAOS) then take_hit(rand_range(150, 300),
 L:USE:          "a Scroll of Logrus") end
@@ -1800,11 +1802,11 @@ D:The chaotic runes on this scroll look very dangerous.
 D:  It creates a chaos burst (400) centered on you, but will hurt you as well.
 
 N:180:Remove Curse
-G:?:d
+G:?:U
 I:70:14:0
 W:17:0:5:100
 A:12/1:35/2:65/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if remove_curse() then
 L:USE:          msgf("You feel as if someone is watching over you.")
 L:USE:          ident = TRUE end
@@ -1812,21 +1814,21 @@ D:This scroll will remove curses that prevent you from removing equipment.
 D:  It isn't powerful enough to affect some curses.
 
 N:181:Light
-G:?:d
+G:?:U
 I:70:24:0
 W:0:0:5:15
 A:0/1:5/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = lite_area(damroll(2, 8), 2)
 D:This scroll lights the room you are in.  It also deals a small amount
 D: of damage to nearby creatures that are vulnerable to light.
 
 N:182:Fire
-G:?:d
+G:?:U
 I:70:48:0
 W:75:0:5:500
 A:75/1
-F:IGNORE_FIRE | EASY_KNOW
+F:IGNORE_FIRE | EASY_KNOW | SKIP_FLAVOR
 L:USE:  fire_ball(GF_FIRE, 0, 350, 4)
 L:USE:  if res_fire_lvl() > 3 then take_hit(rand_range(100, 200),
 L:USE:          "a Scroll of Fire") end
@@ -1837,11 +1839,11 @@ D: will hurt you as well.  For 20-40 turns after reading it, you
 D: will be surrounded by an aura of fire.
 
 N:183:Ice
-G:?:d
+G:?:U
 I:70:49:0
 W:75:0:5:600
 A:75/1
-F:IGNORE_COLD | EASY_KNOW
+F:IGNORE_COLD | EASY_KNOW | SKIP_FLAVOR
 L:USE:  fire_ball(GF_COLD, 0, 300, 4)
 L:USE:  if res_cold_lvl() > 3 then take_hit(rand_range(50, 100),
 L:USE:          "a Scroll of Ice") end
@@ -1852,51 +1854,51 @@ D: will hurt you as well.  For 20-40 turns after reading it, you
 D: will be surrounded by an aura of cold.
 
 N:184:Summon Monster
-G:?:d
+G:?:U
 I:70:4:0
 W:1:0:5:0
 A:1/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = summon_monsters_near_player(randint1(3), 0)
 D:This scroll summons monsters from elsewhere... and they won't
 D: be happy about it!
 
 N:185:Phase Door
-G:?:d
+G:?:U
 I:70:8:0
 W:1:0:5:15
 A:1/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  teleport_player(10)
 L:USE:  ident = TRUE
 D:This scroll teleports you to a random location with a range of 10.
 
 N:186:Teleportation
-G:?:d
+G:?:U
 I:70:9:0
 W:17:0:5:40
 A:17/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  teleport_player(100)
 L:USE:  ident = TRUE
 D:This scroll teleports you to a random location with a range of 100.
 
 N:187:Teleport Level
-G:?:d
+G:?:U
 I:70:10:0
 W:30:0:5:150
 A:30/6
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  teleport_player_level()
 L:USE:  ident = TRUE
 D:This scroll teleports you up or down one level at random.
 
 N:188:Monster Confusion
-G:?:d
+G:?:U
 I:70:36:0
 W:9:0:5:30
 A:9/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if player.state.confusing == 0 then
 L:USE:          msgf("Your hands begin to glow.")
 L:USE:          player.state.confusing = TRUE
@@ -1907,32 +1909,32 @@ D:This scroll creates a magical field that will confuse the next
 D: monster you hit.
 
 N:189:Magic Mapping
-G:?:d
+G:?:U
 I:70:25:0
 W:9:0:5:100
 A:9/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  map_area()
 L:USE:  ident = TRUE
 D:This scroll magically reveals the dungeon around you.
 
 N:190:Rune of Protection
-G:?:d
+G:?:U
 I:70:38:0
 W:75:0:5:1000
 A:75/1:100/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not warding_glyph() then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll creates a magical glyph that will keep monsters
 D: from crossing it.
 
 N:191:*Remove Curse*
-G:?:d
+G:?:U
 I:70:15:0
 W:75:0:5:8000
 A:75/1:100/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if remove_all_curse() then
 L:USE:          msgf("You feel as if someone is watching over you.")
 L:USE:          ident = TRUE
@@ -1941,31 +1943,31 @@ D:This scroll removes all but the most powerful curses from your
 D: equipment, allowing you to remove cursed items.
 
 N:192:Treasure Detection
-G:?:d
+G:?:U
 I:70:26:0
 W:0:0:5:5
 A:0/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = detect_treasure()
 L:USE:  if detect_objects_gold() then ident = TRUE end
 D:This scroll magically reveals the location of gems and
 D: precious metals nearby.
 
 N:193:Object Detection
-G:?:d
+G:?:U
 I:70:27:0
 W:0:0:5:5
 A:0/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = detect_objects_normal()
 D:This scroll magically reveals the location of objects nearby.
 
 N:194:Trap Detection
-G:?:d
+G:?:U
 I:70:28:0
 W:9:0:5:5
 A:9/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = detect_traps(ident)
 D:This scroll magically reveals the location of traps nearby.
 
@@ -1992,20 +1994,20 @@ D:Shiny and hard, excellent ammunition.
 ##### Additional scrolls #####
 
 N:197:Detection
-G:?:d
+G:?:U
 I:70:29:0
 W:9:0:5:35
 A:9/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = detect_all()
 D:This scroll magically detects many things.
 
 N:198:Acquirement
-G:?:d
+G:?:U
 I:70:46:0
 W:50:0:5:100000
 A:35/8
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  current_object_source.type = OM_SCROLL
 L:USE:  current_object_source.place_num = player.place_num
 L:USE:  current_object_source.depth = player.depth
@@ -2016,11 +2018,11 @@ D:This scroll transports a powerful item to your location.
 D:  You will get better items on deeper dungeon levels.
 
 N:199:*Acquirement*
-G:?:d
+G:?:U
 I:70:47:0
 W:90:0:5:200000
 A:90/16
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  current_object_source.type = OM_SCROLL
 L:USE:  current_object_source.place_num = player.place_num
 L:USE:  current_object_source.depth = player.depth
@@ -2031,11 +2033,11 @@ D:This scroll transports several powerful items to your location.
 D:  You will get better items on deeper dungeon levels.
 
 N:200:Mass Genocide
-G:?:d
+G:?:U
 I:70:45:0
 W:75:0:5:5000
 A:75/4:85/4
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  mass_genocide(TRUE)
 L:USE:  ident = TRUE
 D:The evil runes on this scroll make you tremble.
@@ -2043,49 +2045,49 @@ D:It destroys all nearby monsters totally. You won't get any experience
 D: or treasure from them.
 
 N:201:Detect Invisible
-G:?:d
+G:?:U
 I:70:30:0
 W:1:0:5:15
 A:1/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE: ident = detect_monsters_invis()
 D:This scroll magically detects nearby invisible monsters.
 
 N:202:Aggravate Monster
-G:?:d
+G:?:U
 I:70:1:0
 W:9:0:5:0
 A:9/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  msgf("There is a high pitched humming noise.")
 L:USE:  aggravate_monsters(0)
 L:USE:  ident = TRUE
 D:This scroll attracts monsters, and enrages those already nearby.
 
 N:203:Trap Creation
-G:?:d
+G:?:U
 I:70:7:0
 W:5:0:5:0
 A:5/20:17/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = trap_creation()
 D:This scroll creates traps around you.
 
 N:204:Trap/Door Destruction
-G:?:d
+G:?:U
 I:70:39:0
 W:10:0:5:50
 A:10/8:17/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = destroy_doors_touch()
 D:This scroll will destroy traps and doors within 10' of you.
 
 N:205:Artifact Creation
-G:?:d
+G:?:U
 I:70:52:0
 W:100:0:5:300000
 A:100/10:75/20
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not artifact_scroll() then result = FALSE end
 L:USE:  ident = TRUE
 D:This powerful scroll will turn a normal item into a unique
@@ -2094,22 +2096,22 @@ D: well as benefits.  It can't affect an item that already
 D: has special powers.
 
 N:206:Recharging
-G:?:d
+G:?:U
 I:70:22:0
 W:60:0:5:200
 A:60/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not recharge(130) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll will recharge a wand, staff or rod.  There's a small
 D: chance it will fail and blow up the item you're trying to recharge.
 
 N:207:Genocide
-G:?:d
+G:?:U
 I:70:44:0
 W:65:0:5:1000
 A:65/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  genocide(TRUE)
 L:USE:  ident = TRUE
 D:The evil runes on this scroll make you shiver.
@@ -2118,11 +2120,11 @@ D: a single letter you select.  You won't get any experience or treasure
 D: from these monsters.
 
 N:208:Darkness
-G:?:d
+G:?:U
 I:70:0:0
 W:1:0:5:0
 A:1/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not player_res(TR1_RES_BLIND) and not player_res(TR1_RES_DARK) then
 L:USE:          inc_blind(rand_range(3, 8))
 L:USE:  end
@@ -2131,118 +2133,118 @@ D:This scroll creates a sphere of magical darkness centered on you.
 D:  It also causes temporary blindness.
 
 N:209:Protection from Evil
-G:?:d
+G:?:U
 I:70:37:0
 W:52:0:5:200
 A:52/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = inc_protevil(3 * player.lev + randint1(25))
 D:This scroll provides temporary protection from evil monsters.
 
 N:210:Satisfy Hunger
-G:?:d
+G:?:U
 I:70:32:0
 W:5:0:5:10
 A:5/1:20/1:45/1:75/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = set_food(PY_FOOD_MAX - 1)
 D:This scroll makes you instantly full.
 
 N:211:Dispel Undead
-G:?:d
+G:?:U
 I:70:42:0
 W:65:0:5:300
 A:65/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = dispel_undead(60)
 D:This scroll dispels nearby undead (60).
 
 N:212:*Enchant Weapon*
-G:?:d
+G:?:U
 I:70:21:0
 W:50:0:5:10000
 A:50/3:70/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not enchant_spell(randint1(5), randint1(5), 0, 105) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll magically enchants one weapon.
 D:  It might not work on a weapon that's already enchanted.
 
 N:213:Curse Weapon
-G:?:d
+G:?:U
 I:70:3:0
 W:75:0:5:0
 A:75/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = curse_weapon()
 D:This scroll curses your current weapon, making it worse than useless.
 
 N:214:*Enchant Armor*
-G:?:d
+G:?:U
 I:70:20:0
 W:50:0:5:10000
 A:50/3:70/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not enchant_spell(0, 0, rand_range(2, 7), 105) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll magically enchants one piece of armor.
 D:  It might not work on armor that's already enchanted.
 
 N:215:Curse Armor
-G:?:d
+G:?:U
 I:70:2:0
 W:75:0:5:0
 A:75/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = curse_armor()
 D:This scroll curses the armor you are wearing, making it worse than useless.
 
 N:216:Summon Undead
-G:?:d
+G:?:U
 I:70:5:0
 W:15:0:5:0
 A:26/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = summon_monsters_near_player(randint1(3), SUMMON_UNDEAD)
 D:This scroll summons several undead monsters to your location.
 D:  They won't be happy about being summoned.
 
 N:217:Blessing
-G:?:d
+G:?:U
 I:70:33:0
 W:1:0:5:15
 A:1/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = inc_blessed(rand_range(12, 24))
 D:This scroll gives you a temporary blessing (12-24 turns), improving
 D: your accuracy, your damage, and your armor class.
 
 N:218:Holy Chant
-G:?:d
+G:?:U
 I:70:34:0
 W:15:0:5:50
 A:15/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = inc_blessed(rand_range(24, 48))
 D:This scroll gives you a temporary blessing (24-48 turns), improving
 D: your accuracy, your damage, and your armor class.
 
 N:219:Holy Prayer
-G:?:d
+G:?:U
 I:70:35:0
 W:30:0:5:120
 A:30/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = inc_blessed(rand_range(36, 72))
 D:This scroll gives you a temporary blessing (36-72 turns), improving
 D: your accuracy, your damage, and your armor class.
 
 N:220:Word of Recall
-G:?:d
+G:?:U
 I:70:11:0
 W:5:0:5:70
 A:1/3:7/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  word_of_recall()
 L:USE:  ident = TRUE
 D:This scroll has three uses.  If read within a dungeon, it returns you
@@ -2251,11 +2253,11 @@ D: the last level of that dungeon you recalled out from. If read in the
 D: wilderness, it takes you to your home.
 
 N:221:*Destruction*
-G:?:d
+G:?:U
 I:70:41:0
 W:65:0:5:500
 A:65/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not destroy_area(player.px, player.py, 15) then
 L:USE:          msgf("The dungeon trembles...") end
 L:USE:  ident = TRUE
@@ -2265,9 +2267,9 @@ D: jumble of smashed rock.
 ##### Potions #####
 
 N:222:& Bottle~ of Slime Mold Juice
-G:!:d
+G:!:g
 I:75:2:3000
-W:0:0:4:2
+W:12:0:4:2
 A:12/3
 P:0:1d1:0:0:0
 F:EASY_KNOW|NO_FLAVOR
@@ -2278,9 +2280,9 @@ D:A green liquid that tries to climb out of the bottle.
 D:  Provides sustenance for about 1500 turns under normal conditions.
 
 N:223:& Bottle~ of Apple Juice
-G:!:d
+G:!:u
 I:75:1:2000
-W:0:0:4:1
+W:20:0:4:1
 A:20/3
 P:0:1d1:0:0:0
 F:EASY_KNOW|NO_FLAVOR
@@ -2291,9 +2293,9 @@ D:A cloudy brown liquid that smells of apple.
 D:  Provides sustenance for about 1000 turns under normal conditions.
 
 N:224:& Bottle~ of Water
-G:!:d
+G:!:b
 I:75:0:1000
-W:0:0:4:1
+W:1:0:4:1
 A:1/3
 P:0:1d1:0:0:0
 F:EASY_KNOW|NO_FLAVOR
@@ -5506,11 +5508,11 @@ F:SHOW_MODS | VORPAL
 D:You don't dare testing this blade on your fingernail, it is so sharp.
 
 N:566:Mundanity
-G:?:d
+G:?:U
 I:70:23:0
 W:23:0:5:0
 A:23/10:63/10
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  result = mundane_spell()
 L:USE:  ident = TRUE
 D:Your objects seem very ordinary all of a sudden.
@@ -6150,51 +6152,51 @@ A:35/2
 F:HOLD_LIFE | EASY_KNOW
 
 N:631:Weapon Branding
-G:?:d
+G:?:U
 I:70:19:0
 W:40:0:5:1000
 A:40/4
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 D:This scroll infuses a melee weapon or stack of ammunition with elemental power, 
 D:and enchants it.  This cannot be used on "ego" items or artifacts.
 L:USE: ident=TRUE
 L:USE: if not brand_weapon(0) then result=FALSE end
 
 N:632:Rustproofing
-G:?:d
+G:?:U
 I:70:31:0
 W:30:0:5:500
 A:30/4
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 D:This scroll protects an armor of your choice from corrosion.
 L:USE: ident=TRUE
 L:USE: if not rustproof() then result=FALSE end
 
 N:633:Disenchantment
-G:?:d
+G:?:U
 I:70:6:0
 W:10:0:5:0
 A:10/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = apply_disenchant()
 D:This scroll dulls the enchantment of your equipment.
 
 N:634:Alchemy
-G:?:d
+G:?:U
 I:70:53:0
 W:5:0:5:35
 A:5/1:30/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not alchemy() then result=FALSE end
 L:USE: ident=TRUE
 D:This scroll allows you to turn one object into gold.
 
 N:635:Wizard Eye
-G:?:d
+G:?:U
 I:70:54:0
 W:27:0:5:200
 A:27/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  map_area()
 L:USE:  detect_all()
 L:USE:  ident = TRUE
@@ -6640,11 +6642,11 @@ L:USE:  if not dimension_door() then result=FALSE end
 D:This staff allows you to teleport with pinpoint accuracy.
 
 N:662:Dimension Door
-G:?:d
+G:?:U
 I:70:55:0
 W:35:0:5:220
 A:35/2:65/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = TRUE
 L:USE:  if not dimension_door() then result=FALSE end
 D:This scroll allows you to teleport with pinpoint accuracy.
@@ -6662,11 +6664,11 @@ D: turns.  There is a small chance that the spell will backfire and destroy
 D: or drain the item.
 
 N:664:Stone Skin
-G:?:d
+G:?:U
 I:70:56:0
 W:65:0:5:400
 A:65/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  ident = inc_shield(rand_range(30,50))
 D:This scroll toughens your skin into protective stone for a while.
 
@@ -6883,11 +6885,11 @@ D:This potion makes you resistant to stat draining for 20-40 turns.
 
 # Scroll of Corrosion Resistance - copied from Enchant Armor
 N:684:Corrosion Resistance
-G:?:d
+G:?:U
 I:70:57:0
 W:26:0:5:250
 A:26/2
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 D:Protect a peice of equipment from acid.
 L:USE:	if not rustproof() then result = FALSE end
 L:USE:  ident = TRUE
@@ -6906,31 +6908,31 @@ L:USE:  ident = TRUE
 
 # Scroll of Infuse Magic - modified from Acquirement
 N:686:Infuse Magic
-G:?:d
+G:?:U
 I:70:58:0
 W:50:0:5:20000
 A:35/8
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:	if not enchant_pval(randint1(3), 0) then result = FALSE end
 L:USE:  ident = TRUE
 
 # Scroll of *Infuse Magic* - modified from Acquirement
 N:687:*Infuse Magic*
-G:?:d
+G:?:U
 I:70:59:0
 W:60:0:5:150000
 A:60/8: 90/4
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:	if not enchant_pval(1, 1) then result = FALSE end
 L:USE:  ident = TRUE
 
 # Scroll of Shadow Jump - reset the wilderness - modified from Acquirement
 N:688:Shadow Jump
-G:?:d
+G:?:U
 I:70:60:0
 W:35:0:5:1000
 A:35/8:60/4:80/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:	if not shadow_jump() then result = FALSE end
 L:USE:  ident = TRUE
 
@@ -7091,11 +7093,11 @@ D: die, you will be returned to the nearest temple or cathedral.
 D: However, your items and gold will remain in the dungeon.
 
 N:704:Mass Alchemy
-G:?:d
+G:?:U
 I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
 L:USE:  ident = TRUE
 D:This scroll turns objects in an area (radius 2) to gold.
@@ -7121,11 +7123,11 @@ L:USE:  ident = TRUE
 D:This staff turns objects in an area (radius 2) to gold.
 
 N:707:Mass Identify
-G:?:d
+G:?:U
 I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not mass_identify() then result = FALSE end
 L:USE:  identify_pack()
 L:USE:  ident = TRUE
@@ -7154,11 +7156,11 @@ L:USE:  ident = TRUE
 D:This staff identifies all visible objects.
 
 N:710:*Mass Identify*
-G:?:d
+G:?:U
 I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
-F:EASY_KNOW
+F:EASY_KNOW | SKIP_FLAVOR
 L:USE:  if not mass_identify_fully() then result = FALSE end
 L:USE:  identify_pack_fully()
 L:USE:  ident = TRUE
