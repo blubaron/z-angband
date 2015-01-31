@@ -2483,7 +2483,8 @@ static void map_info(int x, int y, byte *ap, char *cp, byte *tap, char *tcp)
 			}
 
 			/* Done */
-			break;
+			if (count > 1)
+				break;
 		/*} else
 		if (o_ptr->info & OB_FUZZY) {
 			if (o_ptr->tval == TV_GOLD) {
