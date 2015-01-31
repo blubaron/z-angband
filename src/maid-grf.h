@@ -120,7 +120,7 @@ struct term_map
 	s16b object;
 	s16b monster;
 	s16b field;
-	byte terrain;
+	s16b terrain;
 	char unknown;
 	byte lighting;
 
