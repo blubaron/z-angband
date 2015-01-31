@@ -1250,6 +1250,7 @@ int context_menu_object(const object_type *o_ptr)
 		} else {
 			set_get_item_object(o_ptr);
 			p_ptr->cmd.cmd = 'u';
+			repeat_check();
 			do_cmd_use();
 			/*cmd_insert(CMD_USE_ANY);
 			cmd_set_arg_item(cmd_get_top(), 0, slot);*/
@@ -1282,6 +1283,7 @@ int context_menu_object(const object_type *o_ptr)
 		/* throw the item */
 		set_get_item_object(o_ptr);
  		p_ptr->cmd.cmd = 'v';
+		repeat_check();
 		do_cmd_throw();
 		/*cmd_insert(CMD_THROW);
 		cmd_set_arg_item(cmd_get_top(), 0, slot);*/
@@ -1309,6 +1311,7 @@ int context_menu_object(const object_type *o_ptr)
 		/* fire some ammo */
 		set_get_item_object(o_ptr);
  		p_ptr->cmd.cmd = 'f';
+		repeat_check();
 		do_cmd_fire();
 	} else
 	if (selected == -1) {
