@@ -330,7 +330,7 @@ void clear_flavor_assignments()
 			bool remove = TRUE;
 			
 			for (j=0; j <= len; j++) {
-				if (isupper(s++)) {
+				if (isupper(*(s++))) {
 					/* generated names do not have an upper
 					 * case letter, so this cannot be one */
 					remove = FALSE;

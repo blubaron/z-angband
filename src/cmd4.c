@@ -1168,6 +1168,16 @@ static bool do_cmd_options_aux(int page)
 	/* Save the changes */
 	init_options(option_flags);
 
+	/* Clear the options (24 options max + MENU_END) */
+	for (i = 0; i < 25; i++)
+	{
+		string_free(options_aux_menu[i].text);
+		options_aux_menu[i].text = NULL;
+
+		string_free(options_aux_menu[i].help);
+		options_aux_menu[i].help = NULL;
+	}
+
 	return (FALSE);
 }
 
