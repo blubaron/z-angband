@@ -436,6 +436,21 @@ void compact_objects(int size)
 	}
 }
 
+/* Save an object list from being wiped in wipe_o_list */
+static void keep_object_list_alloc(int o_idx)
+{
+	/* Save objects in the container */
+	object_type *q_ptr;
+	OBJ_ITT_START (o_idx, q_ptr)
+	{
+		q_ptr->allocated = TRUE;
+		if (q_ptr->contents_o_idx) {
+			keep_object_list_alloc(q_ptr->contents_o_idx);
+		}
+	}
+	OBJ_ITT_END;
+}
+
 
 /*
  * Delete all the non-held items.
@@ -473,21 +488,7 @@ void wipe_o_list(void)
 	/* Only if inventory exists */
 	if (o_list[p_ptr->inventory].k_idx) {
 		/* Save players inventory (only objects in a list to save) */
-		OBJ_ITT_START (p_ptr->inventory, o_ptr)
-		{
-			o_ptr->allocated = TRUE;
-			
-			if (o_ptr->contents_o_idx) {
-				/* Save objects in the container */
-				object_type *q_ptr;
-				OBJ_ITT_START (o_ptr->contents_o_idx, q_ptr)
-				{
-					q_ptr->allocated = TRUE;
-				}
-				OBJ_ITT_END;
-			}
-		}
-		OBJ_ITT_END;
+		keep_object_list_alloc(p_ptr->inventory);
 	}
 
 	/* Delete the existing objects */
