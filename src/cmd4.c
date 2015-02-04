@@ -2543,8 +2543,21 @@ static bool do_cmd_dump_feature(int dummy)
 		froff(fff, "# %s\n", (f_name + f_ptr->name));
 
 		/* Dump the feature attr/char info */
-		froff(fff, "F:%d:0x%02X:0x%02X\n\n", i,
+		if ((f_ptr->xl_attr != f_ptr->x_attr) ||(f_ptr->xl_char != f_ptr->x_char)) {
+			froff(fff, "F:%d:0x%02X:0x%02X:0x%02X:0x%02X:0x%02X:0x%02X\n", i,
+				(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),
+				(byte)(f_ptr->xd_attr), (byte)(f_ptr->xd_char),
+				(byte)(f_ptr->xl_attr), (byte)(f_ptr->xl_char));
+		} else
+		if ((f_ptr->xd_attr != f_ptr->x_attr) ||(f_ptr->xd_char != f_ptr->x_char)) {
+			froff(fff, "F:%d:0x%02X:0x%02X:0x%02X:0x%02X\n", i,
+				(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char),
+				(byte)(f_ptr->xd_attr), (byte)(f_ptr->xd_char));
+		} else
+		{
+			froff(fff, "F:%d:0x%02X:0x%02X\n", i,
 				(byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+		}
 	}
 
 	/* All done */
@@ -2618,8 +2631,21 @@ static bool do_cmd_dump_field(int dummy)
 		froff(fff, "# %s\n", t_ptr->name);
 
 		/* Dump the field attr/char info */
-		froff(fff, "T:%d:0x%02X:0x%02X\n\n", i,
+		if ((t_ptr->xl_attr != t_ptr->x_attr) ||(t_ptr->xl_char != t_ptr->x_char)) {
+			froff(fff, "T:%d:0x%02X:0x%02X:0x%02X:0x%02X:0x%02X:0x%02X\n", i,
+				(byte)(t_ptr->x_attr), (byte)(t_ptr->x_char),
+				(byte)(t_ptr->xd_attr), (byte)(t_ptr->xd_char),
+				(byte)(t_ptr->xl_attr), (byte)(t_ptr->xl_char));
+		} else
+		if ((t_ptr->xd_attr != t_ptr->x_attr) ||(t_ptr->xd_char != t_ptr->x_char)) {
+			froff(fff, "T:%d:0x%02X:0x%02X:0x%02X:0x%02X\n", i,
+				(byte)(t_ptr->x_attr), (byte)(t_ptr->x_char),
+				(byte)(t_ptr->xd_attr), (byte)(t_ptr->xd_char));
+		} else
+		{
+			froff(fff, "T:%d:0x%02X:0x%02X\n", i,
 				(byte)(t_ptr->x_attr), (byte)(t_ptr->x_char));
+		}
 	}
 
 	/* All done */
@@ -2773,6 +2799,7 @@ static bool do_cmd_change_feature(int dummy)
 	static int f = 0;
 
 	char i;
+	char t = 0;
 
 	/* Hack - ignore parameter */
 	(void) dummy;
@@ -2793,6 +2820,10 @@ static bool do_cmd_change_feature(int dummy)
 		byte dc = (byte)f_ptr->d_char;
 		byte ca = (byte)f_ptr->x_attr;
 		byte cc = (byte)f_ptr->x_char;
+		byte cad = (byte)f_ptr->xd_attr;
+		byte ccd = (byte)f_ptr->xd_char;
+		byte cal = (byte)f_ptr->xl_attr;
+		byte ccl = (byte)f_ptr->xl_char;
 
 		/* Label the object */
 		prtf(5, 7, "Terrain = %d, Name = %-40.40s",
@@ -2804,12 +2835,12 @@ static bool do_cmd_change_feature(int dummy)
 		Term_putch(43, 9, da, dc);
 
 		/* Label the Current values */
-		prtf(10, 10, "Current attr/char = %3d / %3d", ca, cc);
+		prtf(10, 10, "Current attr/char = %3d / %3d,  %3d / %3d,  %3d / %3d", ca, cc, cad, ccd, cal, ccl);
 		put_fstr(40, 10, "<< ? >>");
 		Term_putch(43, 10, ca, cc);
 
 		/* Prompt */
-		prtf(0, 12, "Command (n/N/a/A/c/C): ");
+		prtf(0, 12, "Command (n/N/a/A/c/C/d/l): ");
 
 		/* Get a command */
 		i = inkey();
@@ -2820,10 +2851,26 @@ static bool do_cmd_change_feature(int dummy)
 		/* Analyze */
 		if (i == 'n') f = (f + z_info->f_max + 1) % z_info->f_max;
 		if (i == 'N') f = (f + z_info->f_max - 1) % z_info->f_max;
-		if (i == 'a') f_info[f].x_attr = (byte)(ca + 1);
-		if (i == 'A') f_info[f].x_attr = (byte)(ca - 1);
-		if (i == 'c') f_info[f].x_char = (byte)(cc + 1);
-		if (i == 'C') f_info[f].x_char = (byte)(cc - 1);
+		if (i == 'd') if (t == 1) t = 0; else t = 1;
+		if (i == 'l') if (t == 2) t = 0; else t = 2;
+		if (t == 2) {
+			if (i == 'a') f_info[f].x_attr = (byte)(cal + 1);
+			if (i == 'A') f_info[f].x_attr = (byte)(cal - 1);
+			if (i == 'c') f_info[f].x_char = (byte)(ccl + 1);
+			if (i == 'C') f_info[f].x_char = (byte)(ccl - 1);
+		} else
+		if (t == 1) {
+			if (i == 'a') f_info[f].x_attr = (byte)(cad + 1);
+			if (i == 'A') f_info[f].x_attr = (byte)(cad - 1);
+			if (i == 'c') f_info[f].x_char = (byte)(ccd + 1);
+			if (i == 'C') f_info[f].x_char = (byte)(ccd - 1);
+		} else
+		{
+			if (i == 'a') f_info[f].x_attr = (byte)(ca + 1);
+			if (i == 'A') f_info[f].x_attr = (byte)(ca - 1);
+			if (i == 'c') f_info[f].x_char = (byte)(cc + 1);
+			if (i == 'C') f_info[f].x_char = (byte)(cc - 1);
+		}
 	}
 
 	screen_load();
@@ -2838,6 +2885,7 @@ static bool do_cmd_change_field(int dummy)
 	static int f = 0;
 
 	char i;
+	char t = 0;
 
 	/* Hack - ignore parameter */
 	(void) dummy;
@@ -2858,6 +2906,10 @@ static bool do_cmd_change_field(int dummy)
 		byte dc = (byte)t_ptr->d_char;
 		byte ca = (byte)t_ptr->x_attr;
 		byte cc = (byte)t_ptr->x_char;
+		byte cad = (byte)t_ptr->xd_attr;
+		byte ccd = (byte)t_ptr->xd_char;
+		byte cal = (byte)t_ptr->xl_attr;
+		byte ccl = (byte)t_ptr->xl_char;
 
 		/* Label the object */
 		prtf(5, 7, "Field = %d, Name = %-40.40s", f, t_ptr->name);
@@ -2868,12 +2920,12 @@ static bool do_cmd_change_field(int dummy)
 		Term_putch(43, 9, da, dc);
 
 		/* Label the Current values */
-		prtf(10, 10, "Current attr/char = %3d / %3d", ca, cc);
+		prtf(10, 10, "Current attr/char = %3d / %3d,  %3d / %3d,  %3d / %3d", ca, cc, cad, ccd, cal, ccl);
 		put_fstr(40, 10, "<< ? >>");
 		Term_putch(43, 10, ca, cc);
 
 		/* Prompt */
-		prtf(0, 12, "Command (n/N/a/A/c/C): ");
+		prtf(0, 12, "Command (n/N/a/A/c/C/d/l): ");
 
 		/* Get a command */
 		i = inkey();
@@ -2884,10 +2936,26 @@ static bool do_cmd_change_field(int dummy)
 		/* Analyze */
 		if (i == 'n') f = (f + z_info->t_max + 1) % z_info->t_max;
 		if (i == 'N') f = (f + z_info->t_max - 1) % z_info->t_max;
-		if (i == 'a') t_info[f].x_attr = (byte)(ca + 1);
-		if (i == 'A') t_info[f].x_attr = (byte)(ca - 1);
-		if (i == 'c') t_info[f].x_char = (byte)(cc + 1);
-		if (i == 'C') t_info[f].x_char = (byte)(cc - 1);
+		if (i == 'd') if (t == 1) t = 0; else t = 1;
+		if (i == 'l') if (t == 2) t = 0; else t = 2;
+		if (t == 2) {
+			if (i == 'a') t_info[f].x_attr = (byte)(cal + 1);
+			if (i == 'A') t_info[f].x_attr = (byte)(cal - 1);
+			if (i == 'c') t_info[f].x_char = (byte)(ccl + 1);
+			if (i == 'C') t_info[f].x_char = (byte)(ccl - 1);
+		} else
+		if (t == 1) {
+			if (i == 'a') t_info[f].x_attr = (byte)(cad + 1);
+			if (i == 'A') t_info[f].x_attr = (byte)(cad - 1);
+			if (i == 'c') t_info[f].x_char = (byte)(ccd + 1);
+			if (i == 'C') t_info[f].x_char = (byte)(ccd - 1);
+		} else
+		{
+			if (i == 'a') t_info[f].x_attr = (byte)(ca + 1);
+			if (i == 'A') t_info[f].x_attr = (byte)(ca - 1);
+			if (i == 'c') t_info[f].x_char = (byte)(cc + 1);
+			if (i == 'C') t_info[f].x_char = (byte)(cc - 1);
+		}
 	}
 
 	screen_load();
