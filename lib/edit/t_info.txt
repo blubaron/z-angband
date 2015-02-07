@@ -2609,3 +2609,27 @@ G:*:y
 
 N:164:Unknown Creature
 G:*:r
+
+N:165:Project Path Normal
+G:*:w
+
+N:166:Project Path Unknown
+G:*:D
+
+N:167:Project Path Wall
+G:*:b
+
+N:168:Project Path Trap
+G:*:v
+
+N:169:Project Path Hostile Creature
+G:*:R
+
+N:170:Project Path Object
+G:*:y
+
+N:171:Project Path Friendly Creature
+G:*:G
+
+N:172:Project Path Neutral Creature
+G:*:B

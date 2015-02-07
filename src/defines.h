@@ -1664,6 +1664,14 @@
 #define FT_UNKNOWN_OBJ          162
 #define FT_UNKNOWN_GOLD         163
 #define FT_UNKNOWN_MON          164
+#define FT_DRAWPATH_DEFAULT     165
+#define FT_DRAWPATH_UNKNOWN     166
+#define FT_DRAWPATH_WALL        167
+#define FT_DRAWPATH_TRAP        168
+#define FT_DRAWPATH_HOSTILE     169
+#define FT_DRAWPATH_OBJECT      170
+#define FT_DRAWPATH_FRIENDLY    171
+#define FT_DRAWPATH_NEUTRAL     172
 
 /*** Artifact indexes (see "lib/edit/a_info.txt") ***/
 

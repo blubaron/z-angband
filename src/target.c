@@ -35,7 +35,8 @@ sint draw_path(sint path_n, coord *path_g, byte *a, char *c, int x1, int y1)
 	sint i;
 	int x, y;
 	byte colour;
-
+	byte pa,pc;
+	
 	bool on_screen;
 	bool visible_object;
 	cave_type *c_ptr;
@@ -108,36 +109,54 @@ sint draw_path(sint path_n, coord *path_g, byte *a, char *c, int x1, int y1)
 			monster_type *m_ptr = &(m_list[c_ptr->m_idx]);
 
 			/* Mimics act as objects */
-			if (m_ptr->smart & SM_MIMIC) 
-				colour = TERM_YELLOW;
-			else if (m_ptr->smart & (SM_PET|SM_FRIENDLY))
-				colour = TERM_L_GREEN;
-			else
-				colour = TERM_L_RED;
+			if (m_ptr->smart & SM_MIMIC) {
+				pa = t_info[FT_DRAWPATH_OBJECT].x_attr;
+				pc = t_info[FT_DRAWPATH_OBJECT].x_char;
+			} else
+			if (m_ptr->smart & (SM_PET|SM_FRIENDLY)) {
+				pa = t_info[FT_DRAWPATH_FRIENDLY].x_attr;
+				pc = t_info[FT_DRAWPATH_FRIENDLY].x_char;
+			} else
+			{
+				pa = t_info[FT_DRAWPATH_HOSTILE].x_attr;
+				pc = t_info[FT_DRAWPATH_HOSTILE].x_char;
+			}
+		} else
+
+		if (c_ptr->o_idx && visible_object) {
+			/* Known objects are yellow. */
+			pa = t_info[FT_DRAWPATH_OBJECT].x_attr;
+			pc = t_info[FT_DRAWPATH_OBJECT].x_char;
+
+		} else
+		if ((pc_ptr->player & GRID_SEEN) && !cave_floor_grid(c_ptr)) {
+			/* Known walls are blue. */
+			pa = t_info[FT_DRAWPATH_WALL].x_attr;
+			pc = t_info[FT_DRAWPATH_WALL].x_char;
+
+		} else
+		if (is_visible_trap(c_ptr)) {
+			/* Traps are violet. */
+			pa = t_info[FT_DRAWPATH_TRAP].x_attr;
+			pc = t_info[FT_DRAWPATH_TRAP].x_char;
+
+		} else
+		if (!(pc_ptr->player & GRID_SEEN)) {
+			/* Unknown squares are grey. */
+			pa = t_info[FT_DRAWPATH_UNKNOWN].x_attr;
+			pc = t_info[FT_DRAWPATH_UNKNOWN].x_char;
+
+		} else
+		{
+			/* Unoccupied squares are white. */
+			pa = t_info[FT_DRAWPATH_DEFAULT].x_attr;
+			pc = t_info[FT_DRAWPATH_DEFAULT].x_char;
 		}
 
-		else if (c_ptr->o_idx && visible_object)
-			/* Known objects are yellow. */
-			colour = TERM_YELLOW;
-
-		else if ((pc_ptr->player & GRID_SEEN) && !cave_floor_grid(c_ptr))
-			/* Known walls are blue. */
-			colour = TERM_BLUE;
-
-		else if (is_visible_trap(c_ptr))
-			/* Traps are violet. */
-			colour = TERM_VIOLET;
-
-		else if (!(pc_ptr->player & GRID_SEEN))
-			/* Unknown squares are grey. */
-			colour = TERM_L_DARK;
-
-		else
-			/* Unoccupied squares are white. */
-			colour = TERM_WHITE;
-
 		/* Draw the path segment */
-		Term_queue_char(Term->scr->cx, Term->scr->cy, colour, '*', 0, 0);
+		/* Use Term_queue_char instead of Term_queue_char to show more of
+		 * existing graphics underneath */
+		Term_queue_char(Term->scr->cx, Term->scr->cy, pa, pc, 0, 0);
 	}
 	return i;
 }
