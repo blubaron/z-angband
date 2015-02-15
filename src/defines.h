@@ -3872,7 +3872,7 @@ static __inline void COPY_FLAG_AUX(const u32b *flags1, u32b *flags2, int num, u3
  */
 #define object_known_p(T) \
     (((T)->info & (OB_KNOWN)) || \
-     ((k_info[(T)->k_idx].info & OK_EASY_KNOW) && (k_info[(T)->k_idx].info & OK_AWARE)))
+     ((k_info[(T)->k_idx].flags[2] & TR2_EASY_KNOW) && (k_info[(T)->k_idx].info & OK_AWARE)))
 
 /*
  * Is the object fully known?
