@@ -1738,12 +1738,12 @@ bool alchemy(void)
 
 	/* make sure every item is shown */
 	item_tester_full = TRUE;
-	
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
+
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_FLOOR));
 
 	/* return to normal item testing */
 	item_tester_full = FALSE;
-	
+
 	/* Not a valid item */
 	if (!o_ptr) return (FALSE);
 
