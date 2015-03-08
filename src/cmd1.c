@@ -1112,17 +1112,68 @@ void carry(int pickup)
 		return;
 	}
 
-	/* Restrict the choices */
-	item_tester_hook = inven_carry_okay;
+	/* Hack -- query every item */
+	if (carry_query_flag) {
+		int i;
 
-	/* Get an object */
-	o_ptr = get_item("Get which item? ", "You see nothing there.", (USE_FLOOR), (USE_FLOOR));
+		/* Paranoia XXX XXX XXX */
+		message_flush();
 
-	/* Not a valid item */
-	if (!o_ptr) return;
+		/* backup any previous butons */
+		button_backup_all(TRUE);
 
-	/* Pick up the object */
-	py_pickup_aux(o_ptr);
+		/* Prompt for it */
+		prtf(0, 0, "Pick up an item from the pile? [$Xy/$Xn] ");
+
+		/* Get an acceptable answer */
+		while (TRUE)
+		{
+			i = inkey_m();
+			if (i & 0x80) {
+				int x,y;
+				char b;
+				/* this was a mouse press, get the press and translate it */
+				Term_getmousepress(&b,&x,&y);
+				if ((b & 0x07) == 1) {
+					/* get the map coord and see if the click was on it */
+					y = ((y-ROW_MAP) / tile_height_mult) + p_ptr->panel_y1;
+					x = ((x-COL_MAP) / tile_width_mult) + p_ptr->panel_x1;
+					if ((y == p_ptr->py) && (x == p_ptr->px)) {
+						i = 'y';
+						break;
+					}
+				}
+				/* other presses are equivalent to no */
+			}
+			if (quick_messages) break;
+			if (i == ESCAPE) break;
+			if (strchr("YyNnKk", i)) break;
+			bell("Illegal pick-up command!");
+		}
+
+		/* restore any previous butons */
+		button_restore();
+
+		/* Erase the prompt */
+		clear_msg();
+
+		if (!((i == 'Y') || (i == 'y'))) {
+			can_pickup = 0;
+		}
+	}
+	if (can_pickup) {
+		/* Restrict the choices */
+		item_tester_hook = inven_carry_okay;
+
+		/* Get an object */
+		o_ptr = get_item("Get which item? ", "You see nothing there.", (USE_FLOOR), (USE_FLOOR));
+
+		/* Not a valid item */
+		if (!o_ptr) return;
+
+		/* Pick up the object */
+		py_pickup_aux(o_ptr);
+	}
 }
 
 
