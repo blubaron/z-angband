@@ -3364,7 +3364,7 @@ option_type option_info[OPT_MAX] =
 	{FALSE, 0, NULL,					"Number 165" },
 	{TRUE,  1, "easy_open",				"Automatically open doors" },
 	{TRUE,  1, "easy_disarm",			"Automatically disarm traps" },
-	{FALSE, 1, "easy_floor",			"Display floor stacks in a list" },
+	{TRUE,  1, "easy_floor",			"Display floor stacks in a list" },
 	{TRUE,  0, NULL,					"Number 169" },
 	{FALSE, 2, "center_player",			"Always center on the player (*slow*)" },
 	{FALSE, 7, "avoid_center",			"Avoid centering while running" },
