@@ -1349,8 +1349,13 @@ static bool init_graphics(void)
 			use_transparency = TRUE;
 		}
 
-		/* Access the bitmap file */
-		path_make(buf, ANGBAND_DIR_XTRA_GRAF, name);
+		/* Try loading from the user directory first */
+		path_build(buf, 1024, ANGBAND_DIR_USER, name);
+
+		if (!file_exists(buf)) {
+			/* Access the bitmap file */
+			path_build(buf, 1024, ANGBAND_DIR_XTRA_GRAF, name);
+		}
 
 		/* Load the bitmap or quit */
 		//if (!ReadDIB(data[0].w, buf, &infGraph))

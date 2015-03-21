@@ -1649,15 +1649,20 @@ int init_graphics_x11()
 
 	mode = get_graphics_mode(arg_graphics);
 	if (mode && mode->file) {
-		if (mode->alphablend) {
+		if (mode->alphablend & 1) {
 			/* set or clear the flags needed in the ReadTiles function */
 			tiles.bFlags |= 1;
 		} else {
 			tiles.bFlags &= ~1;
 		}
 
-		/* Try the file */
-		path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
+		/* Try loading from the user directory first */
+		path_build(filename, 1024, ANGBAND_DIR_USER, mode->file);
+
+		if (!file_exists(filename)) {
+			/* Try the file */
+			path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
+		}
 
 		res = ReadTiles(dpy, filename, &tiles);
 		if (res >= 0) {

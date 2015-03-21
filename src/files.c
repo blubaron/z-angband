@@ -1094,21 +1094,16 @@ errr process_pref_file(cptr fmt, ...)
 	/* End the Varargs Stuff */
 	va_end(vp);
 
-	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_PREF, name);
+	/* Try loading from the user directory first */
+	path_build(buf, 1024, ANGBAND_DIR_USER, name);
+
+	if (!file_exists(buf)) {
+		/* Build the filename */
+		path_build(buf, 1024, ANGBAND_DIR_PREF, name);
+	}
 
 	/* Process the pref file */
 	err = process_pref_file_aux(buf);
-
-	/* Stop at parser errors, but not at non-existing file */
-	if (err < 1)
-	{
-		/* Build the filename */
-		path_make(buf, ANGBAND_DIR_USER, name);
-
-		/* Process the pref file */
-		err = process_pref_file_aux(buf);
-	}
 
 	/* Result */
 	return (err);
