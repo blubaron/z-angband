@@ -1661,7 +1661,7 @@ int init_graphics_x11()
 
 		if (!file_exists(filename)) {
 			/* Try the file */
-			path_build(filename, 1024, ANGBAND_DIR_XTRA, format("graf/%s",mode->file));
+			path_build(filename, 1024, ANGBAND_DIR_XTRA_GRAF, mode->file);
 		}
 
 		res = ReadTiles(dpy, filename, &tiles);
