@@ -687,7 +687,7 @@ void do_cmd_destroy(void)
 	q = "Destroy which item? ";
 	s = "You have nothing to destroy.";
 
-	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_INVEN));
+	o_ptr = get_item(q, s, (USE_INVEN | USE_FLOOR | USE_FULL_CONTAINER), (USE_FLOOR));
 
 	/* Not a valid item */
 	if (!o_ptr) return;
