@@ -1693,6 +1693,19 @@ static int remove_curse_aux(bool all)
 	}
 	OBJ_ITT_END;
 
+	if (cnt == 0) {
+		/* if nothing was uncursed, check the floor */
+		cave_type *c_ptr = area(p_ptr->px, p_ptr->py);
+		if (c_ptr->o_idx) {
+			OBJ_ITT_START (c_ptr->o_idx, o_ptr)
+			{
+				/* Count the uncursings */
+				if (uncurse_item(o_ptr, all)) cnt++;
+			}
+			OBJ_ITT_END;
+		}
+	}
+
 	/* Return "something uncursed" */
 	return (cnt);
 }
