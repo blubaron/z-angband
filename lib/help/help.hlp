@@ -16,6 +16,7 @@ Please choose one of the following online help files:
     (b) Zangband Options               (option.hlp)
     (c) User Preference Files          (pref.hlp)
     (d) Zangband Spoilers              (spoiler.hlp)
+    (e) Credits                        (credits.txt)
 
 
 ***** [0] general.hlp
@@ -32,3 +33,4 @@ Please choose one of the following online help files:
 ***** [b] option.hlp
 ***** [c] pref.hlp
 ***** [d] spoiler.hlp
+***** [e] credits.txt
