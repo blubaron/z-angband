@@ -176,6 +176,90 @@ static byte wild_first_town[START_STORE_NUM] =
 	BUILD_EMPTY,
 };
 
+/* The capital must contain at least one of each of these */
+static byte wild_palace_town[] =
+{
+	/* Make sure that there is a stairs to use as the palace dungeon */
+	BUILD_STAIRS,
+	BUILD_CASTLE1,
+	BUILD_BANK,
+	BUILD_INN,
+	BUILD_STORE_HOME,
+	/* need a library somewhere to research bounty quests */
+	BUILD_LIBRARY,
+	BUILD_MAGETOWER1,
+	/* uncomment when it is possible to increase the number of
+	 * buildings in the capital
+	BUILD_CATHEDRAL,
+	BUILD_WARRIOR_GUILD,
+	BUILD_MAGE_GUILD,
+	BUILD_THIEVES_GUILD,
+	BUILD_RANGER_GUILD,
+	BUILD_COURIER,
+	BUILD_MAP,
+	BUILD_FOOD,
+	BUILD_CASINO,
+	BUILD_EMPTY,
+	BUILD_EMPTY,
+	BUILD_EMPTY,
+	BUILD_EMPTY,
+	BUILD_BLANK,
+	BUILD_BLANK,
+	BUILD_BLANK,
+	BUILD_BLANK,
+	BUILD_BLANK,
+	BUILD_NONE,
+	BUILD_NONE,
+	BUILD_NONE,
+	BUILD_NONE,
+	BUILD_NONE,*/
+	0
+};
+
+/* The some town in the world must contain at least one of each
+ * of these. If not already existing, these will not be made
+ * in the starting or capital towns. */
+static byte wild_world_required[] =
+{
+	BUILD_PLUS_WEAPON,
+	BUILD_PLUS_ARMOUR,
+	BUILD_HEALER,
+	BUILD_RECHARGE,
+	BUILD_MUTATE,
+	BUILD_MAP,
+	BUILD_WEAPON5,
+	BUILD_ARMOUR5,
+	BUILD_WARHALL5,
+	BUILD_TEMPLE3,
+	BUILD_TEMPLE2,
+	BUILD_MAGIC4,
+	BUILD_SCROLL4,
+	BUILD_POTION4,
+	BUILD_FIGUR1,
+	BUILD_JEWEL4,
+	BUILD_HAT3,
+	BUILD_FLET3,
+	BUILD_SUPPLIES1,
+	BUILD_BLACK2,
+	BUILD_ALCHEMY2,
+	BUILD_BOOK1,
+
+	/* need a library somewhere to research bounty quests */
+	BUILD_LIBRARY,
+	/* remove these when we have the ability to increase
+	 * the capital's size */
+	BUILD_CATHEDRAL,
+	BUILD_WARRIOR_GUILD,
+	BUILD_MAGE_GUILD,
+	BUILD_THIEVES_GUILD,
+	BUILD_RANGER_GUILD,
+	BUILD_COURIER,
+	BUILD_FOOD,
+	BUILD_CASINO,
+
+	0
+};
+
 
 /*
  * Return the building name given a building "type"
@@ -3487,49 +3571,9 @@ static bool create_towns(int *xx, int *yy)
 		}
 	}
 
-	pl_ptr = &place[best_town];
-
-	if (!have_library) {
-		/* need a library somewhere to research bounty quests */
-		int j = high_count_place;
-		/* check if the largest city has a blank spot */
-		y = 0;
-		for (i = place[j].numstores-1; i > 0; i--) {
-			if (place[j].store[i].type == BUILD_NONE) {
-				/* change a random blank spot to a library, and init it */
-				if (build_is_store(BUILD_LIBRARY)) {
-					store_init(j, i, BUILD_LIBRARY);
-				} else {
-					build_init(j, i, BUILD_LIBRARY);
-				}
-				y++;
-				break;
-			}
-		}
-		x = place_count*10;
-		while ((!y) && (x >= 0)) {
-			/* we did not find a blank spot it the largest place, so try random places */
-			j = randint0(place_count);
-			if (place[j].type != PL_TOWN_FRACT) {
-				continue;
-			}
-			x--;
-			for (i = place[j].numstores-1; i > 0; i--) {
-				if (place[j].store[i].type == BUILD_NONE) {
-					/* use this spot */
-					if (build_is_store(BUILD_LIBRARY)) {
-						store_init(j, i, BUILD_LIBRARY);
-					} else {
-						build_init(j, i, BUILD_LIBRARY);
-					}
-					y++;
-					break;
-				}
-			}
-		}
-		/* if x is 0 then no blank buildings were found, the player
-		 * will just have to do without a library */
-	}
+	/* make sure that the largest town has all of the required
+	 * buildings
+	 */
 
 	/* scan the largest town for a large castle to make the palace
 	 * and promote a small castle, keep or townhall to it if necessary
@@ -3553,44 +3597,159 @@ static bool create_towns(int *xx, int *yy)
 		/* a castle was not found, make one */
 	}
 
-	/* make sure that there is a stairs to use as the palace dungeon */
+	/* if the capital has a mage tower, make sure that it is a large one */
 	for (i = 0; i < high_count; i++) {
-		if (place[high_count_place].store[i].type == BUILD_STAIRS) {
-			/* use the vanilla dungeon type */
-			init_dungeon(&(place[high_count_place]), &(dungeons[DUNGEON_VANILLA]));
+		if (place[high_count_place].store[i].type == BUILD_MAGETOWER0) {
+			build_init(high_count_place, i, BUILD_MAGETOWER1);
+			wild_build[BUILD_MAGETOWER1].num++;
+			wild_build[BUILD_MAGETOWER0].num--;
 			break;
 		}
 	}
-	if (i == high_count) {
-		/* a stairs was not found, make one */
+
+	/* make sure that the capital has all of its required buildings */
+# if 0
+	x = 0;
+	for (y=0; wild_palace_town[y] != 0; y++) {
 		for (i = 0; i < high_count; i++) {
-			if (place[high_count_place].store[i].type == BUILD_BLANK) {
+			if (place[high_count_place].store[i].type == wild_palace_town[y]) {
 				break;
 			}
 		}
 		if (i == high_count) {
-			/* an empty spot was not found, try a blank building */
-			for (i = 0; i < high_count; i++) {
-				if (place[high_count_place].store[i].type == BUILD_NONE) {
-					break;
-				}
+			x++;
+		}
+	}
+	j=0;
+	for (i = 0; i < high_count; i++) {
+		if (place[high_count_place].store[i].type == BUILD_NONE) {
+			j++;
+		} else 
+		if (place[high_count_place].store[i].type == BUILD_EMPTY) {
+			j++;
+		}
+	}
+
+#endif 
+	for (y=0; wild_palace_town[y] != 0; y++) {
+		for (i = 0; i < high_count; i++) {
+			if (place[high_count_place].store[i].type == wild_palace_town[y]) {
+				break;
 			}
 		}
 		if (i == high_count) {
-			/* a blank building was not found, try an empty building */
+			/* the building does not already exist, make one */
 			for (i = 0; i < high_count; i++) {
-				if (place[high_count_place].store[i].type == BUILD_EMPTY) {
+				if (place[high_count_place].store[i].type == BUILD_BLANK) {
+						wild_build[BUILD_BLANK].num--;
 					break;
 				}
 			}
+			if (i == high_count) {
+				/* an empty spot was not found, try a blank building */
+				for (i = 0; i < high_count; i++) {
+					if (place[high_count_place].store[i].type == BUILD_NONE) {
+						wild_build[BUILD_NONE].num--;
+						break;
+					}
+				}
+			}
+			if (i == high_count) {
+				/* a blank building was not found, try an empty building */
+				for (i = high_count; i >= 0; i--) {
+					if (place[high_count_place].store[i].type == BUILD_EMPTY) {
+						wild_build[BUILD_EMPTY].num--;
+						break;
+					}
+				}
+			}
+			if (i < high_count) {
+				/* use this spot for the building */
+				if (build_is_store(wild_palace_town[y])) {
+					store_init(high_count_place, i, wild_palace_town[y]);
+				} else
+				if (build_is_general(wild_palace_town[y])) {
+					general_init(high_count_place, i, wild_palace_town[y]);
+				} else
+				{
+					build_init(high_count_place, i, wild_palace_town[y]);
+				}
+				wild_build[wild_palace_town[y]].num++;
+			/*}
+			else {*/
+				/* the building could not be placed in the capital
+				 * for now, just do without it.
+				 */
+			}
 		}
-		if (i < high_count) {
-			/* use this spot for the stairs */
-			build_init(high_count_place, i, BUILD_STAIRS);
+	}
+
+	/* if we have stairs initialize the what will be the palace dungeon */
+	for (i = 0; i < high_count; i++) {
+		if (place[high_count_place].store[i].type == BUILD_STAIRS) {
 			/* use the vanilla dungeon type */
 			init_dungeon(&(place[high_count_place]), &(dungeons[DUNGEON_VANILLA]));
 		}
 	}
+
+	/* check that each required bulding exists somewhere */
+	for (y=0; wild_world_required[y] != 0; y++) {
+		int test = place_count*10;
+		if (wild_build[wild_world_required[y]].num > 0) {
+			/* we already have at least one */
+			continue;
+		}
+		while (test >= 0) {
+			j = randint0(place_count);
+			if ((j == best_town) || (j == high_count_place)) {
+				continue;
+			}
+			if (place[j].type != PL_TOWN_FRACT) {
+				continue;
+			}
+			test--;
+
+			for (i = place[j].numstores-1; i > 0; i--) {
+				if (place[j].store[i].type == BUILD_NONE) {
+					/* use this spot */
+					wild_build[BUILD_NONE].num--;
+					break;
+				}
+			}
+			if (i == 0) {
+				for (i = place[j].numstores-1; i > 0; i--) {
+					if (place[j].store[i].type == BUILD_EMPTY) {
+						/* use this spot */
+						wild_build[BUILD_EMPTY].num--;
+						break;
+					}
+				}
+			}
+			if (i == 0) {
+				/* if we did not find a spot here, try again */
+				continue;
+			} else {
+				/* use this spot */
+				if (build_is_store(wild_world_required[y])) {
+					store_init(j, i, wild_world_required[y]);
+				} else
+				if (build_is_general(wild_world_required[y])) {
+					general_init(j, i, wild_world_required[y]);
+				} else
+				{
+					build_init(j, i, wild_world_required[y]);
+				}
+				wild_build[wild_world_required[y]].num++;
+				/* if we did break this loop */
+				break;
+			}
+		}
+		/* if test is 0 here, the building could not be placed anywhere,
+		 * the player will just have to do without it.
+		 */
+	}
+
+	pl_ptr = &place[best_town];
 
 	/* Build starting city / town */
 	draw_city(pl_ptr);
@@ -4304,7 +4463,7 @@ void init_vanilla_town(void)
 
 	d_ptr = pl_ptr->dungeon;
 
-	/* Set dungeon depths */
+	*//* Set dungeon depths */
 	/*d_ptr->didx = 13;
 	d_ptr->max_level = MAX_DEPTH - 1;
 	d_ptr->min_level = 1;
