@@ -1487,27 +1487,33 @@ void tomb_menu(bool dump)
 static void close_game_handle_death(void)
 {
 	/* Handle retirement */
-	if (p_ptr->state.total_winner)
-	{
-		/* Save winning message to notes file. */
-		if (take_notes)
+	if (!munchkin_death || get_check("Save death? ")) {
+		if (p_ptr->state.total_winner)
 		{
-			add_note_type(NOTE_WINNER);
+			/* Save winning message to notes file. */
+			if (take_notes)
+			{
+				add_note_type(NOTE_WINNER);
+			}
+
+			kingly();
 		}
 
-		kingly();
-	}
-
-	/* Save memories */
-	if (!munchkin_death || get_check("Save death? "))
-	{
+		/* Save memories */
 		if (!save_player()) msgf("death save failed!");
-	}
+
+		/* Enter player in high score list */
+		enter_score();
+
+		tomb_menu(auto_dump);
 
 #if 0
-	/* Dump bones file */
-	make_bones();
+		/* Dump bones file */
+		make_bones();
 #endif
+	} else {
+		predict_score();
+	}
 
 	/* Inform notes file that you are dead */
 	if (take_notes)
@@ -1523,12 +1529,9 @@ static void close_game_handle_death(void)
 				p_ptr->state.died_from, long_day);
 	}
 
-	/* Enter player in high score list */
-	enter_score();
-
-	tomb_menu(auto_dump);
 }
 
+void do_cmd_predict_score(void);
 
 /*
 
@@ -1538,8 +1541,6 @@ static void close_game_handle_death(void)
  */
 void close_game(void)
 {
-	char buf[1024];
-
 	/* Handle stuff */
 	handle_stuff();
 
@@ -1555,28 +1556,34 @@ void close_game(void)
 	/* Hack -- Character is now "icky" */
 	screen_save();
 
-	/* Build the filename */
-	path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
+	if (p_ptr->state.is_dead) {
+		char buf[1024];
 
-	/* Grab permissions */
-	safe_setuid_grab();
+		/* Build the filename */
+		path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
 
-	/* Open the high score file, for reading/writing */
-	highscore_fd = fd_open(buf, O_RDWR);
+		/* Grab permissions */
+		safe_setuid_grab();
 
-	/* Drop permissions */
-	safe_setuid_drop();
+		/* Open the high score file, for reading/writing */
+		highscore_fd = fd_open(buf, O_RDWR);
 
-	if (p_ptr->state.is_dead)
-	{
+		/* Drop permissions */
+		safe_setuid_drop();
+
 		/* Handle death */
 		close_game_handle_death();
-	}
+
+		/* Shut the high score file */
+		(void)fd_close(highscore_fd);
+
+		/* Forget the high score fd */
+		highscore_fd = -1;
+	} else
 
 	/* Still alive */
-	else
 	{
-		int wid, hgt;
+		/*int wid, hgt;*/
 
 		/* Save the game */
 		do_cmd_save_game(FALSE);
@@ -1586,23 +1593,17 @@ void close_game(void)
 		{
 			add_note_type(NOTE_SAVE_GAME);
 		}
-
+#if 0
 		/* Get size */
 		Term_get_size(&wid, &hgt);
 
 		/* Prompt for scores XXX XXX XXX */
-		prtf(0, hgt - 1, "Press Return (or Escape).");
+		prtf(0, hgt - 1, "Show scores? Press Escape to show or any other key to exit.");
 
 		/* Predict score (or ESCAPE) */
-		if (inkey() != ESCAPE) predict_score();
+		if (inkey() != ESCAPE) do_cmd_predict_score();
+#endif
 	}
-
-
-	/* Shut the high score file */
-	(void)fd_close(highscore_fd);
-
-	/* Forget the high score fd */
-	highscore_fd = -1;
 
 	/* No longer icky */
 	screen_load();
@@ -1652,4 +1653,55 @@ void exit_game_panic(void)
 
 	/* Successful panic save */
 	quit("panic save succeeded!");
+}
+
+/*
+ * Show the scores list with the (living) player shown on it.
+ */
+void do_cmd_predict_score(void)
+{
+	char buf[1024];
+	/* Still alive */
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Flush the messages */
+	message_flush();
+
+	/* Flush the input */
+	flush();
+
+	/* No suspending now */
+	signals_ignore_tstp();
+
+	/* Hack -- Character is now "icky" */
+	screen_save();
+
+	/* Build the filename */
+	path_make(buf, ANGBAND_DIR_APEX, "scores.raw");
+
+	/* Grab permissions */
+	safe_setuid_grab();
+
+	/* Open the high score file, for reading/writing */
+	highscore_fd = fd_open(buf, O_RDWR);
+
+	/* Drop permissions */
+	safe_setuid_drop();
+
+	/* Predict score  */
+	predict_score();
+
+	/* Shut the high score file */
+	(void)fd_close(highscore_fd);
+
+	/* Forget the high score fd */
+	highscore_fd = -1;
+
+	/* No longer icky */
+	screen_load();
+
+	/* Allow suspending now */
+	signals_handle_tstp();
 }
