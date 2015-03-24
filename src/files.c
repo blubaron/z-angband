@@ -3735,9 +3735,9 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						/* Count the lines */
 						next++;
 					}
-					mx = 0;
+					mb = 0;
 					/* get the desired line */
-					while (mx == 0) {
+					while (mb == 0) {
 						/* Get a line */
 						if (file_getl_raw(fff, buf, 1024) < 0) break;
 
@@ -3745,19 +3745,45 @@ bool show_file(cptr name, cptr what, int line, int mode)
 						if (prefix(buf, "***** ")) continue;
 
 						/* Count the lines */
-						mx++;
+						mb++;
 						next++;
 					}
 					/* see if the line is a menu item */
-					if (buf[0] && hook[0][0]) {
-						for (i = 0; i < 62; i++) {
-							if (hook[i][0] && strstr(buf, hook[i])) {
-								char *c = strchr(buf, '(');
-								if (c) k = *(c+1);
-								break;
+					if (buf[0] && menu) {
+						/* first, test if the click was on a link reference */
+						char *c = strchr(buf, '[');
+						if (c && (*(c+2) == ']')) {
+							if ((mx >= (c-buf)) && (mx <= (c-buf)+2)) {
+								k = *(c+1);
+							}
+						} 
+						if (!k) {
+							char *d;
+							for (i = 0; i < 62; i++) {
+								if (hook[i][0] && (d = strstr(buf, hook[i]))) {
+									/* test if the click was on a menu line */
+									c = strchr(buf, '(');
+									if (c && (*(c+2) == ')')) {
+										k = *(c+1);
+									}
+									/* test if the click was on a link in the middle of a text line */
+									if ((!k) && (mx >= (d-buf)) && (mx <= (d-buf)+strlen(hook[i]))) {
+										if (i < 10) {
+											k = '0' + i;
+										} else
+										if (i < 36) {
+											k = 'a' + (i-10);
+										} else
+										{
+											k = 'A' + (i-36);
+										}
+									}
+									break;
+								}
 							}
 						}
-					} else {
+					} 
+					if (!k) {
 						/* move the page up or down */
 						if (size > hgt - 4) {
 							line += my-2-((hgt-4)>>1);
