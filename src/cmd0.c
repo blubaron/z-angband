@@ -962,6 +962,13 @@ void process_command(void)
 			break;
 		}
 
+		case '_':
+		{
+			/* Show the predicted score */
+			do_cmd_predict_score();
+			break;
+		}
+
 		default:
 		{
 			/* Hack -- Unknown command */

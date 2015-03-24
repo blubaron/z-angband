@@ -1148,6 +1148,7 @@ extern void ingame_score(bool *initialized, bool game_in_progress);
 extern void close_game(void);
 extern void exit_game_panic(void);
 extern void top_twenty(void);
+extern void do_cmd_predict_score(void);
 
 /* mind.c */
 extern mindcraft_power mindcraft_powers[MINDCRAFT_MAX];

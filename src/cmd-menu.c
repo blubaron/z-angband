@@ -136,6 +136,8 @@ static struct cmd_info cmd_util[] =
 	{ "Version info", 'V', 0, do_cmd_version, NULL },
 	{ "Options menu", '=', 0, NULL, NULL},//, do_cmd_xxx_options, NULL },
 
+	{ "Show Scores", '_', 0, do_cmd_predict_score, NULL },
+
 	{ "Save and don't quit", KTRL('S'), 0, NULL, NULL },
 	{ "Save and quit", KTRL('X'), 0, NULL, NULL },
 	{ "Quit (commit suicide)", KTRL('Q'), 0, NULL, NULL},//, textui_cmd_suicide, NULL },
@@ -149,7 +151,6 @@ static struct cmd_info cmd_hidden[] =
 {
 	{ "Take notes", ':', 0, do_cmd_note, NULL },
 	{ "Load a single pref line", '"', 0, do_cmd_pref, NULL },
-	{ "**Enter a store", '_', 0, NULL, NULL },
 	{ "Walk", ';', 0, NULL, NULL },
 	{ "**Walk into a trap", 'W', '-', NULL, NULL },
 	{ "Start running", '.', ',', NULL, NULL },
