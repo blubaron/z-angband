@@ -3690,7 +3690,8 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		if (mode == RESIZE_SHOW_FILE)
 		{
 			button_restore();
-			/* Hack: the file  will be closed by the other instance of show_file */
+			/* Close it */
+			file_close(fff);
 			return (TRUE);
 		}
 		else
