@@ -727,14 +727,14 @@ int main(int argc, char *argv[])
 				/* Prompt the user */
 				if (savefile[0] != 0) {
 					if (p_ptr->state.is_dead) {
-						prtf(14, 22, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
-						prtf(14, 23, " [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
+						prtf(14, 22, "[Choose $U'($NN$R)ew game'$Yn$V, $U'($NO$R)pen saved'$Yo$V, or $U'e($NX$R)it'$Yx$V]");
+						prtf(14, 23, " [Or choose to $U'load ($NL$R)ast'$Yl$V or $U'return to ($NG$R)raveyard'$Yg$V]");
 					} else {
-						prtf(14, 22, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
-						prtf(14, 23, " [Or choose to $U'load (L)ast'$Yl$V]");
+						prtf(14, 22, "[Choose $U'($NN$R)ew game'$Yn$V, $U'($NO$R)pen saved'$Yo$V, or $U'e($NX$R)it'$Yx$V]");
+						prtf(14, 23, " [Or choose to $U'load ($NL$R)ast'$Yl$V]");
 					}
 				} else {
-					prtf(14, 23, "[Choose $U'(N)ew game'$Yn$V, $U'(O)pen saved'$Yo$V, or $U'e(X)it'$Yx$V]");
+					prtf(14, 23, "[Choose $U'($NN$R)ew game'$Yn$V, $U'($NO$R)pen saved'$Yo$V, or $U'e($NX$R)it'$Yx$V]");
 				}
 
 				/* Flush it */
@@ -806,10 +806,12 @@ int main(int argc, char *argv[])
 					new_game = FALSE;
 				} else*/
 				if ((key == 's') || (key == 'S')) {
+					/* Hack - make sure that there is a resize hook, to prevent
+					 * a crash after displaying the scores */
 					if (!angband_term[0]->resize_hook) {
 						angband_term[0]->resize_hook = resize_map;
 					}
-					/* Start the tutorial */
+					/* Show the scores */
 					top_twenty();
 
 				} else

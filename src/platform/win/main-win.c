@@ -5551,10 +5551,10 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			//if (p_ptr->state.is_dead) highlight = 4;
 			/* Prompt the user */
 			if (savefile[0] != 0) {
-				prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
-				prtf(10, 23, "  [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
+				prtf(10, 22, "[Choose $U'($NN$R)ew'$Yn$V, $U'($NO$R)pen'$Yo$V, or $U'e($NX$R)it'$Yx$V from the 'File' menu]");
+				prtf(10, 23, "  [Or choose to $U'load ($NL$R)ast'$Yl$V or $U'return to ($NG$R)raveyard'$Yg$V]");
 			} else {
-				prtf(10, 23, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+				prtf(10, 23, "[Choose $U'($NN$R)ew'$Yn$V, $U'($NO$R)pen'$Yo$V, or $U'e($NX$R)it'$Yx$V from the 'File' menu]");
 			}
 			Term_fresh();
 
@@ -5606,8 +5606,8 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 						display_introduction();
 
 						/* Prompt the user */
-						prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
-						prtf(10, 23, "  [Or choose to $U'load (L)ast$Yl$V' or $U'return to (G)raveyard'$Yg$V]");
+						prtf(10, 22, "[Choose $U'($NN$R)ew'$Yn$V, $U'($NO$R)pen'$Yo$V, or $U'e($NX$R)it'$Yx$V from the 'File' menu]");
+						prtf(10, 23, "  [Or choose to $U'load ($NL$R)ast$Yl$V' or $U'return to ($NG$R)raveyard'$Yg$V]");
 
 						/* Flush it */
 						Term_fresh();
@@ -5633,10 +5633,10 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 					/* Prompt the user */
 					if (savefile[0] != 0) {
-						prtf(10, 22, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
-						prtf(10, 23, "  [Or choose to $U'load (L)ast'$Yl$V or $U'return to (G)raveyard'$Yg$V]");
+						prtf(10, 22, "[Choose $U'($NN$R)ew'$Yn$V, $U'($NO$R)pen'$Yo$V, or $U'e($NX$R)it'$Yx$V from the 'File' menu]");
+						prtf(10, 23, "  [Or choose to $U'load ($NL$R)ast'$Yl$V or $U'return to ($NG$R)raveyard'$Yg$V]");
 					} else {
-						prtf(10, 23, "[Choose $U'(N)ew'$Yn$V, $U'(O)pen'$Yo$V, or $U'e(X)it'$Yx$V from the 'File' menu]");
+						prtf(10, 23, "[Choose $U'($NN$R)ew'$Yn$V, $U'($NO$R)pen'$Yo$V, or $U'e($NX$R)it'$Yx$V from the 'File' menu]");
 					}
 
 					/* Flush it */
