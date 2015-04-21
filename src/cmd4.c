@@ -1377,17 +1377,28 @@ static bool do_cmd_options_delay(int dummy)
 	Term_clear();
 
 	/* Prompt */
-	prtf(0, 18, "Command: Base Delay Factor");
+	prtf(0, 2, "Command: Base Delay Factor");
 
 	/* Get a new value */
 	while (1)
 	{
 		int msec = delay_factor * delay_factor * delay_factor;
-		prtf(0, 22, "Current base delay factor: %d (%d msec)",
-				   delay_factor, msec);
-		prtf(0, 20, "Delay Factor (0-9 or ESC to accept): ");
 
+		/* backup any current buttons */
+		button_backup_all(TRUE);
+
+		prtf(4, 7, "Current base delay factor: %d (%d msec)",
+				   delay_factor, msec);
+		prtf(3, 5, "$U $N0$R,$Y0$V$U $N1$R,$Y1$V$U $N2$R,$Y2$V$U $N3$R,$Y3$V$U $N4$R,$Y4$V");
+		prtf(18, 5, "$U $N5$R,$Y5$V$U $N6$R,$Y6$V$U $N7$R,$Y7$V$U $N8$R,$Y8$V$U $N9$R$Y9$V");
+		prtf(4, 4, "Delay Factor ($N$X0-$X9$R or$U $NESC$R$Y%c $Vto accept): ", ESCAPE);
+
+		/* TODO change to get_number (0-255)? */
+		
 		k = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		if (k == ESCAPE) break;
 		if (isdigit(k)) delay_factor = D2I(k);
@@ -1417,16 +1428,24 @@ static bool do_cmd_options_hitpoint(int dummy)
 	Term_clear();
 
 	/* Prompt */
-	prtf(0, 18, "Command: Hitpoint Warning");
+	prtf(0, 2, "Command: Hitpoint Warning");
 
 	/* Get a new value */
 	while (1)
 	{
-		prtf(0, 22, "Current hitpoint warning: %d0%%",
-				   hitpoint_warn);
-		prtf(0, 20, "Hitpoint Warning (0-9 or ESC to accept): ");
+		/* backup any current buttons */
+		button_backup_all(TRUE);
+
+		prtf(4, 7, "Current hitpoint warning: %d (%d0%%)",
+				   hitpoint_warn, hitpoint_warn);
+		prtf(3, 5, "$U $N0$R,$Y0$V$U $N1$R,$Y1$V$U $N2$R,$Y2$V$U $N3$R,$Y3$V$U $N4$R,$Y4$V");
+		prtf(18, 5, "$U $N5$R,$Y5$V$U $N6$R,$Y6$V$U $N7$R,$Y7$V$U $N8$R,$Y8$V$U $N9$R$Y9$V");
+		prtf(4, 4, "Hitpoint Warning ($N$X0-$X9$R or$U $NESC$R$Y%c $Vto accept): ", ESCAPE);
 
 		k = inkey();
+
+		/* restore any previous mouse buttons */
+		button_restore();
 
 		if (k == ESCAPE) break;
 		if (isdigit(k)) hitpoint_warn = D2I(k);
