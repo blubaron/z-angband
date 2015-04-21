@@ -1218,14 +1218,19 @@ static bool do_cmd_options_win(int dummy)
 	while (go)
 	{
 		/* Prompt XXX XXX XXX */
-		prtf(0, 0, "Window Flags (<dir>, t, y, n, ESC) ");
+		prtf(0, 0, "Window Flags (<dir>, $N$Xt$R, $N$Xy$R, $N$Xn$R,$U $NESC$R to accept$Y%c$V) ", ESCAPE);
 
 		/* Display the windows */
 		for (j = 0; j < ANGBAND_TERM_MAX; j++)
 		{
 			/* Window name, staggered, centered */
-			put_fstr(35 + j * 5 - strlen(angband_term_name[j]) / 2, 2 + j % 2,
+			if (j == x) {
+				put_fstr(35 + j * 5 - strlen(angband_term_name[j]) / 2, 2 + j % 2,
 						CLR_L_BLUE "%s", angband_term_name[j]);
+			} else {
+				put_fstr(35 + j * 5 - strlen(angband_term_name[j]) / 2, 2 + j % 2,
+						CLR_WHITE "%s", angband_term_name[j]);
+			}
 		}
 
 		/* Display the options */
@@ -1237,7 +1242,11 @@ static bool do_cmd_options_win(int dummy)
 			if (!str) continue;
 
 			/* Flag name */
-			put_fstr(0, i + 5, CLR_L_BLUE "%s", str);
+			if (i == y) {
+				put_fstr(0, i + 5, CLR_L_BLUE "%s", str);
+			} else {
+				put_fstr(0, i + 5, CLR_WHITE "%s", str);
+			}
 
 			/* Display the windows */
 			for (j = 0; j < ANGBAND_TERM_MAX; j++)
@@ -1265,7 +1274,60 @@ static bool do_cmd_options_win(int dummy)
 		Term_gotoxy(35 + x * 5, y + 5);
 
 		/* Get key */
-		ch = inkey();
+		ch = inkey_m();
+
+		/* check for a mouse button */
+		if (ch & 0x80) {
+			char b, p;
+			int mx, my;
+
+			Term_getmousepress(&p, &mx, &my);
+			b = p&0x7;
+
+			if (b == 2) {
+				ch = ESCAPE;
+			} else
+			if (b == 3) {
+				ch = 't';
+			} else
+			if (b == 4) {
+				ch = '8';
+			} else
+			if (b == 5) {
+				ch = '2';
+			} else
+			if (b == 6) {
+				ch = '4';
+			} else
+			if (b == 7) {
+				ch = '6';
+			} else
+			{
+				ch = 0; /* do nothing in switch block below */
+				
+				/* convert to the flag grid */
+				mx = (mx - 35) / 5;
+				my = my - 5;
+
+				if ((my == y) && (mx == x)) {
+					/* note that this does not clear the other flags
+					 * in the row and column like 't' does */
+					if (window_flag[x] & (1L << y)) {
+						/* Clear flag */
+						window_flag[x] &= ~(1L << y);
+					} else {
+						/* Set flag */
+						window_flag[x] |= (1L << y);
+					}
+				} else
+				if ((mx >= 0) && (mx < ANGBAND_TERM_MAX)
+				  && (my >= 0) && (my < WINDOW_CHOICE_MAX))
+				{
+					x = mx;
+					y = my;
+				}
+			}
+		}
 
 		/* Analyze */
 		switch (ch)
@@ -1310,6 +1372,12 @@ static bool do_cmd_options_win(int dummy)
 			{
 				/* Clear flag */
 				window_flag[x] &= ~(1L << y);
+				break;
+			}
+
+			case 0:
+			{
+				/* Do nothing */
 				break;
 			}
 
