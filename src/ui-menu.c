@@ -505,6 +505,9 @@ bool menu_handle_mouse(menu_type *menu, const ui_event *in,
 	int x,y;
 	char b,p;
 	int dir = 0;
+
+	*out = EVT_NONE;
+
 	Term_getmousepress(&p, &x, &y);
 	b = p&0x7;
 	//if (in->mouse.button == 2) {
@@ -531,17 +534,23 @@ bool menu_handle_mouse(menu_type *menu, const ui_event *in,
 		*out = EVT_MOVE;
 		dir = 6;
 	} else
-	//if (!region_inside(&menu->active, in)) {
-	//	/* A click to the left of the active region is 'back' */
-	//	if (!rect_region_inside(&menu->active, in) &&
-	//			in->mouse.x < menu->active.col)
-	//		//out->type = EVT_ESCAPE;
-	//} else
-	if (!rect_region_inside(&menu->active, y, x)) {
+	/*if (!region_inside(&menu->active, in)) {*/
 		/* A click to the left of the active region is 'back' */
-		if (!rect_region_inside(&menu->active, y, x) &&
-				x < menu->active.col)
+	/*	if (!rect_region_inside(&menu->active, in) &&
+			in->mouse.x < menu->active.col)
+			out->type = EVT_ESCAPE;
+	} else*/
+	if (!rect_region_inside(&menu->active, y, x)) {
+		/* A click outside of the active region is 'back' */
+		if (menu->flags & MN_ESCAPE_OUTSIDE) {
 			*out = EVT_ESCAPE;
+		} else
+		/* A click to the left of the active region is 'back' */
+		if ((menu->flags & MN_ESCAPE_LEFT) &&
+				x < menu->active.col)
+		{
+			*out = EVT_ESCAPE;
+		}
 	} else
 	{
 		int count = menu->filter_list ? menu->filter_count : menu->count;

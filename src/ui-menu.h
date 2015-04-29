@@ -202,7 +202,13 @@ enum
 	MN_DBL_TAP = 0x10,
 
 	/* no select events to be triggered */
-	MN_NO_ACTION = 0x20
+	MN_NO_ACTION = 0x20,
+
+	/* a click outside the menu is an ESCAPE event */
+	MN_ESCAPE_OUTSIDE = 0x40,
+
+	/* a click to the left of the menu is an ESCAPE event */
+	MN_ESCAPE_LEFT = 0x80
 } menu_type_flags;
 
 
