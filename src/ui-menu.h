@@ -354,6 +354,7 @@ void menu_refresh(menu_type *menu, bool reset_screen);
  * at the bottom of the menu.
  */
 ui_event menu_select(menu_type *menu, int notify, bool popup);
+ui_event menu_select_multi(int *active, menu_type **menus, int num, int notify, bool popup);
 
 /**
  * Set the menu cursor to the next valid row.

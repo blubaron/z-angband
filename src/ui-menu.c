@@ -739,8 +739,10 @@ ui_event menu_select(menu_type *menu, int notify, bool popup)
 	assert(menu->active.width != 0 && menu->active.page_rows != 0);
 
 	notify |= (EVT_SELECT | EVT_ESCAPE);
-	if (popup)
+	if (popup) {
 		screen_save();
+		button_backup_all(TRUE);
+	}
 
 	/* Stop on first unhandled event */
 	//while (!(in.type & notify))
@@ -799,17 +801,158 @@ ui_event menu_select(menu_type *menu, int notify, bool popup)
 		//if (notify & out.type) {
 		//if (notify & out) {
 		if ((out == EVT_SELECT) || (out == EVT_ESCAPE)) {
-			if (popup)
+			if (popup) {
+				button_restore();
 				screen_load();
+			}
 			return out;
 		}
 	}
 
-	if (popup)
+	if (popup) {
+		button_restore();
 		screen_load();
+	}
 	return in;
 }
 
+/* 
+ * Run multiple menus at the same time.
+ *
+ * If popup is true, the screen is saved before the menu is drawn, and
+ * restored afterwards. Each time a popup menu is redrawn, it resets the
+ * screen before redrawing.
+ */
+ui_event menu_select_multi(int *active, menu_type **menus, int num, int notify, bool popup)
+{
+	ui_event in = EVENT_EMPTY;
+	ui_event out = EVENT_EMPTY;
+	bool no_act = FALSE;
+	int i;
+
+	assert(menus != NULL);
+	assert(active != NULL);
+	assert(num > 1);
+	assert(*active < num);
+	for (i = 0; i < num; i++) {
+		assert(menus[i]->active.width != 0 && menus[i]->active.page_rows != 0);
+	}
+
+	notify |= (EVT_SELECT | EVT_ESCAPE);
+	if (popup) {
+		screen_save();
+		button_backup_all(TRUE);
+	}
+
+	/* Stop on first unhandled event */
+	//while (!(in.type & notify))
+	//while (!(in & notify))
+	while (!(in == EVT_SELECT) && !(in == EVT_ESCAPE))
+	{
+		out = EVENT_EMPTY;
+
+		if (popup) {
+			button_restore();
+			screen_load();
+			screen_save();
+			button_backup_all(TRUE);
+		}
+		no_act = (menus[*active]->flags & MN_NO_ACTION) ? TRUE : FALSE;
+
+		/* refresh all of the menus except the active one */
+		for (i = 0; i < num; i++) {
+			if (i != *active) {
+				menu_refresh(menus[i], FALSE);
+			}
+		}
+		/* refresh the active menu */
+		menu_refresh(menus[*active], FALSE);
+
+		//in = inkey_ex();
+		in = inkey_m();
+
+		/* Handle mouse & keyboard commands */
+		//if (in.type == EVT_MOUSE) {
+		if (in & 0x80) {
+			//if (!no_act && menu_handle_action(menu, &in)) {
+			//	continue;
+			//}
+			//menu_handle_mouse(menu, &in, &out);
+			if (in == EVT_RESIZE) {
+				/* resize all of the menus */
+				for (i = 0; i < num; i++) {
+					menu_calc_size(menus[i]);
+					if (menus[i]->row_funcs->resize)
+						menus[i]->row_funcs->resize(menus[i]);
+				}
+			} else {
+				int mx,my;
+				char p;
+
+				/* check which menu the click was in */
+				Term_peekmousepress(&p, &mx, &my);
+				if (!rect_region_inside(&(menus[*active]->active), my, mx) ) {
+					for (i = 0; i < num; i++) {
+						if (rect_region_inside(&(menus[i]->active), my, mx)) {
+							no_act = (menus[i]->flags & MN_NO_ACTION) ? TRUE : FALSE;
+							*active = i;
+						}
+					}
+				}
+
+				/* handle the click in the active one */
+				if (!no_act && menu_handle_action(menus[*active], &in)) {
+					continue;
+				}
+				menu_handle_mouse(menus[*active], &in, &out);
+			}
+		//} else if (in.type == EVT_KBRD) {
+		} else {
+			/* see if we need to move between menus */
+			/* handle the key press */
+			if (!no_act && menus[*active]->cmd_keys &&
+					//strchr(menu->cmd_keys, (char)in.key.code) &&
+					strchr(menus[*active]->cmd_keys, (char)in) &&
+					menu_handle_action(menus[*active], &in))
+			{
+				continue;
+			}
+
+			menu_handle_keypress(menus[*active], &in, &out);
+		}// else if (in.type == EVT_RESIZE) {
+		//	menu_calc_size(menu);
+		//	if (menu->row_funcs->resize)
+		//		menu->row_funcs->resize(menu);
+		//}
+
+		/* XXX should redraw menu here if cursor has moved */
+
+		/* If we've selected an item, then send that event out */
+		//if (out.type == EVT_SELECT && !no_act && menu_handle_action(menu, &out))
+		if ((out == EVT_SELECT) && !no_act && menu_handle_action(menus[*active], &out))
+			continue;
+
+		/* needed because EVT_* types are composed of multiple flags where in
+		 * angband they are one flag of an int, so the (notify & out) and
+		 * (!(in & notify)) is only true for particular EVT_* values */
+		/* Notify about the outgoing type */
+		//if (notify & out.type) {
+		//if (notify & out) {
+		if ((out == EVT_SELECT) || (out == EVT_ESCAPE)) {
+			if (popup) {
+				button_restore();
+				screen_load();
+			}
+			return out;
+		}
+	}
+
+	if (popup) {
+		button_restore();
+		screen_load();
+	}
+	return in;
+}
 
 /* ================== MENU ACCESSORS ================ */
 
