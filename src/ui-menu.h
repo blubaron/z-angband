@@ -164,7 +164,7 @@ typedef enum
 typedef struct
 {
 	/* Determines the cursor index given a (mouse) location */
-	int (*get_cursor)(int row, int col, int n, int top, rect_region *loc);
+	int (*get_cursor)(menu_type *menu, int row, int col, int n, int top, rect_region *loc);
 
 	/* Displays the current list of visible menu items */
 	void (*display_list)(menu_type *menu, int cursor, int *top, rect_region *);
@@ -252,6 +252,7 @@ struct menu_type
 	/* State variables */
 	int cursor;              /* Currently selected row */
 	int top;                 /* Position in list for partial display */
+	int column_width;        /* Width of columns in column skin, usually 0 */
 	rect_region active;      /* Subregion actually active for selection */
 
 };

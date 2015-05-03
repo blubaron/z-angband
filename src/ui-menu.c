@@ -150,7 +150,7 @@ const menu_iter menu_iter_strings =
 
 /* Scrolling menu */
 /* Find the position of a cursor given a screen address */
-static int scrolling_get_cursor(int row, int col, int n, int top, rect_region *loc)
+static int scrolling_get_cursor(menu_type *menu, int row, int col, int n, int top, rect_region *loc)
 {
 	int cursor = row - loc->row + top;
 	if (cursor >= n) cursor = n - 1;
@@ -242,7 +242,7 @@ static const menu_skin menu_skin_scroll =
 /*** Multi-column menus ***/
 
 /* Find the position of a cursor given a screen address */
-static int columns_get_cursor(int row, int col, int n, int top, rect_region *loc)
+static int columns_get_cursor(menu_type *menu, int row, int col, int n, int top, rect_region *loc)
 {
 	int rows_per_page = loc->page_rows;
 	/*int colw = loc->width / (n + rows_per_page - 1) / rows_per_page;*/
@@ -250,6 +250,9 @@ static int columns_get_cursor(int row, int col, int n, int top, rect_region *loc
 	int colw = 23;/*loc->width / cols;*/
 	int cursor;
 
+	if (menu->column_width > 0) {
+		colw = menu->column_width;
+	} else
 	if ((colw * cols) > loc->width)
 		colw = loc->width / cols;
 
@@ -277,6 +280,9 @@ static void display_columns(menu_type *menu, int cursor, int *top, rect_region *
 
 	Term_get_size(&w, &h);
 
+	if (menu->column_width > 0) {
+		colw = menu->column_width;
+	} else
 	if ((colw * cols) > (w - col))
 		colw = (w - col) / cols;
 
@@ -556,7 +562,7 @@ bool menu_handle_mouse(menu_type *menu, const ui_event *in,
 		int count = menu->filter_list ? menu->filter_count : menu->count;
 
 		//new_cursor = menu->skin->get_cursor(in->mouse.y, in->mouse.x,
-		new_cursor = menu->skin->get_cursor(y, x,
+		new_cursor = menu->skin->get_cursor(menu, y, x,
 				count, menu->top, &menu->active);
 	
 		if (is_valid_row(menu, new_cursor))
