@@ -2262,6 +2262,28 @@ errr Term_getmousepress(char *button, int *x, int *y)
 	/* Success */
 	return (0);
 }
+/*
+ * Check if a mouse press was read from the key queue, get the
+ * mouse press information.
+ */
+errr Term_peekmousepress(char *button, int *x, int *y)
+{
+	/* Assume no key */
+	(*button) = 0;
+
+	/* Do not Wait */
+	/* No keys are ready */
+	if (Term->mouse_head == Term->mouse_tail)
+		return (1);
+
+	/* Extract the next keypress */
+	(*button) = Term->mouse_queue[Term->mouse_tail];
+	(*x) = Term->mouse_x_queue[Term->mouse_tail];
+	(*y) = Term->mouse_y_queue[Term->mouse_tail];
+
+	/* Success */
+	return (0);
+}
 
 
 /*** Extra routines ***/

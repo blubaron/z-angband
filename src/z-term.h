@@ -414,6 +414,7 @@ extern errr Term_mousepress(int button, int mods, int x, int y);
 extern errr Term_key_push(int k);
 extern errr Term_inkey(char *ch, bool wait, bool take);
 extern errr Term_getmousepress(char *button, int *x, int *y);
+extern errr Term_peekmousepress(char *button, int *x, int *y);
 
 extern void Term_save(void);
 extern void Term_load(void);
