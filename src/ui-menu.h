@@ -83,8 +83,11 @@ typedef enum
 /**
  * Flags for menu_actions.
  */
-/*#define MN_ACT_GRAYED     0x0001*/ /* Allows selection but no action */
-/*#define MN_ACT_HIDDEN     0x0002*/ /* Row is hidden, but may be selected via tag */
+#define MN_ACTIVE		0x01	/* Available to choose */
+#define MN_SELECT		0x02	/* Can 'select' action */
+#define MN_CLEAR		0x04	/* Clear screen before calling */
+/*#define MN_ACT_GRAYED	0x08*/	/* Allows selection but no action */
+/*#define MN_ACT_HIDDEN	0x10*/	/* Row is hidden, but may be selected via tag */
 
 
 /*
@@ -113,10 +116,6 @@ struct menu_action
 
 /* Menu terminator */
 #define MENU_END {NULL, NULL, NULL, 0x00}
-
-#define MN_ACTIVE		0x01	/* Available to choose */
-#define MN_SELECT		0x02	/* Can 'select' action */
-#define MN_CLEAR		0x04	/* Clear screen before calling */
 
 
 
@@ -208,7 +207,10 @@ enum
 	MN_ESCAPE_OUTSIDE = 0x40,
 
 	/* a click to the left of the menu is an ESCAPE event */
-	MN_ESCAPE_LEFT = 0x80
+	MN_ESCAPE_LEFT = 0x80,
+
+	/* draw a basic border around the menu */
+	MN_BORDER = 0x0100
 } menu_type_flags;
 
 

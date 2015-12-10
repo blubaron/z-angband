@@ -71,7 +71,7 @@ static int menu_action_valid(menu_type *m, int oid)
 	menu_action *acts = menu_priv(m);
 
 	/*if (acts[oid].flags & MN_ACT_HIDDEN)*/
-	if (acts[oid].flags & MN_ACTIVE)
+	if (!(acts[oid].flags & MN_ACTIVE) && (acts[oid].flags & MN_SELECT))
 		return 2;
 
 	/*return acts[oid].name ? TRUE : FALSE;*/
@@ -480,15 +480,31 @@ void menu_refresh(menu_type *menu, bool reset_screen)
 	if (menu->filter_list && menu->cursor >= 0)
 		oid = menu->filter_list[oid];
 
-	if (menu->title)
-		put_cstr(menu->boundary.col, menu->boundary.row, menu->title, loc->width);
+	if (menu->flags & MN_BORDER) {
+		window_make(menu->boundary.col, menu->boundary.row,
+			menu->boundary.col + menu->boundary.width,
+			menu->boundary.row + menu->boundary.page_rows);
+	}
+
+	if (menu->title) {
+		if (menu->flags & MN_BORDER) {
+			put_cstr(menu->boundary.col+2, menu->boundary.row+2, menu->title, loc->width);
+		} else {
+			put_cstr(menu->boundary.col, menu->boundary.row, menu->title, loc->width);
+		}
+	}
 
 	if (menu->header)
 		put_cstr(loc->col, loc->row - 1, menu->header, loc->width);
 
-	if (menu->prompt)
-		put_cstr(menu->boundary.col, loc->row + loc->page_rows, menu->prompt, loc->width);
-
+	if (menu->prompt) {
+		if (menu->flags & MN_BORDER) {
+			put_cstr(menu->boundary.col+2, loc->row + loc->page_rows, menu->prompt, loc->width);
+		} else {
+			put_cstr(menu->boundary.col, loc->row + loc->page_rows, menu->prompt, loc->width);
+		}
+		
+	}
 	if (menu->browse_hook && oid >= 0)
 		menu->browse_hook(oid, menu->menu_data, loc);
 
@@ -1034,11 +1050,29 @@ static bool menu_calc_size(menu_type *menu)
 	/* Calculate term-relative positions */
 	menu->active = rect_region_calculate(menu->boundary);
 
+	if (menu->flags & MN_BORDER) {
+		if (menu->boundary.row > 0) {
+			menu->boundary.row -= 1;
+			menu->boundary.page_rows += 2;
+		} else {
+			menu->active.row += 1;
+			menu->active.page_rows -= 2;
+		}
+		if (menu->boundary.col > 0) {
+			menu->boundary.col -= 1;
+			menu->boundary.width += 2;
+		} else {
+			menu->active.col += 1;
+			menu->active.width -= 2;
+		}
+	}
+
 	if (menu->title)
 	{
 		menu->active.row += 2;
 		menu->active.page_rows -= 2;
 		menu->active.col += 4;
+		menu->active.width -= 4;
 	}
 
 	if (menu->header)
