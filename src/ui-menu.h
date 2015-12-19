@@ -209,8 +209,11 @@ enum
 	/* a click to the left of the menu is an ESCAPE event */
 	MN_ESCAPE_LEFT = 0x80,
 
+	/* menu receives cursor move events */
+	MN_HANDLE_MOVE = 0x0100,
+
 	/* draw a basic border around the menu */
-	MN_BORDER = 0x0100
+	MN_BORDER = 0x0200
 } menu_type_flags;
 
 

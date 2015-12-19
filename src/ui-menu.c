@@ -609,7 +609,7 @@ bool menu_handle_mouse(menu_type *menu, const ui_event *in,
 				else
 					menu->cursor += ddy[dir];
 			}
-		
+
 			assert(menu->cursor >= 0);
 			assert(menu->cursor < count);
 		}
@@ -728,7 +728,7 @@ bool menu_handle_keypress(menu_type *menu, const ui_event *in,
 					else
 						menu->cursor += ddy[dir];
 				}
-			
+
 				assert(menu->cursor >= 0);
 				assert(menu->cursor < count);
 			}
@@ -804,6 +804,11 @@ ui_event menu_select(menu_type *menu, int notify, bool popup)
 		//}
 
 		/* XXX should redraw menu here if cursor has moved */
+
+		/* if we requested it, send move events out */
+		if ((out == EVT_SELECT) && (menu->flags & MN_HANDLE_MOVE)
+			&& !no_act && menu_handle_action(menu, &out))
+			continue;
 
 		/* If we've selected an item, then send that event out */
 		//if (out.type == EVT_SELECT && !no_act && menu_handle_action(menu, &out))
@@ -942,6 +947,11 @@ ui_event menu_select_multi(int *active, menu_type **menus, int num, int notify, 
 		//}
 
 		/* XXX should redraw menu here if cursor has moved */
+
+		/* if we requested it, send move events out */
+		if ((out == EVT_SELECT) && (menus[*active]->flags & MN_HANDLE_MOVE)
+			&& !no_act && menu_handle_action(menus[*active], &out))
+			continue;
 
 		/* If we've selected an item, then send that event out */
 		//if (out.type == EVT_SELECT && !no_act && menu_handle_action(menu, &out))
