@@ -422,6 +422,7 @@ extern void desc_time(s32b t, char * desc);
 extern void do_cmd_time(void);
 
 /* cmd5.c */
+int get_spell_from_book(int *sn, cptr verb, cptr noun, int known, const object_type *o_ptr);
 extern void do_cmd_browse(void);
 extern void do_cmd_browse_aux(const object_type *o_ptr);
 extern void do_cmd_study(bool force, object_type *o_ptr);

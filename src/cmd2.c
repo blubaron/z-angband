@@ -3378,7 +3378,7 @@ void do_cmd_repeat_ranged(void)
     		p_ptr->cmd.dir = 5;
     		p_ptr->cmd.cmd = 'm';
         /* verify the object */
-        /* save the spell index so it will be picked in get_spell
+        /* save the spell index so it will be picked in get_spell_from_book
          * (after the object choice below) */
         repeat_push(last_ranged->index);
         /* save the object so that it will be picked in get_item */

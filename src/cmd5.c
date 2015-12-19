@@ -26,7 +26,7 @@
  * The "known" should be 0 for Study, 1 for Cast/Pray, 2 for Browse,
  * or 3 if no check is to be used.
  */
-static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
+int get_spell_from_book(int *sn, cptr verb, cptr noun, int known, const object_type *o_ptr)
 {
 	int i;
 	int spell;
@@ -38,7 +38,6 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 	const magic_type *s_ptr;
 	char out_val[160];
 	int realm = o_ptr->tval - TV_BOOKS_MIN;
-	cptr p = ((mp_ptr->spell_book == TV_LIFE_BOOK) ? "prayer" : "spell");
 	spell_external sp_e;
 
 	/* Get the spell */
@@ -112,7 +111,7 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 	window_stuff();
 
 	/* Build a prompt (accept all spells) */
-	(void)strnfmt(out_val, 78, "(%^ss, $UESC=exit$Y%c$V) %^s which %s? ", p, ESCAPE, prompt, p);
+	(void)strnfmt(out_val, 78, "(%^ss, $UESC=exit$Y%c$V) %^s which %s? ", noun, ESCAPE, verb,noun);
 
 	/* Get a spell from the user */
 	while (get_com(out_val, &choice))
@@ -141,7 +140,7 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 		if (!spell_okay(sp_e, known))
 		{
 			bell("Illegal spell choice!");
-			msgf("You may not %s that %s.", prompt, p);
+			msgf("You may not %s that %s.", verb, noun);
 			continue;
 		}
 
@@ -153,7 +152,7 @@ static int get_spell(int *sn, cptr prompt, int known, const object_type *o_ptr)
 		{
 			/* Belay that order */
 			if (!get_check("%^s %s (%d mana, %d%% fail)? ",
-						  prompt, spell_name(sp_e),
+						  verb, spell_name(sp_e),
 						  spell_mana(sp_e),
 						  spell_chance(sp_e))) continue;
 		}
@@ -2125,6 +2124,7 @@ void do_cmd_browse_aux(const object_type *o_ptr)
 	int num = 0;
 	bool home = FALSE;
 	int realm = o_ptr->tval - TV_BOOKS_MIN;
+	cptr p = ((mp_ptr->spell_book == TV_LIFE_BOOK) ? "prayer" : "spell");
 
 	byte spells[PY_MAX_SPELLS];
 
@@ -2167,7 +2167,7 @@ void do_cmd_browse_aux(const object_type *o_ptr)
 	/* Get spell.  If no valid choices, just display the list */
 	if (home)
 	{
-		while (get_spell(&spell, "learn about", 2, o_ptr))
+		while (get_spell_from_book(&spell, "learn about", p, 2, o_ptr))
 		{
 			do_cmd_browse_aux2(o_ptr, spell);
 		}
@@ -2307,7 +2307,7 @@ void do_cmd_study(bool force, object_type * o_ptr)
 	if (mp_ptr->spell_book != TV_LIFE_BOOK)
 	{
 		/* Ask for a spell, allow cancel */
-		if (!get_spell(&spell, "study", 0, o_ptr))
+		if (!get_spell_from_book(&spell, "study", p, 0, o_ptr))
 		{
 			if (spell == -2) msgf ("You can't learn any spells in that book.");
 			return;
@@ -4691,9 +4691,9 @@ void do_cmd_cast(void)
 	realm = o_ptr->tval - TV_BOOKS_MIN;
 
 	/* Ask for a spell */
-	if (!get_spell
-		(&spell, ((mp_ptr->spell_book == TV_LIFE_BOOK) ? "recite" : "cast"),
-		 1, o_ptr))
+	if (!get_spell_from_book(&spell,
+		((mp_ptr->spell_book == TV_LIFE_BOOK) ? "recite" : "cast"),
+		 prayer, 1, o_ptr))
 	{
 		if (spell == -2)
 			msgf("You don't know any %ss in that book.", prayer);
