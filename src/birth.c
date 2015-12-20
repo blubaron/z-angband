@@ -2324,7 +2324,7 @@ static bool player_birth_aux(void)
 		}
 
 		/* Accepted */
-		if ((ch == '\n') || (ch == ' ')) {
+		if ((ch == '\n') || (ch == '\r') || (ch == ' ')) {
 			break;
 		}
 	}
