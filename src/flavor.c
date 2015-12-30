@@ -1505,8 +1505,8 @@ void object_fmt(char *buf, uint max, cptr fmt, va_list *vp)
 void object_desc_store(char *buf, const object_type *o_ptr, int pref,
                        int mode, int size)
 {
-	byte hack_flavor;
-	bool hack_info;
+	u16b hack_flavor;
+	byte hack_info;
 	byte info;
 
 	/* Hack - we will reset the object to exactly like it was */
