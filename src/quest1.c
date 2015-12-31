@@ -480,6 +480,7 @@ static u16b insert_boss_quest(u16b r_idx, int x, int y, int p_num)
 
 	/* One level always */
 	d_ptr->min_level = d_ptr->max_level = r_ptr->level;
+	d_ptr->level_change_step = 1;
 
 	/* Always medium size */
 	d_ptr->flags &= ~(DF_BIG | DF_SMALL);
@@ -561,6 +562,7 @@ static u16b insert_clearout_quest(u16b d_idx, int level, int x, int y, int p_num
 	/* Set up level bounds */
 	d_ptr->min_level = level;
 	d_ptr->max_level = level + n - 1;
+	d_ptr->level_change_step = 1;
 
 	/* limit the size of the dungeon, because clearout
 	 * quests can be annoying */
@@ -653,6 +655,7 @@ static u16b insert_den_quest(u16b mg_idx, int level, int x, int y, int p_num)
 	/* Levels */
 	d_ptr->min_level = level;
 	d_ptr->max_level = level+n-1;
+	d_ptr->level_change_step = 1;
 
 	/* Apply flags from the group */
 	d_ptr->flags |= mg_ptr->d_flags;
@@ -780,6 +783,7 @@ static u16b insert_kill_quest(u16b r_idx, int x, int y, int p_num)
 
 	/* One level always */
 	d_ptr->min_level = d_ptr->max_level = r_ptr->level;
+	d_ptr->level_change_step = 1;
 
 	/* Apply flags */
 	d_ptr->flags |= q_ptr->data.fix.d_flags;
