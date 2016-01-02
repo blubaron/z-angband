@@ -425,27 +425,27 @@ R:0:0x8D:0xCF #
 
 ##### Yeek Classes #####
 ?:[EQU $RACE Yeek]
-R:0:0x95:0x85 #  
-### ?:[AND [EQU $CLASS Mage] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Priest] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Rogue] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Ranger] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Paladin] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Warrior-Mage] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Chaos-Warrior] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Monk] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS Mindcrafter] [EQU $RACE Yeek] ]
-### R:0:          # 
-### ?:[AND [EQU $CLASS High-Mage] [EQU $RACE Yeek] ]
-### R:0:          # 
+R:0:0x8F:0xBE #  
+?:[AND [EQU $CLASS Mage] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBF # 
+?:[AND [EQU $CLASS Priest] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBA # 
+?:[AND [EQU $CLASS Rogue] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBB # 
+?:[AND [EQU $CLASS Ranger] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBC # 
+?:[AND [EQU $CLASS Paladin] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBA # 
+?:[AND [EQU $CLASS Warrior-Mage] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBE # 
+?:[AND [EQU $CLASS Chaos-Warrior] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBD # 
+?:[AND [EQU $CLASS Monk] [EQU $RACE Yeek] ]
+R:0:0x8F:0xB9 # 
+?:[AND [EQU $CLASS Mindcrafter] [EQU $RACE Yeek] ]
+R:0:0x8F:0xB9 # 
+?:[AND [EQU $CLASS High-Mage] [EQU $RACE Yeek] ]
+R:0:0x8F:0xBF # 
 
 ##### Klackon Classes #####
 ?:[EQU $RACE Klackon]

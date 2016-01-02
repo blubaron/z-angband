@@ -579,7 +579,7 @@ R:256:0x92:0x80  # Flesh golem
 R:257:0x8F:0xE8  # Warg  
 R:258:0x82:0xAC  # Cheerful leprechaun  
 R:259:0x92:0xF6  # Giant flea ^
-R:260:0x93:0xE6  # Ufthak of Cirith Ungol ^
+R:260:0x93:0xED  # Ufthak of Cirith Ungol ^
 R:261:0x92:0x81  # Clay golem  
 R:262:0x8D:0x8F  # Black ogre  
 R:263:0x92:0xE7  # Dweller on the threshold ^
@@ -666,7 +666,7 @@ R:343:0x8E:0xA8  # Sasquatch
 R:344:0x92:0xF8  # Weir ^
 R:345:0x95:0xEF  # Whale  
 R:346:0x82:0xD1  # Electric eel  
-R:347:0x90:0xAD  # Werewolf  
+R:347:0x93:0xB3  # Werewolf  
 R:348:0x8D:0x87  # Dark elven lord  
 R:349:0x92:0x8E  # Cloud giant  
 R:350:0x95:0x8F  # Ugluk, the Uruk  
@@ -1192,8 +1192,8 @@ R:869:0x82:0xD5  # Boadile
 R:870:0x82:0xC3  # Ebony monk  
 R:871:0x92:0xE6  # Unstable worm mass ^
 R:872:0x93:0xE9  # Auto-mobile ^
-R:873:0x97:0xC8  # Shallow puddle   (same as shallow water)
-R:874:0x97:0xC9  # Deep puddle   (same as deep water)
+R:873:0x98:0x81  # Shallow puddle ^  (same as shallow water)
+R:874:0x98:0x82  # Deep puddle ^  (same as deep water)
 R:875:0x90:0xFB  # Noxious fume ^
 R:876:0x92:0xA8  # Pattern vortex   (purple, with aura)
 R:877:0x95:0xD0  # Storm troll ^
@@ -1205,7 +1205,7 @@ R:882:0x90:0xCF  # Anti-magic hound
 R:883:0x90:0xD0  # Mana hound  
 R:884:0x8E:0xF7  # Vore ^
 R:885:0x82:0xC6  # Giant silver ant  
-R:886:0x8E:0xF9  # Bakeneko ^
+R:886:0x93:0xB7  # Bakeneko ^
 R:887:0x90:0xF4  # Iridescent worm mass  
 R:888:0x8E:0xF8  # Giant time fly ^
 R:889:0x82:0xB0  # Sheep  
@@ -1238,8 +1238,8 @@ R:916:0x84:0x98  # Mystic
 R:917:0x95:0xB5  # The Balrog of Moria  
 R:918:0x95:0xB7  # Harowen the Black Hand  
 R:919:0x84:0xA3  # Grand master mystic  
-R:920:0x95:0xD3  # Huan, Wolfhound of the Valar  
-R:921:0x93:0xB1  # Beorn, the Shape-Changer ^
+R:920:0x8F:0xD5  # Huan, Wolfhound of the Valar  
+R:921:0x93:0xB4  # Beorn, the Shape-Changer ^
 R:922:0x8D:0xA2  # Barbazu  
 R:923:0x82:0xDC  # Bile Demon ^
 R:924:0x94:0xBF  # Osyluth ^
@@ -1253,7 +1253,7 @@ R:931:0x8C:0xCF  # Great swamp wyrm
 R:932:0x8C:0xD0  # Great wyrm of perplexity  
 R:933:0x8C:0xCF  # Great bile wyrm ^
 R:934:0x8C:0xCA  # Great wyrm of thunder  
-R:935:0x84:0x84  # Ranger  
+R:935:0x84:0xAD  # Ranger  
 R:936:0x84:0x85  # Paladin  
 R:937:0x90:0xF0  # Ranger chieftain ^
 R:938:0x8D:0xE0  # Polyphemus, the Blind Cyclops ^
@@ -1262,12 +1262,12 @@ R:940:0x8C:0xDC  # Kronos, Lord of the Titans
 R:941:0x82:0xB1  # Evil eye  
 R:942:0x82:0xB5  # Gauth  
 R:943:0x95:0xC7  # Beholder hive-mother  
-R:944:0x8E:0xEE  # Giant firefly ^
+R:944:0x8E:0xF9  # Giant firefly ^
 R:945:0x95:0xD6  # Eol, the Dark Elf  
 R:946:0x95:0xD7  # Maeglin, the Traitor of Gondolin  
 R:948:0x8C:0xCD  # Nighthawk  
 R:949:0x83:0xD9  # Kobold shaman  
-R:950:0x90:0xAD  # Werewolf chieftain ^
+R:950:0x93:0xB2  # Werewolf chieftain ^
 R:951:0x94:0xA1  # Bone golem ^
 R:952:0x92:0x80  # Bronze golem ^
 R:953:0x8D:0x92  # Ogre chieftain  
@@ -1282,8 +1282,8 @@ R:961:0x8F:0x98  # Greater fire elemental   (FA Fire elemental)
 R:962:0x82:0x9F  # Kobold archer  
 R:963:0x83:0xD3  # Kobold chieftain  
 R:964:0x84:0xA4  # Thief  
-R:965:0x93:0xA1  # Werebear  
-R:966:0x90:0xB4  # Weretiger   (FA Tiger)
+R:965:0x93:0xB1  # Werebear  
+R:966:0x93:0xBD  # Weretiger   (FA Tiger)
 R:967:0x93:0xAF  # Manbearpig ^
 ### R:968:          # Mirror image
 ### R:969:          # Clone
