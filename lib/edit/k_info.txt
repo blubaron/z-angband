@@ -7098,7 +7098,7 @@ I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
 F:EASY_KNOW | SKIP_FLAVOR
-L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  fire_ball(GF_ALCHEMY, dir, 1, 2)
 L:USE:  ident = TRUE
 D:This scroll turns objects in an area (radius 2) to gold.
 
@@ -7108,7 +7108,7 @@ I:66:32:20
 W:80:0:10:500
 A:75/20:79/5
 F:EASY_KNOW
-L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  fire_ball(GF_ALCHEMY, dir, 1, 2)
 L:USE:  ident = TRUE
 D:This rod turns objects in an area (radius 2) to gold.
 
@@ -7118,7 +7118,7 @@ I:55:29:20
 W:80:0:10:500
 A:75/20:79/5
 F:EASY_KNOW
-L:USE:  if not fire_ball(GF_ALCHEMY, dir, 1, 2) then result = FALSE end
+L:USE:  fire_ball(GF_ALCHEMY, dir, 1, 2)
 L:USE:  ident = TRUE
 D:This staff turns objects in an area (radius 2) to gold.
 
@@ -7128,7 +7128,7 @@ I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
 F:EASY_KNOW | SKIP_FLAVOR
-L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  mass_identify()
 L:USE:  identify_pack()
 L:USE:  ident = TRUE
 D:This scroll identifies all visible objects.
@@ -7139,7 +7139,7 @@ I:66:33:20
 W:80:0:10:50000
 A:75/20:90/5
 F:EASY_KNOW
-L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  mass_identify()
 L:USE:  identify_pack()
 L:USE:  ident = TRUE
 D:This rod identifies all visible objects.
@@ -7150,7 +7150,7 @@ I:55:33:20
 W:80:0:10:50000
 A:75/20:90/5
 F:EASY_KNOW
-L:USE:  if not mass_identify() then result = FALSE end
+L:USE:  mass_identify()
 L:USE:  identify_pack()
 L:USE:  ident = TRUE
 D:This staff identifies all visible objects.
@@ -7161,7 +7161,7 @@ I:70:13:0
 W:30:0:5:500
 A:30/1:60/1:90/1
 F:EASY_KNOW | SKIP_FLAVOR
-L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  mass_identify_fully()
 L:USE:  identify_pack_fully()
 L:USE:  ident = TRUE
 D:This scroll reveals all powers of all visible objects.
@@ -7172,7 +7172,7 @@ I:66:34:20
 W:80:0:10:100000
 A:75/20:90/5
 F:EASY_KNOW
-L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  mass_identify_fully()
 L:USE:  identify_pack_fully()
 L:USE:  ident = TRUE
 D:This rod reveals all powers of all visible objects.
@@ -7183,7 +7183,7 @@ I:55:34:20
 W:80:0:10:50000
 A:75/20:90/5
 F:EASY_KNOW
-L:USE:  if not mass_identify_fully() then result = FALSE end
+L:USE:  mass_identify_fully()
 L:USE:  identify_pack_fully()
 L:USE:  ident = TRUE
 D:This staff reveals all powers of all visible objects.
